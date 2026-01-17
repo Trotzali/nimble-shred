@@ -6,13 +6,15 @@
     <meta name="theme-color" content="#1e1e1e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Nimble Shred v23.2</title>
+    <title>Nimble Shred v24.0</title>
     <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiTmltYmxlIFNocmVkIiwiYmFja2dyb3VuZF9jb2xvciI6IiMxMjEyMTIiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiIzFlMWUxZSIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2ltZy5pY29uczguY29tL2ZsdWVuY3kvOTYvbnVsbC9kdW1iYmVsbC5wbmciLCJzaXplcyI6Ijk2eDk2IiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
     <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/96/null/dumbbell.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --bg: #121212; --card: #1e1e1e; --primary: #BB86FC; --sec: #03DAC6; --text: #fff; --gold: #FFD700; --danger: #CF6679; --success: #00C853; --warn: #FF9800; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 120px; -webkit-tap-highlight-color: transparent; }
+        
+        /* Layout & Nav */
         .container { max-width: 600px; margin: 0 auto; display: none; padding-bottom: 50px; } 
         .container.active { display: block; }
         h1, h2 { text-align: center; margin: 10px 0; }
@@ -20,6 +22,8 @@
         .nav-btn { background: none; color: #777; border: none; font-size: 0.75em; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
         .nav-btn.active { color: var(--sec); }
         .nav-icon { font-size: 1.5em; }
+        
+        /* Components */
         .card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); position: relative; }
         .btn { display: block; width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; transition: 0.1s; }
         .btn:active { transform: scale(0.98); }
@@ -30,22 +34,34 @@
         .row { display: flex; gap: 10px; align-items: center; }
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .unit-toggle { background: #333; padding: 5px 12px; border-radius: 20px; font-size: 0.8em; border: 1px solid #555; color: #aaa; cursor: pointer; }
+        
+        /* Workout Cards */
         .exercise-card { border-left: 4px solid var(--primary); margin-bottom: 15px; }
         .exercise-card.Mobility { border-left-color: var(--sec); }
         .exercise-card.Strength { border-left-color: var(--danger); }
         .exercise-header { display: flex; justify-content: space-between; align-items: flex-start; }
         .suggestion-text { color: var(--success); font-size: 0.85em; margin: 5px 0; font-style: italic; display: flex; align-items: center; gap: 5px; }
+        
+        /* Interactive Elements */
         .smart-inc { background: #333; color: #fff; border: 1px solid #555; padding: 8px 12px; border-radius: 4px; font-size: 0.8em; margin-left: 5px; cursor: pointer; }
+        .mic-btn { background: #333; border: 1px solid #555; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2em; cursor: pointer; }
+        .mic-btn.listening { background: var(--danger); animation: pulse 1s infinite; border: none; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(207, 102, 121, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(207, 102, 121, 0); } 100% { box-shadow: 0 0 0 0 rgba(207, 102, 121, 0); } }
+        
+        /* Full Screen Modals/Overlays */
+        .fs-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 5000; padding: 20px; overflow-y: auto; box-sizing: border-box; display: none; }
+        .fs-overlay.flex-center { display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.95); }
+        
+        /* The Fix: Hidden must override inline styles */
+        .hidden { display: none !important; }
+        
+        /* Misc */
         .macro-bar-container { background: #333; height: 8px; border-radius: 4px; margin-top: 5px; overflow: hidden; }
         .macro-fill { height: 100%; transition: width 0.5s; }
         .macro-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; text-align: center; font-size: 0.8em; }
         .badge-grid { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
         .badge { min-width: 60px; height: 60px; background: #252525; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5em; opacity: 0.3; border: 2px solid #444; }
         .badge.unlocked { opacity: 1; border-color: var(--gold); box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
-        .mic-btn { background: #333; border: 1px solid #555; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2em; cursor: pointer; }
-        .mic-btn.listening { background: var(--danger); animation: pulse 1s infinite; border: none; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(207, 102, 121, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(207, 102, 121, 0); } 100% { box-shadow: 0 0 0 0 rgba(207, 102, 121, 0); } }
-        .hidden { display: none; }
         #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
         .template-tag { background: #333; padding: 8px 12px; border-radius: 8px; font-size: 0.9em; border: 1px solid #555; cursor: pointer; white-space: nowrap; }
         .template-scroll { display: flex; gap: 10px; overflow-x: auto; margin: 10px 0; padding-bottom: 5px; }
@@ -54,6 +70,15 @@
         .gif-input { width: 100%; padding: 5px; background: #111; border: 1px solid #444; color: #fff; border-radius: 4px; margin-top: 5px; margin-bottom: 5px; font-size: 0.8em; }
         .btn-sm { padding: 5px 10px; font-size: 0.8em; width: auto; display: inline-block; margin-top: 5px; }
         .btn-guide { background: #333; color: #aaa; border: 1px solid #444; padding: 5px 10px; border-radius: 5px; font-size: 0.8em; cursor: pointer; }
+        
+        /* Modal for Plate Calc */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 6000; }
+        .modal-content { background: var(--card); padding: 20px; border-radius: 10px; width: 95%; max-width: 500px; text-align: center; position: relative; }
+        .close-modal { position: absolute; top: 10px; right: 15px; color: #fff; font-size: 24px; cursor: pointer; }
+        .plate-vis { display: flex; justify-content: center; align-items: center; gap: 2px; margin: 15px 0; overflow-x: auto; }
+        .plate { height: 40px; background: #444; border: 1px solid #777; color: #fff; font-size: 0.7em; display: flex; align-items: center; justify-content: center; width: 10px; }
+        .plate-45 { width: 15px; background: #2196F3; height: 50px; } .plate-25 { width: 12px; background: #4CAF50; height: 40px; } .plate-10 { width: 10px; background: #fff; color: #000; height: 30px; }
+        .bar { height: 10px; width: 60px; background: #777; }
     </style>
 </head>
 <body>
@@ -76,7 +101,7 @@
         <div style="text-align:center; margin-top:15px;"><div style="font-size:2.5em; font-weight:bold; color:var(--sec);" id="score-display">--</div><div style="color:#aaa; font-style:italic;" id="score-text">Move sliders to calculate</div></div>
     </div>
     <div style="text-align:center; margin-top:30px; opacity:0.5;">
-        <small style="color:#777;">Version 23.2 - Nav Fix</small><br>
+        <small style="color:#777;">Version 24.0</small><br>
         <button class="btn-danger" style="width:auto; display:inline-block; font-size:0.8em; margin-top:5px;" onclick="factoryReset()">⚠️ Reset App</button>
     </div>
 </div>
@@ -169,7 +194,7 @@
     <button class="nav-btn" onclick="switchTab('progress')" id="nav-progress"><span class="nav-icon">📈</span>Stats</button>
 </div>
 
-<div id="builder-overlay" class="hidden" style="position:fixed; top:0; bottom:0; left:0; right:0; background:var(--bg); z-index:1000; overflow-y:auto; padding:20px;">
+<div id="builder-overlay" class="fs-overlay hidden">
     <div class="top-bar"><h2>Exercise Builder</h2><button class="btn-danger" style="width:auto;" onclick="closeBuilder()">Close</button></div>
     <div class="card">
         <input type="text" id="builder-search-inp" placeholder="Search..." onkeyup="filterBuilder()">
@@ -177,28 +202,36 @@
     </div>
 </div>
 
-<div id="gif-modal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+<div id="gif-modal" class="fs-overlay flex-center hidden">
     <h3 id="gif-modal-title" style="color:#fff;">Technique</h3>
     <img id="gif-player" src="" style="max-width:90%; border-radius:10px;">
     <button class="btn-danger" style="width:auto; margin-top:20px;" onclick="closeGifModal()">Close</button>
 </div>
 
-<div id="timer-overlay" class="hidden" style="position:fixed; bottom:0; left:0; right:0; background:rgba(0,0,0,0.95); height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:2000;">
+<div id="timer-overlay" class="fs-overlay flex-center hidden">
     <div id="timer-display" style="font-size:4em; font-weight:bold; color:var(--primary);">00:00</div>
     <div style="margin-top:20px;"><button class="btn-danger" onclick="closeTimer()">Stop</button><button class="btn-action" onclick="addTime(10)">+10s</button></div>
 </div>
 
-<script>
-    window.onerror = function(msg, url, line) { alert("App Error: " + msg + "\nTry the Reset Button at the bottom of the Daily tab."); };
+<div id="plate-modal" class="modal" onclick="closeModal('plate-modal')">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="close-modal" onclick="closeModal('plate-modal')">&times;</span>
+        <h3>Plate Calculator</h3>
+        <input type="number" id="plate-weight-input" class="garmin-input" placeholder="Weight" oninput="calcPlates()">
+        <div id="plate-visuals" class="plate-vis"></div>
+        <div id="plate-text" style="color:#aaa; margin-top:10px;"></div>
+    </div>
+</div>
 
-    // --- GLOBAL ---
+<script>
+    // GLOBAL CONFIG
     const GOOGLE_SCRIPT_URL = "https://script.google.com/a/macros/tjkcivil.com.au/s/AKfycbwG0PbAwqkX3EbWki7vjewgP-FIwCt11_ybFsFJrYmmgq6_QpfKrbPfRxeSEJGu7Ovg/exec"; 
     let state = { unit: 'lbs', history: [], food: [], wellness: [], readiness: [], routine: [] };
     let apiKey = "";
     let activeRoutine = [];
     let gifOverrides = {};
 
-    // --- COMPLETE DATA (150 Items) ---
+    // DATA
     const allExercises = [
       {"name": "Low Cable Chest Fly", "categories": ["Chest", "Shoulders"], "type": "Muscle Build", "desc": "Set pulleys low. Scoop hands up."},
       {"name": "High Cable Chest Fly", "categories": ["Chest"], "type": "Muscle Build", "desc": "Set pulleys high. Press hands down."},
@@ -326,7 +359,7 @@
       {"name": "Plank Jacks", "categories": ["Core", "Cardio"], "type": "Calisthenics", "desc": "Jacks."},
       {"name": "Mountain Climbers (Twisting)", "categories": ["Core"], "type": "Calisthenics", "desc": "Twist.", "isTimed": true, "duration": 45},
       {"name": "Bicycle Crunches", "categories": ["Core", "Abs"], "type": "Calisthenics", "desc": "Cycle."},
-      {"name": "Leg Raises (Lying)", "categories": ["Core", "Abs"], "type": "Calisthenics", "desc": "Lying."},
+      {"name": "Leg Raises (Lying)", "categories": ["Core"], "type": "Calisthenics", "desc": "Lying."},
       {"name": "Flutter Kicks", "categories": ["Core"], "type": "Calisthenics", "desc": "Kicks.", "isTimed": true, "duration": 45},
       {"name": "Russian Twists", "categories": ["Core", "Obliques"], "type": "Calisthenics", "desc": "Twist."},
       {"name": "V-Ups", "categories": ["Core"], "type": "Calisthenics", "desc": "V up."},
@@ -361,6 +394,8 @@
             updateStreak();
             renderBadges();
             updateMacrosUI();
+            
+            // Set defaults
             state.unit = localStorage.getItem('nimbleUnit') || 'lbs';
             document.getElementById('unit-disp-1').innerText = state.unit.toUpperCase();
             document.getElementById('unit-disp-2').innerText = state.unit.toUpperCase();
@@ -368,11 +403,11 @@
             apiKey = localStorage.getItem('usdaKey') || "";
             gifOverrides = JSON.parse(localStorage.getItem('nimbleGifOverrides')) || {};
             
-            // Force safe start
-            switchTab('readiness');
+            // NAVIGATION FIX
+            switchTab('readiness'); 
         } catch (e) {
             console.error(e);
-            alert("Safe Mode Started: Previous data was corrupt and has been reset for stability.");
+            alert("Recovering from crash...");
             factoryReset();
         }
     };
@@ -396,11 +431,23 @@
         }
     }
 
+    // --- NAVIGATION ---
     function switchTab(id) {
-        document.querySelectorAll('.container').forEach(d => d.classList.remove('active')); // CSS hide
-        document.getElementById('view-' + id).classList.add('active'); // CSS show
+        // Hide all views
+        document.querySelectorAll('.container').forEach(d => {
+            d.classList.remove('active');
+            d.style.display = "none"; // JS Force
+        });
+        
+        // Show target view
+        const target = document.getElementById('view-' + id);
+        target.classList.add('active');
+        target.style.display = "block"; // JS Force
+        
+        // Update Buttons
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('nav-' + id).classList.add('active');
+        
         if(id==='progress') renderChart();
     }
 
@@ -523,8 +570,10 @@
         const pool = allExercises.filter(filterFn);
         activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
         renderWorkout(activeRoutine);
-        document.getElementById('setup-panel').classList.add('hidden');
+        document.getElementById('setup-panel').classList.add('hidden'); // Ensure CSS class works
+        document.getElementById('setup-panel').style.display = 'none'; // Force JS hide
         document.getElementById('active-workout').classList.remove('hidden');
+        document.getElementById('active-workout').style.display = 'block';
     }
 
     function renderWorkout(exercises) {
@@ -600,7 +649,9 @@
     function finishSession() {
         if(confirm("Finish & Save?")) {
             document.getElementById('active-workout').classList.add('hidden');
+            document.getElementById('active-workout').style.display='none';
             document.getElementById('setup-panel').classList.remove('hidden');
+            document.getElementById('setup-panel').style.display='block';
             alert("Workout Saved!");
         }
     }
@@ -608,7 +659,9 @@
     function cancelWorkout() {
         if(confirm("Discard Session?")) {
             document.getElementById('active-workout').classList.add('hidden');
+            document.getElementById('active-workout').style.display='none';
             document.getElementById('setup-panel').classList.remove('hidden');
+            document.getElementById('setup-panel').style.display='block';
         }
     }
 
@@ -648,6 +701,11 @@
         fetch(GOOGLE_SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: type, data: data }) }).catch(e=>console.log(e));
     }
     
+    // --- MODAL UTILS ---
+    function closeModal(id) {
+        document.getElementById(id).style.display = "none";
+    }
+    
     // --- GIFS ---
     function saveGifOverride(name, inputId) {
         const url = document.getElementById(inputId).value;
@@ -663,13 +721,18 @@
             document.getElementById('gif-player').src = url;
             document.getElementById('gif-modal-title').innerText = name;
             document.getElementById('gif-modal').classList.remove('hidden');
+            document.getElementById('gif-modal').style.display = 'flex'; // Force flex
         }
     }
-    function closeGifModal() { document.getElementById('gif-modal').classList.add('hidden'); }
+    function closeGifModal() { 
+        document.getElementById('gif-modal').classList.add('hidden'); 
+        document.getElementById('gif-modal').style.display = 'none'; 
+    }
 
     // --- BUILDER ---
     function openBuilder(add) {
         document.getElementById('builder-overlay').classList.remove('hidden');
+        document.getElementById('builder-overlay').style.display = 'block';
         const list = document.getElementById('builder-list-content');
         list.innerHTML = "";
         allExercises.forEach(ex => {
@@ -684,22 +747,38 @@
             list.appendChild(d);
         });
     }
-    function closeBuilder() { document.getElementById('builder-overlay').classList.add('hidden'); }
+    function closeBuilder() { 
+        document.getElementById('builder-overlay').classList.add('hidden'); 
+        document.getElementById('builder-overlay').style.display = 'none'; 
+    }
     function filterBuilder() {
         const q = document.getElementById('builder-search-inp').value.toLowerCase();
         const items = document.getElementById('builder-list-content').children;
         Array.from(items).forEach(i => i.style.display = i.innerHTML.toLowerCase().includes(q) ? 'block' : 'none');
     }
+    
+    // --- PLATE CALC ---
+    function calcPlates() {
+        const weight = parseFloat(document.getElementById('plate-weight-input').value);
+        if(!weight) return;
+        openPlateModal(); // ensure modal is open
+    }
+    function openPlateModal() { document.getElementById('plate-modal').style.display = 'flex'; }
 
     // --- TIMER ---
     let tInt;
     function startTimer(s) {
         document.getElementById('timer-overlay').classList.remove('hidden');
+        document.getElementById('timer-overlay').style.display = 'flex';
         document.getElementById('timer-display').innerText = s;
         let t = s; clearInterval(tInt);
         tInt = setInterval(()=>{ t--; document.getElementById('timer-display').innerText = t; if(t<=0) closeTimer(); }, 1000);
     }
-    function closeTimer() { document.getElementById('timer-overlay').classList.add('hidden'); clearInterval(tInt); }
+    function closeTimer() { 
+        document.getElementById('timer-overlay').classList.add('hidden'); 
+        document.getElementById('timer-overlay').style.display = 'none';
+        clearInterval(tInt); 
+    }
     function addTime(s) { startTimer(parseInt(document.getElementById('timer-display').innerText)+s); }
 
     // --- CHART ---
