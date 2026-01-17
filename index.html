@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#1e1e1e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Nimble Shred v23.0 (Complete)</title>
+    <title>Nimble Shred v22.1</title>
     <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiTmltYmxlIFNocmVkIiwiYmFja2dyb3VuZF9jb2xvciI6IiMxMjEyMTIiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiIzFlMWUxZSIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2ltZy5pY29uczguY29tL2ZsdWVuY3kvOTYvbnVsbC9kdW1iYmVsbC5wbmciLCJzaXplcyI6Ijk2eDk2IiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
     <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/96/null/dumbbell.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -74,6 +74,10 @@
         <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
         <div class="row"><input type="number" id="garmin-score" placeholder="Garmin Body Battery (Optional)" oninput="calcReadiness()"></div>
         <div style="text-align:center; margin-top:15px;"><div style="font-size:2.5em; font-weight:bold; color:var(--sec);" id="score-display">--</div><div style="color:#aaa; font-style:italic;" id="score-text">Move sliders to calculate</div></div>
+    </div>
+    <div style="text-align:center; margin-top:30px; opacity:0.5;">
+        <small style="color:#777;">Version 22.1 - Crash Proof</small><br>
+        <button class="btn-danger" style="width:auto; display:inline-block; font-size:0.8em; margin-top:5px;" onclick="factoryReset()">⚠️ Reset App (Fix Crash)</button>
     </div>
 </div>
 
@@ -185,12 +189,14 @@
 </div>
 
 <script>
+    window.onerror = function(msg, url, line) { alert("App Error: " + msg + "\nTry the Reset Button at the bottom of the Daily tab."); };
+
     // --- GLOBAL ---
     const GOOGLE_SCRIPT_URL = "https://script.google.com/a/macros/tjkcivil.com.au/s/AKfycbwG0PbAwqkX3EbWki7vjewgP-FIwCt11_ybFsFJrYmmgq6_QpfKrbPfRxeSEJGu7Ovg/exec"; 
     let state = { unit: 'lbs', history: [], food: [], wellness: [], readiness: [], routine: [] };
-    let apiKey = localStorage.getItem('usdaKey') || "";
+    let apiKey = "";
     let activeRoutine = [];
-    let gifOverrides = JSON.parse(localStorage.getItem('nimbleGifOverrides')) || {};
+    let gifOverrides = {};
 
     // --- COMPLETE DATA (150 Items) ---
     const allExercises = [
@@ -285,7 +291,7 @@
       {"name": "Concentration Curls", "categories": ["Biceps"], "type": "Muscle Build", "desc": "Elbow thigh."},
       {"name": "Reverse DB Flys", "categories": ["Shoulders", "Back"], "type": "Muscle Build", "desc": "Bent fly."},
       {"name": "Standing Calf Raises", "categories": ["Calves"], "type": "Muscle Build", "desc": "Calf raise."},
-      {"name": "Tibialis Raise", "categories": ["Legs", "Mobility"], "type": "Mobility", "desc": "Toe raise."},
+      {"name": "Tibialis Raise", "categories": ["Legs", "Mobility"], "type": "Mobility", "desc": "Lift toes to shins."},
       {"name": "Couch Stretch", "categories": ["Hips", "Mobility"], "type": "Mobility", "desc": "Hip flexor.", "isTimed": true, "duration": 60},
       {"name": "Pigeon Pose", "categories": ["Hips", "Mobility"], "type": "Mobility", "desc": "Glute stretch.", "isTimed": true, "duration": 60},
       {"name": "Child's Pose", "categories": ["Back", "Mobility"], "type": "Mobility", "desc": "Rest pose.", "isTimed": true, "duration": 60},
@@ -310,16 +316,16 @@
       {"name": "Fire Hydrants", "categories": ["Glutes"], "type": "Calisthenics", "desc": "Side lift."},
       {"name": "Push-ups (Wide)", "categories": ["Chest"], "type": "Calisthenics", "desc": "Wide."},
       {"name": "Push-ups (Diamond)", "categories": ["Triceps"], "type": "Calisthenics", "desc": "Close."},
-      {"name": "Push-ups (Decline)", "categories": ["Chest"], "type": "Calisthenics", "desc": "Feet up."},
+      {"name": "Push-ups (Decline)", "categories": ["Chest", "Shoulders"], "type": "Calisthenics", "desc": "Feet up."},
       {"name": "Push-ups (Incline)", "categories": ["Chest"], "type": "Calisthenics", "desc": "Hands up."},
       {"name": "Tricep Dips", "categories": ["Triceps"], "type": "Calisthenics", "desc": "Dips."},
       {"name": "Plank (Forearm)", "categories": ["Core"], "type": "Calisthenics", "desc": "Low.", "isTimed": true, "duration": 60},
       {"name": "Plank (High)", "categories": ["Core"], "type": "Calisthenics", "desc": "High.", "isTimed": true, "duration": 60},
-      {"name": "Side Plank (Left)", "categories": ["Core"], "type": "Calisthenics", "desc": "Left.", "isTimed": true, "duration": 45},
-      {"name": "Side Plank (Right)", "categories": ["Core"], "type": "Calisthenics", "desc": "Right.", "isTimed": true, "duration": 45},
+      {"name": "Side Plank (Left)", "categories": ["Core", "Obliques"], "type": "Calisthenics", "desc": "Left.", "isTimed": true, "duration": 45},
+      {"name": "Side Plank (Right)", "categories": ["Core", "Obliques"], "type": "Calisthenics", "desc": "Right.", "isTimed": true, "duration": 45},
       {"name": "Plank Jacks", "categories": ["Core", "Cardio"], "type": "Calisthenics", "desc": "Jacks."},
       {"name": "Mountain Climbers (Twisting)", "categories": ["Core"], "type": "Calisthenics", "desc": "Twist.", "isTimed": true, "duration": 45},
-      {"name": "Bicycle Crunches", "categories": ["Core"], "type": "Calisthenics", "desc": "Cycle."},
+      {"name": "Bicycle Crunches", "categories": ["Core", "Abs"], "type": "Calisthenics", "desc": "Cycle."},
       {"name": "Leg Raises (Lying)", "categories": ["Core"], "type": "Calisthenics", "desc": "Lying."},
       {"name": "Flutter Kicks", "categories": ["Core"], "type": "Calisthenics", "desc": "Kicks.", "isTimed": true, "duration": 45},
       {"name": "Russian Twists", "categories": ["Core"], "type": "Calisthenics", "desc": "Twist."},
@@ -331,7 +337,7 @@
       {"name": "Scapular Push-ups", "categories": ["Back"], "type": "Calisthenics", "desc": "Scap."},
       {"name": "Burpees (No Push-up)", "categories": ["Cardio"], "type": "Calisthenics", "desc": "No push."},
       {"name": "Jumping Jacks", "categories": ["Cardio"], "type": "Calisthenics", "desc": "Jacks.", "isTimed": true, "duration": 60},
-      {"name": "High Knees", "categories": ["Cardio"], "type": "Calisthenics", "desc": "Run.", "isTimed": true, "duration": 45},
+      {"name": "High Knees", "categories": ["Cardio", "Legs"], "type": "Calisthenics", "desc": "Run.", "isTimed": true, "duration": 45},
       {"name": "Bear Crawl (Reverse)", "categories": ["Full Body"], "type": "Calisthenics", "desc": "Reverse.", "isTimed": true, "duration": 45},
       {"name": "Crab Walk", "categories": ["Full Body"], "type": "Calisthenics", "desc": "Crab.", "isTimed": true, "duration": 45},
       {"name": "Hindu Push-ups", "categories": ["Shoulders"], "type": "Calisthenics", "desc": "Swoop."},
@@ -350,27 +356,49 @@
 
     // --- INIT ---
     window.onload = () => {
-        loadLocal();
-        updateStreak();
-        renderBadges();
-        updateMacrosUI();
-        state.unit = localStorage.getItem('nimbleUnit') || 'lbs';
-        document.getElementById('unit-disp-1').innerText = state.unit.toUpperCase();
-        document.getElementById('unit-disp-2').innerText = state.unit.toUpperCase();
-        switchTab('readiness');
+        try {
+            loadLocal();
+            updateStreak();
+            renderBadges();
+            updateMacrosUI();
+            state.unit = localStorage.getItem('nimbleUnit') || 'lbs';
+            document.getElementById('unit-disp-1').innerText = state.unit.toUpperCase();
+            document.getElementById('unit-disp-2').innerText = state.unit.toUpperCase();
+            
+            apiKey = localStorage.getItem('usdaKey') || "";
+            gifOverrides = JSON.parse(localStorage.getItem('nimbleGifOverrides')) || {};
+            
+            // Force safe start
+            switchTab('readiness');
+        } catch (e) {
+            console.error(e);
+            alert("Safe Mode Started: Previous data was corrupt and has been reset for stability.");
+            factoryReset();
+        }
     };
 
     function loadLocal() {
-        state.history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-        state.food = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
-        state.wellness = JSON.parse(localStorage.getItem('nimbleWellness')) || [];
+        state.history = safeParse('nimbleHistory') || [];
+        state.food = safeParse('nimbleNutrition') || [];
+        state.wellness = safeParse('nimbleWellness') || [];
+        state.readiness = safeParse('nimbleReadiness') || [];
+    }
+    
+    function safeParse(key) {
+        try { return JSON.parse(localStorage.getItem(key)); } 
+        catch (e) { return null; }
+    }
+
+    function factoryReset() {
+        if(confirm("This will fix crashes but wipe your saved data. Continue?")) {
+            localStorage.clear();
+            location.reload();
+        }
     }
 
     function switchTab(id) {
-        document.querySelectorAll('.container').forEach(d => d.classList.remove('active')); // Clear active class
-        document.querySelectorAll('.container').forEach(d => d.classList.add('hidden')); // Add hidden
-        document.getElementById('view-' + id).classList.remove('hidden'); // Show target
-        document.getElementById('view-' + id).classList.add('active'); // Activate target
+        document.querySelectorAll('.container').forEach(d => d.classList.remove('active')); // CSS hide
+        document.getElementById('view-' + id).classList.add('active'); // CSS show
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('nav-' + id).classList.add('active');
         if(id==='progress') renderChart();
