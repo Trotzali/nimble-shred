@@ -6,15 +6,13 @@
     <meta name="theme-color" content="#1e1e1e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Nimble Shred v24.0</title>
+    <title>Nimble Shred v25.0</title>
     <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiTmltYmxlIFNocmVkIiwiYmFja2dyb3VuZF9jb2xvciI6IiMxMjEyMTIiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiIzFlMWUxZSIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2ltZy5pY29uczguY29tL2ZsdWVuY3kvOTYvbnVsbC9kdW1iYmVsbC5wbmciLCJzaXplcyI6Ijk2eDk2IiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
     <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/96/null/dumbbell.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --bg: #121212; --card: #1e1e1e; --primary: #BB86FC; --sec: #03DAC6; --text: #fff; --gold: #FFD700; --danger: #CF6679; --success: #00C853; --warn: #FF9800; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 120px; -webkit-tap-highlight-color: transparent; }
-        
-        /* Layout & Nav */
         .container { max-width: 600px; margin: 0 auto; display: none; padding-bottom: 50px; } 
         .container.active { display: block; }
         h1, h2 { text-align: center; margin: 10px 0; }
@@ -22,8 +20,6 @@
         .nav-btn { background: none; color: #777; border: none; font-size: 0.75em; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
         .nav-btn.active { color: var(--sec); }
         .nav-icon { font-size: 1.5em; }
-        
-        /* Components */
         .card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); position: relative; }
         .btn { display: block; width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; transition: 0.1s; }
         .btn:active { transform: scale(0.98); }
@@ -34,35 +30,31 @@
         .row { display: flex; gap: 10px; align-items: center; }
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .unit-toggle { background: #333; padding: 5px 12px; border-radius: 20px; font-size: 0.8em; border: 1px solid #555; color: #aaa; cursor: pointer; }
-        
-        /* Workout Cards */
         .exercise-card { border-left: 4px solid var(--primary); margin-bottom: 15px; }
         .exercise-card.Mobility { border-left-color: var(--sec); }
         .exercise-card.Strength { border-left-color: var(--danger); }
         .exercise-header { display: flex; justify-content: space-between; align-items: flex-start; }
         .suggestion-text { color: var(--success); font-size: 0.85em; margin: 5px 0; font-style: italic; display: flex; align-items: center; gap: 5px; }
-        
-        /* Interactive Elements */
+        .pr-highlight { animation: prGlow 2s ease-in-out; }
+        @keyframes prGlow { 0%, 100% { background: var(--card); } 50% { background: rgba(0, 200, 83, 0.2); } }
         .smart-inc { background: #333; color: #fff; border: 1px solid #555; padding: 8px 12px; border-radius: 4px; font-size: 0.8em; margin-left: 5px; cursor: pointer; }
         .mic-btn { background: #333; border: 1px solid #555; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2em; cursor: pointer; }
         .mic-btn.listening { background: var(--danger); animation: pulse 1s infinite; border: none; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(207, 102, 121, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(207, 102, 121, 0); } 100% { box-shadow: 0 0 0 0 rgba(207, 102, 121, 0); } }
-        
-        /* Full Screen Modals/Overlays */
         .fs-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 5000; padding: 20px; overflow-y: auto; box-sizing: border-box; display: none; }
         .fs-overlay.flex-center { display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.95); }
-        
-        /* The Fix: Hidden must override inline styles */
         .hidden { display: none !important; }
-        
-        /* Misc */
-        .macro-bar-container { background: #333; height: 8px; border-radius: 4px; margin-top: 5px; overflow: hidden; }
+        .macro-bar-container { background: #333; height: 12px; border-radius: 6px; margin-top: 5px; overflow: hidden; position: relative; }
         .macro-fill { height: 100%; transition: width 0.5s; }
-        .macro-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; text-align: center; font-size: 0.8em; }
+        .macro-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; text-align: center; font-size: 0.85em; }
+        .macro-item { position: relative; }
+        .macro-percent { font-size: 0.7em; color: #aaa; margin-top: 2px; }
+        .water-tracker { display: flex; justify-content: center; align-items: center; gap: 20px; margin: 15px 0; }
+        .water-btn { background: var(--primary); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5em; cursor: pointer; border: none; color: #000; }
+        .water-display { font-size: 2em; font-weight: bold; color: var(--sec); }
         .badge-grid { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
         .badge { min-width: 60px; height: 60px; background: #252525; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5em; opacity: 0.3; border: 2px solid #444; }
         .badge.unlocked { opacity: 1; border-color: var(--gold); box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
-        #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
         .template-tag { background: #333; padding: 8px 12px; border-radius: 8px; font-size: 0.9em; border: 1px solid #555; cursor: pointer; white-space: nowrap; }
         .template-scroll { display: flex; gap: 10px; overflow-x: auto; margin: 10px 0; padding-bottom: 5px; }
         .instruction-box { background: #252525; padding: 10px; border-radius: 5px; margin-top: 10px; margin-bottom: 10px; font-size: 0.9em; color: #ddd; border-left: 2px solid #777; display: none; line-height: 1.4; }
@@ -70,20 +62,19 @@
         .gif-input { width: 100%; padding: 5px; background: #111; border: 1px solid #444; color: #fff; border-radius: 4px; margin-top: 5px; margin-bottom: 5px; font-size: 0.8em; }
         .btn-sm { padding: 5px 10px; font-size: 0.8em; width: auto; display: inline-block; margin-top: 5px; }
         .btn-guide { background: #333; color: #aaa; border: 1px solid #444; padding: 5px 10px; border-radius: 5px; font-size: 0.8em; cursor: pointer; }
-        
-        /* Modal for Plate Calc */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 6000; }
         .modal-content { background: var(--card); padding: 20px; border-radius: 10px; width: 95%; max-width: 500px; text-align: center; position: relative; }
         .close-modal { position: absolute; top: 10px; right: 15px; color: #fff; font-size: 24px; cursor: pointer; }
-        .plate-vis { display: flex; justify-content: center; align-items: center; gap: 2px; margin: 15px 0; overflow-x: auto; }
-        .plate { height: 40px; background: #444; border: 1px solid #777; color: #fff; font-size: 0.7em; display: flex; align-items: center; justify-content: center; width: 10px; }
-        .plate-45 { width: 15px; background: #2196F3; height: 50px; } .plate-25 { width: 12px; background: #4CAF50; height: 40px; } .plate-10 { width: 10px; background: #fff; color: #000; height: 30px; }
-        .bar { height: 10px; width: 60px; background: #777; }
+        .goal-setter { display: flex; gap: 10px; margin: 10px 0; flex-wrap: wrap; }
+        .goal-input { flex: 1; min-width: 60px; }
+        .timer-badge { position: fixed; bottom: 80px; right: 20px; background: var(--danger); color: #fff; padding: 15px; border-radius: 50%; width: 60px; height: 60px; display: none; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2em; box-shadow: 0 4px 8px rgba(0,0,0,0.5); z-index: 4000; cursor: pointer; }
+        .timer-badge.active { display: flex; animation: timerPulse 1s infinite; }
+        @keyframes timerPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
     </style>
 </head>
 <body>
 
-<canvas id="confetti-canvas"></canvas>
+<div id="timer-badge" class="timer-badge" onclick="openTimerOverlay()"></div>
 
 <div class="container active" id="view-readiness">
     <div class="top-bar"><h2>Daily Check-In</h2><button class="unit-toggle" onclick="toggleUnit()"><span id="unit-disp-1">LBS</span></button></div>
@@ -101,7 +92,7 @@
         <div style="text-align:center; margin-top:15px;"><div style="font-size:2.5em; font-weight:bold; color:var(--sec);" id="score-display">--</div><div style="color:#aaa; font-style:italic;" id="score-text">Move sliders to calculate</div></div>
     </div>
     <div style="text-align:center; margin-top:30px; opacity:0.5;">
-        <small style="color:#777;">Version 24.0</small><br>
+        <small style="color:#777;">Version 25.0 - Phase 1</small><br>
         <button class="btn-danger" style="width:auto; display:inline-block; font-size:0.8em; margin-top:5px;" onclick="factoryReset()">⚠️ Reset App</button>
     </div>
 </div>
@@ -130,9 +121,6 @@
                 <option value="legs">Legs</option>
                 <option value="core">Core & Mobility</option>
             </select>
-            <div class="row" style="margin-top:10px;"><label>Strength</label><input type="range" id="vol-str" min="0" max="6" value="3"></div>
-            <div class="row"><label>Shred</label><input type="range" id="vol-shred" min="0" max="6" value="3"></div>
-            <div class="row"><label>Mobility</label><input type="range" id="vol-mob" min="0" max="6" value="3"></div>
             <button class="btn btn-main" onclick="generateWorkout()">🎲 Generate Workout</button>
             <button class="btn btn-action" onclick="openBuilder()">🛠️ Build Custom</button>
         </div>
@@ -152,13 +140,62 @@
         <button class="btn btn-action" onclick="saveApiKey()">Save Key</button>
         <p style="font-size:0.8em; color:#aaa; margin-top:5px;">Get key at: fdc.nal.usda.gov</p>
     </div>
+    
     <div class="card">
-        <div class="macro-grid">
-            <div>🔥 <span id="disp-cals">0</span><div class="macro-bar-container"><div id="bar-cals" class="macro-fill" style="width:0%; background:var(--sec);"></div></div></div>
-            <div>🥩 <span id="disp-pro">0</span>g<div class="macro-bar-container"><div id="bar-pro" class="macro-fill" style="width:0%; background:var(--primary);"></div></div></div>
-            <div>🍚 <span id="disp-carb">0</span>g<div class="macro-bar-container"><div id="bar-carb" class="macro-fill" style="width:0%; background:var(--warn);"></div></div></div>
-            <div>🥑 <span id="disp-fat">0</span>g<div class="macro-bar-container"><div id="bar-fat" class="macro-fill" style="width:0%; background:var(--danger);"></div></div></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h3 style="margin: 0;">Daily Goals</h3>
+            <button class="btn-guide" onclick="toggleGoalSetter()">⚙️ Set</button>
         </div>
+        <div id="goal-setter" class="goal-setter hidden">
+            <input type="number" class="goal-input" id="goal-cals" placeholder="Cals">
+            <input type="number" class="goal-input" id="goal-pro" placeholder="Protein">
+            <input type="number" class="goal-input" id="goal-carb" placeholder="Carbs">
+            <input type="number" class="goal-input" id="goal-fat" placeholder="Fat">
+            <button class="btn-action" style="width: 100%; margin-top: 5px;" onclick="saveGoals()">Save Goals</button>
+        </div>
+        <div class="macro-grid">
+            <div class="macro-item">
+                🔥 <span id="disp-cals">0</span>/<span id="goal-cals-disp">2000</span>
+                <div class="macro-bar-container">
+                    <div id="bar-cals" class="macro-fill" style="width:0%; background:var(--sec);"></div>
+                </div>
+                <div class="macro-percent" id="percent-cals">0%</div>
+            </div>
+            <div class="macro-item">
+                🥩 <span id="disp-pro">0</span>/<span id="goal-pro-disp">150</span>g
+                <div class="macro-bar-container">
+                    <div id="bar-pro" class="macro-fill" style="width:0%; background:var(--primary);"></div>
+                </div>
+                <div class="macro-percent" id="percent-pro">0%</div>
+            </div>
+            <div class="macro-item">
+                🍚 <span id="disp-carb">0</span>/<span id="goal-carb-disp">200</span>g
+                <div class="macro-bar-container">
+                    <div id="bar-carb" class="macro-fill" style="width:0%; background:var(--warn);"></div>
+                </div>
+                <div class="macro-percent" id="percent-carb">0%</div>
+            </div>
+            <div class="macro-item">
+                🥑 <span id="disp-fat">0</span>/<span id="goal-fat-disp">60</span>g
+                <div class="macro-bar-container">
+                    <div id="bar-fat" class="macro-fill" style="width:0%; background:var(--danger);"></div>
+                </div>
+                <div class="macro-percent" id="percent-fat">0%</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h3>💧 Water Intake</h3>
+        <div class="water-tracker">
+            <button class="water-btn" onclick="updateWater(-1)">➖</button>
+            <div class="water-display"><span id="water-count">0</span> 💧</div>
+            <button class="water-btn" onclick="updateWater(1)">➕</button>
+        </div>
+        <div style="text-align: center; color: #aaa; font-size: 0.8em;">Target: 8 cups/day</div>
+    </div>
+    
+    <div class="card">
         <div class="row"><input type="text" id="food-search" placeholder="Search USDA or Local DB..."><button class="btn-action" style="width:auto;" onclick="searchFood()">🔎</button></div>
         <div id="search-results" style="margin-top:10px; max-height:200px; overflow-y:auto;"></div>
     </div>
@@ -171,10 +208,6 @@
 
 <div class="container" id="view-wellness">
     <h2>Wellness & Recovery</h2>
-    <div class="card">
-        <h3>💧 Water Intake</h3>
-        <div class="row" style="justify-content:center; gap:20px; font-size:2em;"><span style="cursor:pointer" onclick="updateWater(-1)">➖</span><span id="water-count">0</span> Cups<span style="cursor:pointer" onclick="updateWater(1)">➕</span></div>
-    </div>
     <div class="card"><h3>⚖️ Body Stats</h3><div class="row"><input type="number" id="body-weight" placeholder="Bodyweight"><button class="btn-action" onclick="saveBodyStat()">Log</button></div></div>
     <div class="card"><h3>🤕 Injury / Pain</h3><textarea id="pain-log" style="width:100%; background:#2c2c2c; color:#fff; border:1px solid #444; border-radius:5px;" rows="3" placeholder="Notes on pain..."></textarea><button class="btn-action" style="margin-top:5px;" onclick="savePainLog()">Save Note</button></div>
 </div>
@@ -210,28 +243,23 @@
 
 <div id="timer-overlay" class="fs-overlay flex-center hidden">
     <div id="timer-display" style="font-size:4em; font-weight:bold; color:var(--primary);">00:00</div>
-    <div style="margin-top:20px;"><button class="btn-danger" onclick="closeTimer()">Stop</button><button class="btn-action" onclick="addTime(10)">+10s</button></div>
-</div>
-
-<div id="plate-modal" class="modal" onclick="closeModal('plate-modal')">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <span class="close-modal" onclick="closeModal('plate-modal')">&times;</span>
-        <h3>Plate Calculator</h3>
-        <input type="number" id="plate-weight-input" class="garmin-input" placeholder="Weight" oninput="calcPlates()">
-        <div id="plate-visuals" class="plate-vis"></div>
-        <div id="plate-text" style="color:#aaa; margin-top:10px;"></div>
+    <div style="margin-top:20px;">
+        <button class="btn-danger" onclick="closeTimer()">Stop</button>
+        <button class="btn-action" onclick="addTime(10)">+10s</button>
+        <button class="btn-action" onclick="addTime(30)">+30s</button>
     </div>
 </div>
-
 <script>
-    // GLOBAL CONFIG
     const GOOGLE_SCRIPT_URL = "https://script.google.com/a/macros/tjkcivil.com.au/s/AKfycbwG0PbAwqkX3EbWki7vjewgP-FIwCt11_ybFsFJrYmmgq6_QpfKrbPfRxeSEJGu7Ovg/exec"; 
-    let state = { unit: 'lbs', history: [], food: [], wellness: [], readiness: [], routine: [] };
+    let state = { unit: 'lbs', history: [], food: [], wellness: [], readiness: [], goals: {cals: 2000, pro: 150, carb: 200, fat: 60} };
     let apiKey = "";
     let activeRoutine = [];
     let gifOverrides = {};
+    let myChart = null;
+    let timerInterval = null;
+    let timerSeconds = 0;
+    let autoTimerEnabled = true;
 
-    // DATA
     const allExercises = [
       {"name": "Low Cable Chest Fly", "categories": ["Chest", "Shoulders"], "type": "Muscle Build", "desc": "Set pulleys low. Scoop hands up."},
       {"name": "High Cable Chest Fly", "categories": ["Chest"], "type": "Muscle Build", "desc": "Set pulleys high. Press hands down."},
@@ -243,12 +271,6 @@
       {"name": "Bicep Cable Curl", "categories": ["Biceps"], "type": "Muscle Build", "desc": "Elbows pinned. Curl up."},
       {"name": "Cable Crunch", "categories": ["Abs", "Core"], "type": "Muscle Build", "desc": "Kneel. Curl down."},
       {"name": "Cable Pull-through", "categories": ["Glutes", "Hamstrings"], "type": "Muscle Build", "desc": "Face away. Hinge back."},
-      {"name": "Cable Kickbacks", "categories": ["Glutes"], "type": "Muscle Build", "desc": "Kick back."},
-      {"name": "Single Arm Lat Pulldown", "categories": ["Back", "Biceps"], "type": "Muscle Build", "desc": "One arm pull."},
-      {"name": "Woodchopper", "categories": ["Core", "Shoulders"], "type": "Mobility", "desc": "Rotate diagonally."},
-      {"name": "Cable Shrugs", "categories": ["Traps"], "type": "Muscle Build", "desc": "Shrug shoulders."},
-      {"name": "Cable Upright Row", "categories": ["Shoulders", "Traps"], "type": "Muscle Build", "desc": "Pull high."},
-      {"name": "Cable Rear Delt Fly", "categories": ["Shoulders", "Back"], "type": "Muscle Build", "desc": "Pull apart."},
       {"name": "Dumbbell Chest Press", "categories": ["Chest", "Triceps"], "type": "Strength", "desc": "Press weights over chest."},
       {"name": "Dumbbell Shoulder Press", "categories": ["Shoulders", "Triceps"], "type": "Strength", "desc": "Press overhead."},
       {"name": "Goblet Squat", "categories": ["Legs", "Glutes"], "type": "Strength", "desc": "Hold weight at chest. Squat."},
@@ -267,135 +289,38 @@
       {"name": "Barbell Bench Press", "categories": ["Chest", "Triceps"], "type": "Strength", "desc": "Bar to chest. Press."},
       {"name": "Barbell Deadlift", "categories": ["Back", "Hamstrings"], "type": "Strength", "desc": "Lift from floor."},
       {"name": "Overhead Press", "categories": ["Shoulders", "Triceps"], "type": "Strength", "desc": "Press bar overhead."},
-      {"name": "Pistol Squats", "categories": ["Legs", "Balance"], "type": "Mobility", "desc": "One leg squat."},
       {"name": "Hanging Leg Raises", "categories": ["Core", "Abs"], "type": "Calisthenics", "desc": "Lift legs to 90."},
-      {"name": "Muscle-ups", "categories": ["Back", "Chest", "Triceps"], "type": "Calisthenics", "desc": "Pull high, transition to dip."},
-      {"name": "Front Lever", "categories": ["Back", "Core"], "type": "Calisthenics", "desc": "Hold body horizontal."},
-      {"name": "Handstand Push-ups", "categories": ["Shoulders", "Triceps"], "type": "Calisthenics", "desc": "Invert and press."},
       {"name": "Nordic Curls", "categories": ["Hamstrings"], "type": "Calisthenics", "desc": "Lower forward slowly."},
       {"name": "Pike Push-ups", "categories": ["Shoulders"], "type": "Calisthenics", "desc": "Hips high push up."},
-      {"name": "Inchworms", "categories": ["Mobility", "Hamstrings"], "type": "Mobility", "desc": "Walk hands out."},
-      {"name": "Cossack Squats", "categories": ["Mobility", "Legs"], "type": "Mobility", "desc": "Side lunge deep."},
       {"name": "Kettlebell Swing", "categories": ["Glutes", "Hamstrings"], "type": "Strength", "desc": "Hinge snap."},
-      {"name": "Turkish Get-up", "categories": ["Full Body", "Mobility"], "type": "Mobility", "desc": "Stand up with weight."},
       {"name": "Farmers Walk", "categories": ["Core", "Traps"], "type": "Strength", "desc": "Walk heavy.", "isTimed": true, "duration": 60},
       {"name": "Dumbbell Lunges", "categories": ["Legs", "Glutes"], "type": "Strength", "desc": "Step forward."},
       {"name": "Bicep Curls", "categories": ["Biceps"], "type": "Muscle Build", "desc": "Curl to shoulder."},
       {"name": "Tricep Kickbacks", "categories": ["Triceps"], "type": "Muscle Build", "desc": "Kick back."},
       {"name": "Hammer Curls", "categories": ["Biceps", "Forearms"], "type": "Muscle Build", "desc": "Neutral grip."},
       {"name": "Arnold Press", "categories": ["Shoulders", "Triceps"], "type": "Strength", "desc": "Rotate palms out."},
-      {"name": "Dumbbell Shrugs", "categories": ["Traps"], "type": "Muscle Build", "desc": "Shrug up."},
-      {"name": "Dumbbell Flys", "categories": ["Chest"], "type": "Muscle Build", "desc": "Fly out."},
-      {"name": "Step-ups", "categories": ["Legs", "Glutes"], "type": "Strength", "desc": "Step up."},
-      {"name": "Renegade Row", "categories": ["Core", "Back"], "type": "Strength", "desc": "Plank row."},
-      {"name": "Skull Crushers", "categories": ["Triceps"], "type": "Muscle Build", "desc": "Weight to forehead."},
-      {"name": "Front Raises", "categories": ["Shoulders"], "type": "Muscle Build", "desc": "Lift front."},
-      {"name": "Chin-ups", "categories": ["Back", "Biceps"], "type": "Calisthenics", "desc": "Palms facing you."},
-      {"name": "Leg Raises", "categories": ["Core", "Abs"], "type": "Calisthenics", "desc": "Lift legs."},
-      {"name": "Bench Dips", "categories": ["Triceps"], "type": "Calisthenics", "desc": "Hands behind back."},
-      {"name": "Box Jumps", "categories": ["Legs", "Cardio"], "type": "Calisthenics", "desc": "Jump on box."},
-      {"name": "Glute Bridge", "categories": ["Glutes"], "type": "Calisthenics", "desc": "Hips up."},
-      {"name": "Superman", "categories": ["Lower Back"], "type": "Mobility", "desc": "Lift limbs.", "isTimed": true, "duration": 30},
-      {"name": "Inverted Row", "categories": ["Back", "Biceps"], "type": "Calisthenics", "desc": "Pull chest to bar."},
-      {"name": "Bear Crawl", "categories": ["Full Body", "Mobility"], "type": "Mobility", "desc": "Crawl.", "isTimed": true, "duration": 45},
-      {"name": "Hollow Body Hold", "categories": ["Core", "Abs"], "type": "Calisthenics", "desc": "Hold hollow.", "isTimed": true, "duration": 30},
-      {"name": "Cat-Cow", "categories": ["Core", "Mobility"], "type": "Mobility", "desc": "Arch back."},
-      {"name": "World's Greatest Stretch", "categories": ["Full Body", "Mobility"], "type": "Mobility", "desc": "Lunge twist.", "isTimed": true, "duration": 45},
-      {"name": "Barbell Row", "categories": ["Back", "Biceps"], "type": "Strength", "desc": "Bent row."},
-      {"name": "Walking Lunges", "categories": ["Legs", "Cardio"], "type": "Calisthenics", "desc": "Walk lunge."},
-      {"name": "Side Plank", "categories": ["Core", "Obliques"], "type": "Calisthenics", "desc": "Side hold.", "isTimed": true, "duration": 45},
-      {"name": "Bird Dog", "categories": ["Core", "Mobility"], "type": "Mobility", "desc": "Opposite arm leg.", "isTimed": true, "duration": 30},
-      {"name": "Dead Bug", "categories": ["Core", "Abs"], "type": "Mobility", "desc": "Lower opposite.", "isTimed": true, "duration": 45},
-      {"name": "Glute Bridge March", "categories": ["Glutes", "Core"], "type": "Mobility", "desc": "March in bridge."},
-      {"name": "Scapular Pull-ups", "categories": ["Back", "Mobility"], "type": "Mobility", "desc": "Shrug on bar."},
-      {"name": "Wall Slides", "categories": ["Shoulders", "Mobility"], "type": "Mobility", "desc": "Slide arms."},
-      {"name": "90/90 Hip Switches", "categories": ["Hips", "Mobility"], "type": "Mobility", "desc": "Switch hips.", "isTimed": true, "duration": 60},
-      {"name": "Archer Push-ups", "categories": ["Chest", "Triceps"], "type": "Calisthenics", "desc": "Side to side."},
-      {"name": "L-Sit Hold", "categories": ["Core", "Abs"], "type": "Calisthenics", "desc": "Legs out.", "isTimed": true, "duration": 20},
-      {"name": "Hanging Knee Raises", "categories": ["Core", "Abs"], "type": "Calisthenics", "desc": "Knees up."},
-      {"name": "Negative Pull-ups", "categories": ["Back", "Biceps"], "type": "Calisthenics", "desc": "Lower slow."},
-      {"name": "Bulgarian Split Squat (BW)", "categories": ["Legs"], "type": "Calisthenics", "desc": "No weight."},
-      {"name": "Single Leg RDL", "categories": ["Hamstrings", "Balance"], "type": "Mobility", "desc": "One leg hinge."},
-      {"name": "Incline Push-ups", "categories": ["Chest"], "type": "Calisthenics", "desc": "Hands up."},
-      {"name": "Decline Push-ups", "categories": ["Chest"], "type": "Calisthenics", "desc": "Feet up."},
-      {"name": "Diamond Push-ups", "categories": ["Triceps"], "type": "Calisthenics", "desc": "Hands close."},
-      {"name": "Close Grip DB Press", "categories": ["Triceps", "Chest"], "type": "Muscle Build", "desc": "DBs touching."},
-      {"name": "Dumbbell Pullover", "categories": ["Back", "Chest"], "type": "Muscle Build", "desc": "Over head."},
-      {"name": "Concentration Curls", "categories": ["Biceps"], "type": "Muscle Build", "desc": "Elbow thigh."},
-      {"name": "Reverse DB Flys", "categories": ["Shoulders", "Back"], "type": "Muscle Build", "desc": "Bent fly."},
-      {"name": "Standing Calf Raises", "categories": ["Calves"], "type": "Muscle Build", "desc": "Calf raise."},
-      {"name": "Tibialis Raise", "categories": ["Legs", "Mobility"], "type": "Mobility", "desc": "Lift toes to shins."},
-      {"name": "Couch Stretch", "categories": ["Hips", "Mobility"], "type": "Mobility", "desc": "Hip flexor.", "isTimed": true, "duration": 60},
-      {"name": "Pigeon Pose", "categories": ["Hips", "Mobility"], "type": "Mobility", "desc": "Glute stretch.", "isTimed": true, "duration": 60},
-      {"name": "Child's Pose", "categories": ["Back", "Mobility"], "type": "Mobility", "desc": "Rest pose.", "isTimed": true, "duration": 60},
-      {"name": "Deep Squat Hold", "categories": ["Hips", "Mobility"], "type": "Mobility", "desc": "Sit deep.", "isTimed": true, "duration": 120},
-      {"name": "Prone Y-W-T Raises", "categories": ["Back", "Shoulders"], "type": "Mobility", "desc": "Arm shapes."},
-      {"name": "Suitcase Carry", "categories": ["Core"], "type": "Strength", "desc": "One hand walk.", "isTimed": true, "duration": 60},
-      {"name": "Pallof Press", "categories": ["Core"], "type": "Strength", "desc": "Anti rotate.", "isTimed": true, "duration": 30},
-      {"name": "Face Away Cable Curl", "categories": ["Biceps"], "type": "Muscle Build", "desc": "Arms back."},
-      {"name": "Cable Pullover", "categories": ["Back", "Lats"], "type": "Muscle Build", "desc": "Straight arm push."},
-      {"name": "Air Squats", "categories": ["Legs"], "type": "Calisthenics", "desc": "Squat."},
-      {"name": "Jump Squats", "categories": ["Legs", "Cardio"], "type": "Calisthenics", "desc": "Jump."},
-      {"name": "Lunges (Forward)", "categories": ["Legs"], "type": "Calisthenics", "desc": "Forward."},
-      {"name": "Lunges (Reverse)", "categories": ["Legs"], "type": "Calisthenics", "desc": "Back."},
-      {"name": "Curtsy Lunges", "categories": ["Legs", "Glutes"], "type": "Calisthenics", "desc": "Side back."},
-      {"name": "Lateral Lunges", "categories": ["Legs"], "type": "Calisthenics", "desc": "Side."},
-      {"name": "Step-Ups (Chair)", "categories": ["Legs"], "type": "Calisthenics", "desc": "Step up."},
-      {"name": "Calf Raises", "categories": ["Calves", "Legs"], "type": "Calisthenics", "desc": "Raise."},
-      {"name": "Single Leg Calf Raises", "categories": ["Calves"], "type": "Calisthenics", "desc": "One leg."},
-      {"name": "Wall Sit", "categories": ["Legs"], "type": "Calisthenics", "desc": "Sit.", "isTimed": true, "duration": 60},
-      {"name": "Glute Bridges (Single Leg)", "categories": ["Glutes"], "type": "Calisthenics", "desc": "One leg."},
-      {"name": "Donkey Kicks", "categories": ["Glutes"], "type": "Calisthenics", "desc": "Kick up."},
-      {"name": "Fire Hydrants", "categories": ["Glutes"], "type": "Calisthenics", "desc": "Side lift."},
-      {"name": "Push-ups (Wide)", "categories": ["Chest"], "type": "Calisthenics", "desc": "Wide."},
-      {"name": "Push-ups (Diamond)", "categories": ["Triceps"], "type": "Calisthenics", "desc": "Close."},
-      {"name": "Push-ups (Decline)", "categories": ["Chest", "Shoulders"], "type": "Calisthenics", "desc": "Feet elevated."},
-      {"name": "Push-ups (Incline)", "categories": ["Chest"], "type": "Calisthenics", "desc": "Hands elevated."},
-      {"name": "Tricep Dips", "categories": ["Triceps"], "type": "Calisthenics", "desc": "Dips."},
-      {"name": "Plank (Forearm)", "categories": ["Core"], "type": "Calisthenics", "desc": "Low.", "isTimed": true, "duration": 60},
-      {"name": "Plank (High)", "categories": ["Core"], "type": "Calisthenics", "desc": "High.", "isTimed": true, "duration": 60},
-      {"name": "Side Plank (Left)", "categories": ["Core", "Obliques"], "type": "Calisthenics", "desc": "Left.", "isTimed": true, "duration": 45},
-      {"name": "Side Plank (Right)", "categories": ["Core", "Obliques"], "type": "Calisthenics", "desc": "Right.", "isTimed": true, "duration": 45},
-      {"name": "Plank Jacks", "categories": ["Core", "Cardio"], "type": "Calisthenics", "desc": "Jacks."},
-      {"name": "Mountain Climbers (Twisting)", "categories": ["Core"], "type": "Calisthenics", "desc": "Twist.", "isTimed": true, "duration": 45},
-      {"name": "Bicycle Crunches", "categories": ["Core", "Abs"], "type": "Calisthenics", "desc": "Cycle."},
-      {"name": "Leg Raises (Lying)", "categories": ["Core"], "type": "Calisthenics", "desc": "Lying."},
-      {"name": "Flutter Kicks", "categories": ["Core"], "type": "Calisthenics", "desc": "Kicks.", "isTimed": true, "duration": 45},
-      {"name": "Russian Twists", "categories": ["Core", "Obliques"], "type": "Calisthenics", "desc": "Twist."},
-      {"name": "V-Ups", "categories": ["Core"], "type": "Calisthenics", "desc": "V up."},
-      {"name": "Superman Hold", "categories": ["Lower Back"], "type": "Calisthenics", "desc": "Hold.", "isTimed": true, "duration": 45},
-      {"name": "Pull-ups (Wide)", "categories": ["Back"], "type": "Calisthenics", "desc": "Wide."},
-      {"name": "Inverted Row (Under table)", "categories": ["Back"], "type": "Calisthenics", "desc": "Table row."},
-      {"name": "Doorframe Row", "categories": ["Back"], "type": "Calisthenics", "desc": "Door row."},
-      {"name": "Scapular Push-ups", "categories": ["Back"], "type": "Calisthenics", "desc": "Scap."},
-      {"name": "Burpees (No Push-up)", "categories": ["Cardio"], "type": "Calisthenics", "desc": "No push."},
-      {"name": "Jumping Jacks", "categories": ["Cardio"], "type": "Calisthenics", "desc": "Jacks.", "isTimed": true, "duration": 60},
-      {"name": "High Knees", "categories": ["Cardio", "Legs"], "type": "Calisthenics", "desc": "Run.", "isTimed": true, "duration": 45},
-      {"name": "Bear Crawl (Reverse)", "categories": ["Full Body"], "type": "Calisthenics", "desc": "Reverse.", "isTimed": true, "duration": 45},
-      {"name": "Crab Walk", "categories": ["Full Body"], "type": "Calisthenics", "desc": "Crab.", "isTimed": true, "duration": 45},
-      {"name": "Hindu Push-ups", "categories": ["Shoulders"], "type": "Calisthenics", "desc": "Swoop."},
-      {"name": "Box Jumps (Step down)", "categories": ["Legs"], "type": "Calisthenics", "desc": "Step down."},
-      {"name": "Broad Jumps", "categories": ["Legs"], "type": "Calisthenics", "desc": "Jump far."},
-      {"name": "Skater Hops", "categories": ["Legs", "Cardio"], "type": "Calisthenics", "desc": "Skate."},
-      {"name": "Hollow Body Rock", "categories": ["Core"], "type": "Calisthenics", "desc": "Rock."}
+      {"name": "Chin-ups", "categories": ["Back", "Biceps"], "type": "Calisthenics", "desc": "Palms facing you."}
     ];
 
     const internalFoodDB = [
-        {name:"Chicken Breast", c:165, p:31, f:3.6, ch:0}, {name:"Rice (Cup)", c:200, p:4, f:0.4, ch:44},
-        {name:"Egg", c:70, p:6, f:5, ch:0}, {name:"Whey Scoop", c:120, p:24, f:1, ch:3},
-        {name:"Banana", c:105, p:1, f:0, ch:27}, {name:"Oats (Cup)", c:300, p:10, f:5, ch:50},
-        {name:"Avocado", c:160, p:2, f:15, ch:9}, {name:"Salmon", c:208, p:20, f:13, ch:0}
+        {name:"Chicken Breast", c:165, p:31, f:3.6, ch:0}, 
+        {name:"Rice (Cup)", c:200, p:4, f:0.4, ch:44},
+        {name:"Egg", c:70, p:6, f:5, ch:0}, 
+        {name:"Whey Scoop", c:120, p:24, f:1, ch:3},
+        {name:"Banana", c:105, p:1, f:0, ch:27}, 
+        {name:"Oats (Cup)", c:300, p:10, f:5, ch:50},
+        {name:"Avocado", c:160, p:2, f:15, ch:9}, 
+        {name:"Salmon", c:208, p:20, f:13, ch:0}
     ];
 
-    // --- INIT ---
     window.onload = () => {
         try {
             loadLocal();
             updateStreak();
             renderBadges();
             updateMacrosUI();
+            loadGoals();
             
-            // Set defaults
             state.unit = localStorage.getItem('nimbleUnit') || 'lbs';
             document.getElementById('unit-disp-1').innerText = state.unit.toUpperCase();
             document.getElementById('unit-disp-2').innerText = state.unit.toUpperCase();
@@ -403,8 +328,8 @@
             apiKey = localStorage.getItem('usdaKey') || "";
             gifOverrides = JSON.parse(localStorage.getItem('nimbleGifOverrides')) || {};
             
-            // NAVIGATION FIX
             switchTab('readiness'); 
+            populateChartSelect();
         } catch (e) {
             console.error(e);
             alert("Recovering from crash...");
@@ -417,6 +342,7 @@
         state.food = safeParse('nimbleNutrition') || [];
         state.wellness = safeParse('nimbleWellness') || [];
         state.readiness = safeParse('nimbleReadiness') || [];
+        state.goals = safeParse('nimbleGoals') || {cals: 2000, pro: 150, carb: 200, fat: 60};
     }
     
     function safeParse(key) {
@@ -431,24 +357,21 @@
         }
     }
 
-    // --- NAVIGATION ---
     function switchTab(id) {
-        // Hide all views
         document.querySelectorAll('.container').forEach(d => {
             d.classList.remove('active');
-            d.style.display = "none"; // JS Force
+            d.style.display = "none";
         });
         
-        // Show target view
         const target = document.getElementById('view-' + id);
         target.classList.add('active');
-        target.style.display = "block"; // JS Force
+        target.style.display = "block";
         
-        // Update Buttons
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('nav-' + id).classList.add('active');
         
         if(id==='progress') renderChart();
+        if(id==='food') updateMacrosUI();
     }
 
     function toggleUnit() {
@@ -458,7 +381,6 @@
         document.getElementById('unit-disp-2').innerText = state.unit.toUpperCase();
     }
 
-    // --- READINESS ---
     function calcReadiness() {
         const g = document.getElementById('garmin-score').value;
         let score = g ? parseInt(g) : Math.round((parseInt(document.getElementById('val-sleep').value)*10 + parseInt(document.getElementById('val-mood').value)*10 + (10-parseInt(document.getElementById('val-sore').value))*10)/3);
@@ -489,12 +411,51 @@
         });
     }
 
-    // --- FOOD ---
-    function toggleApiSettings() { document.getElementById('api-settings').classList.toggle('hidden'); }
-    function saveApiKey() { apiKey = document.getElementById('usda-key').value; localStorage.setItem('usdaKey', apiKey); toggleApiSettings(); }
+    function toggleGoalSetter() {
+        document.getElementById('goal-setter').classList.toggle('hidden');
+    }
+
+    function loadGoals() {
+        const goals = state.goals;
+        document.getElementById('goal-cals').value = goals.cals;
+        document.getElementById('goal-pro').value = goals.pro;
+        document.getElementById('goal-carb').value = goals.carb;
+        document.getElementById('goal-fat').value = goals.fat;
+        
+        document.getElementById('goal-cals-disp').innerText = goals.cals;
+        document.getElementById('goal-pro-disp').innerText = goals.pro;
+        document.getElementById('goal-carb-disp').innerText = goals.carb;
+        document.getElementById('goal-fat-disp').innerText = goals.fat;
+    }
+
+    function saveGoals() {
+        state.goals = {
+            cals: parseInt(document.getElementById('goal-cals').value) || 2000,
+            pro: parseInt(document.getElementById('goal-pro').value) || 150,
+            carb: parseInt(document.getElementById('goal-carb').value) || 200,
+            fat: parseInt(document.getElementById('goal-fat').value) || 60
+        };
+        localStorage.setItem('nimbleGoals', JSON.stringify(state.goals));
+        loadGoals();
+        updateMacrosUI();
+        toggleGoalSetter();
+        alert('Goals saved!');
+    }
+    function toggleApiSettings() { 
+        document.getElementById('api-settings').classList.toggle('hidden'); 
+    }
+    
+    function saveApiKey() { 
+        apiKey = document.getElementById('usda-key').value; 
+        localStorage.setItem('usdaKey', apiKey); 
+        toggleApiSettings(); 
+        alert('API Key saved!');
+    }
 
     async function searchFood() {
         const query = document.getElementById('food-search').value;
+        if(!query) return;
+        
         const resDiv = document.getElementById('search-results');
         resDiv.innerHTML = 'Searching...';
         let results = [...internalFoodDB.filter(f => f.name.toLowerCase().includes(query.toLowerCase()))];
@@ -505,18 +466,36 @@
                 const data = await req.json();
                 if(data.foods) {
                     data.foods.forEach(f => {
-                        const getNut = (id) => (f.foodNutrients.find(x => x.nutrientId === id) || {}).value || 0;
-                        results.push({ name: f.description, c: getNut(208), p: getNut(203), f: getNut(204), ch: getNut(205) });
+                        const getNut = (nutName) => {
+                            const nutrient = f.foodNutrients.find(n => n.nutrientName === nutName);
+                            return nutrient ? nutrient.value : 0;
+                        };
+                        results.push({ 
+                            name: f.description, 
+                            c: Math.round(getNut('Energy')), 
+                            p: Math.round(getNut('Protein')), 
+                            f: Math.round(getNut('Total lipid (fat)')), 
+                            ch: Math.round(getNut('Carbohydrate, by difference')) 
+                        });
                     });
                 }
-            } catch(e) {}
+            } catch(e) {
+                console.error('USDA API Error:', e);
+            }
         }
         
         resDiv.innerHTML = '';
+        if(results.length === 0) {
+            resDiv.innerHTML = '<div style="padding:10px; color:#aaa;">No results found</div>';
+            return;
+        }
+        
         results.forEach(f => {
             const div = document.createElement('div');
-            div.style.padding = "10px"; div.style.borderBottom = "1px solid #333";
-            div.innerHTML = `<b>${f.name}</b> <br> <small>${f.c} cal | ${f.p}p | ${f.ch}c</small>`;
+            div.style.padding = "10px"; 
+            div.style.borderBottom = "1px solid #333";
+            div.style.cursor = "pointer";
+            div.innerHTML = `<b>${f.name}</b> <br> <small>${f.c} cal | ${f.p}p | ${f.ch}c | ${f.f}f</small>`;
             div.onclick = () => addFoodLog(f);
             resDiv.appendChild(div);
         });
@@ -529,27 +508,63 @@
         localStorage.setItem('nimbleNutrition', JSON.stringify(cl));
         sendToCloud('nutrition', log);
         updateMacrosUI();
-        document.getElementById('search-results').innerHTML = 'Added!';
+        document.getElementById('search-results').innerHTML = '<div style="color:var(--success); padding:10px;">✅ Added!</div>';
+        setTimeout(() => document.getElementById('search-results').innerHTML = '', 2000);
     }
 
     function updateMacrosUI() {
         const today = new Date().toLocaleDateString();
         const logs = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
-        const t = logs.filter(l => l.date === today).reduce((acc, l) => ({ c: acc.c+l.c, p: acc.p+l.p, f: acc.f+l.f, ch: acc.ch+l.ch }), {c:0, p:0, f:0, ch:0});
+        const t = logs.filter(l => l.date === today).reduce((acc, l) => ({ 
+            c: acc.c+(l.c||0), 
+            p: acc.p+(l.p||0), 
+            f: acc.f+(l.f||0), 
+            ch: acc.ch+(l.ch||0) 
+        }), {c:0, p:0, f:0, ch:0});
         
-        ['cals','pro','fat','carb'].forEach(k => {
-            const val = Math.round(t[k==='cals'?'c':(k==='pro'?'p':(k==='fat'?'f':'ch'))]);
-            document.getElementById('disp-'+k).innerText = val;
-            document.getElementById('bar-'+k).style.width = Math.min(100, val/20) + '%'; 
-        });
+        const goals = state.goals;
+        
+        document.getElementById('disp-cals').innerText = Math.round(t.c);
+        document.getElementById('disp-pro').innerText = Math.round(t.p);
+        document.getElementById('disp-carb').innerText = Math.round(t.ch);
+        document.getElementById('disp-fat').innerText = Math.round(t.f);
+        
+        const calcPercent = (val, goal) => Math.round((val / goal) * 100);
+        document.getElementById('percent-cals').innerText = calcPercent(t.c, goals.cals) + '%';
+        document.getElementById('percent-pro').innerText = calcPercent(t.p, goals.pro) + '%';
+        document.getElementById('percent-carb').innerText = calcPercent(t.ch, goals.carb) + '%';
+        document.getElementById('percent-fat').innerText = calcPercent(t.f, goals.fat) + '%';
+        
+        document.getElementById('bar-cals').style.width = Math.min(100, calcPercent(t.c, goals.cals)) + '%';
+        document.getElementById('bar-pro').style.width = Math.min(100, calcPercent(t.p, goals.pro)) + '%';
+        document.getElementById('bar-carb').style.width = Math.min(100, calcPercent(t.ch, goals.carb)) + '%';
+        document.getElementById('bar-fat').style.width = Math.min(100, calcPercent(t.f, goals.fat)) + '%';
+        
+        const waterCount = parseInt(localStorage.getItem('nimbleWater')) || 0;
+        document.getElementById('water-count').innerText = waterCount;
     }
 
     function logMacroManual() {
-        const f = { name: "Manual", c: parseFloat(document.getElementById('inp-cals').value)||0, p: parseFloat(document.getElementById('inp-pro').value)||0, ch: parseFloat(document.getElementById('inp-carb').value)||0, f: parseFloat(document.getElementById('inp-fat').value)||0 };
+        const f = { 
+            name: "Manual", 
+            c: parseFloat(document.getElementById('inp-cals').value)||0, 
+            p: parseFloat(document.getElementById('inp-pro').value)||0, 
+            ch: parseFloat(document.getElementById('inp-carb').value)||0, 
+            f: parseFloat(document.getElementById('inp-fat').value)||0 
+        };
         addFoodLog(f);
+        document.getElementById('inp-cals').value = '';
+        document.getElementById('inp-pro').value = '';
+        document.getElementById('inp-carb').value = '';
+        document.getElementById('inp-fat').value = '';
     }
 
-    // --- WORKOUT ---
+    function updateWater(c) {
+        let w = parseInt(localStorage.getItem('nimbleWater') || 0) + c;
+        if(w<0) w=0;
+        localStorage.setItem('nimbleWater', w);
+        document.getElementById('water-count').innerText = w;
+    }
     function loadTemplate(type) {
         let filter = [];
         if(type==='push') filter = ['Chest','Shoulders','Triceps'];
@@ -570,8 +585,8 @@
         const pool = allExercises.filter(filterFn);
         activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
         renderWorkout(activeRoutine);
-        document.getElementById('setup-panel').classList.add('hidden'); // Ensure CSS class works
-        document.getElementById('setup-panel').style.display = 'none'; // Force JS hide
+        document.getElementById('setup-panel').classList.add('hidden');
+        document.getElementById('setup-panel').style.display = 'none';
         document.getElementById('active-workout').classList.remove('hidden');
         document.getElementById('active-workout').style.display = 'block';
     }
@@ -586,7 +601,6 @@
             const suggestion = lastLog ? `Beat: ${lastLog.weight}${lastLog.unit} x ${lastLog.reps}` : "New Exercise";
             const val = lastLog ? lastLog.weight : "";
             
-            // GIF Logic
             const hasGif = gifOverrides[ex.name];
             const searchUrl = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(ex.name + ' exercise form gif')}`;
             const uniqueId = `desc-${i}`;
@@ -595,6 +609,7 @@
 
             const div = document.createElement('div');
             div.className = `card exercise-card ${ex.type}`;
+            div.id = `exercise-${i}`;
             div.innerHTML = `
                 <div class="exercise-header">
                     <strong>${ex.name}</strong>
@@ -615,7 +630,7 @@
                 <div class="row" style="margin-top:10px;">
                     <div style="flex:1">
                         <div class="row" style="gap:2px;">
-                            <input type="number" id="w-${i}" value="${val}" placeholder="Wt">
+                            <input type="number" id="w-${i}" value="${val}" placeholder="Wt" step="0.5">
                             <button class="smart-inc" onclick="incVal('w-${i}', 2.5)">+2.5</button>
                             <button class="smart-inc" onclick="incVal('w-${i}', 5)">+5</button>
                         </div>
@@ -636,14 +651,24 @@
     function logSet(name, idx) {
         const w = document.getElementById(`w-${idx}`).value;
         const r = document.getElementById(`r-${idx}`).value;
-        if(!w || !r) return;
+        if(!w || !r) return alert('Enter weight and reps!');
+        
         const entry = { date: new Date().toISOString(), name: name, weight: parseFloat(w), reps: parseFloat(r), unit: state.unit };
         let h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+        
+        const lastLog = h.filter(log => log.name === name).sort((a,b) => new Date(b.date) - new Date(a.date))[0];
+        if(lastLog && parseFloat(w) > lastLog.weight) {
+            const card = document.getElementById(`exercise-${idx}`);
+            card.classList.add('pr-highlight');
+            setTimeout(() => card.classList.remove('pr-highlight'), 2000);
+        }
+        
         h.push(entry);
         localStorage.setItem('nimbleHistory', JSON.stringify(h));
         sendToCloud("workout", entry);
         document.getElementById(`r-${idx}`).style.border = "2px solid var(--success)";
-        startTimer(90);
+        
+        if(autoTimerEnabled) startTimer(90);
     }
 
     function finishSession() {
@@ -652,7 +677,13 @@
             document.getElementById('active-workout').style.display='none';
             document.getElementById('setup-panel').classList.remove('hidden');
             document.getElementById('setup-panel').style.display='block';
-            alert("Workout Saved!");
+            
+            let streak = parseInt(localStorage.getItem('streakCount')) || 0;
+            streak++;
+            localStorage.setItem('streakCount', streak);
+            updateStreak();
+            
+            alert("🔥 Workout Saved! Streak: " + streak + " days!");
         }
     }
 
@@ -665,9 +696,8 @@
         }
     }
 
-    // --- VOICE ---
     function startVoiceLog(btn, idx) {
-        if (!('webkitSpeechRecognition' in window)) return alert("Browser mismatch. Use Chrome.");
+        if (!('webkitSpeechRecognition' in window)) return alert("Browser not supported. Use Chrome.");
         const recognition = new webkitSpeechRecognition();
         recognition.lang = 'en-US';
         btn.classList.add('listening');
@@ -685,28 +715,31 @@
         recognition.start();
     }
 
-    // --- WELLNESS ---
-    function updateWater(c) {
-        let w = parseInt(document.getElementById('water-count').innerText) + c;
-        if(w<0) w=0;
-        document.getElementById('water-count').innerText = w;
-        localStorage.setItem('nimbleWater', w);
+    function saveBodyStat() { 
+        const weight = document.getElementById('body-weight').value;
+        if(!weight) return;
+        sendToCloud("wellness", {type:"weight", val: weight, date: new Date().toISOString()}); 
+        alert("Weight logged!"); 
+        document.getElementById('body-weight').value = '';
     }
-    function saveBodyStat() { sendToCloud("wellness", {type:"weight", val: document.getElementById('body-weight').value}); alert("Logged"); }
-    function savePainLog() { sendToCloud("wellness", {type:"pain", note: document.getElementById('pain-log').value}); alert("Logged"); }
+    
+    function savePainLog() { 
+        const note = document.getElementById('pain-log').value;
+        if(!note) return;
+        sendToCloud("wellness", {type:"pain", note: note, date: new Date().toISOString()}); 
+        alert("Pain log saved!"); 
+        document.getElementById('pain-log').value = '';
+    }
 
-    // --- UTILS ---
     function sendToCloud(type, data) {
         if (!GOOGLE_SCRIPT_URL) return;
-        fetch(GOOGLE_SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: type, data: data }) }).catch(e=>console.log(e));
+        fetch(GOOGLE_SCRIPT_URL, { 
+            method: "POST", 
+            mode: "no-cors", 
+            headers: { "Content-Type": "application/json" }, 
+            body: JSON.stringify({ type: type, data: data }) 
+        }).catch(e=>console.log(e));
     }
-    
-    // --- MODAL UTILS ---
-    function closeModal(id) {
-        document.getElementById(id).style.display = "none";
-    }
-    
-    // --- GIFS ---
     function saveGifOverride(name, inputId) {
         const url = document.getElementById(inputId).value;
         if(!url) return alert("Paste a URL first");
@@ -715,21 +748,22 @@
         renderWorkout(activeRoutine);
         alert("GIF Saved!");
     }
+    
     function showGif(name) {
         const url = gifOverrides[name];
         if(url) {
             document.getElementById('gif-player').src = url;
             document.getElementById('gif-modal-title').innerText = name;
             document.getElementById('gif-modal').classList.remove('hidden');
-            document.getElementById('gif-modal').style.display = 'flex'; // Force flex
+            document.getElementById('gif-modal').style.display = 'flex';
         }
     }
+    
     function closeGifModal() { 
         document.getElementById('gif-modal').classList.add('hidden'); 
         document.getElementById('gif-modal').style.display = 'none'; 
     }
 
-    // --- BUILDER ---
     function openBuilder(add) {
         document.getElementById('builder-overlay').classList.remove('hidden');
         document.getElementById('builder-overlay').style.display = 'block';
@@ -737,8 +771,10 @@
         list.innerHTML = "";
         allExercises.forEach(ex => {
             const d = document.createElement('div');
-            d.style.padding="10px"; d.style.borderBottom="1px solid #333";
-            d.innerHTML = `<b>${ex.name}</b>`;
+            d.style.padding="10px"; 
+            d.style.borderBottom="1px solid #333";
+            d.style.cursor="pointer";
+            d.innerHTML = `<b>${ex.name}</b><br><small style="color:#aaa;">${ex.type}</small>`;
             d.onclick = () => { 
                 activeRoutine.push(ex);
                 renderWorkout(activeRoutine); 
@@ -747,45 +783,145 @@
             list.appendChild(d);
         });
     }
+    
     function closeBuilder() { 
         document.getElementById('builder-overlay').classList.add('hidden'); 
         document.getElementById('builder-overlay').style.display = 'none'; 
     }
+    
     function filterBuilder() {
         const q = document.getElementById('builder-search-inp').value.toLowerCase();
         const items = document.getElementById('builder-list-content').children;
         Array.from(items).forEach(i => i.style.display = i.innerHTML.toLowerCase().includes(q) ? 'block' : 'none');
     }
-    
-    // --- PLATE CALC ---
-    function calcPlates() {
-        const weight = parseFloat(document.getElementById('plate-weight-input').value);
-        if(!weight) return;
-        openPlateModal(); // ensure modal is open
-    }
-    function openPlateModal() { document.getElementById('plate-modal').style.display = 'flex'; }
 
-    // --- TIMER ---
-    let tInt;
-    function startTimer(s) {
-        document.getElementById('timer-overlay').classList.remove('hidden');
-        document.getElementById('timer-overlay').style.display = 'flex';
-        document.getElementById('timer-display').innerText = s;
-        let t = s; clearInterval(tInt);
-        tInt = setInterval(()=>{ t--; document.getElementById('timer-display').innerText = t; if(t<=0) closeTimer(); }, 1000);
+    function startTimer(seconds) {
+        timerSeconds = seconds;
+        updateTimerDisplay();
+        
+        const badge = document.getElementById('timer-badge');
+        badge.classList.add('active');
+        
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            timerSeconds--;
+            updateTimerDisplay();
+            if(timerSeconds <= 0) {
+                stopTimer();
+                alert("Rest complete! 💪");
+            }
+        }, 1000);
     }
+
+    function updateTimerDisplay() {
+        const mins = Math.floor(timerSeconds / 60);
+        const secs = timerSeconds % 60;
+        const display = `${mins}:${secs.toString().padStart(2, '0')}`;
+        document.getElementById('timer-badge').innerText = display;
+        document.getElementById('timer-display').innerText = display;
+    }
+
+    function stopTimer() {
+        clearInterval(timerInterval);
+        document.getElementById('timer-badge').classList.remove('active');
+    }
+
     function closeTimer() { 
+        stopTimer();
         document.getElementById('timer-overlay').classList.add('hidden'); 
         document.getElementById('timer-overlay').style.display = 'none';
-        clearInterval(tInt); 
     }
-    function addTime(s) { startTimer(parseInt(document.getElementById('timer-display').innerText)+s); }
 
-    // --- CHART ---
+    function openTimerOverlay() {
+        document.getElementById('timer-overlay').classList.remove('hidden');
+        document.getElementById('timer-overlay').style.display = 'flex';
+    }
+
+    function addTime(seconds) {
+        timerSeconds += seconds;
+        updateTimerDisplay();
+        if(!timerInterval) {
+            startTimer(timerSeconds);
+        }
+    }
+
+    function populateChartSelect() {
+        const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+        const exercises = [...new Set(history.map(h => h.name))];
+        const select = document.getElementById('chart-select');
+        select.innerHTML = '<option>Select Exercise...</option>';
+        exercises.forEach(ex => {
+            const opt = document.createElement('option');
+            opt.value = ex;
+            opt.innerText = ex;
+            select.appendChild(opt);
+        });
+    }
+
     function renderChart() {
+        const selected = document.getElementById('chart-select').value;
+        if(selected === 'Select Exercise...') return;
+        
+        const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+        const filtered = history.filter(h => h.name === selected).slice(-10);
+        
+        const labels = filtered.map(h => new Date(h.date).toLocaleDateString());
+        const weights = filtered.map(h => h.weight);
+        
         const ctx = document.getElementById('progressChart').getContext('2d');
         if(myChart) myChart.destroy();
-        myChart = new Chart(ctx, { type:'line', data:{labels:['Jan','Feb','Mar'], datasets:[{label:'Demo Data', data:[100,110,115], borderColor:'#BB86FC'}]} });
+        
+        myChart = new Chart(ctx, { 
+            type:'line', 
+            data:{
+                labels: labels, 
+                datasets:[{
+                    label: selected + ' Weight Progress', 
+                    data: weights, 
+                    borderColor:'#BB86FC',
+                    backgroundColor: 'rgba(187, 134, 252, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#fff'
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#aaa' },
+                        grid: { color: '#333' }
+                    },
+                    y: {
+                        ticks: { color: '#aaa' },
+                        grid: { color: '#333' }
+                    }
+                }
+            }
+        });
+    }
+
+    function exportData() {
+        const data = {
+            history: JSON.parse(localStorage.getItem('nimbleHistory')) || [],
+            nutrition: JSON.parse(localStorage.getItem('nimbleNutrition')) || [],
+            wellness: JSON.parse(localStorage.getItem('nimbleWellness')) || [],
+            goals: state.goals,
+            streak: localStorage.getItem('streakCount') || 0
+        };
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `nimble-shred-backup-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
     }
 </script>
 </body>
