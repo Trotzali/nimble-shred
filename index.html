@@ -6,20 +6,20 @@
     <meta name="theme-color" content="#1e1e1e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Nimble Shred v22.1</title>
+    <title>Nimble Shred v23.2</title>
     <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiTmltYmxlIFNocmVkIiwiYmFja2dyb3VuZF9jb2xvciI6IiMxMjEyMTIiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiIzFlMWUxZSIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2ltZy5pY29uczguY29tL2ZsdWVuY3kvOTYvbnVsbC9kdW1iYmVsbC5wbmciLCJzaXplcyI6Ijk2eDk2IiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
     <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/96/null/dumbbell.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --bg: #121212; --card: #1e1e1e; --primary: #BB86FC; --sec: #03DAC6; --text: #fff; --gold: #FFD700; --danger: #CF6679; --success: #00C853; --warn: #FF9800; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 90px; -webkit-tap-highlight-color: transparent; }
-        .container { max-width: 600px; margin: 0 auto; display: none; } 
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 120px; -webkit-tap-highlight-color: transparent; }
+        .container { max-width: 600px; margin: 0 auto; display: none; padding-bottom: 50px; } 
         .container.active { display: block; }
         h1, h2 { text-align: center; margin: 10px 0; }
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a1a; display: flex; justify-content: space-around; padding: 12px; border-top: 1px solid #333; z-index: 999; padding-bottom: max(12px, env(safe-area-inset-bottom)); }
-        .nav-btn { background: none; color: #777; border: none; font-size: 0.7em; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a1a; display: flex; justify-content: space-around; padding: 15px 10px; border-top: 1px solid #333; z-index: 9999; padding-bottom: max(15px, env(safe-area-inset-bottom)); box-shadow: 0 -5px 10px rgba(0,0,0,0.5); }
+        .nav-btn { background: none; color: #777; border: none; font-size: 0.75em; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
         .nav-btn.active { color: var(--sec); }
-        .nav-icon { font-size: 1.4em; }
+        .nav-icon { font-size: 1.5em; }
         .card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); position: relative; }
         .btn { display: block; width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; transition: 0.1s; }
         .btn:active { transform: scale(0.98); }
@@ -76,8 +76,8 @@
         <div style="text-align:center; margin-top:15px;"><div style="font-size:2.5em; font-weight:bold; color:var(--sec);" id="score-display">--</div><div style="color:#aaa; font-style:italic;" id="score-text">Move sliders to calculate</div></div>
     </div>
     <div style="text-align:center; margin-top:30px; opacity:0.5;">
-        <small style="color:#777;">Version 22.1 - Crash Proof</small><br>
-        <button class="btn-danger" style="width:auto; display:inline-block; font-size:0.8em; margin-top:5px;" onclick="factoryReset()">⚠️ Reset App (Fix Crash)</button>
+        <small style="color:#777;">Version 23.2 - Nav Fix</small><br>
+        <button class="btn-danger" style="width:auto; display:inline-block; font-size:0.8em; margin-top:5px;" onclick="factoryReset()">⚠️ Reset App</button>
     </div>
 </div>
 
@@ -308,7 +308,7 @@
       {"name": "Curtsy Lunges", "categories": ["Legs", "Glutes"], "type": "Calisthenics", "desc": "Side back."},
       {"name": "Lateral Lunges", "categories": ["Legs"], "type": "Calisthenics", "desc": "Side."},
       {"name": "Step-Ups (Chair)", "categories": ["Legs"], "type": "Calisthenics", "desc": "Step up."},
-      {"name": "Calf Raises", "categories": ["Calves"], "type": "Calisthenics", "desc": "Raise."},
+      {"name": "Calf Raises", "categories": ["Calves", "Legs"], "type": "Calisthenics", "desc": "Raise."},
       {"name": "Single Leg Calf Raises", "categories": ["Calves"], "type": "Calisthenics", "desc": "One leg."},
       {"name": "Wall Sit", "categories": ["Legs"], "type": "Calisthenics", "desc": "Sit.", "isTimed": true, "duration": 60},
       {"name": "Glute Bridges (Single Leg)", "categories": ["Glutes"], "type": "Calisthenics", "desc": "One leg."},
@@ -316,8 +316,8 @@
       {"name": "Fire Hydrants", "categories": ["Glutes"], "type": "Calisthenics", "desc": "Side lift."},
       {"name": "Push-ups (Wide)", "categories": ["Chest"], "type": "Calisthenics", "desc": "Wide."},
       {"name": "Push-ups (Diamond)", "categories": ["Triceps"], "type": "Calisthenics", "desc": "Close."},
-      {"name": "Push-ups (Decline)", "categories": ["Chest", "Shoulders"], "type": "Calisthenics", "desc": "Feet up."},
-      {"name": "Push-ups (Incline)", "categories": ["Chest"], "type": "Calisthenics", "desc": "Hands up."},
+      {"name": "Push-ups (Decline)", "categories": ["Chest", "Shoulders"], "type": "Calisthenics", "desc": "Feet elevated."},
+      {"name": "Push-ups (Incline)", "categories": ["Chest"], "type": "Calisthenics", "desc": "Hands elevated."},
       {"name": "Tricep Dips", "categories": ["Triceps"], "type": "Calisthenics", "desc": "Dips."},
       {"name": "Plank (Forearm)", "categories": ["Core"], "type": "Calisthenics", "desc": "Low.", "isTimed": true, "duration": 60},
       {"name": "Plank (High)", "categories": ["Core"], "type": "Calisthenics", "desc": "High.", "isTimed": true, "duration": 60},
@@ -326,9 +326,9 @@
       {"name": "Plank Jacks", "categories": ["Core", "Cardio"], "type": "Calisthenics", "desc": "Jacks."},
       {"name": "Mountain Climbers (Twisting)", "categories": ["Core"], "type": "Calisthenics", "desc": "Twist.", "isTimed": true, "duration": 45},
       {"name": "Bicycle Crunches", "categories": ["Core", "Abs"], "type": "Calisthenics", "desc": "Cycle."},
-      {"name": "Leg Raises (Lying)", "categories": ["Core"], "type": "Calisthenics", "desc": "Lying."},
+      {"name": "Leg Raises (Lying)", "categories": ["Core", "Abs"], "type": "Calisthenics", "desc": "Lying."},
       {"name": "Flutter Kicks", "categories": ["Core"], "type": "Calisthenics", "desc": "Kicks.", "isTimed": true, "duration": 45},
-      {"name": "Russian Twists", "categories": ["Core"], "type": "Calisthenics", "desc": "Twist."},
+      {"name": "Russian Twists", "categories": ["Core", "Obliques"], "type": "Calisthenics", "desc": "Twist."},
       {"name": "V-Ups", "categories": ["Core"], "type": "Calisthenics", "desc": "V up."},
       {"name": "Superman Hold", "categories": ["Lower Back"], "type": "Calisthenics", "desc": "Hold.", "isTimed": true, "duration": 45},
       {"name": "Pull-ups (Wide)", "categories": ["Back"], "type": "Calisthenics", "desc": "Wide."},
