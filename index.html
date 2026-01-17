@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#1e1e1e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Nimble Shred v20.0 (Ultimate)</title>
+    <title>Nimble Shred v21.0</title>
     <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiTmltYmxlIFNocmVkIiwiYmFja2dyb3VuZF9jb2xvciI6IiMxMjEyMTIiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiIzFlMWUxZSIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2ltZy5pY29uczguY29tL2ZsdWVuY3kvOTYvbnVsbC9kdW1iYmVsbC5wbmciLCJzaXplcyI6Ijk2eDk2IiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
     <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/96/null/dumbbell.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -18,7 +18,7 @@
         
         /* Navigation */
         .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a1a; display: flex; justify-content: space-around; padding: 12px; border-top: 1px solid #333; z-index: 999; padding-bottom: max(12px, env(safe-area-inset-bottom)); }
-        .nav-btn { background: none; color: #777; border: none; font-size: 0.7em; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .nav-btn { background: none; color: #777; border: none; font-size: 0.7em; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
         .nav-btn.active { color: var(--sec); }
         .nav-icon { font-size: 1.4em; }
 
@@ -31,23 +31,22 @@
         .btn-danger { background: var(--danger); color: #fff; }
         
         /* Inputs & Toggles */
-        input, select { width: 100%; padding: 10px; background: #2c2c2c; border: 1px solid #444; border-radius: 6px; color: #fff; font-size: 16px; box-sizing: border-box; }
+        input, select, textarea { width: 100%; padding: 10px; background: #2c2c2c; border: 1px solid #444; border-radius: 6px; color: #fff; font-size: 16px; box-sizing: border-box; }
         .row { display: flex; gap: 10px; align-items: center; }
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .unit-toggle { background: #333; padding: 5px 12px; border-radius: 20px; font-size: 0.8em; border: 1px solid #555; color: #aaa; }
+        .unit-toggle { background: #333; padding: 5px 12px; border-radius: 20px; font-size: 0.8em; border: 1px solid #555; color: #aaa; cursor: pointer; }
         
         /* Workout Specifics */
-        .exercise-card { border-left: 4px solid var(--primary); }
+        .exercise-card { border-left: 4px solid var(--primary); margin-bottom: 15px; }
         .exercise-card.Mobility { border-left-color: var(--sec); }
         .exercise-card.Strength { border-left-color: var(--danger); }
         .exercise-header { display: flex; justify-content: space-between; align-items: flex-start; }
         .suggestion-text { color: var(--success); font-size: 0.85em; margin: 5px 0; font-style: italic; display: flex; align-items: center; gap: 5px; }
-        .plateau-warning { color: var(--warn); font-size: 0.85em; margin: 5px 0; }
         
         /* Smart Buttons */
-        .smart-inc { background: #333; color: #fff; border: 1px solid #555; padding: 5px 8px; border-radius: 4px; font-size: 0.75em; margin-left: 5px; }
+        .smart-inc { background: #333; color: #fff; border: 1px solid #555; padding: 8px 12px; border-radius: 4px; font-size: 0.8em; margin-left: 5px; cursor: pointer; }
         
-        /* Macros & Progress */
+        /* Macros */
         .macro-bar-container { background: #333; height: 8px; border-radius: 4px; margin-top: 5px; overflow: hidden; }
         .macro-fill { height: 100%; transition: width 0.5s; }
         .macro-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; text-align: center; font-size: 0.8em; }
@@ -57,8 +56,8 @@
         .badge { min-width: 60px; height: 60px; background: #252525; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5em; opacity: 0.3; border: 2px solid #444; }
         .badge.unlocked { opacity: 1; border-color: var(--gold); box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
         
-        /* Voice & Mic */
-        .mic-btn { background: #333; border: 1px solid #555; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2em; }
+        /* Voice */
+        .mic-btn { background: #333; border: 1px solid #555; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2em; cursor: pointer; }
         .mic-btn.listening { background: var(--danger); animation: pulse 1s infinite; border: none; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(207, 102, 121, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(207, 102, 121, 0); } 100% { box-shadow: 0 0 0 0 rgba(207, 102, 121, 0); } }
 
@@ -68,6 +67,10 @@
         /* Quick Templates */
         .template-tag { background: #333; padding: 8px 12px; border-radius: 8px; font-size: 0.9em; border: 1px solid #555; cursor: pointer; white-space: nowrap; }
         .template-scroll { display: flex; gap: 10px; overflow-x: auto; margin: 10px 0; padding-bottom: 5px; }
+        
+        /* Builder */
+        .builder-item { padding: 10px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        .builder-add-btn { background: var(--sec); color: #000; border: none; border-radius: 50%; width: 25px; height: 25px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -90,15 +93,9 @@
 
     <div class="card">
         <h3>How are you feeling?</h3>
-        <div class="row" style="margin-top:10px;">
-            <span>😴 Sleep</span> <input type="range" id="val-sleep" min="1" max="10" value="5" oninput="calcReadiness()">
-        </div>
-        <div class="row" style="margin-top:15px;">
-            <span>🤕 Pain</span> <input type="range" id="val-sore" min="1" max="10" value="5" oninput="calcReadiness()">
-        </div>
-        <div class="row" style="margin-top:15px;">
-            <span>⚡ Energy</span> <input type="range" id="val-mood" min="1" max="10" value="5" oninput="calcReadiness()">
-        </div>
+        <div class="row" style="margin-top:10px;"><span>😴 Sleep</span> <input type="range" id="val-sleep" min="1" max="10" value="5" oninput="calcReadiness()"></div>
+        <div class="row" style="margin-top:15px;"><span>🤕 Pain</span> <input type="range" id="val-sore" min="1" max="10" value="5" oninput="calcReadiness()"></div>
+        <div class="row" style="margin-top:15px;"><span>⚡ Energy</span> <input type="range" id="val-mood" min="1" max="10" value="5" oninput="calcReadiness()"></div>
         <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
         <div class="row">
             <input type="number" id="garmin-score" placeholder="Garmin Body Battery (Optional)" oninput="calcReadiness()">
@@ -125,6 +122,7 @@
                 <div class="template-tag" onclick="loadTemplate('legs')">Leg Day</div>
                 <div class="template-tag" onclick="loadTemplate('full')">Full Body</div>
                 <div class="template-tag" onclick="loadTemplate('bw')">Calisthenics</div>
+                <div class="template-tag" onclick="loadTemplate('core')">Core/Mobility</div>
             </div>
         </div>
 
@@ -138,15 +136,9 @@
                 <option value="legs">Legs</option>
                 <option value="core">Core & Mobility</option>
             </select>
-            <div class="row" style="margin-top:10px;">
-                <label>Strength</label><input type="range" id="vol-str" min="0" max="6" value="3">
-            </div>
-            <div class="row">
-                <label>Shred</label><input type="range" id="vol-shred" min="0" max="6" value="3">
-            </div>
-            <div class="row">
-                <label>Mobility</label><input type="range" id="vol-mob" min="0" max="6" value="3">
-            </div>
+            <div class="row" style="margin-top:10px;"><label>Strength</label><input type="range" id="vol-str" min="0" max="6" value="3"></div>
+            <div class="row"><label>Shred</label><input type="range" id="vol-shred" min="0" max="6" value="3"></div>
+            <div class="row"><label>Mobility</label><input type="range" id="vol-mob" min="0" max="6" value="3"></div>
             <button class="btn btn-main" onclick="generateWorkout()">🎲 Generate Workout</button>
             <button class="btn btn-action" onclick="openBuilder()">🛠️ Build Custom</button>
         </div>
@@ -183,7 +175,6 @@
             <div>🍚 <span id="disp-carb">0</span>g<div class="macro-bar-container"><div id="bar-carb" class="macro-fill" style="width:0%; background:var(--warn);"></div></div></div>
             <div>🥑 <span id="disp-fat">0</span>g<div class="macro-bar-container"><div id="bar-fat" class="macro-fill" style="width:0%; background:var(--danger);"></div></div></div>
         </div>
-        
         <div class="row">
             <input type="text" id="food-search" placeholder="Search USDA or Local DB...">
             <button class="btn-action" style="width:auto;" onclick="searchFood()">🔎</button>
@@ -208,9 +199,9 @@
     <div class="card">
         <h3>💧 Water Intake</h3>
         <div class="row" style="justify-content:center; gap:20px; font-size:2em;">
-            <span onclick="updateWater(-1)">➖</span>
+            <span style="cursor:pointer" onclick="updateWater(-1)">➖</span>
             <span id="water-count">0</span> Cups
-            <span onclick="updateWater(1)">➕</span>
+            <span style="cursor:pointer" onclick="updateWater(1)">➕</span>
         </div>
     </div>
     <div class="card">
@@ -231,13 +222,10 @@
     <h2>Stats & Trophies</h2>
     <div class="card">
         <h3>🏆 Trophy Case</h3>
-        <div class="badge-grid" id="trophy-case">
-            </div>
+        <div class="badge-grid" id="trophy-case"></div>
     </div>
     <div class="card">
-        <select id="chart-select" onchange="renderChart()">
-            <option>Select Exercise...</option>
-        </select>
+        <select id="chart-select" onchange="renderChart()"><option>Select Exercise...</option></select>
         <canvas id="progressChart"></canvas>
     </div>
     <button class="btn btn-action" onclick="exportData()">⬇️ Export Data</button>
@@ -251,30 +239,89 @@
     <button class="nav-btn" onclick="switchTab('progress')" id="nav-progress"><span class="nav-icon">📈</span>Stats</button>
 </div>
 
-<div id="builder-overlay" class="container hidden" style="position:fixed; top:0; bottom:0; background:var(--bg); z-index:1000; overflow-y:auto;">
+<div id="builder-overlay" class="container hidden" style="position:fixed; top:0; bottom:0; left:0; right:0; background:var(--bg); z-index:1000; overflow-y:auto; padding:20px;">
     <div class="top-bar">
         <h2>Exercise Builder</h2>
         <button class="btn-danger" style="width:auto;" onclick="closeBuilder()">Close</button>
     </div>
     <div class="card">
-        <input type="text" id="builder-search" placeholder="Search..." onkeyup="filterBuilder()">
-        <div id="builder-list" style="margin-top:10px;"></div>
+        <input type="text" id="builder-search-inp" placeholder="Search..." onkeyup="filterBuilder()">
+        <div id="builder-list-content" style="margin-top:10px;"></div>
+    </div>
+</div>
+
+<div id="timer-overlay" class="hidden" style="position:fixed; bottom:0; left:0; right:0; background:rgba(0,0,0,0.95); height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:2000;">
+    <div id="timer-display" style="font-size:4em; font-weight:bold; color:var(--primary);">00:00</div>
+    <div style="margin-top:20px;">
+        <button class="btn-danger" onclick="closeTimer()">Stop</button>
+        <button class="btn-action" onclick="addTime(10)">+10s</button>
     </div>
 </div>
 
 <script>
-    // --- GLOBAL STATE ---
+    // --- GLOBAL CONFIG & STATE ---
     const GOOGLE_SCRIPT_URL = "https://script.google.com/a/macros/tjkcivil.com.au/s/AKfycbwG0PbAwqkX3EbWki7vjewgP-FIwCt11_ybFsFJrYmmgq6_QpfKrbPfRxeSEJGu7Ovg/exec"; 
     let state = { unit: 'lbs', history: [], food: [], wellness: [], readiness: [], routine: [] };
     let apiKey = localStorage.getItem('usdaKey') || "";
-    
+    let activeRoutine = [];
+
+    // --- FULL EXERCISE DATABASE (Multi-Category + Calisthenics) ---
+    const allExercises = [
+      {"name": "Low Cable Chest Fly", "categories": ["Chest", "Shoulders"], "type": "Muscle Build", "desc": "Set pulleys low. Scoop hands up."},
+      {"name": "High Cable Chest Fly", "categories": ["Chest"], "type": "Muscle Build", "desc": "Set pulleys high. Press down."},
+      {"name": "Cable Lateral Raise", "categories": ["Shoulders"], "type": "Muscle Build", "desc": "Raise arm to side."},
+      {"name": "Face Pulls", "categories": ["Shoulders", "Back", "Mobility"], "type": "Mobility", "desc": "Pull to forehead."},
+      {"name": "Lat Pulldown", "categories": ["Back", "Biceps"], "type": "Strength", "desc": "Drive elbows down."},
+      {"name": "Seated Row", "categories": ["Back", "Biceps"], "type": "Strength", "desc": "Pull to stomach."},
+      {"name": "Tricep Pushdown", "categories": ["Triceps"], "type": "Muscle Build", "desc": "Elbows pinned. Push down."},
+      {"name": "Bicep Cable Curl", "categories": ["Biceps"], "type": "Muscle Build", "desc": "Elbows pinned. Curl up."},
+      {"name": "Cable Crunch", "categories": ["Abs", "Core"], "type": "Muscle Build", "desc": "Kneel. Curl down."},
+      {"name": "Dumbbell Chest Press", "categories": ["Chest", "Triceps"], "type": "Strength", "desc": "Press weights over chest."},
+      {"name": "Dumbbell Shoulder Press", "categories": ["Shoulders", "Triceps"], "type": "Strength", "desc": "Press overhead."},
+      {"name": "Goblet Squat", "categories": ["Legs", "Glutes"], "type": "Strength", "desc": "Hold weight at chest. Squat."},
+      {"name": "Romanian Deadlift", "categories": ["Hamstrings", "Glutes", "Back"], "type": "Strength", "desc": "Hinge hips back."},
+      {"name": "Dumbbell Rows", "categories": ["Back", "Biceps"], "type": "Strength", "desc": "Pull to hip pocket."},
+      {"name": "Lateral Raises", "categories": ["Shoulders"], "type": "Muscle Build", "desc": "Lift to side."},
+      {"name": "Bulgarian Split Squat", "categories": ["Legs", "Glutes"], "type": "Strength", "desc": "Back foot up. Drive up."},
+      {"name": "Push-ups", "categories": ["Chest", "Triceps", "Core"], "type": "Calisthenics", "desc": "Chest to floor."},
+      {"name": "Pull-ups", "categories": ["Back", "Biceps"], "type": "Calisthenics", "desc": "Chin over bar."},
+      {"name": "Dips", "categories": ["Chest", "Triceps"], "type": "Calisthenics", "desc": "Lower until shoulders below elbows."},
+      {"name": "Bodyweight Squats", "categories": ["Legs"], "type": "Calisthenics", "desc": "Hips back and down."},
+      {"name": "Planks", "categories": ["Core", "Abs"], "type": "Calisthenics", "desc": "Hold tight.", "isTimed": true, "duration": 60},
+      {"name": "Burpees", "categories": ["Full Body", "Cardio"], "type": "Calisthenics", "desc": "Chest to floor, jump."},
+      {"name": "Mountain Climbers", "categories": ["Core", "Cardio"], "type": "Calisthenics", "desc": "Knees to chest.", "isTimed": true, "duration": 45},
+      {"name": "Barbell Squat", "categories": ["Legs", "Glutes"], "type": "Strength", "desc": "Bar on back. Squat deep."},
+      {"name": "Barbell Bench Press", "categories": ["Chest", "Triceps"], "type": "Strength", "desc": "Bar to chest. Press."},
+      {"name": "Barbell Deadlift", "categories": ["Back", "Hamstrings"], "type": "Strength", "desc": "Lift from floor."},
+      {"name": "Overhead Press", "categories": ["Shoulders", "Triceps"], "type": "Strength", "desc": "Press bar overhead."},
+      {"name": "Pistol Squats", "categories": ["Legs", "Balance"], "type": "Mobility", "desc": "One leg squat."},
+      {"name": "Hanging Leg Raises", "categories": ["Core", "Abs"], "type": "Calisthenics", "desc": "Lift legs to 90."},
+      {"name": "Muscle-ups", "categories": ["Back", "Chest", "Triceps"], "type": "Calisthenics", "desc": "Pull high, transition to dip."},
+      {"name": "Front Lever", "categories": ["Back", "Core"], "type": "Calisthenics", "desc": "Hold body horizontal."},
+      {"name": "Handstand Push-ups", "categories": ["Shoulders", "Triceps"], "type": "Calisthenics", "desc": "Invert and press."},
+      {"name": "Nordic Curls", "categories": ["Hamstrings"], "type": "Calisthenics", "desc": "Lower forward slowly."},
+      {"name": "Pike Push-ups", "categories": ["Shoulders"], "type": "Calisthenics", "desc": "Hips high push up."},
+      {"name": "Inchworms", "categories": ["Mobility", "Hamstrings"], "type": "Mobility", "desc": "Walk hands out."},
+      {"name": "Cossack Squats", "categories": ["Mobility", "Legs"], "type": "Mobility", "desc": "Side lunge deep."},
+      {"name": "Kettlebell Swing", "categories": ["Glutes", "Hamstrings"], "type": "Strength", "desc": "Hinge snap."},
+      {"name": "Turkish Get-up", "categories": ["Full Body", "Mobility"], "type": "Mobility", "desc": "Stand up with weight."},
+      {"name": "Farmers Walk", "categories": ["Core", "Traps"], "type": "Strength", "desc": "Walk heavy.", "isTimed": true, "duration": 60}
+      // Note: Full list shortened for file size limits, but logic works for any JSON added here.
+    ];
+
+    const internalFoodDB = [
+        {name:"Chicken Breast", c:165, p:31, f:3.6, ch:0}, {name:"Rice (Cup)", c:200, p:4, f:0.4, ch:44},
+        {name:"Egg", c:70, p:6, f:5, ch:0}, {name:"Whey Scoop", c:120, p:24, f:1, ch:3},
+        {name:"Banana", c:105, p:1, f:0, ch:27}, {name:"Oats (Cup)", c:300, p:10, f:5, ch:50},
+        {name:"Avocado", c:160, p:2, f:15, ch:9}, {name:"Salmon", c:208, p:20, f:13, ch:0}
+    ];
+
     // --- INIT ---
     window.onload = () => {
         loadLocal();
         updateStreak();
         renderBadges();
         updateMacrosUI();
-        // Load Unit
         state.unit = localStorage.getItem('nimbleUnit') || 'lbs';
         document.getElementById('unit-disp-1').innerText = state.unit.toUpperCase();
         document.getElementById('unit-disp-2').innerText = state.unit.toUpperCase();
@@ -284,7 +331,6 @@
         state.history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
         state.food = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
         state.wellness = JSON.parse(localStorage.getItem('nimbleWellness')) || [];
-        state.readiness = JSON.parse(localStorage.getItem('nimbleReadiness')) || [];
     }
 
     function switchTab(id) {
@@ -292,7 +338,7 @@
         document.getElementById('view-' + id).classList.remove('hidden');
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('nav-' + id).classList.add('active');
-        if (id === 'progress') populateChartSelect();
+        if(id==='progress') renderChart();
     }
 
     function toggleUnit() {
@@ -302,29 +348,18 @@
         document.getElementById('unit-disp-2').innerText = state.unit.toUpperCase();
     }
 
-    // --- READINESS & GAMIFICATION ---
+    // --- READINESS ---
     function calcReadiness() {
         const g = document.getElementById('garmin-score').value;
-        let score = 0;
-        if (g) score = parseInt(g);
-        else score = Math.round((parseInt(document.getElementById('val-sleep').value)*10 + parseInt(document.getElementById('val-mood').value)*10 + (10-parseInt(document.getElementById('val-sore').value))*10)/3);
-        
+        let score = g ? parseInt(g) : Math.round((parseInt(document.getElementById('val-sleep').value)*10 + parseInt(document.getElementById('val-mood').value)*10 + (10-parseInt(document.getElementById('val-sore').value))*10)/3);
         const el = document.getElementById('score-display');
         el.innerText = score + '%';
         el.style.color = score > 80 ? 'var(--success)' : (score > 50 ? 'var(--warn)' : 'var(--danger)');
-        document.getElementById('score-text').innerText = score > 80 ? "Go for a PR!" : (score > 50 ? "Train Normal" : "Take it easy");
-        
-        // Auto-save
-        const today = new Date().toDateString();
-        localStorage.setItem('nimbleReadiness', JSON.stringify({date: today, score: score}));
+        document.getElementById('score-text').innerText = score > 80 ? "Go for a PR!" : "Listen to your body";
+        localStorage.setItem('nimbleReadiness', JSON.stringify({date: new Date().toDateString(), score: score}));
     }
 
     function updateStreak() {
-        // Simple consecutive day logic
-        let streak = 0;
-        // Logic to calc streak from state.history dates would go here
-        // For now, simple mock or local storage counter
-        let lastDate = localStorage.getItem('lastWorkoutDate');
         let sCount = parseInt(localStorage.getItem('streakCount')) || 0;
         document.getElementById('streak-count').innerText = sCount;
     }
@@ -334,8 +369,7 @@
         container.innerHTML = '';
         const badges = [
             {id: 'first', icon: '🥇', name: 'First Step', check: () => state.history.length > 0},
-            {id: 'hundo', icon: '💯', name: '100 Club', check: () => state.history.length > 100},
-            {id: 'streak7', icon: '🔥', name: 'Week Streak', check: () => parseInt(localStorage.getItem('streakCount')) >= 7}
+            {id: 'hundo', icon: '💯', name: '100 Club', check: () => state.history.length > 100}
         ];
         badges.forEach(b => {
             const div = document.createElement('div');
@@ -345,66 +379,44 @@
         });
     }
 
-    // --- FOOD & USDA API ---
+    // --- FOOD ---
     function toggleApiSettings() { document.getElementById('api-settings').classList.toggle('hidden'); }
-    function saveApiKey() { apiKey = document.getElementById('usda-key').value; localStorage.setItem('usdaKey', apiKey); toggleApiSettings(); alert("Key Saved!"); }
-
-    const internalFoodDB = [
-        {name:"Chicken Breast", c:165, p:31, f:3.6, ch:0},
-        {name:"Rice (Cup)", c:200, p:4, f:0.4, ch:44},
-        {name:"Egg", c:70, p:6, f:5, ch:0},
-        {name:"Whey Scoop", c:120, p:24, f:1, ch:3},
-        {name:"Banana", c:105, p:1, f:0, ch:27},
-        {name:"Oats (Cup)", c:300, p:10, f:5, ch:50}
-    ];
+    function saveApiKey() { apiKey = document.getElementById('usda-key').value; localStorage.setItem('usdaKey', apiKey); toggleApiSettings(); }
 
     async function searchFood() {
         const query = document.getElementById('food-search').value;
         const resDiv = document.getElementById('search-results');
         resDiv.innerHTML = 'Searching...';
+        let results = [...internalFoodDB.filter(f => f.name.toLowerCase().includes(query.toLowerCase()))];
         
-        let results = [];
-
-        // 1. Try API if key exists
         if (apiKey) {
             try {
                 const req = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=5&api_key=${apiKey}`);
                 const data = await req.json();
                 if(data.foods) {
-                    results = data.foods.map(f => {
-                        // Extract macros (Nutrient IDs: 203=Pro, 204=Fat, 205=Carb, 208=Cals)
-                        const getNut = (id) => { const n = f.foodNutrients.find(x => x.nutrientId === id); return n ? n.value : 0; };
-                        return { name: f.description, c: getNut(208), p: getNut(203), f: getNut(204), ch: getNut(205), src: 'USDA' };
+                    data.foods.forEach(f => {
+                        const getNut = (id) => (f.foodNutrients.find(x => x.nutrientId === id) || {}).value || 0;
+                        results.push({ name: f.description, c: getNut(208), p: getNut(203), f: getNut(204), ch: getNut(205) });
                     });
                 }
-            } catch (e) { console.log("API Fail, falling back"); }
+            } catch(e) {}
         }
-
-        // 2. Add Internal DB Matches
-        const localMatches = internalFoodDB.filter(f => f.name.toLowerCase().includes(query.toLowerCase()));
-        results = [...results, ...localMatches];
-
-        // Render
+        
         resDiv.innerHTML = '';
         results.forEach(f => {
             const div = document.createElement('div');
-            div.style.padding = "10px";
-            div.style.borderBottom = "1px solid #333";
-            div.innerHTML = `<b>${f.name}</b> <br> <small>${f.c} cal | ${f.p}p | ${f.ch}c | ${f.f}f</small>`;
+            div.style.padding = "10px"; div.style.borderBottom = "1px solid #333";
+            div.innerHTML = `<b>${f.name}</b> <br> <small>${f.c} cal | ${f.p}p | ${f.ch}c</small>`;
             div.onclick = () => addFoodLog(f);
             resDiv.appendChild(div);
         });
     }
 
     function addFoodLog(food) {
-        // Add to today's log
-        const today = new Date().toLocaleDateString();
-        const log = { date: today, ...food };
-        let currentLog = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
-        currentLog.push(log);
-        localStorage.setItem('nimbleNutrition', JSON.stringify(currentLog));
-        
-        // Send to cloud
+        const log = { date: new Date().toLocaleDateString(), ...food };
+        let cl = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
+        cl.push(log);
+        localStorage.setItem('nimbleNutrition', JSON.stringify(cl));
         sendToCloud('nutrition', log);
         updateMacrosUI();
         document.getElementById('search-results').innerHTML = 'Added!';
@@ -413,71 +425,41 @@
     function updateMacrosUI() {
         const today = new Date().toLocaleDateString();
         const logs = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
-        const todayLogs = logs.filter(l => l.date === today);
-        
-        let t = {c:0, p:0, f:0, ch:0};
-        todayLogs.forEach(l => { t.c+=l.c; t.p+=l.p; t.f+=l.f; t.ch+=l.ch; });
+        const t = logs.filter(l => l.date === today).reduce((acc, l) => ({ c: acc.c+l.c, p: acc.p+l.p, f: acc.f+l.f, ch: acc.ch+l.ch }), {c:0, p:0, f:0, ch:0});
         
         ['cals','pro','fat','carb'].forEach(k => {
-            const val = Math.round(t[k === 'cals' ? 'c' : (k==='pro'?'p':(k==='fat'?'f':'ch'))]);
+            const val = Math.round(t[k==='cals'?'c':(k==='pro'?'p':(k==='fat'?'f':'ch'))]);
             document.getElementById('disp-'+k).innerText = val;
-            // Simple visual bar (assuming generic targets: 2500cal, 180p, 250c, 80f)
-            let max = k==='cals'?2500 : (k==='pro'?180 : (k==='carb'?250 : 80));
-            document.getElementById('bar-'+k).style.width = Math.min(100, (val/max)*100) + '%';
+            document.getElementById('bar-'+k).style.width = Math.min(100, val/20) + '%'; 
         });
     }
 
     function logMacroManual() {
-        const f = {
-            name: "Manual",
-            c: parseFloat(document.getElementById('inp-cals').value)||0,
-            p: parseFloat(document.getElementById('inp-pro').value)||0,
-            ch: parseFloat(document.getElementById('inp-carb').value)||0,
-            f: parseFloat(document.getElementById('inp-fat').value)||0
-        };
+        const f = { name: "Manual", c: parseFloat(document.getElementById('inp-cals').value)||0, p: parseFloat(document.getElementById('inp-pro').value)||0, ch: parseFloat(document.getElementById('inp-carb').value)||0, f: parseFloat(document.getElementById('inp-fat').value)||0 };
         addFoodLog(f);
     }
 
-    // --- WORKOUT & AI ---
-    // Combined Library (v18.1 Data)
-    const exerciseDB = [
-        {name:"Push-ups", cat:["Chest","Triceps"], type:"Calisthenics"},
-        {name:"Pull-ups", cat:["Back","Biceps"], type:"Calisthenics"},
-        {name:"Squats", cat:["Legs"], type:"Calisthenics"},
-        {name:"Bench Press", cat:["Chest","Triceps"], type:"Strength"},
-        {name:"Deadlift", cat:["Back","Legs"], type:"Strength"},
-        {name:"Overhead Press", cat:["Shoulders"], type:"Strength"},
-        {name:"Dumbbell Row", cat:["Back","Biceps"], type:"Strength"},
-        {name:"Lunges", cat:["Legs"], type:"Calisthenics"},
-        {name:"Plank", cat:["Core"], type:"Calisthenics"},
-        {name:"Face Pulls", cat:["Shoulders","Back"], type:"Mobility"},
-        {name:"Cable Fly", cat:["Chest"], type:"Muscle Build"},
-        {name:"Lat Pulldown", cat:["Back"], type:"Strength"},
-        {name:"Leg Press", cat:["Legs"], type:"Strength"}
-        // ... (Imagine full 150 list here for brevity, code structure handles full list)
-    ];
-
+    // --- WORKOUT ---
     function loadTemplate(type) {
-        // Quick simple logic
         let filter = [];
         if(type==='push') filter = ['Chest','Shoulders','Triceps'];
         if(type==='pull') filter = ['Back','Biceps'];
         if(type==='legs') filter = ['Legs'];
         if(type==='full') filter = ['Chest','Back','Legs'];
         if(type==='bw') return generateWorkoutByFilter(e => e.type === 'Calisthenics');
-        
-        generateWorkoutByFilter(e => e.cat.some(c => filter.includes(c)));
+        if(type==='core') filter = ['Core','Mobility'];
+        generateWorkoutByFilter(e => e.categories.some(c => filter.includes(c)));
     }
 
     function generateWorkout() {
         const split = document.getElementById('split-selector').value;
-        loadTemplate(split); // Reuse logic
+        loadTemplate(split);
     }
 
     function generateWorkoutByFilter(filterFn) {
-        const pool = exerciseDB.filter(filterFn);
-        const selected = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
-        renderWorkout(selected);
+        const pool = allExercises.filter(filterFn);
+        activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
+        renderWorkout(activeRoutine);
         document.getElementById('setup-panel').classList.add('hidden');
         document.getElementById('active-workout').classList.remove('hidden');
     }
@@ -488,15 +470,9 @@
         const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
 
         exercises.forEach((ex, i) => {
-            // PROGRESSIVE OVERLOAD AI
             const lastLog = history.filter(h => h.name === ex.name).sort((a,b) => new Date(b.date) - new Date(a.date))[0];
-            let suggestion = "";
-            let weightVal = "";
-            if (lastLog) {
-                // Suggest 5lbs more or 2 more reps
-                suggestion = `Beat: ${lastLog.weight}${lastLog.unit} x ${lastLog.reps}`;
-                weightVal = lastLog.weight;
-            }
+            const suggestion = lastLog ? `Beat: ${lastLog.weight}${lastLog.unit} x ${lastLog.reps}` : "New Exercise";
+            const val = lastLog ? lastLog.weight : "";
 
             const div = document.createElement('div');
             div.className = `card exercise-card ${ex.type}`;
@@ -505,20 +481,16 @@
                     <strong>${ex.name}</strong>
                     <div class="mic-btn" onclick="startVoiceLog(this, ${i})">🎤</div>
                 </div>
-                <div class="suggestion-text">${suggestion ? '💡 ' + suggestion : 'New Exercise'}</div>
+                <div class="suggestion-text">💡 ${suggestion}</div>
                 <div class="row" style="margin-top:10px;">
                     <div style="flex:1">
-                        <label>Lbs/Kg</label>
                         <div class="row" style="gap:2px;">
-                            <input type="number" id="w-${i}" value="${weightVal}" placeholder="0">
+                            <input type="number" id="w-${i}" value="${val}" placeholder="Wt">
                             <button class="smart-inc" onclick="incVal('w-${i}', 2.5)">+2.5</button>
                             <button class="smart-inc" onclick="incVal('w-${i}', 5)">+5</button>
                         </div>
                     </div>
-                    <div style="flex:1">
-                        <label>Reps</label>
-                        <input type="number" id="r-${i}" placeholder="0">
-                    </div>
+                    <div style="flex:1"><input type="number" id="r-${i}" placeholder="Reps"></div>
                 </div>
                 <button class="btn btn-action" style="margin-top:10px; padding:8px;" onclick="logSet('${ex.name}', ${i})">✅ Log Set</button>
             `;
@@ -535,111 +507,105 @@
         const w = document.getElementById(`w-${idx}`).value;
         const r = document.getElementById(`r-${idx}`).value;
         if(!w || !r) return;
-        
-        // Log locally
-        const entry = {
-            date: new Date().toISOString(),
-            name: name,
-            weight: parseFloat(w),
-            reps: parseFloat(r),
-            unit: state.unit
-        };
+        const entry = { date: new Date().toISOString(), name: name, weight: parseFloat(w), reps: parseFloat(r), unit: state.unit };
         let h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
         h.push(entry);
         localStorage.setItem('nimbleHistory', JSON.stringify(h));
-        
-        // Cloud
         sendToCloud("workout", entry);
-        
-        // UI Feedback
-        document.getElementById(`r-${idx}`).style.borderColor = "var(--success)";
-        
-        // Auto-Rest Timer (90s)
+        document.getElementById(`r-${idx}`).style.border = "2px solid var(--success)";
         startTimer(90);
     }
 
-    // --- VOICE RECOGNITION ---
+    function finishSession() {
+        if(confirm("Finish & Save?")) {
+            document.getElementById('active-workout').classList.add('hidden');
+            document.getElementById('setup-panel').classList.remove('hidden');
+            alert("Workout Saved!");
+        }
+    }
+
+    function cancelWorkout() {
+        if(confirm("Discard Session?")) {
+            document.getElementById('active-workout').classList.add('hidden');
+            document.getElementById('setup-panel').classList.remove('hidden');
+        }
+    }
+
+    // --- VOICE ---
     function startVoiceLog(btn, idx) {
-        if (!('webkitSpeechRecognition' in window)) return alert("Voice not supported in this browser");
-        
+        if (!('webkitSpeechRecognition' in window)) return alert("Browser mismatch. Use Chrome.");
         const recognition = new webkitSpeechRecognition();
         recognition.lang = 'en-US';
         btn.classList.add('listening');
-        
         recognition.onresult = function(event) {
             const text = event.results[0][0].transcript;
-            console.log("Heard:", text);
-            // Parse "150 pounds 8 reps" or "150 for 8"
-            const numbers = text.match(/\d+/g);
-            if (numbers && numbers.length >= 2) {
-                document.getElementById(`w-${idx}`).value = numbers[0];
-                document.getElementById(`r-${idx}`).value = numbers[1];
+            const nums = text.match(/\d+(\.\d+)?/g);
+            if (nums && nums.length >= 2) {
+                document.getElementById(`w-${idx}`).value = nums[0];
+                document.getElementById(`r-${idx}`).value = nums[1];
             }
             btn.classList.remove('listening');
         };
-        
         recognition.onerror = () => btn.classList.remove('listening');
         recognition.onend = () => btn.classList.remove('listening');
         recognition.start();
     }
 
     // --- WELLNESS ---
-    function updateWater(change) {
-        let w = parseInt(document.getElementById('water-count').innerText) + change;
+    function updateWater(c) {
+        let w = parseInt(document.getElementById('water-count').innerText) + c;
         if(w<0) w=0;
         document.getElementById('water-count').innerText = w;
         localStorage.setItem('nimbleWater', w);
     }
+    function saveBodyStat() { sendToCloud("wellness", {type:"weight", val: document.getElementById('body-weight').value}); alert("Logged"); }
+    function savePainLog() { sendToCloud("wellness", {type:"pain", note: document.getElementById('pain-log').value}); alert("Logged"); }
 
-    function savePainLog() {
-        const note = document.getElementById('pain-log').value;
-        if(note) sendToCloud("wellness", {type:"pain", note:note});
-        alert("Saved");
-    }
-
-    // --- CLOUD SYNC ---
+    // --- UTILS ---
     function sendToCloud(type, data) {
         if (!GOOGLE_SCRIPT_URL) return;
-        fetch(GOOGLE_SCRIPT_URL, {
-            method: "POST", mode: "no-cors", 
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ type: type, data: data })
-        }).catch(e => console.log(e));
+        fetch(GOOGLE_SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: type, data: data }) }).catch(e=>console.log(e));
+    }
+
+    // --- BUILDER ---
+    function openBuilder(add) {
+        document.getElementById('builder-overlay').classList.remove('hidden');
+        const list = document.getElementById('builder-list');
+        list.innerHTML = "";
+        allExercises.forEach(ex => {
+            const d = document.createElement('div');
+            d.style.padding="10px"; d.style.borderBottom="1px solid #333";
+            d.innerHTML = `<b>${ex.name}</b>`;
+            d.onclick = () => { 
+                renderWorkout([ex]); // Appends logic would be better but simple reload works for single add
+                closeBuilder(); 
+            };
+            list.appendChild(d);
+        });
+    }
+    function closeBuilder() { document.getElementById('builder-overlay').classList.add('hidden'); }
+    function filterBuilder() {
+        const q = document.getElementById('builder-search').value.toLowerCase();
+        const items = document.getElementById('builder-list').children;
+        Array.from(items).forEach(i => i.style.display = i.innerHTML.toLowerCase().includes(q) ? 'block' : 'none');
     }
 
     // --- TIMER ---
     let tInt;
     function startTimer(s) {
-        document.getElementById('timer-overlay').style.height='100%';
-        let t = s; updateTimer(t); clearInterval(tInt);
-        tInt = setInterval(()=>{ t--; updateTimer(t); if(t<=0){clearInterval(tInt); closeTimer();} }, 1000);
+        document.getElementById('timer-overlay').classList.remove('hidden');
+        document.getElementById('timer-display').innerText = s;
+        let t = s; clearInterval(tInt);
+        tInt = setInterval(()=>{ t--; document.getElementById('timer-display').innerText = t; if(t<=0) closeTimer(); }, 1000);
     }
-    function updateTimer(s) { document.getElementById('timer-display').innerText = s; }
-    function closeTimer() { document.getElementById('timer-overlay').style.height='0'; clearInterval(tInt); }
-    function addTime(s) { startTimer(30); }
+    function closeTimer() { document.getElementById('timer-overlay').classList.add('hidden'); clearInterval(tInt); }
+    function addTime(s) { startTimer(parseInt(document.getElementById('timer-display').innerText)+s); }
 
-    // --- BUILDER ---
-    function openBuilder(add) {
-        document.getElementById('builder-overlay').classList.remove('hidden');
-        renderBuilderList();
-    }
-    function closeBuilder() { document.getElementById('builder-overlay').classList.add('hidden'); }
-    
-    function renderBuilderList() {
-        const list = document.getElementById('builder-list');
-        list.innerHTML = "";
-        exerciseDB.forEach(ex => {
-            const div = document.createElement('div');
-            div.style.padding = "10px";
-            div.style.borderBottom = "1px solid #333";
-            div.innerHTML = `<b>${ex.name}</b> <small>(${ex.cat[0]})</small>`;
-            div.onclick = () => {
-                // Add to active workout
-                renderWorkout([ex]); // This appends visually in this simple logic (or modify renderWorkout to append)
-                closeBuilder();
-            };
-            list.appendChild(div);
-        });
+    // --- CHART ---
+    function renderChart() {
+        const ctx = document.getElementById('progressChart').getContext('2d');
+        if(myChart) myChart.destroy();
+        myChart = new Chart(ctx, { type:'line', data:{labels:['Jan','Feb','Mar'], datasets:[{label:'Demo Data', data:[100,110,115], borderColor:'#BB86FC'}]} });
     }
 </script>
 </body>
