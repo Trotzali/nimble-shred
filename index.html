@@ -6,13 +6,15 @@
     <meta name="theme-color" content="#1e1e1e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Nimble Shred v25.0</title>
+    <title>Nimble Shred v24.0</title>
     <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiTmltYmxlIFNocmVkIiwiYmFja2dyb3VuZF9jb2xvciI6IiMxMjEyMTIiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiIzFlMWUxZSIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2ltZy5pY29uczguY29tL2ZsdWVuY3kvOTYvbnVsbC9kdW1iYmVsbC5wbmciLCJzaXplcyI6Ijk2eDk2IiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
     <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/96/null/dumbbell.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --bg: #121212; --card: #1e1e1e; --primary: #BB86FC; --sec: #03DAC6; --text: #fff; --gold: #FFD700; --danger: #CF6679; --success: #00C853; --warn: #FF9800; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 120px; -webkit-tap-highlight-color: transparent; }
+        
+        /* Layout & Nav */
         .container { max-width: 600px; margin: 0 auto; display: none; padding-bottom: 50px; } 
         .container.active { display: block; }
         h1, h2 { text-align: center; margin: 10px 0; }
@@ -20,6 +22,8 @@
         .nav-btn { background: none; color: #777; border: none; font-size: 0.75em; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
         .nav-btn.active { color: var(--sec); }
         .nav-icon { font-size: 1.5em; }
+        
+        /* Components */
         .card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); position: relative; }
         .btn { display: block; width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; transition: 0.1s; }
         .btn:active { transform: scale(0.98); }
@@ -30,33 +34,51 @@
         .row { display: flex; gap: 10px; align-items: center; }
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .unit-toggle { background: #333; padding: 5px 12px; border-radius: 20px; font-size: 0.8em; border: 1px solid #555; color: #aaa; cursor: pointer; }
+        
+        /* Workout Cards */
         .exercise-card { border-left: 4px solid var(--primary); margin-bottom: 15px; }
         .exercise-card.Mobility { border-left-color: var(--sec); }
         .exercise-card.Strength { border-left-color: var(--danger); }
         .exercise-header { display: flex; justify-content: space-between; align-items: flex-start; }
         .suggestion-text { color: var(--success); font-size: 0.85em; margin: 5px 0; font-style: italic; display: flex; align-items: center; gap: 5px; }
+        
+        /* Interactive Elements */
         .smart-inc { background: #333; color: #fff; border: 1px solid #555; padding: 8px 12px; border-radius: 4px; font-size: 0.8em; margin-left: 5px; cursor: pointer; }
+        .mic-btn { background: #333; border: 1px solid #555; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2em; cursor: pointer; }
+        .mic-btn.listening { background: var(--danger); animation: pulse 1s infinite; border: none; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(207, 102, 121, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(207, 102, 121, 0); } 100% { box-shadow: 0 0 0 0 rgba(207, 102, 121, 0); } }
+        
+        /* Full Screen Modals/Overlays */
+        .fs-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 5000; padding: 20px; overflow-y: auto; box-sizing: border-box; display: none; }
+        .fs-overlay.flex-center { display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.95); }
+        
+        /* The Fix: Hidden must override inline styles */
+        .hidden { display: none !important; }
+        
+        /* Misc */
         .macro-bar-container { background: #333; height: 8px; border-radius: 4px; margin-top: 5px; overflow: hidden; }
         .macro-fill { height: 100%; transition: width 0.5s; }
         .macro-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; text-align: center; font-size: 0.8em; }
         .badge-grid { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
         .badge { min-width: 60px; height: 60px; background: #252525; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5em; opacity: 0.3; border: 2px solid #444; }
         .badge.unlocked { opacity: 1; border-color: var(--gold); box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
-        .mic-btn { background: #333; border: 1px solid #555; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2em; cursor: pointer; }
-        .mic-btn.listening { background: var(--danger); animation: pulse 1s infinite; border: none; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(207, 102, 121, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(207, 102, 121, 0); } 100% { box-shadow: 0 0 0 0 rgba(207, 102, 121, 0); } }
-        .hidden { display: none !important; }
         #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
         .template-tag { background: #333; padding: 8px 12px; border-radius: 8px; font-size: 0.9em; border: 1px solid #555; cursor: pointer; white-space: nowrap; }
         .template-scroll { display: flex; gap: 10px; overflow-x: auto; margin: 10px 0; padding-bottom: 5px; }
-        .fs-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 5000; padding: 20px; overflow-y: auto; box-sizing: border-box; display: none; }
-        .fs-overlay.flex-center { display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.95); }
         .instruction-box { background: #252525; padding: 10px; border-radius: 5px; margin-top: 10px; margin-bottom: 10px; font-size: 0.9em; color: #ddd; border-left: 2px solid #777; display: none; line-height: 1.4; }
         .instruction-box.visible { display: block; }
         .gif-input { width: 100%; padding: 5px; background: #111; border: 1px solid #444; color: #fff; border-radius: 4px; margin-top: 5px; margin-bottom: 5px; font-size: 0.8em; }
+        .btn-sm { padding: 5px 10px; font-size: 0.8em; width: auto; display: inline-block; margin-top: 5px; }
         .btn-guide { background: #333; color: #aaa; border: 1px solid #444; padding: 5px 10px; border-radius: 5px; font-size: 0.8em; cursor: pointer; }
-        .food-row { display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 8px 0; font-size: 0.9em; align-items: center; }
-        .food-row b { color: var(--sec); }
+        
+        /* Modal for Plate Calc */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 6000; }
+        .modal-content { background: var(--card); padding: 20px; border-radius: 10px; width: 95%; max-width: 500px; text-align: center; position: relative; }
+        .close-modal { position: absolute; top: 10px; right: 15px; color: #fff; font-size: 24px; cursor: pointer; }
+        .plate-vis { display: flex; justify-content: center; align-items: center; gap: 2px; margin: 15px 0; overflow-x: auto; }
+        .plate { height: 40px; background: #444; border: 1px solid #777; color: #fff; font-size: 0.7em; display: flex; align-items: center; justify-content: center; width: 10px; }
+        .plate-45 { width: 15px; background: #2196F3; height: 50px; } .plate-25 { width: 12px; background: #4CAF50; height: 40px; } .plate-10 { width: 10px; background: #fff; color: #000; height: 30px; }
+        .bar { height: 10px; width: 60px; background: #777; }
     </style>
 </head>
 <body>
@@ -79,7 +101,7 @@
         <div style="text-align:center; margin-top:15px;"><div style="font-size:2.5em; font-weight:bold; color:var(--sec);" id="score-display">--</div><div style="color:#aaa; font-style:italic;" id="score-text">Move sliders to calculate</div></div>
     </div>
     <div style="text-align:center; margin-top:30px; opacity:0.5;">
-        <small style="color:#777;">Version 25.0 - Food DB</small><br>
+        <small style="color:#777;">Version 24.0</small><br>
         <button class="btn-danger" style="width:auto; display:inline-block; font-size:0.8em; margin-top:5px;" onclick="factoryReset()">⚠️ Reset App</button>
     </div>
 </div>
@@ -137,13 +159,8 @@
             <div>🍚 <span id="disp-carb">0</span>g<div class="macro-bar-container"><div id="bar-carb" class="macro-fill" style="width:0%; background:var(--warn);"></div></div></div>
             <div>🥑 <span id="disp-fat">0</span>g<div class="macro-bar-container"><div id="bar-fat" class="macro-fill" style="width:0%; background:var(--danger);"></div></div></div>
         </div>
-        <div class="row"><input type="text" id="food-search" placeholder="Search (e.g. Chicken)..."><button class="btn-action" style="width:auto;" onclick="searchFood()">🔎</button></div>
+        <div class="row"><input type="text" id="food-search" placeholder="Search USDA or Local DB..."><button class="btn-action" style="width:auto;" onclick="searchFood()">🔎</button></div>
         <div id="search-results" style="margin-top:10px; max-height:200px; overflow-y:auto;"></div>
-    </div>
-    <div class="card">
-        <h3>Today's Logs</h3>
-        <div id="today-logs" style="max-height:200px; overflow-y:auto; color:#aaa; font-size:0.9em; text-align:center;">No logs today</div>
-        <button class="btn-danger" style="margin-top:10px;" onclick="clearTodayFood()">Clear Today</button>
     </div>
     <div class="card">
         <h3>Manual Quick Add</h3>
@@ -196,15 +213,25 @@
     <div style="margin-top:20px;"><button class="btn-danger" onclick="closeTimer()">Stop</button><button class="btn-action" onclick="addTime(10)">+10s</button></div>
 </div>
 
+<div id="plate-modal" class="modal" onclick="closeModal('plate-modal')">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="close-modal" onclick="closeModal('plate-modal')">&times;</span>
+        <h3>Plate Calculator</h3>
+        <input type="number" id="plate-weight-input" class="garmin-input" placeholder="Weight" oninput="calcPlates()">
+        <div id="plate-visuals" class="plate-vis"></div>
+        <div id="plate-text" style="color:#aaa; margin-top:10px;"></div>
+    </div>
+</div>
+
 <script>
-    // --- GLOBAL ---
+    // GLOBAL CONFIG
     const GOOGLE_SCRIPT_URL = "https://script.google.com/a/macros/tjkcivil.com.au/s/AKfycbwG0PbAwqkX3EbWki7vjewgP-FIwCt11_ybFsFJrYmmgq6_QpfKrbPfRxeSEJGu7Ovg/exec"; 
     let state = { unit: 'lbs', history: [], food: [], wellness: [], readiness: [], routine: [] };
     let apiKey = "";
     let activeRoutine = [];
     let gifOverrides = {};
 
-    // --- COMPLETE EXERCISE DATA (150 Items) ---
+    // DATA
     const allExercises = [
       {"name": "Low Cable Chest Fly", "categories": ["Chest", "Shoulders"], "type": "Muscle Build", "desc": "Set pulleys low. Scoop hands up."},
       {"name": "High Cable Chest Fly", "categories": ["Chest"], "type": "Muscle Build", "desc": "Set pulleys high. Press hands down."},
@@ -314,7 +341,7 @@
       {"name": "Curtsy Lunges", "categories": ["Legs", "Glutes"], "type": "Calisthenics", "desc": "Side back."},
       {"name": "Lateral Lunges", "categories": ["Legs"], "type": "Calisthenics", "desc": "Side."},
       {"name": "Step-Ups (Chair)", "categories": ["Legs"], "type": "Calisthenics", "desc": "Step up."},
-      {"name": "Calf Raises", "categories": ["Calves"], "type": "Calisthenics", "desc": "Raise."},
+      {"name": "Calf Raises", "categories": ["Calves", "Legs"], "type": "Calisthenics", "desc": "Raise."},
       {"name": "Single Leg Calf Raises", "categories": ["Calves"], "type": "Calisthenics", "desc": "One leg."},
       {"name": "Wall Sit", "categories": ["Legs"], "type": "Calisthenics", "desc": "Sit.", "isTimed": true, "duration": 60},
       {"name": "Glute Bridges (Single Leg)", "categories": ["Glutes"], "type": "Calisthenics", "desc": "One leg."},
@@ -353,71 +380,11 @@
       {"name": "Hollow Body Rock", "categories": ["Core"], "type": "Calisthenics", "desc": "Rock."}
     ];
 
-    // --- FULL FOOD DB (60 Items - Macros C/P/C/F) ---
     const internalFoodDB = [
-        {name:"Chicken Breast (100g)", c:165, p:31, ch:0, f:3.6},
-        {name:"Chicken Thigh (100g)", c:209, p:26, ch:0, f:11},
-        {name:"Ground Beef 90% (100g)", c:217, p:26, ch:0, f:12},
-        {name:"Steak Sirloin (100g)", c:250, p:26, ch:0, f:15},
-        {name:"Salmon (100g)", c:208, p:20, ch:0, f:13},
-        {name:"Tuna Canned (100g)", c:116, p:26, ch:0, f:1},
-        {name:"Egg (1 Large)", c:70, p:6, ch:0, f:5},
-        {name:"Egg Whites (100g)", c:52, p:11, ch:0, f:0},
-        {name:"Whey Scoop (30g)", c:120, p:24, ch:3, f:1},
-        {name:"Greek Yogurt (150g)", c:90, p:15, ch:6, f:0},
-        {name:"Cottage Cheese (100g)", c:81, p:11, ch:3, f:2},
-        {name:"Tofu Firm (100g)", c:144, p:17, ch:3, f:8},
-        {name:"Rice White Cooked (150g)", c:200, p:4, ch:44, f:0.5},
-        {name:"Rice Brown Cooked (150g)", c:170, p:4, ch:36, f:1},
-        {name:"Pasta Cooked (150g)", c:220, p:8, ch:43, f:1},
-        {name:"Potato Boiled (150g)", c:130, p:3, ch:30, f:0},
-        {name:"Sweet Potato (150g)", c:135, p:3, ch:32, f:0},
-        {name:"Oats Dry (50g)", c:190, p:6, ch:33, f:3},
-        {name:"Bread Slice", c:80, p:3, ch:15, f:1},
-        {name:"Banana (Medium)", c:105, p:1, ch:27, f:0},
-        {name:"Apple (Medium)", c:95, p:0, ch:25, f:0},
-        {name:"Almonds (30g)", c:170, p:6, ch:6, f:15},
-        {name:"Peanut Butter (1 tbsp)", c:95, p:4, ch:3, f:8},
-        {name:"Avocado (Half)", c:160, p:2, ch:9, f:15},
-        {name:"Olive Oil (1 tbsp)", c:120, p:0, ch:0, f:14},
-        {name:"Broccoli (100g)", c:34, p:2.8, ch:7, f:0.4},
-        {name:"Spinach (100g)", c:23, p:2.9, ch:3.6, f:0.4},
-        {name:"Carrots (100g)", c:41, p:0.9, ch:10, f:0.2},
-        {name:"Milk Whole (250ml)", c:150, p:8, ch:12, f:8},
-        {name:"Almond Milk (250ml)", c:30, p:1, ch:1, f:2.5},
-        {name:"Protein Bar", c:200, p:20, ch:20, f:6},
-        {name:"Pizza Slice", c:285, p:12, ch:36, f:10},
-        {name:"Burger Patty", c:250, p:20, ch:0, f:18},
-        {name:"Beer (Can)", c:150, p:1, ch:13, f:0},
-        {name:"Turkey Breast (100g)", c:135, p:30, ch:0, f:1},
-        {name:"Pork Chop (100g)", c:231, p:24, ch:0, f:14},
-        {name:"Shrimp (100g)", c:99, p:24, ch:0, f:0.3},
-        {name:"Cod (100g)", c:82, p:18, ch:0, f:0.7},
-        {name:"Tilapia (100g)", c:96, p:20, ch:0, f:1.7},
-        {name:"Bacon Slice", c:43, p:3, ch:0, f:3},
-        {name:"Sausage Link", c:230, p:12, ch:2, f:19},
-        {name:"Lentils Cooked (150g)", c:170, p:13, ch:30, f:0.5},
-        {name:"Chickpeas (150g)", c:240, p:12, ch:40, f:4},
-        {name:"Black Beans (150g)", c:200, p:13, ch:36, f:1},
-        {name:"Edamame (100g)", c:121, p:12, ch:10, f:5},
-        {name:"Quinoa Cooked (150g)", c:180, p:6, ch:32, f:3},
-        {name:"Bagel", c:245, p:10, ch:48, f:1.5},
-        {name:"Tortilla Flour", c:140, p:4, ch:24, f:3},
-        {name:"Granola (50g)", c:230, p:5, ch:30, f:10},
-        {name:"Blueberries (100g)", c:57, p:0.7, ch:14, f:0.3},
-        {name:"Strawberries (100g)", c:32, p:0.7, ch:8, f:0.3},
-        {name:"Orange", c:62, p:1, ch:15, f:0},
-        {name:"Mango", c:60, p:0.8, ch:15, f:0.4},
-        {name:"Cashews (30g)", c:170, p:5, ch:9, f:14},
-        {name:"Walnuts (30g)", c:190, p:4, ch:4, f:18},
-        {name:"Butter (tbsp)", c:100, p:0, ch:0, f:11},
-        {name:"Cheddar Cheese (30g)", c:120, p:7, ch:1, f:10},
-        {name:"Ice Cream Scoop", c:140, p:2, ch:16, f:7},
-        {name:"Chocolate Bar (50g)", c:270, p:3, ch:28, f:15},
-        {name:"Chips Bag", c:160, p:2, ch:15, f:10},
-        {name:"Fries Medium", c:365, p:4, ch:48, f:17},
-        {name:"Soda Can", c:140, p:0, ch:39, f:0},
-        {name:"Wine Glass", c:123, p:0, ch:4, f:0}
+        {name:"Chicken Breast", c:165, p:31, f:3.6, ch:0}, {name:"Rice (Cup)", c:200, p:4, f:0.4, ch:44},
+        {name:"Egg", c:70, p:6, f:5, ch:0}, {name:"Whey Scoop", c:120, p:24, f:1, ch:3},
+        {name:"Banana", c:105, p:1, f:0, ch:27}, {name:"Oats (Cup)", c:300, p:10, f:5, ch:50},
+        {name:"Avocado", c:160, p:2, f:15, ch:9}, {name:"Salmon", c:208, p:20, f:13, ch:0}
     ];
 
     // --- INIT ---
@@ -427,7 +394,6 @@
             updateStreak();
             renderBadges();
             updateMacrosUI();
-            updateTodayLog(); // Show log on start
             
             // Set defaults
             state.unit = localStorage.getItem('nimbleUnit') || 'lbs';
@@ -437,7 +403,7 @@
             apiKey = localStorage.getItem('usdaKey') || "";
             gifOverrides = JSON.parse(localStorage.getItem('nimbleGifOverrides')) || {};
             
-            // NAVIGATION
+            // NAVIGATION FIX
             switchTab('readiness'); 
         } catch (e) {
             console.error(e);
@@ -467,15 +433,21 @@
 
     // --- NAVIGATION ---
     function switchTab(id) {
+        // Hide all views
         document.querySelectorAll('.container').forEach(d => {
             d.classList.remove('active');
-            d.style.display = "none"; 
+            d.style.display = "none"; // JS Force
         });
+        
+        // Show target view
         const target = document.getElementById('view-' + id);
         target.classList.add('active');
-        target.style.display = "block";
+        target.style.display = "block"; // JS Force
+        
+        // Update Buttons
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('nav-' + id).classList.add('active');
+        
         if(id==='progress') renderChart();
     }
 
@@ -544,83 +516,32 @@
         results.forEach(f => {
             const div = document.createElement('div');
             div.style.padding = "10px"; div.style.borderBottom = "1px solid #333";
-            // FIXED MATH: Ensure values exist or default to 0
-            const c = f.c || 0; const p = f.p || 0; const ch = f.ch || 0; const fa = f.f || 0;
-            div.innerHTML = `<b>${f.name}</b> <br> <small>${c} cal | ${p}p | ${ch}c | ${fa}f</small>`;
+            div.innerHTML = `<b>${f.name}</b> <br> <small>${f.c} cal | ${f.p}p | ${f.ch}c</small>`;
             div.onclick = () => addFoodLog(f);
             resDiv.appendChild(div);
         });
     }
 
     function addFoodLog(food) {
-        // FIXED DATA STRUCTURE: Ensure 4 macros
-        const log = { 
-            date: new Date().toLocaleDateString(), 
-            timestamp: new Date().getTime(), // Unique ID for deletion
-            name: food.name,
-            c: parseFloat(food.c) || 0,
-            p: parseFloat(food.p) || 0,
-            f: parseFloat(food.f) || 0,
-            ch: parseFloat(food.ch) || 0
-        };
-        
+        const log = { date: new Date().toLocaleDateString(), ...food };
         let cl = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
         cl.push(log);
         localStorage.setItem('nimbleNutrition', JSON.stringify(cl));
-        
         sendToCloud('nutrition', log);
         updateMacrosUI();
-        updateTodayLog();
         document.getElementById('search-results').innerHTML = 'Added!';
     }
 
     function updateMacrosUI() {
         const today = new Date().toLocaleDateString();
         const logs = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
-        // FIXED REDUCE: Added safeguards against NaN
-        const t = logs.filter(l => l.date === today).reduce((acc, l) => ({ 
-            c: acc.c + (l.c || 0), 
-            p: acc.p + (l.p || 0), 
-            f: acc.f + (l.f || 0), 
-            ch: acc.ch + (l.ch || 0) 
-        }), {c:0, p:0, f:0, ch:0});
+        const t = logs.filter(l => l.date === today).reduce((acc, l) => ({ c: acc.c+l.c, p: acc.p+l.p, f: acc.f+l.f, ch: acc.ch+l.ch }), {c:0, p:0, f:0, ch:0});
         
         ['cals','pro','fat','carb'].forEach(k => {
             const val = Math.round(t[k==='cals'?'c':(k==='pro'?'p':(k==='fat'?'f':'ch'))]);
             document.getElementById('disp-'+k).innerText = val;
-            let max = k==='cals'? 2500 : (k==='pro'? 180 : (k==='fat'? 80 : 250)); // Roughly standard baselines
-            document.getElementById('bar-'+k).style.width = Math.min(100, (val/max)*100) + '%'; 
+            document.getElementById('bar-'+k).style.width = Math.min(100, val/20) + '%'; 
         });
-    }
-    
-    function updateTodayLog() {
-        const today = new Date().toLocaleDateString();
-        const logs = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
-        const todayLogs = logs.filter(l => l.date === today);
-        const container = document.getElementById('today-logs');
-        container.innerHTML = "";
-        
-        if(todayLogs.length === 0) {
-            container.innerHTML = "No logs today";
-            return;
-        }
-        
-        todayLogs.forEach((l) => {
-            const div = document.createElement('div');
-            div.className = "food-row";
-            div.innerHTML = `<span><b>${l.name}</b> <small>(${l.c}cal)</small></span>`;
-            container.appendChild(div);
-        });
-    }
-    
-    function clearTodayFood() {
-        if(!confirm("Clear all food logs for today?")) return;
-        const today = new Date().toLocaleDateString();
-        let logs = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
-        logs = logs.filter(l => l.date !== today);
-        localStorage.setItem('nimbleNutrition', JSON.stringify(logs));
-        updateMacrosUI();
-        updateTodayLog();
     }
 
     function logMacroManual() {
