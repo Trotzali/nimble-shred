@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#1e1e1e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Nimble Shred v36.0</title>
+    <title>Nimble Shred v37.0 (Master)</title>
     <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiTmltYmxlIFNocmVkIiwiYmFja2dyb3VuZF9jb2xvciI6IiMxMjEyMTIiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiIzFlMWUxZSIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2ltZy5pY29uczguY29tL2ZsdWVuY3kvOTYvbnVsbC9kdW1iYmVsbC5wbmciLCJzaXplcyI6Ijk2eDk2IiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
     <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/96/null/dumbbell.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -66,8 +66,6 @@
         .macro-bar-container { background: #333; height: 12px; border-radius: 6px; margin-top: 5px; overflow: hidden; position: relative; }
         .macro-fill { height: 100%; transition: width 0.5s; }
         .macro-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; text-align: center; font-size: 0.85em; }
-        .instruction-box { background: #252525; padding: 10px; border-radius: 5px; margin-top: 10px; margin-bottom: 10px; font-size: 0.9em; color: #ddd; border-left: 2px solid #777; display: none; line-height: 1.4; }
-        .instruction-box.visible { display: block; }
         .gif-input { width: 100%; padding: 5px; background: #111; border: 1px solid #444; color: #fff; border-radius: 4px; margin-top: 5px; margin-bottom: 5px; font-size: 0.8em; }
         .btn-guide { background: #333; color: #aaa; border: 1px solid #444; padding: 5px 10px; border-radius: 5px; font-size: 0.8em; cursor: pointer; }
         .btn-sm { padding: 5px 10px; font-size: 0.8em; width: auto; display: inline-block; margin-top: 5px; }
@@ -210,8 +208,12 @@
         
         <span class="guide-label">🎥 Visual</span>
         <img id="guide-gif" src="" style="width:100%; border-radius:8px; display:none; margin-bottom:10px;">
-        <input type="text" id="guide-gif-input" class="gif-input" placeholder="Paste new GIF URL here...">
-        <button class="btn btn-action" onclick="saveGuideGif()">💾 Save GIF to Cloud</button>
+        
+        <div style="background:#252525; padding:10px; border-radius:8px; margin-top:10px;">
+            <a id="gif-search-btn" href="#" target="_blank" class="btn-guide" style="display:block; text-align:center; text-decoration:none; margin-bottom:10px;">🔎 Find on Google</a>
+            <input type="text" id="guide-gif-input" class="gif-input" placeholder="Paste GIF URL here...">
+            <button class="btn btn-action" style="margin-top:5px;" onclick="saveGuideGif()">💾 Save to Cloud</button>
+        </div>
     </div>
 </div>
 
@@ -359,8 +361,8 @@
       {name: "Romanian Deadlift (DB)", cat: ["Legs"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Hinge"], cue: "Back flat"},
       {name: "Dumbbell Curl", cat: ["Arms", "Biceps"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Curl"], cue: "Squeeze"},
       {name: "Hammer Curl", cat: ["Arms"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Neutral curl"], cue: "Forearms"},
-      {name: "Tricep Kickback", cat: ["Arms"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Kick back"], cue: "Lockout"},
-      {name: "Skull Crusher (DB)", cat: ["Arms"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Lower to head"], cue: "Elbows in"},
+      {name: "Tricep Kickback", cat: ["Arms", "Triceps"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Kick back"], cue: "Lockout"},
+      {name: "Skull Crusher (DB)", cat: ["Arms", "Triceps"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Lower to head"], cue: "Elbows in"},
       {name: "Farmers Walk", cat: ["Core", "Traps"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Walk"], cue: "Tall posture"},
       // BODYWEIGHT
       {name: "Push-ups", cat: ["Chest"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Push floor"], cue: "Plank position"},
@@ -377,7 +379,8 @@
       {name: "Hanging Leg Raise", cat: ["Core"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Legs up"], cue: "Control"},
       {name: "Pike Push-up", cat: ["Shoulders"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Hips high push"], cue: "Shoulders"},
       {name: "Cat-Cow", cat: ["Core"], equip: "Bodyweight", type: "Mobility", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Flex spine"], cue: "Breathe"},
-      {name: "Dead Bug", cat: ["Core"], equip: "Bodyweight", type: "Mobility", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Opposite limbs"], cue: "Flat back"}
+      {name: "Dead Bug", cat: ["Core"], equip: "Bodyweight", type: "Mobility", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Opposite limbs"], cue: "Flat back"},
+      {name: "Thoracic Extension", cat: ["Back"], equip: "Bodyweight", type: "Mobility", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Roll back"], cue: "Relax"}
     ];
 
     const internalFoodDB = [
@@ -697,6 +700,11 @@
         const gifUrl = gifOverrides[exName];
         const img = document.getElementById('guide-gif');
         if (gifUrl) { img.src = gifUrl; img.style.display = 'block'; } else { img.style.display = 'none'; }
+        
+        // Update Search Button Link
+        const searchUrl = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(ex.name + ' exercise form gif')}`;
+        document.getElementById('gif-search-btn').href = searchUrl;
+
         document.getElementById('guide-modal').classList.remove('hidden');
         document.getElementById('guide-modal').style.display = 'block';
     }
