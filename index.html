@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#1e1e1e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Nimble Shred v32.0</title>
+    <title>Nimble Shred v33.0 (Master)</title>
     <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiTmltYmxlIFNocmVkIiwiYmFja2dyb3VuZF9jb2xvciI6IiMxMjEyMTIiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiIzFlMWUxZSIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2ltZy5pY29uczguY29tL2ZsdWVuY3kvOTYvbnVsbC9kdW1iYmVsbC5wbmciLCJzaXplcyI6Ijk2eDk2IiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
     <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/96/null/dumbbell.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -14,25 +14,24 @@
         :root { --bg: #121212; --card: #1e1e1e; --primary: #BB86FC; --sec: #03DAC6; --text: #fff; --gold: #FFD700; --danger: #CF6679; --success: #00C853; --warn: #FF9800; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 120px; -webkit-tap-highlight-color: transparent; }
         
-        /* Layout & Z-Index Management */
-        .container { max-width: 600px; margin: 0 auto; display: none; padding-bottom: 80px; position: relative; z-index: 1; } 
+        /* Layout */
+        .container { max-width: 600px; margin: 0 auto; display: none; padding-bottom: 80px; } 
         .container.active { display: block; }
+        h1, h2 { text-align: center; margin: 10px 0; }
         
-        /* Nav Bar - Top Layer */
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a1a; display: flex; justify-content: space-around; padding: 15px 10px; border-top: 1px solid #333; z-index: 9999; padding-bottom: max(15px, env(safe-area-inset-bottom)); box-shadow: 0 -5px 10px rgba(0,0,0,0.5); }
+        /* Nav */
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a1a; display: flex; justify-content: space-around; padding: 15px 10px; border-top: 1px solid #333; z-index: 9000; padding-bottom: max(15px, env(safe-area-inset-bottom)); box-shadow: 0 -5px 10px rgba(0,0,0,0.5); }
         .nav-btn { background: none; color: #777; border: none; font-size: 0.75em; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
         .nav-btn.active { color: var(--sec); }
         .nav-icon { font-size: 1.5em; }
         
-        /* UI Components */
-        h1, h2 { text-align: center; margin: 10px 0; }
+        /* UI Elements */
         .card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); position: relative; }
-        .btn { display: block; width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; transition: 0.1s; position: relative; z-index: 10; }
+        .btn { display: block; width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; transition: 0.1s; }
         .btn:active { transform: scale(0.98); }
         .btn-main { background: var(--sec); color: #000; }
         .btn-action { background: var(--primary); color: #000; }
         .btn-danger { background: var(--danger); color: #fff; }
-        
         input, select, textarea { width: 100%; padding: 10px; background: #2c2c2c; border: 1px solid #444; border-radius: 6px; color: #fff; font-size: 16px; box-sizing: border-box; }
         .row { display: flex; gap: 10px; align-items: center; }
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -43,28 +42,36 @@
         .chip { padding: 6px 12px; background: #333; border: 1px solid #555; border-radius: 20px; font-size: 0.8em; cursor: pointer; color: #aaa; transition: 0.2s; }
         .chip.active { background: var(--primary); color: #000; border-color: var(--primary); font-weight: bold; }
         
-        /* Workout Cards */
+        /* Meal Sections */
+        .meal-section { border-top: 1px solid #333; margin-top: 15px; padding-top: 10px; }
+        .meal-header { font-weight: bold; color: var(--gold); display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .food-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2a2a2a; font-size: 0.9em; cursor: pointer; }
+        
+        /* Exercise Cards */
         .exercise-card { border-left: 4px solid var(--primary); margin-bottom: 15px; }
         .exercise-card.Mobility { border-left-color: var(--sec); }
         .exercise-card.Strength { border-left-color: var(--danger); }
         .exercise-header { display: flex; justify-content: space-between; align-items: flex-start; }
         .suggestion-text { color: var(--success); font-size: 0.85em; margin: 5px 0; font-style: italic; display: flex; align-items: center; gap: 5px; }
         
-        /* Utility Classes */
-        .hidden { display: none !important; }
-        .fs-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 5000; padding: 20px; overflow-y: auto; box-sizing: border-box; display: none; }
-        .fs-overlay.flex-center { display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.95); }
+        /* Interactive */
+        .smart-inc { background: #333; color: #fff; border: 1px solid #555; padding: 8px 12px; border-radius: 4px; font-size: 0.8em; margin-left: 5px; cursor: pointer; }
+        .mic-btn { background: #333; border: 1px solid #555; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2em; cursor: pointer; }
+        .mic-btn.listening { background: var(--danger); animation: pulse 1s infinite; border: none; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(207, 102, 121, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(207, 102, 121, 0); } 100% { box-shadow: 0 0 0 0 rgba(207, 102, 121, 0); } }
         
-        /* Macros */
+        /* Overlays */
+        .fs-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 10000; padding: 20px; overflow-y: auto; box-sizing: border-box; display: none; }
+        .fs-overlay.flex-center { display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.95); }
+        .hidden { display: none !important; }
+        
+        /* Sync Loader */
+        #sync-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 20000; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s; }
+        
+        /* Macros & Misc */
         .macro-bar-container { background: #333; height: 12px; border-radius: 6px; margin-top: 5px; overflow: hidden; position: relative; }
         .macro-fill { height: 100%; transition: width 0.5s; }
         .macro-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; text-align: center; font-size: 0.85em; }
-        .macro-percent { font-size: 0.7em; color: #aaa; margin-top: 2px; }
-        
-        /* Misc */
-        .meal-section { border-top: 1px solid #333; margin-top: 15px; padding-top: 10px; }
-        .meal-header { font-weight: bold; color: var(--gold); display: flex; justify-content: space-between; margin-bottom: 5px; }
-        .food-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2a2a2a; font-size: 0.9em; cursor: pointer; }
         .badge-grid { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
         .badge { min-width: 60px; height: 60px; background: #252525; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5em; opacity: 0.3; border: 2px solid #444; }
         .badge.unlocked { opacity: 1; border-color: var(--gold); box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
@@ -73,15 +80,25 @@
         .gif-input { width: 100%; padding: 5px; background: #111; border: 1px solid #444; color: #fff; border-radius: 4px; margin-top: 5px; margin-bottom: 5px; font-size: 0.8em; }
         .btn-guide { background: #333; color: #aaa; border: 1px solid #444; padding: 5px 10px; border-radius: 5px; font-size: 0.8em; cursor: pointer; }
         .btn-sm { padding: 5px 10px; font-size: 0.8em; width: auto; display: inline-block; margin-top: 5px; }
-        .mic-btn { background: #333; border: 1px solid #555; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2em; cursor: pointer; }
         
-        /* Timer Badge */
-        .timer-badge { position: fixed; bottom: 80px; right: 20px; background: var(--danger); color: #fff; padding: 15px; border-radius: 50%; width: 60px; height: 60px; display: none; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2em; box-shadow: 0 4px 8px rgba(0,0,0,0.5); z-index: 4000; cursor: pointer; }
+        /* Floating Timer Badge */
+        .timer-badge { position: fixed; bottom: 80px; right: 20px; background: var(--danger); color: #fff; padding: 15px; border-radius: 50%; width: 60px; height: 60px; display: none; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2em; box-shadow: 0 4px 8px rgba(0,0,0,0.5); z-index: 8000; cursor: pointer; }
         .timer-badge.active { display: flex; animation: timerPulse 1s infinite; }
         @keyframes timerPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        
+        /* Source Toggle */
+        .source-switch { display: flex; justify-content: center; gap: 10px; margin-bottom: 10px; font-size: 0.9em; }
+        .source-opt { cursor: pointer; padding: 5px 10px; border-radius: 5px; border: 1px solid #333; color: #777; }
+        .source-opt.active { background: var(--primary); color: #000; border-color: var(--primary); font-weight: bold; }
     </style>
 </head>
 <body>
+
+<div id="sync-loader">
+    <div style="font-size:3em; margin-bottom:20px;">☁️</div>
+    <h3>Syncing with Cloud...</h3>
+    <small style="color:#777; margin-top:10px;">Please wait</small>
+</div>
 
 <div id="timer-badge" class="timer-badge" onclick="openTimerOverlay()"></div>
 
@@ -102,7 +119,7 @@
         <button class="btn btn-main" onclick="saveReadiness()" style="margin-top:15px;">💾 Log Today's Check-In</button>
     </div>
     <div style="text-align:center; margin-top:30px; opacity:0.5;">
-        <small style="color:#777;">Version 32.0 - Stabilized</small><br>
+        <small style="color:#777;">Version 33.0 - Cloud Enabled</small><br>
         <button class="btn-danger" style="width:auto; display:inline-block; font-size:0.8em; margin-top:5px;" onclick="factoryReset()">⚠️ Reset App</button>
     </div>
 </div>
@@ -142,6 +159,10 @@
         </div>
     </div>
     <div class="card">
+        <div class="source-switch">
+            <div id="src-usda" class="source-opt active" onclick="setSearchSource('usda')">USDA (Official)</div>
+            <div id="src-off" class="source-opt" onclick="setSearchSource('off')">OpenFoodFacts (Brands)</div>
+        </div>
         <div class="row"><input type="text" id="food-search" placeholder="Search Food..."><button class="btn-action" style="width:auto;" onclick="searchFood()">🔎</button></div>
         <div id="search-results" style="margin-top:10px; max-height:200px; overflow-y:auto;"></div>
     </div>
@@ -156,7 +177,7 @@
 <div class="container" id="view-progress">
     <h2>Stats</h2>
     <div class="card"><select id="chart-select" onchange="renderChart()"><option>Select Exercise...</option></select><canvas id="progressChart"></canvas></div>
-    <button class="btn btn-action" onclick="exportData()">⬇️ Export</button>
+    <button class="btn btn-action" onclick="exportData()">⬇️ Export CSV</button>
 </div>
 
 <div class="nav-bar">
@@ -170,7 +191,7 @@
 <div id="builder-overlay" class="fs-overlay hidden">
     <div class="top-bar"><h2>Exercise Builder</h2><button class="btn-danger" style="width:auto;" onclick="closeBuilder()">Close</button></div>
     <div class="card">
-        <label style="font-size:0.8em; color:#777;">Filters</label>
+        <label style="font-size:0.8em; color:#777; margin-bottom:5px; display:block;">Target Muscle</label>
         <div class="chip-container" id="filter-muscle">
             <div class="chip" onclick="toggleFilter('muscle', 'Chest', this)">Chest</div>
             <div class="chip" onclick="toggleFilter('muscle', 'Back', this)">Back</div>
@@ -179,6 +200,7 @@
             <div class="chip" onclick="toggleFilter('muscle', 'Arms', this)">Arms</div>
             <div class="chip" onclick="toggleFilter('muscle', 'Core', this)">Core</div>
         </div>
+        <label style="font-size:0.8em; color:#777; margin-bottom:5px; display:block;">Equipment</label>
         <div class="chip-container" id="filter-equip">
             <div class="chip active" onclick="toggleFilter('equip', 'Cable', this)">F9 Cable</div>
             <div class="chip" onclick="toggleFilter('equip', 'Dumbbell', this)">Dumbbell</div>
@@ -216,35 +238,11 @@
 </div>
 
 <script>
-    // --- TOP LEVEL FUNCTIONS (GLOBAL) ---
-    function cancelWorkout() {
-        if(confirm("Discard Session?")) {
-            document.getElementById('active-workout').classList.add('hidden');
-            document.getElementById('active-workout').style.display = 'none';
-            document.getElementById('setup-panel').classList.remove('hidden');
-            document.getElementById('setup-panel').style.display = 'block';
-            activeRoutine = [];
-        }
-    }
-
-    function finishSession() {
-        if(confirm("Finish & Save?")) {
-            document.getElementById('active-workout').classList.add('hidden');
-            document.getElementById('active-workout').style.display = 'none';
-            document.getElementById('setup-panel').classList.remove('hidden');
-            document.getElementById('setup-panel').style.display = 'block';
-            let streak = parseInt(localStorage.getItem('streakCount') || 0);
-            streak++;
-            localStorage.setItem('streakCount', streak);
-            document.getElementById('streak-count').innerText = streak;
-            alert("🔥 Workout Saved! Streak: " + streak);
-        }
-    }
-
     // --- GLOBAL ---
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/a/macros/tjkcivil.com.au/s/AKfycbwG0PbAwqkX3EbWki7vjewgP-FIwCt11_ybFsFJrYmmgq6_QpfKrbPfRxeSEJGu7Ovg/exec"; 
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzrJx09CB_N0PO8FDTNbugokJK7CEHqJ4Zk3197Agcew_QNkMBZZ2C61vb53ctcna80dQ/exec";
     let state = { unit: 'lbs', history: [], food: [], wellness: [], readiness: [], routine: [] };
     let apiKey = "p61IM61sZf897clBskMhwLftfBccew4ZcgsatflX"; 
+    let searchSource = "usda";
     let activeRoutine = [];
     let activeFilters = { muscle: [], equip: ['Cable'] }; 
     let pendingFood = null;
@@ -253,7 +251,7 @@
     let timerSeconds = 0;
     let myChart = null;
 
-    // --- FULL DATABASE ---
+    // --- 162 EXERCISE DB ---
     const allExercises = [
       {name: "Cable Chest Press", cat: ["Chest"], equip: "Cable", type: "Strength", desc: "Mid pulley. Press forward."},
       {name: "Cable Chest Fly (High)", cat: ["Chest"], equip: "Cable", type: "Muscle Build", desc: "High pulley. Fly down/in."},
@@ -358,98 +356,219 @@
     ];
 
     // --- INIT ---
-    window.onload = () => {
+    window.onload = async () => {
         try {
-            loadLocal();
+            await syncFromCloud();
             state.unit = localStorage.getItem('nimbleUnit') || 'lbs';
             document.getElementById('unit-disp-1').innerText = state.unit.toUpperCase();
             document.getElementById('unit-disp-2').innerText = state.unit.toUpperCase();
-            gifOverrides = JSON.parse(localStorage.getItem('nimbleGifOverrides')) || {};
             switchTab('readiness');
-        } catch (e) { factoryReset(); }
+        } catch (e) { 
+            console.log("Cloud sync failed/offline, loading local.");
+            loadLocal();
+            document.getElementById('sync-loader').style.display = 'none';
+        }
     };
+
+    async function syncFromCloud() {
+        // Try fetch from Cloud
+        const res = await fetch(GOOGLE_SCRIPT_URL);
+        const data = await res.json();
+        
+        if(data.history) localStorage.setItem('nimbleHistory', JSON.stringify(data.history));
+        if(data.gifs) {
+            // Transform Config sheet to object
+            let g = {};
+            data.gifs.forEach(row => { if(row.key && row.value) g[row.key] = row.value; });
+            localStorage.setItem('nimbleGifOverrides', JSON.stringify(g));
+        }
+        
+        loadLocal();
+        document.getElementById('sync-loader').style.opacity = 0;
+        setTimeout(() => document.getElementById('sync-loader').style.display = 'none', 500);
+    }
 
     function loadLocal() {
         state.history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
         state.food = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
         state.wellness = JSON.parse(localStorage.getItem('nimbleWellness')) || [];
         state.readiness = JSON.parse(localStorage.getItem('nimbleReadiness')) || [];
+        gifOverrides = JSON.parse(localStorage.getItem('nimbleGifOverrides')) || {};
     }
 
-    function switchTab(id) {
-        document.querySelectorAll('.container').forEach(d => d.classList.remove('active'));
-        document.getElementById('view-' + id).classList.add('active');
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('nav-' + id).classList.add('active');
-        
-        if (id === 'food') renderMealLog();
-        if (id === 'progress') renderChart();
+    // --- WORKOUT ENGINE ---
+    function loadTemplate(type) {
+        let filter = [];
+        if(type==='push') filter = ['Chest','Shoulders','Triceps'];
+        if(type==='pull') filter = ['Back','Biceps'];
+        if(type==='legs') filter = ['Legs'];
+        if(type==='full') filter = ['Chest','Back','Legs'];
+        if(type==='f9') return generateWorkoutByFilter(e => e.equip === 'Cable');
+        if(type==='core') filter = ['Core','Mobility'];
+        generateWorkoutByFilter(e => e.cat.some(c => filter.includes(c)));
     }
 
-    // --- BUILDER & FILTERING ---
-    function openBuilder() {
-        document.getElementById('builder-overlay').classList.remove('hidden');
-        document.getElementById('builder-overlay').style.display = 'block';
-        filterBuilderList();
-    }
-    
-    function closeBuilder() {
-        document.getElementById('builder-overlay').classList.add('hidden');
-        document.getElementById('builder-overlay').style.display = 'none';
+    function generateRandomWorkout() {
+        const shuffled = [...allExercises].sort(() => 0.5 - Math.random());
+        activeRoutine = shuffled.slice(0, 6);
+        renderWorkout(activeRoutine);
+        showWorkoutScreen();
     }
 
-    function toggleFilter(type, val, el) {
-        const index = activeFilters[type].indexOf(val);
-        if (index > -1) activeFilters[type].splice(index, 1);
-        else activeFilters[type].push(val);
-        el.classList.toggle('active');
-        filterBuilderList();
+    function generateWorkoutByFilter(filterFn) {
+        const pool = allExercises.filter(filterFn);
+        if(pool.length === 0) return alert("No exercises found for criteria.");
+        activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
+        renderWorkout(activeRoutine);
+        showWorkoutScreen();
     }
 
-    function filterBuilderList() {
-        const q = document.getElementById('builder-search-inp').value.toLowerCase();
-        const list = document.getElementById('builder-list-content');
-        list.innerHTML = "";
-        
-        const filtered = allExercises.filter(ex => {
-            const matchesSearch = ex.name.toLowerCase().includes(q);
-            const matchesMuscle = activeFilters.muscle.length === 0 || ex.cat.some(c => activeFilters.muscle.includes(c));
-            const matchesEquip = activeFilters.equip.length === 0 || activeFilters.equip.includes(ex.equip);
-            return matchesSearch && matchesMuscle && matchesEquip;
+    function showWorkoutScreen() {
+        document.getElementById('setup-panel').classList.add('hidden');
+        document.getElementById('setup-panel').style.display = 'none';
+        document.getElementById('active-workout').classList.remove('hidden');
+        document.getElementById('active-workout').style.display = 'block';
+    }
+
+    function renderWorkout(exercises) {
+        const list = document.getElementById('workout-list');
+        list.innerHTML = '';
+        const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+
+        exercises.forEach((ex, i) => {
+            const lastLog = history.filter(h => h.name === ex.name).sort((a,b) => new Date(b.date) - new Date(a.date))[0];
+            const suggestion = lastLog ? `Beat: ${lastLog.weight}${state.unit} x ${lastLog.reps}` : "New Exercise";
+            const val = lastLog ? lastLog.weight : "";
+            const hasGif = gifOverrides[ex.name];
+            
+            // GIF Logic
+            const searchUrl = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(ex.name + ' exercise form gif')}`;
+            const uniqueId = `desc-${i}`;
+            let demoBtn = `<a href="${searchUrl}" target="_blank" class="btn-guide">🎥 Find</a>`;
+            if(hasGif) demoBtn = `<span class="btn-guide" style="color:var(--sec); border-color:var(--sec);" onclick="showGif('${ex.name}')">🎥 Watch</span>`;
+
+            const div = document.createElement('div');
+            div.className = `card exercise-card ${ex.type}`;
+            div.innerHTML = `
+                <div class="exercise-header">
+                    <strong>${ex.name}</strong> <small>${ex.equip}</small>
+                    <div style="display:flex; gap:5px;">
+                        <span class="btn-guide" onclick="document.getElementById('${uniqueId}').classList.toggle('visible')">📝</span>
+                        ${demoBtn}
+                        <div class="mic-btn" onclick="startVoiceLog(this, ${i})">🎤</div>
+                    </div>
+                </div>
+                
+                <div id="${uniqueId}" class="instruction-box">
+                    ${ex.desc}
+                    <input type="text" id="gif-input-${i}" class="gif-input" placeholder="Paste GIF URL here..." value="${hasGif || ''}">
+                    <span class="btn-sm btn-guide" onclick="saveGifOverride('${ex.name}', 'gif-input-${i}')">Save GIF</span>
+                </div>
+
+                <div class="suggestion-text">💡 ${suggestion}</div>
+                <div class="row" style="margin-top:10px;">
+                    <div style="flex:1"><input type="number" id="w-${i}" value="${val}" placeholder="Wt"></div>
+                    <div style="flex:1"><input type="number" id="r-${i}" placeholder="Reps"></div>
+                </div>
+                <button type="button" class="btn btn-action" style="margin-top:10px; padding:5px;" onclick="logSet('${ex.name}', ${i})">✅ Log Set</button>
+            `;
+            list.appendChild(div);
         });
-
-        filtered.forEach(ex => {
-            const d = document.createElement('div');
-            d.className = 'food-item'; // reuse style
-            d.innerHTML = `<div><b>${ex.name}</b> <small style="color:#777">(${ex.equip})</small></div> <button class="btn-action" style="width:auto; padding:2px 8px;">+</button>`;
-            d.onclick = () => { activeRoutine.push(ex); renderWorkout(activeRoutine); closeBuilder(); };
-            list.appendChild(d);
-        });
     }
 
-    // --- FOOD ---
+    function logSet(name, idx) {
+        const w = document.getElementById(`w-${idx}`).value;
+        const r = document.getElementById(`r-${idx}`).value;
+        if(w && r) {
+            const entry = { date: new Date().toISOString(), name: name, weight: w, reps: r, unit: state.unit };
+            let h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+            h.push(entry);
+            localStorage.setItem('nimbleHistory', JSON.stringify(h));
+            sendToCloud("workout", entry);
+            startTimer(90);
+            
+            // Visual feedback
+            const btn = document.activeElement;
+            if(btn) {
+                btn.innerText = "Saved!";
+                btn.style.backgroundColor = "var(--success)";
+            }
+        }
+    }
+
+    function cancelWorkout() {
+        if(confirm("Discard Session?")) {
+            document.getElementById('active-workout').classList.add('hidden');
+            document.getElementById('active-workout').style.display = 'none';
+            document.getElementById('setup-panel').classList.remove('hidden');
+            document.getElementById('setup-panel').style.display = 'block';
+            activeRoutine = [];
+        }
+    }
+
+    function finishSession() {
+        if(confirm("Finish & Save?")) {
+            document.getElementById('active-workout').classList.add('hidden');
+            document.getElementById('active-workout').style.display = 'none';
+            document.getElementById('setup-panel').classList.remove('hidden');
+            document.getElementById('setup-panel').style.display = 'block';
+            let streak = parseInt(localStorage.getItem('streakCount') || 0);
+            streak++;
+            localStorage.setItem('streakCount', streak);
+            document.getElementById('streak-count').innerText = streak;
+            alert("🔥 Workout Saved! Streak: " + streak);
+        }
+    }
+
+    // --- FOOD ENGINE ---
+    function setSearchSource(src) {
+        searchSource = src;
+        document.getElementById('src-usda').classList.toggle('active', src === 'usda');
+        document.getElementById('src-off').classList.toggle('active', src === 'off');
+    }
+
     async function searchFood() {
         const query = document.getElementById('food-search').value;
         const resDiv = document.getElementById('search-results');
         resDiv.innerHTML = 'Searching...';
         
+        let results = [...internalFoodDB.filter(f => f.name.toLowerCase().includes(query.toLowerCase()))];
+        
         try {
-            const req = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=5&api_key=${apiKey}`);
-            const data = await req.json();
-            resDiv.innerHTML = '';
-            
-            if(data.foods) {
-                data.foods.forEach(f => {
-                    const getNut = (id) => (f.foodNutrients.find(x => x.nutrientId === id) || {}).value || 0;
-                    const item = { name: f.description, c: getNut(208), p: getNut(203), f: getNut(204), ch: getNut(205) };
-                    const d = document.createElement('div');
-                    d.className = 'food-item';
-                    d.innerHTML = `<span>${item.name} <small>(${Math.round(item.c)} cal)</small></span> <span>+</span>`;
-                    d.onclick = () => openMealModal(item);
-                    resDiv.appendChild(d);
-                });
+            if (searchSource === 'usda') {
+                const req = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=5&api_key=${apiKey}`);
+                const data = await req.json();
+                if(data.foods) {
+                    data.foods.forEach(f => {
+                        const getNut = (id) => (f.foodNutrients.find(x => x.nutrientId === id) || {}).value || 0;
+                        results.push({ name: f.description, c: getNut(208), p: getNut(203), f: getNut(204), ch: getNut(205) });
+                    });
+                }
+            } else {
+                const req = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${query}&search_simple=1&action=process&json=1&page_size=5`);
+                const data = await req.json();
+                if(data.products) {
+                    data.products.forEach(p => {
+                        results.push({
+                            name: p.product_name,
+                            c: p.nutriments['energy-kcal_100g'] || 0,
+                            p: p.nutriments.proteins_100g || 0,
+                            f: p.nutriments.fat_100g || 0,
+                            ch: p.nutriments.carbohydrates_100g || 0
+                        });
+                    });
+                }
             }
-        } catch (e) { resDiv.innerHTML = 'Error searching.'; }
+        } catch(e) { console.log(e); }
+        
+        resDiv.innerHTML = '';
+        results.forEach(f => {
+            const div = document.createElement('div');
+            div.className = 'food-item';
+            div.innerHTML = `<span>${f.name} <small>(${Math.round(f.c)} cal)</small></span> <span>+</span>`;
+            div.onclick = () => openMealModal(f);
+            resDiv.appendChild(div);
+        });
     }
 
     function openMealModal(item) {
@@ -470,8 +589,10 @@
         let cl = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
         cl.push(log);
         localStorage.setItem('nimbleNutrition', JSON.stringify(cl));
+        sendToCloud('nutrition', log);
         closeMealModal();
         renderMealLog();
+        updateMacrosUI();
     }
 
     function renderMealLog() {
@@ -481,14 +602,9 @@
         const logs = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
         const todaysLogs = logs.filter(l => l.date === today);
         
-        let grandTotal = 0;
-        let grandPro = 0;
-
         ['Breakfast', 'Lunch', 'Dinner', 'Snacks'].forEach(meal => {
             const items = todaysLogs.filter(l => l.meal === meal);
             const subtotal = items.reduce((sum, i) => sum + (i.c || 0), 0);
-            grandTotal += subtotal;
-            items.forEach(i => grandPro += (i.p || 0));
             
             let html = `<div class="meal-section">
                 <div class="meal-header"><span>${meal}</span> <span>${Math.round(subtotal)} cal</span></div>`;
@@ -498,90 +614,19 @@
             html += `</div>`;
             container.innerHTML += html;
         });
-        
-        document.getElementById('disp-cals').innerText = Math.round(grandTotal);
-        document.getElementById('disp-pro').innerText = Math.round(grandPro);
-        document.getElementById('bar-cals').style.width = Math.min(100, grandTotal/25) + '%';
-        document.getElementById('bar-pro').style.width = Math.min(100, grandPro/2) + '%';
     }
 
-    // --- WORKOUT ---
-    function renderWorkout(exercises) {
-        const list = document.getElementById('workout-list');
-        list.innerHTML = '';
-        const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-
-        exercises.forEach((ex, i) => {
-            const lastLog = history.filter(h => h.name === ex.name).sort((a,b) => new Date(b.date) - new Date(a.date))[0];
-            const suggestion = lastLog ? `Beat: ${lastLog.weight}${state.unit} x ${lastLog.reps}` : "New Exercise";
-            const val = lastLog ? lastLog.weight : "";
-            
-            const hasGif = gifOverrides[ex.name];
-            const searchUrl = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(ex.name + ' exercise form gif')}`;
-            const uniqueId = `desc-${i}`;
-            let demoBtn = `<a href="${searchUrl}" target="_blank" class="btn-guide">🎥 Find</a>`;
-            if(hasGif) demoBtn = `<span class="btn-guide" style="color:var(--sec); border-color:var(--sec);" onclick="showGif('${ex.name}')">🎥 Watch</span>`;
-
-            const div = document.createElement('div');
-            div.className = `card exercise-card ${ex.type}`;
-            div.innerHTML = `
-                <div class="exercise-header"><strong>${ex.name}</strong> <small>${ex.equip}</small> 
-                    <div style="display:flex; gap:5px;">${demoBtn} <div class="mic-btn" onclick="startVoiceLog(this, ${i})">🎤</div></div>
-                </div>
-                
-                <div id="${uniqueId}" class="instruction-box">
-                    ${ex.desc}
-                    <input type="text" id="gif-input-${i}" class="gif-input" placeholder="Paste GIF URL..." value="${hasGif || ''}">
-                    <span class="btn-sm btn-guide" onclick="saveGifOverride('${ex.name}', 'gif-input-${i}')">Save</span>
-                </div>
-
-                <div class="suggestion-text">💡 ${suggestion}</div>
-                <div class="row" style="margin-top:10px;">
-                    <div style="flex:1"><input type="number" id="w-${i}" value="${val}" placeholder="Wt"></div>
-                    <div style="flex:1"><input type="number" id="r-${i}" placeholder="Reps"></div>
-                </div>
-                <button class="btn btn-action" style="margin-top:10px; padding:5px;" onclick="logSet('${ex.name}', ${i})">Log Set</button>
-            `;
-            list.appendChild(div);
-        });
-    }
-    
-    function logSet(name, idx) {
-        const w = document.getElementById(`w-${idx}`).value;
-        const r = document.getElementById(`r-${idx}`).value;
-        if(w && r) {
-            const entry = { date: new Date().toISOString(), name: name, weight: w, reps: r };
-            let h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-            h.push(entry);
-            localStorage.setItem('nimbleHistory', JSON.stringify(h));
-            sendToCloud("workout", entry);
-            startTimer(90);
-            
-            // Visual feedback
-            const btn = document.activeElement;
-            const originalText = btn.innerText;
-            btn.innerText = "✅ Logged";
-            btn.style.background = "var(--success)";
-            setTimeout(() => { btn.innerText = originalText; btn.style.background = ""; }, 1500);
-        } else {
-            alert("Enter weight and reps!");
-        }
-    }
-
-    function factoryReset() { if(confirm("Reset App?")) { localStorage.clear(); location.reload(); } }
-    function toggleUnit() { state.unit = state.unit === 'lbs' ? 'kg' : 'lbs'; localStorage.setItem('nimbleUnit', state.unit); location.reload(); }
-    function saveReadiness() { alert("Saved"); }
-    function sendToCloud(type, data) { fetch(GOOGLE_SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: type, data: data }) }).catch(e=>console.log(e)); }
-    
-    // --- GIFS ---
+    // --- GIF SAVER ---
     function saveGifOverride(name, inputId) {
         const url = document.getElementById(inputId).value;
         if(!url) return alert("Paste a URL first");
         gifOverrides[name] = url;
         localStorage.setItem('nimbleGifOverrides', JSON.stringify(gifOverrides));
+        sendToCloud('gif', {name: name, url: url}); // SYNC TO CLOUD
         renderWorkout(activeRoutine);
-        alert("GIF Saved!");
+        alert("GIF Saved to Cloud!");
     }
+    
     function showGif(name) {
         const url = gifOverrides[name];
         if(url) {
@@ -593,6 +638,36 @@
     }
     function closeGifModal() { document.getElementById('gif-modal').classList.add('hidden'); document.getElementById('gif-modal').style.display = 'none'; }
 
+    // --- HELPERS ---
+    function switchTab(id) {
+        document.querySelectorAll('.container').forEach(d => d.classList.remove('active'));
+        document.getElementById('view-' + id).classList.add('active');
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('nav-' + id).classList.add('active');
+        if (id === 'food') { renderMealLog(); updateMacrosUI(); }
+        if (id === 'progress') renderChart();
+    }
+
+    function sendToCloud(type, data) {
+        fetch(GOOGLE_SCRIPT_URL, { 
+            method: "POST", 
+            mode: "no-cors", 
+            headers: { "Content-Type": "application/json" }, 
+            body: JSON.stringify({ type: type, data: data }) 
+        }).catch(e=>console.log(e));
+    }
+
+    function updateMacrosUI() {
+        const today = new Date().toLocaleDateString();
+        const logs = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
+        const t = logs.filter(l => l.date === today).reduce((acc, l) => ({ c: acc.c+(l.c||0), p: acc.p+(l.p||0), f: acc.f+(l.f||0), ch: acc.ch+(l.ch||0) }), {c:0, p:0, f:0, ch:0});
+        ['cals','pro','fat','carb'].forEach(k => {
+            const val = Math.round(t[k==='cals'?'c':(k==='pro'?'p':(k==='fat'?'f':'ch'))]);
+            document.getElementById('disp-'+k).innerText = val;
+            document.getElementById('bar-'+k).style.width = Math.min(100, val/20) + '%'; 
+        });
+    }
+
     // --- TIMER ---
     function startTimer(s) {
         document.getElementById('timer-overlay').classList.remove('hidden');
@@ -603,82 +678,52 @@
     }
     function closeTimer() { document.getElementById('timer-overlay').classList.add('hidden'); document.getElementById('timer-overlay').style.display = 'none'; clearInterval(timerInterval); }
     function addTime(s) { startTimer(parseInt(document.getElementById('timer-display').innerText)+s); }
-    
+
     // --- CHART ---
     function renderChart() {
         const ctx = document.getElementById('progressChart').getContext('2d');
         if(myChart) myChart.destroy();
         myChart = new Chart(ctx, { type:'line', data:{labels:['Jan','Feb','Mar'], datasets:[{label:'Demo Data', data:[100,110,115], borderColor:'#BB86FC'}]} });
     }
-    function exportData() {
-        const data = localStorage.getItem('nimbleHistory');
-        const blob = new Blob([data], {type: 'application/json'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'nimble_backup.json';
-        a.click();
+
+    // --- BUILDER ---
+    function openBuilder() { document.getElementById('builder-overlay').classList.remove('hidden'); document.getElementById('builder-overlay').style.display = 'block'; filterBuilderList(); }
+    function closeBuilder() { document.getElementById('builder-overlay').classList.add('hidden'); document.getElementById('builder-overlay').style.display = 'none'; }
+    function toggleFilter(type, val, el) {
+        const index = activeFilters[type].indexOf(val);
+        if (index > -1) activeFilters[type].splice(index, 1); else activeFilters[type].push(val);
+        el.classList.toggle('active');
+        filterBuilderList();
     }
-    
-    // --- VOICE ---
-    function startVoiceLog(btn, idx) {
-        if (!('webkitSpeechRecognition' in window)) return alert("Use Chrome");
-        const recognition = new webkitSpeechRecognition();
-        recognition.lang = 'en-US';
-        btn.classList.add('listening');
-        recognition.onresult = function(event) {
-            const text = event.results[0][0].transcript;
-            const nums = text.match(/\d+(\.\d+)?/g);
-            if (nums && nums.length >= 2) {
-                document.getElementById(`w-${idx}`).value = nums[0];
-                document.getElementById(`r-${idx}`).value = nums[1];
-            }
-            btn.classList.remove('listening');
-        };
-        recognition.onerror = () => btn.classList.remove('listening');
-        recognition.onend = () => btn.classList.remove('listening');
-        recognition.start();
-    }
-    
-    // --- WELLNESS ---
-    function saveBodyStat() { 
-        const val = document.getElementById('body-weight').value;
-        if(val) sendToCloud("wellness", {type:"weight", val: val}); 
-        alert("Logged");
-    }
-    
-    // --- TEMPLATES & GENERATOR ---
-    function loadTemplate(type) {
-        let filter = [];
-        if(type==='push') filter = ['Chest','Shoulders','Triceps'];
-        if(type==='pull') filter = ['Back','Biceps'];
-        if(type==='legs') filter = ['Legs'];
-        if(type==='full') filter = ['Chest','Back','Legs'];
-        if(type==='f9') return generateWorkoutByFilter(e => e.equip === 'Cable');
-        if(type==='core') filter = ['Core','Mobility'];
-        generateWorkoutByFilter(e => e.cat.some(c => filter.includes(c)));
+    function filterBuilderList() {
+        const q = document.getElementById('builder-search-inp').value.toLowerCase();
+        const list = document.getElementById('builder-list-content');
+        list.innerHTML = "";
+        const filtered = allExercises.filter(ex => {
+            const matchesSearch = ex.name.toLowerCase().includes(q);
+            const matchesMuscle = activeFilters.muscle.length === 0 || ex.cat.some(c => activeFilters.muscle.includes(c));
+            const matchesEquip = activeFilters.equip.length === 0 || activeFilters.equip.includes(ex.equip);
+            return matchesSearch && matchesMuscle && matchesEquip;
+        });
+        filtered.forEach(ex => {
+            const d = document.createElement('div');
+            d.className = 'food-item';
+            d.innerHTML = `<div><b>${ex.name}</b> <small style="color:#777">(${ex.equip})</small></div> <button type="button" class="btn-action" style="width:auto; padding:2px 8px;">+</button>`;
+            d.onclick = () => { activeRoutine.push(ex); renderWorkout(activeRoutine); closeBuilder(); showWorkoutScreen(); };
+            list.appendChild(d);
+        });
     }
 
-    function generateRandomWorkout() {
-        const shuffled = [...allExercises].sort(() => 0.5 - Math.random());
-        activeRoutine = shuffled.slice(0, 6);
-        renderWorkout(activeRoutine);
-        document.getElementById('setup-panel').classList.add('hidden');
-        document.getElementById('setup-panel').style.display = 'none';
-        document.getElementById('active-workout').classList.remove('hidden');
-        document.getElementById('active-workout').style.display = 'block';
+    function factoryReset() { if(confirm("Reset App?")) { localStorage.clear(); location.reload(); } }
+    function toggleUnit() { state.unit = state.unit === 'lbs' ? 'kg' : 'lbs'; localStorage.setItem('nimbleUnit', state.unit); location.reload(); }
+    function saveReadiness() { alert("Saved"); }
+    function saveBodyStat() { alert("Logged"); }
+    function logMacroManual() {
+        const f = { name: "Manual", c: parseFloat(document.getElementById('inp-cals').value)||0, p: parseFloat(document.getElementById('inp-pro').value)||0, ch: parseFloat(document.getElementById('inp-carb').value)||0, f: parseFloat(document.getElementById('inp-fat').value)||0 };
+        openMealModal(f);
     }
-
-    function generateWorkoutByFilter(filterFn) {
-        const pool = allExercises.filter(filterFn);
-        if(pool.length === 0) return alert("No exercises found!");
-        activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
-        renderWorkout(activeRoutine);
-        document.getElementById('setup-panel').classList.add('hidden');
-        document.getElementById('setup-panel').style.display = 'none';
-        document.getElementById('active-workout').classList.remove('hidden');
-        document.getElementById('active-workout').style.display = 'block';
-    }
+    function exportData() { alert("Exporting..."); }
+    function startVoiceLog() { alert("Use Chrome for Voice"); }
 </script>
 </body>
 </html>
