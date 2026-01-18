@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#1e1e1e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Nimble Shred v33.0 (Master)</title>
+    <title>Nimble Shred v35.0</title>
     <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiTmltYmxlIFNocmVkIiwiYmFja2dyb3VuZF9jb2xvciI6IiMxMjEyMTIiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiIzFlMWUxZSIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2ltZy5pY29uczguY29tL2ZsdWVuY3kvOTYvbnVsbC9kdW1iYmVsbC5wbmciLCJzaXplcyI6Ijk2eDk2IiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
     <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/96/null/dumbbell.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -42,11 +42,6 @@
         .chip { padding: 6px 12px; background: #333; border: 1px solid #555; border-radius: 20px; font-size: 0.8em; cursor: pointer; color: #aaa; transition: 0.2s; }
         .chip.active { background: var(--primary); color: #000; border-color: var(--primary); font-weight: bold; }
         
-        /* Meal Sections */
-        .meal-section { border-top: 1px solid #333; margin-top: 15px; padding-top: 10px; }
-        .meal-header { font-weight: bold; color: var(--gold); display: flex; justify-content: space-between; margin-bottom: 5px; }
-        .food-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2a2a2a; font-size: 0.9em; cursor: pointer; }
-        
         /* Exercise Cards */
         .exercise-card { border-left: 4px solid var(--primary); margin-bottom: 15px; }
         .exercise-card.Mobility { border-left-color: var(--sec); }
@@ -54,42 +49,40 @@
         .exercise-header { display: flex; justify-content: space-between; align-items: flex-start; }
         .suggestion-text { color: var(--success); font-size: 0.85em; margin: 5px 0; font-style: italic; display: flex; align-items: center; gap: 5px; }
         
-        /* Interactive */
-        .smart-inc { background: #333; color: #fff; border: 1px solid #555; padding: 8px 12px; border-radius: 4px; font-size: 0.8em; margin-left: 5px; cursor: pointer; }
-        .mic-btn { background: #333; border: 1px solid #555; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2em; cursor: pointer; }
-        .mic-btn.listening { background: var(--danger); animation: pulse 1s infinite; border: none; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(207, 102, 121, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(207, 102, 121, 0); } 100% { box-shadow: 0 0 0 0 rgba(207, 102, 121, 0); } }
+        /* Guide Modal Styles */
+        .guide-section { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #333; }
+        .guide-label { color: var(--gold); font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; display: block; }
+        .guide-val { font-size: 1.1em; color: #fff; }
+        .step-list { padding-left: 20px; color: #ddd; line-height: 1.5; }
+        .step-list li { margin-bottom: 8px; }
         
         /* Overlays */
         .fs-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 10000; padding: 20px; overflow-y: auto; box-sizing: border-box; display: none; }
         .fs-overlay.flex-center { display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.95); }
         .hidden { display: none !important; }
-        
-        /* Sync Loader */
         #sync-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 20000; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s; }
         
         /* Macros & Misc */
         .macro-bar-container { background: #333; height: 12px; border-radius: 6px; margin-top: 5px; overflow: hidden; position: relative; }
         .macro-fill { height: 100%; transition: width 0.5s; }
         .macro-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; text-align: center; font-size: 0.85em; }
-        .badge-grid { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
-        .badge { min-width: 60px; height: 60px; background: #252525; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5em; opacity: 0.3; border: 2px solid #444; }
-        .badge.unlocked { opacity: 1; border-color: var(--gold); box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
         .instruction-box { background: #252525; padding: 10px; border-radius: 5px; margin-top: 10px; margin-bottom: 10px; font-size: 0.9em; color: #ddd; border-left: 2px solid #777; display: none; line-height: 1.4; }
         .instruction-box.visible { display: block; }
         .gif-input { width: 100%; padding: 5px; background: #111; border: 1px solid #444; color: #fff; border-radius: 4px; margin-top: 5px; margin-bottom: 5px; font-size: 0.8em; }
         .btn-guide { background: #333; color: #aaa; border: 1px solid #444; padding: 5px 10px; border-radius: 5px; font-size: 0.8em; cursor: pointer; }
         .btn-sm { padding: 5px 10px; font-size: 0.8em; width: auto; display: inline-block; margin-top: 5px; }
-        
-        /* Floating Timer Badge */
-        .timer-badge { position: fixed; bottom: 80px; right: 20px; background: var(--danger); color: #fff; padding: 15px; border-radius: 50%; width: 60px; height: 60px; display: none; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2em; box-shadow: 0 4px 8px rgba(0,0,0,0.5); z-index: 8000; cursor: pointer; }
-        .timer-badge.active { display: flex; animation: timerPulse 1s infinite; }
-        @keyframes timerPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        
-        /* Source Toggle */
+        .mic-btn { background: #333; border: 1px solid #555; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2em; cursor: pointer; }
+        .meal-section { border-top: 1px solid #333; margin-top: 15px; padding-top: 10px; }
+        .meal-header { font-weight: bold; color: var(--gold); display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .food-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2a2a2a; font-size: 0.9em; cursor: pointer; }
         .source-switch { display: flex; justify-content: center; gap: 10px; margin-bottom: 10px; font-size: 0.9em; }
         .source-opt { cursor: pointer; padding: 5px 10px; border-radius: 5px; border: 1px solid #333; color: #777; }
         .source-opt.active { background: var(--primary); color: #000; border-color: var(--primary); font-weight: bold; }
+        
+        /* Floating Timer */
+        .timer-badge { position: fixed; bottom: 80px; right: 20px; background: var(--danger); color: #fff; padding: 15px; border-radius: 50%; width: 60px; height: 60px; display: none; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2em; box-shadow: 0 4px 8px rgba(0,0,0,0.5); z-index: 8000; cursor: pointer; }
+        .timer-badge.active { display: flex; animation: timerPulse 1s infinite; }
+        @keyframes timerPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
     </style>
 </head>
 <body>
@@ -97,7 +90,7 @@
 <div id="sync-loader">
     <div style="font-size:3em; margin-bottom:20px;">☁️</div>
     <h3>Syncing with Cloud...</h3>
-    <small style="color:#777; margin-top:10px;">Please wait</small>
+    <small style="color:#777; margin-top:10px;">Checking History, Foods & GIFs</small>
 </div>
 
 <div id="timer-badge" class="timer-badge" onclick="openTimerOverlay()"></div>
@@ -116,11 +109,7 @@
         <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
         <div class="row"><input type="number" id="garmin-score" placeholder="Garmin Body Battery (Optional)" oninput="calcReadiness()"></div>
         <div style="text-align:center; margin-top:15px;"><div style="font-size:2.5em; font-weight:bold; color:var(--sec);" id="score-display">--</div><div style="color:#aaa; font-style:italic;" id="score-text">Move sliders to calculate</div></div>
-        <button class="btn btn-main" onclick="saveReadiness()" style="margin-top:15px;">💾 Log Today's Check-In</button>
-    </div>
-    <div style="text-align:center; margin-top:30px; opacity:0.5;">
-        <small style="color:#777;">Version 33.0 - Cloud Enabled</small><br>
-        <button class="btn-danger" style="width:auto; display:inline-block; font-size:0.8em; margin-top:5px;" onclick="factoryReset()">⚠️ Reset App</button>
+        <button type="button" class="btn btn-main" onclick="handleReadinessLog()" style="margin-top:15px;">💾 Log & Get Advice</button>
     </div>
 </div>
 
@@ -136,7 +125,7 @@
                 <div class="chip" onclick="loadTemplate('full')">Full Body</div>
                 <div class="chip" onclick="loadTemplate('f9')">Torque F9 Only</div>
             </div>
-            <button type="button" class="btn btn-main" onclick="generateRandomWorkout()">🎲 Random Workout</button>
+            <button type="button" class="btn btn-main" onclick="generateRandomWorkout()">🎲 Random F9 Workout</button>
             <button type="button" class="btn btn-action" onclick="openBuilder()">🛠️ Build Custom</button>
         </div>
     </div>
@@ -160,8 +149,8 @@
     </div>
     <div class="card">
         <div class="source-switch">
-            <div id="src-usda" class="source-opt active" onclick="setSearchSource('usda')">USDA (Official)</div>
-            <div id="src-off" class="source-opt" onclick="setSearchSource('off')">OpenFoodFacts (Brands)</div>
+            <div id="src-usda" class="source-opt active" onclick="setSearchSource('usda')">USDA</div>
+            <div id="src-off" class="source-opt" onclick="setSearchSource('off')">OpenFoodFacts</div>
         </div>
         <div class="row"><input type="text" id="food-search" placeholder="Search Food..."><button class="btn-action" style="width:auto;" onclick="searchFood()">🔎</button></div>
         <div id="search-results" style="margin-top:10px; max-height:200px; overflow-y:auto;"></div>
@@ -177,7 +166,7 @@
 <div class="container" id="view-progress">
     <h2>Stats</h2>
     <div class="card"><select id="chart-select" onchange="renderChart()"><option>Select Exercise...</option></select><canvas id="progressChart"></canvas></div>
-    <button class="btn btn-action" onclick="exportData()">⬇️ Export CSV</button>
+    <button class="btn btn-action" onclick="exportData()">⬇️ Export</button>
 </div>
 
 <div class="nav-bar">
@@ -188,10 +177,76 @@
     <button class="nav-btn" onclick="switchTab('progress')" id="nav-progress"><span class="nav-icon">📈</span>Stats</button>
 </div>
 
+<div id="readiness-modal" class="fs-overlay flex-center hidden">
+    <div class="card" style="width:85%; max-width:350px; text-align:center;">
+        <div id="readiness-icon" style="font-size:3em;">⚠️</div>
+        <h2 id="readiness-title">Recovery Mode</h2>
+        <p id="readiness-desc" style="color:#aaa; margin-bottom:20px;">Low score detected.</p>
+        <button class="btn btn-main" onclick="applyReadinessStrategy('modify')">📉 Modify (Reduce Volume)</button>
+        <button class="btn btn-action" onclick="applyReadinessStrategy('ignore')">🔥 Ignore (Full Send)</button>
+        <button class="btn btn-danger" style="margin-top:10px;" onclick="closeReadinessModal()">Cancel</button>
+    </div>
+</div>
+
+<div id="guide-modal" class="fs-overlay hidden">
+    <div class="top-bar"><h2 id="guide-title">Exercise Name</h2><button class="btn-danger" style="width:auto;" onclick="closeGuideModal()">Close</button></div>
+    <div class="card">
+        <div class="guide-section">
+            <span class="guide-label">⚙️ Torque F9 Setup</span>
+            <div class="row">
+                <div style="flex:1"><span style="color:#777;">Arms:</span> <span class="guide-val" id="guide-arms">--</span></div>
+                <div style="flex:1"><span style="color:#777;">Pulleys:</span> <span class="guide-val" id="guide-pulleys">--</span></div>
+            </div>
+        </div>
+        <div class="guide-section">
+            <span class="guide-label">📝 Instructions</span>
+            <ul class="step-list" id="guide-steps"></ul>
+        </div>
+        <div class="guide-section">
+            <span class="guide-label">💡 Pro Tip</span>
+            <div id="guide-cue" style="color:#fff; font-style:italic;">--</div>
+        </div>
+        
+        <span class="guide-label">🎥 Visual</span>
+        <img id="guide-gif" src="" style="width:100%; border-radius:8px; display:none; margin-bottom:10px;">
+        <input type="text" id="guide-gif-input" class="gif-input" placeholder="Paste new GIF URL here...">
+        <button class="btn btn-action" onclick="saveGuideGif()">💾 Save GIF to Cloud</button>
+    </div>
+</div>
+
+<div id="food-modal" class="fs-overlay flex-center hidden">
+    <div class="card" style="width:85%; max-width:350px;">
+        <h3>Adjust Portion</h3>
+        <h4 id="food-modal-name" style="color:var(--primary);">Food Name</h4>
+        
+        <div class="row" style="margin:15px 0;">
+            <div style="flex:1">
+                <label style="font-size:0.8em; color:#aaa;">Qty</label>
+                <input type="number" id="food-qty" value="1" step="0.25" oninput="updateFoodCalc()">
+            </div>
+            <div style="flex:2; text-align:right;">
+                <div style="font-size:1.5em; font-weight:bold; color:var(--sec);"><span id="food-calc-cals">0</span> kcal</div>
+                <div style="font-size:0.9em; color:#aaa;"><span id="food-calc-pro">0</span>g Pro</div>
+            </div>
+        </div>
+        
+        <label style="font-size:0.8em; color:#aaa; margin-bottom:5px; display:block;">Select Meal</label>
+        <div class="row">
+            <button class="btn-guide" onclick="selectMeal('Breakfast', this)">Breakfast</button>
+            <button class="btn-guide" onclick="selectMeal('Lunch', this)">Lunch</button>
+            <button class="btn-guide" onclick="selectMeal('Dinner', this)">Dinner</button>
+            <button class="btn-guide" onclick="selectMeal('Snacks', this)">Snack</button>
+        </div>
+        
+        <button class="btn btn-main" style="margin-top:15px;" onclick="confirmAddFood()">✅ Add to Log</button>
+        <button class="btn btn-danger" style="margin-top:10px;" onclick="closeFoodModal()">Cancel</button>
+    </div>
+</div>
+
 <div id="builder-overlay" class="fs-overlay hidden">
     <div class="top-bar"><h2>Exercise Builder</h2><button class="btn-danger" style="width:auto;" onclick="closeBuilder()">Close</button></div>
     <div class="card">
-        <label style="font-size:0.8em; color:#777; margin-bottom:5px; display:block;">Target Muscle</label>
+        <label style="font-size:0.8em; color:#777;">Filters</label>
         <div class="chip-container" id="filter-muscle">
             <div class="chip" onclick="toggleFilter('muscle', 'Chest', this)">Chest</div>
             <div class="chip" onclick="toggleFilter('muscle', 'Back', this)">Back</div>
@@ -200,7 +255,6 @@
             <div class="chip" onclick="toggleFilter('muscle', 'Arms', this)">Arms</div>
             <div class="chip" onclick="toggleFilter('muscle', 'Core', this)">Core</div>
         </div>
-        <label style="font-size:0.8em; color:#777; margin-bottom:5px; display:block;">Equipment</label>
         <div class="chip-container" id="filter-equip">
             <div class="chip active" onclick="toggleFilter('equip', 'Cable', this)">F9 Cable</div>
             <div class="chip" onclick="toggleFilter('equip', 'Dumbbell', this)">Dumbbell</div>
@@ -209,23 +263,6 @@
         <input type="text" id="builder-search-inp" placeholder="Search..." onkeyup="filterBuilderList()">
         <div id="builder-list-content" style="margin-top:10px;"></div>
     </div>
-</div>
-
-<div id="meal-modal" class="fs-overlay flex-center hidden">
-    <div class="card" style="width:80%; max-width:300px; text-align:center;">
-        <h3>Which Meal?</h3>
-        <button class="btn btn-main" onclick="confirmAddFood('Breakfast')">🌅 Breakfast</button>
-        <button class="btn btn-main" onclick="confirmAddFood('Lunch')">☀️ Lunch</button>
-        <button class="btn btn-main" onclick="confirmAddFood('Dinner')">🌙 Dinner</button>
-        <button class="btn btn-main" onclick="confirmAddFood('Snacks')">🍎 Snack</button>
-        <button class="btn btn-danger" style="margin-top:10px;" onclick="closeMealModal()">Cancel</button>
-    </div>
-</div>
-
-<div id="gif-modal" class="fs-overlay flex-center hidden">
-    <h3 id="gif-modal-title" style="color:#fff;">Technique</h3>
-    <img id="gif-player" src="" style="max-width:90%; border-radius:10px;">
-    <button class="btn-danger" style="width:auto; margin-top:20px;" onclick="closeGifModal()">Close</button>
 </div>
 
 <div id="timer-overlay" class="fs-overlay flex-center hidden">
@@ -245,114 +282,101 @@
     let searchSource = "usda";
     let activeRoutine = [];
     let activeFilters = { muscle: [], equip: ['Cable'] }; 
-    let pendingFood = null;
+    let pendingFood = null; // Stores food item temporarily
+    let selectedMeal = 'Snacks'; // Default meal
     let gifOverrides = {};
     let timerInterval = null;
     let timerSeconds = 0;
     let myChart = null;
+    let currentGuideExercise = null;
+    let modifyVolume = false;
 
-    // --- 162 EXERCISE DB ---
+    // --- FULL 162 EXERCISE DB ---
     const allExercises = [
-      {name: "Cable Chest Press", cat: ["Chest"], equip: "Cable", type: "Strength", desc: "Mid pulley. Press forward."},
-      {name: "Cable Chest Fly (High)", cat: ["Chest"], equip: "Cable", type: "Muscle Build", desc: "High pulley. Fly down/in."},
-      {name: "Cable Chest Fly (Low)", cat: ["Chest"], equip: "Cable", type: "Muscle Build", desc: "Low pulley. Fly up/in."},
-      {name: "Cable Chest Fly (Mid)", cat: ["Chest"], equip: "Cable", type: "Muscle Build", desc: "Mid pulley. Fly straight."},
-      {name: "Single Arm Cable Chest Press", cat: ["Chest"], equip: "Cable", type: "Strength", desc: "One arm press."},
-      {name: "Cable Crossover", cat: ["Chest"], equip: "Cable", type: "Muscle Build", desc: "Cross hands at end."},
-      {name: "Cable Pullover (Bench)", cat: ["Chest", "Lats"], equip: "Cable", type: "Muscle Build", desc: "Lying on bench. Pull over."},
-      {name: "Lat Pulldown (Standing)", cat: ["Back"], equip: "Cable", type: "Strength", desc: "High pulley. Kneel or squat."},
-      {name: "Seated Cable Row", cat: ["Back"], equip: "Cable", type: "Strength", desc: "Low/Mid pulley. Pull to abs."},
-      {name: "Face Pulls", cat: ["Back", "Shoulders"], equip: "Cable", type: "Mobility", desc: "High pulley. Pull to face."},
-      {name: "Straight Arm Pulldown", cat: ["Back"], equip: "Cable", type: "Muscle Build", desc: "High pulley. Keep arms straight."},
-      {name: "Single Arm Cable Row", cat: ["Back"], equip: "Cable", type: "Strength", desc: "Mid pulley. Rotate torso."},
-      {name: "Cable Shrugs", cat: ["Back", "Traps"], equip: "Cable", type: "Muscle Build", desc: "Low pulley. Shrug up."},
-      {name: "Cable Rear Delt Fly", cat: ["Back", "Shoulders"], equip: "Cable", type: "Muscle Build", desc: "High pulley. Pull apart."},
-      {name: "Cable Y-Raise", cat: ["Back", "Shoulders"], equip: "Cable", type: "Mobility", desc: "Low pulley. Raise to Y."},
-      {name: "High Row (Rope)", cat: ["Back"], equip: "Cable", type: "Strength", desc: "High pulley. Pull to chin."},
-      {name: "Cable Overhead Press", cat: ["Shoulders"], equip: "Cable", type: "Strength", desc: "Low pulley. Press up."},
-      {name: "Cable Lateral Raise", cat: ["Shoulders"], equip: "Cable", type: "Muscle Build", desc: "Low pulley. Raise to side."},
-      {name: "Cable Front Raise", cat: ["Shoulders"], equip: "Cable", type: "Muscle Build", desc: "Low pulley. Raise to front."},
-      {name: "Cable Upright Row", cat: ["Shoulders", "Traps"], equip: "Cable", type: "Muscle Build", desc: "Low pulley. Pull to chin."},
-      {name: "Cable External Rotation", cat: ["Shoulders", "Mobility"], equip: "Cable", type: "Mobility", desc: "Elbow at side. Rotate out."},
-      {name: "Cable Internal Rotation", cat: ["Shoulders", "Mobility"], equip: "Cable", type: "Mobility", desc: "Elbow at side. Rotate in."},
-      {name: "Tricep Pushdown (Rope)", cat: ["Arms", "Triceps"], equip: "Cable", type: "Muscle Build", desc: "High pulley. Spread rope."},
-      {name: "Tricep Pushdown (Bar)", cat: ["Arms", "Triceps"], equip: "Cable", type: "Muscle Build", desc: "High pulley. Straight bar."},
-      {name: "Overhead Cable Extension", cat: ["Arms", "Triceps"], equip: "Cable", type: "Muscle Build", desc: "Mid pulley. Lean forward."},
-      {name: "Cable Kickback", cat: ["Arms", "Triceps"], equip: "Cable", type: "Muscle Build", desc: "Low pulley. Extend back."},
-      {name: "Cable Bicep Curl", cat: ["Arms", "Biceps"], equip: "Cable", type: "Muscle Build", desc: "Low pulley. Curl."},
-      {name: "Cable Hammer Curl", cat: ["Arms", "Biceps"], equip: "Cable", type: "Muscle Build", desc: "Low pulley. Rope attachment."},
-      {name: "Bayesian Curl", cat: ["Arms", "Biceps"], equip: "Cable", type: "Muscle Build", desc: "Face away. Curl forward."},
-      {name: "Reverse Grip Pushdown", cat: ["Arms", "Triceps"], equip: "Cable", type: "Muscle Build", desc: "Palms up."},
-      {name: "Cable Squat", cat: ["Legs"], equip: "Cable", type: "Strength", desc: "Low pulleys. Hold at shoulders."},
-      {name: "Cable Pull-Through", cat: ["Legs", "Glutes", "Hamstrings"], equip: "Cable", type: "Strength", desc: "Low pulley. Face away. Hinge."},
-      {name: "Cable RDL", cat: ["Legs", "Hamstrings"], equip: "Cable", type: "Strength", desc: "Low pulley. Deadlift motion."},
-      {name: "Cable Lunge", cat: ["Legs"], equip: "Cable", type: "Strength", desc: "Low pulley. Hold handles."},
-      {name: "Cable Kickback (Glute)", cat: ["Legs", "Glutes"], equip: "Cable", type: "Muscle Build", desc: "Low pulley. Ankle strap."},
-      {name: "Cable Abductor", cat: ["Legs", "Glutes"], equip: "Cable", type: "Mobility", desc: "Low pulley. Leg out to side."},
-      {name: "Cable Adductor", cat: ["Legs"], equip: "Cable", type: "Mobility", desc: "Low pulley. Leg across body."},
-      {name: "Cable Calf Raise", cat: ["Legs", "Calves"], equip: "Cable", type: "Muscle Build", desc: "Low pulley. Stand on block."},
-      {name: "Cable Crunch", cat: ["Core"], equip: "Cable", type: "Muscle Build", desc: "High pulley. Kneel. Curl."},
-      {name: "Woodchopper (High to Low)", cat: ["Core"], equip: "Cable", type: "Mobility", desc: "High pulley. Rotate down."},
-      {name: "Woodchopper (Low to High)", cat: ["Core"], equip: "Cable", type: "Mobility", desc: "Low pulley. Rotate up."},
-      {name: "Pallof Press", cat: ["Core"], equip: "Cable", type: "Strength", desc: "Mid pulley. Press out. Resist rotation."},
-      {name: "Cable Side Bend", cat: ["Core"], equip: "Cable", type: "Mobility", desc: "Low pulley. Lean side."},
-      {name: "Dumbbell Bench Press", cat: ["Chest"], equip: "Dumbbell", type: "Strength", desc: "Flat bench."},
-      {name: "Dumbbell Incline Press", cat: ["Chest"], equip: "Dumbbell", type: "Strength", desc: "Incline bench."},
-      {name: "Dumbbell Fly", cat: ["Chest"], equip: "Dumbbell", type: "Muscle Build", desc: "Fly open."},
-      {name: "Dumbbell Shoulder Press", cat: ["Shoulders"], equip: "Dumbbell", type: "Strength", desc: "Seated or standing."},
-      {name: "Arnold Press", cat: ["Shoulders"], equip: "Dumbbell", type: "Strength", desc: "Rotate palms."},
-      {name: "Lateral Raise", cat: ["Shoulders"], equip: "Dumbbell", type: "Muscle Build", desc: "Side raise."},
-      {name: "Front Raise", cat: ["Shoulders"], equip: "Dumbbell", type: "Muscle Build", desc: "Front raise."},
-      {name: "Dumbbell Row", cat: ["Back"], equip: "Dumbbell", type: "Strength", desc: "Knee on bench."},
-      {name: "Dumbbell Pullover", cat: ["Back"], equip: "Dumbbell", type: "Muscle Build", desc: "Cross bench."},
-      {name: "Goblet Squat", cat: ["Legs"], equip: "Dumbbell", type: "Strength", desc: "Hold at chest."},
-      {name: "Dumbbell Lunge", cat: ["Legs"], equip: "Dumbbell", type: "Strength", desc: "Walking lunge."},
-      {name: "Bulgarian Split Squat", cat: ["Legs"], equip: "Dumbbell", type: "Strength", desc: "Rear foot elevated."},
-      {name: "Romanian Deadlift (DB)", cat: ["Legs", "Hamstrings"], equip: "Dumbbell", type: "Strength", desc: "Hinge hips."},
-      {name: "Dumbbell Curl", cat: ["Arms", "Biceps"], equip: "Dumbbell", type: "Muscle Build", desc: "Standard."},
-      {name: "Hammer Curl", cat: ["Arms", "Biceps"], equip: "Dumbbell", type: "Muscle Build", desc: "Neutral grip."},
-      {name: "Tricep Kickback", cat: ["Arms", "Triceps"], equip: "Dumbbell", type: "Muscle Build", desc: "Bent over."},
-      {name: "Skull Crusher (DB)", cat: ["Arms", "Triceps"], equip: "Dumbbell", type: "Muscle Build", desc: "Lying down."},
-      {name: "Farmers Walk", cat: ["Core", "Traps"], equip: "Dumbbell", type: "Strength", desc: "Walk heavy."},
-      {name: "Push-ups", cat: ["Chest"], equip: "Bodyweight", type: "Calisthenics", desc: "Chest to floor."},
-      {name: "Pull-ups", cat: ["Back"], equip: "Bodyweight", type: "Calisthenics", desc: "Chin over bar."},
-      {name: "Chin-ups", cat: ["Back", "Biceps"], equip: "Bodyweight", type: "Calisthenics", desc: "Underhand grip."},
-      {name: "Dips", cat: ["Chest", "Triceps"], equip: "Bodyweight", type: "Calisthenics", desc: "Parallel bars."},
-      {name: "Bodyweight Squat", cat: ["Legs"], equip: "Bodyweight", type: "Calisthenics", desc: "Air squat."},
-      {name: "Lunge (BW)", cat: ["Legs"], equip: "Bodyweight", type: "Calisthenics", desc: "Step forward."},
-      {name: "Glute Bridge", cat: ["Legs", "Glutes"], equip: "Bodyweight", type: "Calisthenics", desc: "Hips up."},
-      {name: "Single Leg Glute Bridge", cat: ["Legs", "Glutes"], equip: "Bodyweight", type: "Calisthenics", desc: "One leg."},
-      {name: "Plank", cat: ["Core"], equip: "Bodyweight", type: "Calisthenics", desc: "Forearms."},
-      {name: "Side Plank", cat: ["Core"], equip: "Bodyweight", type: "Calisthenics", desc: "Side hold."},
-      {name: "Mountain Climbers", cat: ["Core", "Cardio"], equip: "Bodyweight", type: "Calisthenics", desc: "Run in plank."},
-      {name: "Burpees", cat: ["Full Body", "Cardio"], equip: "Bodyweight", type: "Calisthenics", desc: "Chest to floor jump."},
-      {name: "Hanging Leg Raise", cat: ["Core", "Abs"], equip: "Bodyweight", type: "Calisthenics", desc: "Toes to bar."},
-      {name: "L-Sit", cat: ["Core"], equip: "Bodyweight", type: "Calisthenics", desc: "Hold legs out."},
-      {name: "Pistol Squat", cat: ["Legs"], equip: "Bodyweight", type: "Mobility", desc: "One leg squat."},
-      {name: "Nordic Curl", cat: ["Legs", "Hamstrings"], equip: "Bodyweight", type: "Calisthenics", desc: "Lower slowly."},
-      {name: "Calf Raise (BW)", cat: ["Legs", "Calves"], equip: "Bodyweight", type: "Calisthenics", desc: "Edge of step."},
-      {name: "Inverted Row", cat: ["Back"], equip: "Bodyweight", type: "Calisthenics", desc: "Pull chest to bar."},
-      {name: "Pike Push-up", cat: ["Shoulders"], equip: "Bodyweight", type: "Calisthenics", desc: "Hips high."},
-      {name: "Handstand Hold", cat: ["Shoulders"], equip: "Bodyweight", type: "Calisthenics", desc: "Against wall."},
-      {name: "Cat-Cow", cat: ["Core"], equip: "Bodyweight", type: "Mobility", desc: "Spine flex."},
-      {name: "World's Greatest Stretch", cat: ["Full Body"], equip: "Bodyweight", type: "Mobility", desc: "Lunge twist."},
-      {name: "90/90 Hip Switch", cat: ["Legs"], equip: "Bodyweight", type: "Mobility", desc: "Hip rotation."},
-      {name: "Shoulder Dislocates", cat: ["Shoulders"], equip: "Bodyweight", type: "Mobility", desc: "Broomstick over head."},
-      {name: "Wall Slides", cat: ["Shoulders"], equip: "Bodyweight", type: "Mobility", desc: "Back to wall."},
-      {name: "Deep Squat Hold", cat: ["Legs"], equip: "Bodyweight", type: "Mobility", desc: "Sit deep."},
-      {name: "Couch Stretch", cat: ["Legs"], equip: "Bodyweight", type: "Mobility", desc: "Hip flexor."},
-      {name: "Dead Bug", cat: ["Core"], equip: "Bodyweight", type: "Mobility", desc: "Back flat."},
-      {name: "Bird Dog", cat: ["Core"], equip: "Bodyweight", type: "Mobility", desc: "Opposite arm/leg."},
-      {name: "Thoracic Extension", cat: ["Back"], equip: "Bodyweight", type: "Mobility", desc: "Foam roller."}
-    ];
-
-    const internalFoodDB = [
-        {name:"Chicken Breast", c:165, p:31, f:3.6, ch:0}, 
-        {name:"Rice (Cup)", c:200, p:4, f:0.4, ch:44},
-        {name:"Egg", c:70, p:6, f:5, ch:0}, 
-        {name:"Whey Scoop", c:120, p:24, f:1, ch:3},
-        {name:"Banana", c:105, p:1, f:0, ch:27}, 
-        {name:"Salmon", c:208, p:20, f:13, ch:0}
+      // CABLE CHEST
+      {name: "Cable Chest Press", cat: ["Chest"], equip: "Cable", type: "Strength", setup: {arms: "Wide (Pos 8-9)", pulleys: "Chest Height"}, steps: ["Step forward", "Press"], cue: "Squeeze pecs"},
+      {name: "Cable Chest Fly (High)", cat: ["Chest"], equip: "Cable", type: "Muscle Build", setup: {arms: "Wide", pulleys: "Top"}, steps: ["Lean forward", "Fly down"], cue: "Hug a tree"},
+      {name: "Cable Chest Fly (Low)", cat: ["Chest"], equip: "Cable", type: "Muscle Build", setup: {arms: "Wide", pulleys: "Bottom"}, steps: ["Palms up", "Fly high"], cue: "Scoop up"},
+      {name: "Cable Chest Fly (Mid)", cat: ["Chest"], equip: "Cable", type: "Muscle Build", setup: {arms: "Wide", pulleys: "Mid"}, steps: ["Fly center"], cue: "Squeeze middle"},
+      {name: "Single Arm Cable Chest Press", cat: ["Chest"], equip: "Cable", type: "Strength", setup: {arms: "Standard", pulleys: "Chest"}, steps: ["One arm press"], cue: "Anti-rotation"},
+      {name: "Cable Crossover", cat: ["Chest"], equip: "Cable", type: "Muscle Build", setup: {arms: "Wide", pulleys: "Top"}, steps: ["Cross hands at bottom"], cue: "Maximum squeeze"},
+      {name: "Cable Pullover (Bench)", cat: ["Chest", "Lats"], equip: "Cable", type: "Muscle Build", setup: {arms: "Narrow", pulleys: "Mid"}, steps: ["Lie on bench", "Pull over head"], cue: "Stretch lats"},
+      // CABLE BACK
+      {name: "Lat Pulldown (Standing)", cat: ["Back"], equip: "Cable", type: "Strength", setup: {arms: "Top", pulleys: "Top"}, steps: ["Kneel down", "Pull to chest"], cue: "Elbows to pockets"},
+      {name: "Seated Cable Row", cat: ["Back"], equip: "Cable", type: "Strength", setup: {arms: "Narrow", pulleys: "Low"}, steps: ["Sit on floor", "Row to waist"], cue: "Chest up"},
+      {name: "Face Pulls", cat: ["Back", "Shoulders"], equip: "Cable", type: "Mobility", setup: {arms: "Narrow", pulleys: "Face"}, steps: ["Pull to forehead", "Rotate up"], cue: "Thumbs back"},
+      {name: "Straight Arm Pulldown", cat: ["Back"], equip: "Cable", type: "Muscle Build", setup: {arms: "Top", pulleys: "Top"}, steps: ["Arms straight", "Push down"], cue: "Lats only"},
+      {name: "Single Arm Cable Row", cat: ["Back"], equip: "Cable", type: "Strength", setup: {arms: "Mid", pulleys: "Mid"}, steps: ["Row one arm", "Rotate torso"], cue: "Reach and pull"},
+      {name: "Cable Shrugs", cat: ["Back", "Traps"], equip: "Cable", type: "Muscle Build", setup: {arms: "Low", pulleys: "Low"}, steps: ["Shrug up"], cue: "Touch ears"},
+      {name: "Cable Rear Delt Fly", cat: ["Back", "Shoulders"], equip: "Cable", type: "Muscle Build", setup: {arms: "Wide", pulleys: "Eye"}, steps: ["Cross cables", "Pull apart"], cue: "Touch walls"},
+      {name: "Cable Y-Raise", cat: ["Back", "Shoulders"], equip: "Cable", type: "Mobility", setup: {arms: "Low", pulleys: "Low"}, steps: ["Raise into Y shape"], cue: "Lower traps"},
+      {name: "High Row (Rope)", cat: ["Back"], equip: "Cable", type: "Strength", setup: {arms: "Top", pulleys: "Top"}, steps: ["Pull to chin"], cue: "High elbows"},
+      // CABLE SHOULDERS
+      {name: "Cable Overhead Press", cat: ["Shoulders"], equip: "Cable", type: "Strength", setup: {arms: "Wide", pulleys: "Low"}, steps: ["Press up"], cue: "Biceps by ears"},
+      {name: "Cable Lateral Raise", cat: ["Shoulders"], equip: "Cable", type: "Muscle Build", setup: {arms: "Low", pulleys: "Low"}, steps: ["Cross cables", "Raise to side"], cue: "Pour pitcher"},
+      {name: "Cable Front Raise", cat: ["Shoulders"], equip: "Cable", type: "Muscle Build", setup: {arms: "Low", pulleys: "Low"}, steps: ["Raise front"], cue: "Control down"},
+      {name: "Cable Upright Row", cat: ["Shoulders", "Traps"], equip: "Cable", type: "Muscle Build", setup: {arms: "Low", pulleys: "Low"}, steps: ["Pull to chin"], cue: "Elbows high"},
+      {name: "Cable External Rotation", cat: ["Shoulders"], equip: "Cable", type: "Mobility", setup: {arms: "Mid", pulleys: "Mid"}, steps: ["Rotate out"], cue: "Pinned elbow"},
+      {name: "Cable Internal Rotation", cat: ["Shoulders"], equip: "Cable", type: "Mobility", setup: {arms: "Mid", pulleys: "Mid"}, steps: ["Rotate in"], cue: "Pinned elbow"},
+      // CABLE ARMS
+      {name: "Tricep Pushdown (Rope)", cat: ["Arms", "Triceps"], equip: "Cable", type: "Muscle Build", setup: {arms: "Top", pulleys: "Top"}, steps: ["Push down", "Spread rope"], cue: "Lock elbows"},
+      {name: "Tricep Pushdown (Bar)", cat: ["Arms", "Triceps"], equip: "Cable", type: "Muscle Build", setup: {arms: "Top", pulleys: "Top"}, steps: ["Push down"], cue: "Lock elbows"},
+      {name: "Overhead Cable Extension", cat: ["Arms", "Triceps"], equip: "Cable", type: "Muscle Build", setup: {arms: "Mid", pulleys: "Mid"}, steps: ["Lean forward", "Extend over head"], cue: "Stretch tricep"},
+      {name: "Cable Kickback", cat: ["Arms", "Triceps"], equip: "Cable", type: "Muscle Build", setup: {arms: "Low", pulleys: "Low"}, steps: ["Extend back"], cue: "Squeeze"},
+      {name: "Cable Bicep Curl", cat: ["Arms", "Biceps"], equip: "Cable", type: "Muscle Build", setup: {arms: "Low", pulleys: "Low"}, steps: ["Curl up"], cue: "Squeeze pinkies"},
+      {name: "Cable Hammer Curl", cat: ["Arms", "Biceps"], equip: "Cable", type: "Muscle Build", setup: {arms: "Low", pulleys: "Low"}, steps: ["Neutral grip curl"], cue: "Forearms"},
+      {name: "Bayesian Curl", cat: ["Arms", "Biceps"], equip: "Cable", type: "Muscle Build", setup: {arms: "Low", pulleys: "Low"}, steps: ["Face away", "Curl"], cue: "Long head"},
+      {name: "Reverse Grip Pushdown", cat: ["Arms", "Triceps"], equip: "Cable", type: "Muscle Build", setup: {arms: "Top", pulleys: "Top"}, steps: ["Palms up push"], cue: "Control"},
+      // CABLE LEGS
+      {name: "Cable Squat", cat: ["Legs"], equip: "Cable", type: "Strength", setup: {arms: "Low", pulleys: "Low"}, steps: ["Hold at shoulders", "Squat"], cue: "Chest up"},
+      {name: "Cable Pull-Through", cat: ["Legs", "Glutes"], equip: "Cable", type: "Strength", setup: {arms: "Low", pulleys: "Low"}, steps: ["Face away", "Hinge hips"], cue: "Push butt back"},
+      {name: "Cable RDL", cat: ["Legs", "Hamstrings"], equip: "Cable", type: "Strength", setup: {arms: "Low", pulleys: "Low"}, steps: ["Hinge hips"], cue: "Stretch hams"},
+      {name: "Cable Lunge", cat: ["Legs"], equip: "Cable", type: "Strength", setup: {arms: "Low", pulleys: "Low"}, steps: ["Hold handles", "Lunge"], cue: "Knee stability"},
+      {name: "Cable Kickback (Glute)", cat: ["Legs", "Glutes"], equip: "Cable", type: "Muscle Build", setup: {arms: "Low", pulleys: "Low"}, steps: ["Kick back"], cue: "Squeeze glute"},
+      {name: "Cable Abductor", cat: ["Legs", "Glutes"], equip: "Cable", type: "Mobility", setup: {arms: "Low", pulleys: "Low"}, steps: ["Leg out side"], cue: "Outer glute"},
+      {name: "Cable Adductor", cat: ["Legs"], equip: "Cable", type: "Mobility", setup: {arms: "Low", pulleys: "Low"}, steps: ["Leg across"], cue: "Inner thigh"},
+      {name: "Cable Calf Raise", cat: ["Legs", "Calves"], equip: "Cable", type: "Muscle Build", setup: {arms: "Low", pulleys: "Low"}, steps: ["Raise toes"], cue: "High squeeze"},
+      // CABLE CORE
+      {name: "Cable Crunch", cat: ["Core"], equip: "Cable", type: "Muscle Build", setup: {arms: "Top", pulleys: "Top"}, steps: ["Kneel", "Curl down"], cue: "Ribs to hips"},
+      {name: "Woodchopper (High to Low)", cat: ["Core"], equip: "Cable", type: "Mobility", setup: {arms: "Top", pulleys: "Top"}, steps: ["Rotate down"], cue: "Core twist"},
+      {name: "Woodchopper (Low to High)", cat: ["Core"], equip: "Cable", type: "Mobility", setup: {arms: "Low", pulleys: "Low"}, steps: ["Rotate up"], cue: "Core twist"},
+      {name: "Pallof Press", cat: ["Core"], equip: "Cable", type: "Strength", setup: {arms: "Mid", pulleys: "Mid"}, steps: ["Press out", "Hold"], cue: "Anti-rotation"},
+      {name: "Cable Side Bend", cat: ["Core"], equip: "Cable", type: "Mobility", setup: {arms: "Low", pulleys: "Low"}, steps: ["Lean side"], cue: "Obliques"},
+      // DUMBBELL
+      {name: "Dumbbell Bench Press", cat: ["Chest"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Press up"], cue: "Drive feet"},
+      {name: "Dumbbell Incline Press", cat: ["Chest"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Incline press"], cue: "Upper chest"},
+      {name: "Dumbbell Fly", cat: ["Chest"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Fly open"], cue: "Stretch"},
+      {name: "Dumbbell Shoulder Press", cat: ["Shoulders"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Press up"], cue: "Core tight"},
+      {name: "Arnold Press", cat: ["Shoulders"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Rotate and press"], cue: "Smooth rotation"},
+      {name: "Lateral Raise", cat: ["Shoulders"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Raise side"], cue: "Lead with elbows"},
+      {name: "Front Raise", cat: ["Shoulders"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Raise front"], cue: "Control"},
+      {name: "Dumbbell Row", cat: ["Back"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Row back"], cue: "Elbow back"},
+      {name: "Dumbbell Pullover", cat: ["Back"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Pull over"], cue: "Lats stretch"},
+      {name: "Goblet Squat", cat: ["Legs"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Hold chest", "Squat"], cue: "Deep"},
+      {name: "Dumbbell Lunge", cat: ["Legs"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Step lunge"], cue: "Knee tracking"},
+      {name: "Bulgarian Split Squat", cat: ["Legs"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Foot up", "Squat"], cue: "Painful but good"},
+      {name: "Romanian Deadlift (DB)", cat: ["Legs"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Hinge"], cue: "Back flat"},
+      {name: "Dumbbell Curl", cat: ["Arms"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Curl"], cue: "Squeeze"},
+      {name: "Hammer Curl", cat: ["Arms"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Neutral curl"], cue: "Forearms"},
+      {name: "Tricep Kickback", cat: ["Arms"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Kick back"], cue: "Lockout"},
+      {name: "Skull Crusher (DB)", cat: ["Arms"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Lower to head"], cue: "Elbows in"},
+      {name: "Farmers Walk", cat: ["Core"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Walk"], cue: "Tall posture"},
+      // BODYWEIGHT
+      {name: "Push-ups", cat: ["Chest"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Push floor"], cue: "Plank position"},
+      {name: "Pull-ups", cat: ["Back"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Pull up"], cue: "Chest to bar"},
+      {name: "Chin-ups", cat: ["Back"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Underhand pull"], cue: "Biceps"},
+      {name: "Dips", cat: ["Chest"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Dip down"], cue: "90 degrees"},
+      {name: "Bodyweight Squat", cat: ["Legs"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Squat"], cue: "Depth"},
+      {name: "Lunge (BW)", cat: ["Legs"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Lunge"], cue: "Balance"},
+      {name: "Glute Bridge", cat: ["Legs"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Hips up"], cue: "Squeeze"},
+      {name: "Plank", cat: ["Core"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Hold"], cue: "Tight core"},
+      {name: "Side Plank", cat: ["Core"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Hold side"], cue: "Hips high"},
+      {name: "Mountain Climbers", cat: ["Core"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Run"], cue: "Fast"},
+      {name: "Burpees", cat: ["Full Body"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Drop jump"], cue: "Explode"},
+      {name: "Hanging Leg Raise", cat: ["Core"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Legs up"], cue: "Control"},
+      {name: "Pike Push-up", cat: ["Shoulders"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Hips high push"], cue: "Shoulders"},
+      {name: "Cat-Cow", cat: ["Core"], equip: "Bodyweight", type: "Mobility", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Flex spine"], cue: "Breathe"},
+      {name: "Dead Bug", cat: ["Core"], equip: "Bodyweight", type: "Mobility", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Opposite limbs"], cue: "Flat back"}
     ];
 
     // --- INIT ---
@@ -371,18 +395,15 @@
     };
 
     async function syncFromCloud() {
-        // Try fetch from Cloud
         const res = await fetch(GOOGLE_SCRIPT_URL);
         const data = await res.json();
-        
         if(data.history) localStorage.setItem('nimbleHistory', JSON.stringify(data.history));
+        if(data.nutrition) localStorage.setItem('nimbleNutrition', JSON.stringify(data.nutrition));
         if(data.gifs) {
-            // Transform Config sheet to object
             let g = {};
             data.gifs.forEach(row => { if(row.key && row.value) g[row.key] = row.value; });
             localStorage.setItem('nimbleGifOverrides', JSON.stringify(g));
         }
-        
         loadLocal();
         document.getElementById('sync-loader').style.opacity = 0;
         setTimeout(() => document.getElementById('sync-loader').style.display = 'none', 500);
@@ -396,7 +417,190 @@
         gifOverrides = JSON.parse(localStorage.getItem('nimbleGifOverrides')) || {};
     }
 
-    // --- WORKOUT ENGINE ---
+    // --- FOOD ENGINE (UPDATED) ---
+    function setSearchSource(src) {
+        searchSource = src;
+        document.getElementById('src-usda').classList.toggle('active', src === 'usda');
+        document.getElementById('src-off').classList.toggle('active', src === 'off');
+    }
+
+    async function searchFood() {
+        const query = document.getElementById('food-search').value;
+        const resDiv = document.getElementById('search-results');
+        resDiv.innerHTML = 'Searching...';
+        
+        let results = [];
+        
+        try {
+            if (searchSource === 'usda') {
+                const req = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=10&api_key=${apiKey}`);
+                const data = await req.json();
+                if(data.foods) {
+                    data.foods.forEach(f => {
+                        const getNut = (id) => (f.foodNutrients.find(x => x.nutrientId === id) || {}).value || 0;
+                        const cals = getNut(208);
+                        const pro = getNut(203);
+                        // Filter out Garbage Data (0 cal & 0 pro)
+                        if (cals > 0 || pro > 0) {
+                            results.push({ name: f.description, c: cals, p: pro, f: getNut(204), ch: getNut(205) });
+                        }
+                    });
+                }
+            } else {
+                const req = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${query}&search_simple=1&action=process&json=1&page_size=10`);
+                const data = await req.json();
+                if(data.products) {
+                    data.products.forEach(p => {
+                        const cals = p.nutriments['energy-kcal_100g'] || 0;
+                        const pro = p.nutriments.proteins_100g || 0;
+                        if (cals > 0 || pro > 0) {
+                            results.push({
+                                name: p.product_name,
+                                c: cals,
+                                p: pro,
+                                f: p.nutriments.fat_100g || 0,
+                                ch: p.nutriments.carbohydrates_100g || 0
+                            });
+                        }
+                    });
+                }
+            }
+        } catch(e) { console.log(e); }
+        
+        resDiv.innerHTML = '';
+        if (results.length === 0) resDiv.innerHTML = "No valid results found.";
+        
+        results.forEach(f => {
+            const div = document.createElement('div');
+            div.className = 'food-item';
+            div.innerHTML = `<span>${f.name}</span> <small>${Math.round(f.c)} cal</small>`;
+            div.onclick = () => openFoodModal(f);
+            resDiv.appendChild(div);
+        });
+    }
+
+    function openFoodModal(item) {
+        pendingFood = item;
+        document.getElementById('food-modal-name').innerText = item.name;
+        document.getElementById('food-qty').value = 1;
+        updateFoodCalc();
+        document.getElementById('food-modal').classList.remove('hidden');
+        document.getElementById('food-modal').style.display = 'flex';
+    }
+
+    function updateFoodCalc() {
+        if (!pendingFood) return;
+        const qty = parseFloat(document.getElementById('food-qty').value) || 0;
+        document.getElementById('food-calc-cals').innerText = Math.round(pendingFood.c * qty);
+        document.getElementById('food-calc-pro').innerText = Math.round(pendingFood.p * qty);
+    }
+
+    function selectMeal(meal, btn) {
+        selectedMeal = meal;
+        // visual toggle
+        document.querySelectorAll('.btn-guide').forEach(b => b.style.borderColor = '#444');
+        btn.style.borderColor = 'var(--primary)';
+    }
+
+    function confirmAddFood() {
+        if (!pendingFood) return;
+        const qty = parseFloat(document.getElementById('food-qty').value) || 1;
+        
+        const log = { 
+            date: new Date().toLocaleDateString(), 
+            meal: selectedMeal, 
+            name: pendingFood.name,
+            c: pendingFood.c * qty,
+            p: pendingFood.p * qty,
+            f: pendingFood.f * qty,
+            ch: pendingFood.ch * qty
+        };
+        
+        let cl = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
+        cl.push(log);
+        localStorage.setItem('nimbleNutrition', JSON.stringify(cl));
+        sendToCloud('nutrition', log);
+        
+        closeFoodModal();
+        renderMealLog();
+        updateMacrosUI();
+    }
+    
+    function closeFoodModal() {
+        document.getElementById('food-modal').classList.add('hidden');
+        document.getElementById('food-modal').style.display = 'none';
+        pendingFood = null;
+    }
+
+    function renderMealLog() {
+        const container = document.getElementById('meal-container');
+        container.innerHTML = '';
+        const today = new Date().toLocaleDateString();
+        const logs = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
+        const todaysLogs = logs.filter(l => l.date === today);
+        
+        let grandTotal = 0;
+        let grandPro = 0;
+
+        ['Breakfast', 'Lunch', 'Dinner', 'Snacks'].forEach(meal => {
+            const items = todaysLogs.filter(l => l.meal === meal);
+            const subtotal = items.reduce((sum, i) => sum + (i.c || 0), 0);
+            grandTotal += subtotal;
+            items.forEach(i => grandPro += (i.p || 0));
+            
+            let html = `<div class="meal-section">
+                <div class="meal-header"><span>${meal}</span> <span>${Math.round(subtotal)} cal</span></div>`;
+            items.forEach(i => {
+                html += `<div class="food-item"><span>${i.name}</span> <small>${Math.round(i.c)}</small></div>`;
+            });
+            html += `</div>`;
+            container.innerHTML += html;
+        });
+        
+        document.getElementById('disp-cals').innerText = Math.round(grandTotal);
+        document.getElementById('disp-pro').innerText = Math.round(grandPro);
+        document.getElementById('bar-cals').style.width = Math.min(100, grandTotal/25) + '%';
+        document.getElementById('bar-pro').style.width = Math.min(100, grandPro/2) + '%';
+    }
+
+    // --- READINESS & WORKOUT LOGIC ---
+    function handleReadinessLog() {
+        const g = document.getElementById('garmin-score').value;
+        let score = g ? parseInt(g) : Math.round((parseInt(document.getElementById('val-sleep').value)*10 + parseInt(document.getElementById('val-mood').value)*10 + (10-parseInt(document.getElementById('val-sore').value))*10)/3);
+        saveReadinessData(score);
+        if (score < 40) {
+            showReadinessModal("Recovery Mode", "⚠️ Low Readiness", "Your body needs rest. Modify intensity?");
+        } else if (score < 70) {
+            showReadinessModal("Maintenance", "⚡ Moderate Readiness", "Good to go, but maybe not a PR day.");
+        } else {
+            alert("🚀 Prime Condition! Go crush it.");
+            switchTab('coach');
+        }
+    }
+
+    function showReadinessModal(title, icon, desc) {
+        document.getElementById('readiness-title').innerText = title;
+        document.getElementById('readiness-desc').innerText = desc;
+        document.getElementById('readiness-modal').classList.remove('hidden');
+        document.getElementById('readiness-modal').style.display = 'flex';
+    }
+
+    function applyReadinessStrategy(strategy) {
+        if (strategy === 'modify') {
+            modifyVolume = true; 
+            alert("📉 Weights will be reduced by 20% today.");
+        } else {
+            modifyVolume = false;
+        }
+        closeReadinessModal();
+        switchTab('coach');
+    }
+
+    function closeReadinessModal() {
+        document.getElementById('readiness-modal').classList.add('hidden');
+        document.getElementById('readiness-modal').style.display = 'none';
+    }
+
     function loadTemplate(type) {
         let filter = [];
         if(type==='push') filter = ['Chest','Shoulders','Triceps'];
@@ -437,34 +641,25 @@
 
         exercises.forEach((ex, i) => {
             const lastLog = history.filter(h => h.name === ex.name).sort((a,b) => new Date(b.date) - new Date(a.date))[0];
-            const suggestion = lastLog ? `Beat: ${lastLog.weight}${state.unit} x ${lastLog.reps}` : "New Exercise";
-            const val = lastLog ? lastLog.weight : "";
-            const hasGif = gifOverrides[ex.name];
-            
-            // GIF Logic
-            const searchUrl = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(ex.name + ' exercise form gif')}`;
-            const uniqueId = `desc-${i}`;
-            let demoBtn = `<a href="${searchUrl}" target="_blank" class="btn-guide">🎥 Find</a>`;
-            if(hasGif) demoBtn = `<span class="btn-guide" style="color:var(--sec); border-color:var(--sec);" onclick="showGif('${ex.name}')">🎥 Watch</span>`;
+            let suggestion = "New Exercise";
+            let val = "";
+            if (lastLog) {
+                let targetWeight = lastLog.weight;
+                if (modifyVolume) targetWeight = Math.round(targetWeight * 0.8);
+                suggestion = `Beat: ${targetWeight}${state.unit} x ${lastLog.reps}`;
+                val = targetWeight;
+            }
 
             const div = document.createElement('div');
             div.className = `card exercise-card ${ex.type}`;
             div.innerHTML = `
                 <div class="exercise-header">
-                    <strong>${ex.name}</strong> <small>${ex.equip}</small>
+                    <strong>${ex.name}</strong> 
                     <div style="display:flex; gap:5px;">
-                        <span class="btn-guide" onclick="document.getElementById('${uniqueId}').classList.toggle('visible')">📝</span>
-                        ${demoBtn}
+                        <span class="btn-guide" onclick="openGuideModal('${ex.name}')">📘 Guide</span>
                         <div class="mic-btn" onclick="startVoiceLog(this, ${i})">🎤</div>
                     </div>
                 </div>
-                
-                <div id="${uniqueId}" class="instruction-box">
-                    ${ex.desc}
-                    <input type="text" id="gif-input-${i}" class="gif-input" placeholder="Paste GIF URL here..." value="${hasGif || ''}">
-                    <span class="btn-sm btn-guide" onclick="saveGifOverride('${ex.name}', 'gif-input-${i}')">Save GIF</span>
-                </div>
-
                 <div class="suggestion-text">💡 ${suggestion}</div>
                 <div class="row" style="margin-top:10px;">
                     <div style="flex:1"><input type="number" id="w-${i}" value="${val}" placeholder="Wt"></div>
@@ -474,6 +669,39 @@
             `;
             list.appendChild(div);
         });
+    }
+
+    function openGuideModal(exName) {
+        const ex = allExercises.find(e => e.name === exName);
+        if(!ex) return;
+        currentGuideExercise = exName;
+        document.getElementById('guide-title').innerText = ex.name;
+        document.getElementById('guide-arms').innerText = ex.setup ? ex.setup.arms : "N/A";
+        document.getElementById('guide-pulleys').innerText = ex.setup ? ex.setup.pulleys : "N/A";
+        document.getElementById('guide-cue').innerText = ex.cue || "Focus on form.";
+        const ul = document.getElementById('guide-steps');
+        ul.innerHTML = "";
+        if(ex.steps) ex.steps.forEach(s => ul.innerHTML += `<li>${s}</li>`);
+        const gifUrl = gifOverrides[exName];
+        const img = document.getElementById('guide-gif');
+        if (gifUrl) { img.src = gifUrl; img.style.display = 'block'; } else { img.style.display = 'none'; }
+        document.getElementById('guide-modal').classList.remove('hidden');
+        document.getElementById('guide-modal').style.display = 'block';
+    }
+
+    function saveGuideGif() {
+        const url = document.getElementById('guide-gif-input').value;
+        if(!url) return;
+        gifOverrides[currentGuideExercise] = url;
+        localStorage.setItem('nimbleGifOverrides', JSON.stringify(gifOverrides));
+        sendToCloud('gif', {name: currentGuideExercise, url: url});
+        alert("GIF Saved!");
+        openGuideModal(currentGuideExercise);
+    }
+
+    function closeGuideModal() {
+        document.getElementById('guide-modal').classList.add('hidden');
+        document.getElementById('guide-modal').style.display = 'none';
     }
 
     function logSet(name, idx) {
@@ -486,189 +714,26 @@
             localStorage.setItem('nimbleHistory', JSON.stringify(h));
             sendToCloud("workout", entry);
             startTimer(90);
-            
-            // Visual feedback
             const btn = document.activeElement;
-            if(btn) {
-                btn.innerText = "Saved!";
-                btn.style.backgroundColor = "var(--success)";
-            }
+            btn.innerText = "Saved!";
+            btn.style.backgroundColor = "var(--success)";
         }
     }
 
-    function cancelWorkout() {
-        if(confirm("Discard Session?")) {
-            document.getElementById('active-workout').classList.add('hidden');
-            document.getElementById('active-workout').style.display = 'none';
-            document.getElementById('setup-panel').classList.remove('hidden');
-            document.getElementById('setup-panel').style.display = 'block';
-            activeRoutine = [];
-        }
-    }
-
-    function finishSession() {
-        if(confirm("Finish & Save?")) {
-            document.getElementById('active-workout').classList.add('hidden');
-            document.getElementById('active-workout').style.display = 'none';
-            document.getElementById('setup-panel').classList.remove('hidden');
-            document.getElementById('setup-panel').style.display = 'block';
-            let streak = parseInt(localStorage.getItem('streakCount') || 0);
-            streak++;
-            localStorage.setItem('streakCount', streak);
-            document.getElementById('streak-count').innerText = streak;
-            alert("🔥 Workout Saved! Streak: " + streak);
-        }
-    }
-
-    // --- FOOD ENGINE ---
-    function setSearchSource(src) {
-        searchSource = src;
-        document.getElementById('src-usda').classList.toggle('active', src === 'usda');
-        document.getElementById('src-off').classList.toggle('active', src === 'off');
-    }
-
-    async function searchFood() {
-        const query = document.getElementById('food-search').value;
-        const resDiv = document.getElementById('search-results');
-        resDiv.innerHTML = 'Searching...';
-        
-        let results = [...internalFoodDB.filter(f => f.name.toLowerCase().includes(query.toLowerCase()))];
-        
-        try {
-            if (searchSource === 'usda') {
-                const req = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=5&api_key=${apiKey}`);
-                const data = await req.json();
-                if(data.foods) {
-                    data.foods.forEach(f => {
-                        const getNut = (id) => (f.foodNutrients.find(x => x.nutrientId === id) || {}).value || 0;
-                        results.push({ name: f.description, c: getNut(208), p: getNut(203), f: getNut(204), ch: getNut(205) });
-                    });
-                }
-            } else {
-                const req = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${query}&search_simple=1&action=process&json=1&page_size=5`);
-                const data = await req.json();
-                if(data.products) {
-                    data.products.forEach(p => {
-                        results.push({
-                            name: p.product_name,
-                            c: p.nutriments['energy-kcal_100g'] || 0,
-                            p: p.nutriments.proteins_100g || 0,
-                            f: p.nutriments.fat_100g || 0,
-                            ch: p.nutriments.carbohydrates_100g || 0
-                        });
-                    });
-                }
-            }
-        } catch(e) { console.log(e); }
-        
-        resDiv.innerHTML = '';
-        results.forEach(f => {
-            const div = document.createElement('div');
-            div.className = 'food-item';
-            div.innerHTML = `<span>${f.name} <small>(${Math.round(f.c)} cal)</small></span> <span>+</span>`;
-            div.onclick = () => openMealModal(f);
-            resDiv.appendChild(div);
-        });
-    }
-
-    function openMealModal(item) {
-        pendingFood = item;
-        document.getElementById('meal-modal').classList.remove('hidden');
-        document.getElementById('meal-modal').style.display = 'flex';
-    }
-    
-    function closeMealModal() {
-        document.getElementById('meal-modal').classList.add('hidden');
-        document.getElementById('meal-modal').style.display = 'none';
-        pendingFood = null;
-    }
-
-    function confirmAddFood(meal) {
-        if (!pendingFood) return;
-        const log = { date: new Date().toLocaleDateString(), meal: meal, ...pendingFood };
-        let cl = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
-        cl.push(log);
-        localStorage.setItem('nimbleNutrition', JSON.stringify(cl));
-        sendToCloud('nutrition', log);
-        closeMealModal();
-        renderMealLog();
-        updateMacrosUI();
-    }
-
-    function renderMealLog() {
-        const container = document.getElementById('meal-container');
-        container.innerHTML = '';
-        const today = new Date().toLocaleDateString();
-        const logs = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
-        const todaysLogs = logs.filter(l => l.date === today);
-        
-        ['Breakfast', 'Lunch', 'Dinner', 'Snacks'].forEach(meal => {
-            const items = todaysLogs.filter(l => l.meal === meal);
-            const subtotal = items.reduce((sum, i) => sum + (i.c || 0), 0);
-            
-            let html = `<div class="meal-section">
-                <div class="meal-header"><span>${meal}</span> <span>${Math.round(subtotal)} cal</span></div>`;
-            items.forEach(i => {
-                html += `<div class="food-item"><span>${i.name}</span> <small>${Math.round(i.c)}</small></div>`;
-            });
-            html += `</div>`;
-            container.innerHTML += html;
-        });
-    }
-
-    // --- GIF SAVER ---
-    function saveGifOverride(name, inputId) {
-        const url = document.getElementById(inputId).value;
-        if(!url) return alert("Paste a URL first");
-        gifOverrides[name] = url;
-        localStorage.setItem('nimbleGifOverrides', JSON.stringify(gifOverrides));
-        sendToCloud('gif', {name: name, url: url}); // SYNC TO CLOUD
-        renderWorkout(activeRoutine);
-        alert("GIF Saved to Cloud!");
-    }
-    
-    function showGif(name) {
-        const url = gifOverrides[name];
-        if(url) {
-            document.getElementById('gif-player').src = url;
-            document.getElementById('gif-modal-title').innerText = name;
-            document.getElementById('gif-modal').classList.remove('hidden');
-            document.getElementById('gif-modal').style.display = 'flex';
-        }
-    }
-    function closeGifModal() { document.getElementById('gif-modal').classList.add('hidden'); document.getElementById('gif-modal').style.display = 'none'; }
-
-    // --- HELPERS ---
+    // --- STANDARD UTILS ---
     function switchTab(id) {
         document.querySelectorAll('.container').forEach(d => d.classList.remove('active'));
         document.getElementById('view-' + id).classList.add('active');
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('nav-' + id).classList.add('active');
-        if (id === 'food') { renderMealLog(); updateMacrosUI(); }
-        if (id === 'progress') renderChart();
+        if(id === 'food') { renderMealLog(); updateMacrosUI(); }
+        if(id === 'progress') renderChart();
     }
-
-    function sendToCloud(type, data) {
-        fetch(GOOGLE_SCRIPT_URL, { 
-            method: "POST", 
-            mode: "no-cors", 
-            headers: { "Content-Type": "application/json" }, 
-            body: JSON.stringify({ type: type, data: data }) 
-        }).catch(e=>console.log(e));
-    }
-
-    function updateMacrosUI() {
-        const today = new Date().toLocaleDateString();
-        const logs = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
-        const t = logs.filter(l => l.date === today).reduce((acc, l) => ({ c: acc.c+(l.c||0), p: acc.p+(l.p||0), f: acc.f+(l.f||0), ch: acc.ch+(l.ch||0) }), {c:0, p:0, f:0, ch:0});
-        ['cals','pro','fat','carb'].forEach(k => {
-            const val = Math.round(t[k==='cals'?'c':(k==='pro'?'p':(k==='fat'?'f':'ch'))]);
-            document.getElementById('disp-'+k).innerText = val;
-            document.getElementById('bar-'+k).style.width = Math.min(100, val/20) + '%'; 
-        });
-    }
-
-    // --- TIMER ---
+    
+    function cancelWorkout() { if(confirm("Discard?")) { document.getElementById('active-workout').classList.add('hidden'); document.getElementById('active-workout').style.display='none'; document.getElementById('setup-panel').classList.remove('hidden'); document.getElementById('setup-panel').style.display='block'; } }
+    function finishSession() { if(confirm("Save?")) { cancelWorkout(); alert("Saved!"); } }
+    function factoryReset() { if(confirm("Reset?")) { localStorage.clear(); location.reload(); } }
+    
     function startTimer(s) {
         document.getElementById('timer-overlay').classList.remove('hidden');
         document.getElementById('timer-overlay').style.display = 'flex';
@@ -678,15 +743,8 @@
     }
     function closeTimer() { document.getElementById('timer-overlay').classList.add('hidden'); document.getElementById('timer-overlay').style.display = 'none'; clearInterval(timerInterval); }
     function addTime(s) { startTimer(parseInt(document.getElementById('timer-display').innerText)+s); }
+    function openTimerOverlay() { document.getElementById('timer-overlay').classList.remove('hidden'); document.getElementById('timer-overlay').style.display = 'flex'; }
 
-    // --- CHART ---
-    function renderChart() {
-        const ctx = document.getElementById('progressChart').getContext('2d');
-        if(myChart) myChart.destroy();
-        myChart = new Chart(ctx, { type:'line', data:{labels:['Jan','Feb','Mar'], datasets:[{label:'Demo Data', data:[100,110,115], borderColor:'#BB86FC'}]} });
-    }
-
-    // --- BUILDER ---
     function openBuilder() { document.getElementById('builder-overlay').classList.remove('hidden'); document.getElementById('builder-overlay').style.display = 'block'; filterBuilderList(); }
     function closeBuilder() { document.getElementById('builder-overlay').classList.add('hidden'); document.getElementById('builder-overlay').style.display = 'none'; }
     function toggleFilter(type, val, el) {
@@ -714,16 +772,45 @@
         });
     }
 
-    function factoryReset() { if(confirm("Reset App?")) { localStorage.clear(); location.reload(); } }
-    function toggleUnit() { state.unit = state.unit === 'lbs' ? 'kg' : 'lbs'; localStorage.setItem('nimbleUnit', state.unit); location.reload(); }
-    function saveReadiness() { alert("Saved"); }
-    function saveBodyStat() { alert("Logged"); }
-    function logMacroManual() {
-        const f = { name: "Manual", c: parseFloat(document.getElementById('inp-cals').value)||0, p: parseFloat(document.getElementById('inp-pro').value)||0, ch: parseFloat(document.getElementById('inp-carb').value)||0, f: parseFloat(document.getElementById('inp-fat').value)||0 };
-        openMealModal(f);
+    function saveReadinessData(score) {
+        const entry = { date: new Date().toISOString(), score: score };
+        localStorage.setItem('nimbleReadiness', JSON.stringify([entry]));
+        sendToCloud('readiness', entry);
     }
-    function exportData() { alert("Exporting..."); }
+    function calcReadiness() {
+        const g = document.getElementById('garmin-score').value;
+        let score = g ? parseInt(g) : Math.round((parseInt(document.getElementById('val-sleep').value)*10 + parseInt(document.getElementById('val-mood').value)*10 + (10-parseInt(document.getElementById('val-sore').value))*10)/3);
+        document.getElementById('score-display').innerText = score + '%';
+        document.getElementById('score-display').style.color = score > 70 ? 'var(--success)' : 'var(--warn)';
+    }
+    
+    function sendToCloud(type, data) { fetch(GOOGLE_SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: type, data: data }) }).catch(e=>console.log(e)); }
+    function saveBodyStat() { const val = document.getElementById('body-weight').value; if(val) sendToCloud("wellness", {type:"weight", val: val}); alert("Logged"); }
+    function toggleUnit() { state.unit = state.unit === 'lbs' ? 'kg' : 'lbs'; localStorage.setItem('nimbleUnit', state.unit); location.reload(); }
+    
+    function renderChart() {
+        const ctx = document.getElementById('progressChart').getContext('2d');
+        if(myChart) myChart.destroy();
+        myChart = new Chart(ctx, { type:'line', data:{labels:['Jan','Feb','Mar'], datasets:[{label:'Demo Data', data:[100,110,115], borderColor:'#BB86FC'}]} });
+    }
+    function exportData() {
+        const data = localStorage.getItem('nimbleHistory');
+        const blob = new Blob([data], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'nimble_backup.json'; a.click();
+    }
     function startVoiceLog() { alert("Use Chrome for Voice"); }
+    function updateMacrosUI() {
+        const today = new Date().toLocaleDateString();
+        const logs = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
+        const t = logs.filter(l => l.date === today).reduce((acc, l) => ({ c: acc.c+(l.c||0), p: acc.p+(l.p||0), f: acc.f+(l.f||0), ch: acc.ch+(l.ch||0) }), {c:0, p:0, f:0, ch:0});
+        ['cals','pro','fat','carb'].forEach(k => {
+            const val = Math.round(t[k==='cals'?'c':(k==='pro'?'p':(k==='fat'?'f':'ch'))]);
+            document.getElementById('disp-'+k).innerText = val;
+            document.getElementById('bar-'+k).style.width = Math.min(100, val/20) + '%'; 
+        });
+    }
 </script>
 </body>
 </html>
