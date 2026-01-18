@@ -258,7 +258,6 @@
     let myChart = null;
     let timerInterval = null;
     let timerSeconds = 0;
-    let autoTimerEnabled = true;
 
     const allExercises = [
       {"name": "Low Cable Chest Fly", "categories": ["Chest", "Shoulders"], "type": "Muscle Build", "desc": "Set pulleys low. Scoop hands up."},
@@ -270,7 +269,6 @@
       {"name": "Tricep Pushdown", "categories": ["Triceps"], "type": "Muscle Build", "desc": "Elbows pinned. Push down."},
       {"name": "Bicep Cable Curl", "categories": ["Biceps"], "type": "Muscle Build", "desc": "Elbows pinned. Curl up."},
       {"name": "Cable Crunch", "categories": ["Abs", "Core"], "type": "Muscle Build", "desc": "Kneel. Curl down."},
-      {"name": "Cable Pull-through", "categories": ["Glutes", "Hamstrings"], "type": "Muscle Build", "desc": "Face away. Hinge back."},
       {"name": "Dumbbell Chest Press", "categories": ["Chest", "Triceps"], "type": "Strength", "desc": "Press weights over chest."},
       {"name": "Dumbbell Shoulder Press", "categories": ["Shoulders", "Triceps"], "type": "Strength", "desc": "Press overhead."},
       {"name": "Goblet Squat", "categories": ["Legs", "Glutes"], "type": "Strength", "desc": "Hold weight at chest. Squat."},
@@ -280,26 +278,9 @@
       {"name": "Bulgarian Split Squat", "categories": ["Legs", "Glutes"], "type": "Strength", "desc": "Back foot up. Drive up."},
       {"name": "Push-ups", "categories": ["Chest", "Triceps", "Core"], "type": "Calisthenics", "desc": "Chest to floor."},
       {"name": "Pull-ups", "categories": ["Back", "Biceps"], "type": "Calisthenics", "desc": "Chin over bar."},
-      {"name": "Dips", "categories": ["Chest", "Triceps", "Shoulders"], "type": "Calisthenics", "desc": "Lower until shoulders below elbows."},
-      {"name": "Bodyweight Squats", "categories": ["Legs"], "type": "Calisthenics", "desc": "Hips back and down."},
-      {"name": "Planks", "categories": ["Core", "Abs"], "type": "Calisthenics", "desc": "Hold tight.", "isTimed": true, "duration": 60},
       {"name": "Burpees", "categories": ["Full Body", "Cardio"], "type": "Calisthenics", "desc": "Chest to floor, jump."},
-      {"name": "Mountain Climbers", "categories": ["Core", "Cardio"], "type": "Calisthenics", "desc": "Knees to chest.", "isTimed": true, "duration": 45},
       {"name": "Barbell Squat", "categories": ["Legs", "Glutes"], "type": "Strength", "desc": "Bar on back. Squat deep."},
-      {"name": "Barbell Bench Press", "categories": ["Chest", "Triceps"], "type": "Strength", "desc": "Bar to chest. Press."},
-      {"name": "Barbell Deadlift", "categories": ["Back", "Hamstrings"], "type": "Strength", "desc": "Lift from floor."},
-      {"name": "Overhead Press", "categories": ["Shoulders", "Triceps"], "type": "Strength", "desc": "Press bar overhead."},
-      {"name": "Hanging Leg Raises", "categories": ["Core", "Abs"], "type": "Calisthenics", "desc": "Lift legs to 90."},
-      {"name": "Nordic Curls", "categories": ["Hamstrings"], "type": "Calisthenics", "desc": "Lower forward slowly."},
-      {"name": "Pike Push-ups", "categories": ["Shoulders"], "type": "Calisthenics", "desc": "Hips high push up."},
-      {"name": "Kettlebell Swing", "categories": ["Glutes", "Hamstrings"], "type": "Strength", "desc": "Hinge snap."},
-      {"name": "Farmers Walk", "categories": ["Core", "Traps"], "type": "Strength", "desc": "Walk heavy.", "isTimed": true, "duration": 60},
-      {"name": "Dumbbell Lunges", "categories": ["Legs", "Glutes"], "type": "Strength", "desc": "Step forward."},
-      {"name": "Bicep Curls", "categories": ["Biceps"], "type": "Muscle Build", "desc": "Curl to shoulder."},
-      {"name": "Tricep Kickbacks", "categories": ["Triceps"], "type": "Muscle Build", "desc": "Kick back."},
-      {"name": "Hammer Curls", "categories": ["Biceps", "Forearms"], "type": "Muscle Build", "desc": "Neutral grip."},
-      {"name": "Arnold Press", "categories": ["Shoulders", "Triceps"], "type": "Strength", "desc": "Rotate palms out."},
-      {"name": "Chin-ups", "categories": ["Back", "Biceps"], "type": "Calisthenics", "desc": "Palms facing you."}
+      {"name": "Barbell Bench Press", "categories": ["Chest", "Triceps"], "type": "Strength", "desc": "Bar to chest. Press."}
     ];
 
     const internalFoodDB = [
@@ -308,12 +289,10 @@
         {name:"Egg", c:70, p:6, f:5, ch:0}, 
         {name:"Whey Scoop", c:120, p:24, f:1, ch:3},
         {name:"Banana", c:105, p:1, f:0, ch:27}, 
-        {name:"Oats (Cup)", c:300, p:10, f:5, ch:50},
-        {name:"Avocado", c:160, p:2, f:15, ch:9}, 
         {name:"Salmon", c:208, p:20, f:13, ch:0}
     ];
 
-    window.onload = () => {
+    window.onload = function() {
         try {
             loadLocal();
             updateStreak();
@@ -326,14 +305,13 @@
             document.getElementById('unit-disp-2').innerText = state.unit.toUpperCase();
             
             apiKey = localStorage.getItem('usdaKey') || "";
-            gifOverrides = JSON.parse(localStorage.getItem('nimbleGifOverrides')) || {};
+            gifOverrides = JSON.parse(localStorage.getItem('nimbleGifOverrides') || '{}');
             
             switchTab('readiness'); 
             populateChartSelect();
         } catch (e) {
-            console.error(e);
-            alert("Recovering from crash...");
-            factoryReset();
+            console.error('Init error:', e);
+            alert("App error. Check console.");
         }
     };
 
@@ -346,29 +324,30 @@
     }
     
     function safeParse(key) {
-        try { return JSON.parse(localStorage.getItem(key)); } 
-        catch (e) { return null; }
+        try { 
+            const val = localStorage.getItem(key);
+            return val ? JSON.parse(val) : null;
+        } 
+        catch (e) { 
+            return null; 
+        }
     }
 
     function factoryReset() {
-        if(confirm("This will fix crashes but wipe your saved data. Continue?")) {
+        if(confirm("This will wipe all data. Continue?")) {
             localStorage.clear();
             location.reload();
         }
     }
 
     function switchTab(id) {
-        document.querySelectorAll('.container').forEach(d => {
-            d.classList.remove('active');
-            d.style.display = "none";
-        });
-        
+        document.querySelectorAll('.container').forEach(d => d.classList.remove('active'));
         const target = document.getElementById('view-' + id);
-        target.classList.add('active');
-        target.style.display = "block";
+        if(target) target.classList.add('active');
         
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('nav-' + id).classList.add('active');
+        const navBtn = document.getElementById('nav-' + id);
+        if(navBtn) navBtn.classList.add('active');
         
         if(id==='progress') renderChart();
         if(id==='food') updateMacrosUI();
@@ -382,48 +361,37 @@
     }
 
     function calcReadiness() {
-    const g = document.getElementById('garmin-score').value;
-    let score = g ? parseInt(g) : Math.round((parseInt(document.getElementById('val-sleep').value)*10 + parseInt(document.getElementById('val-mood').value)*10 + (10-parseInt(document.getElementById('val-sore').value))*10)/3);
-    const el = document.getElementById('score-display');
-    el.innerText = score + '%';
-    el.style.color = score > 80 ? 'var(--success)' : (score > 50 ? 'var(--warn)' : 'var(--danger)');
-    document.getElementById('score-text').innerText = score > 80 ? "Go for a PR!" : "Listen to your body";
-    // Removed the localStorage line that was causing conflicts
-}
-    
-function saveReadiness() {
-    const g = document.getElementById('garmin-score').value;
-    let score = g ? parseInt(g) : Math.round((parseInt(document.getElementById('val-sleep').value)*10 + parseInt(document.getElementById('val-mood').value)*10 + (10-parseInt(document.getElementById('val-sore').value))*10)/3);
-    
-    const entry = {
-        date: new Date().toISOString(),
-        score: score,
-        sleep: parseInt(document.getElementById('val-sleep').value),
-        pain: parseInt(document.getElementById('val-sore').value),
-        energy: parseInt(document.getElementById('val-mood').value),
-        garmin: g || null
-    };
-    
-    // FIX: Ensure logs is always an array
-    let logs = JSON.parse(localStorage.getItem('nimbleReadiness'));
-    if(!Array.isArray(logs)) {
-        logs = []; // Force it to be an array
+        const g = document.getElementById('garmin-score').value;
+        let score = g ? parseInt(g) : Math.round((parseInt(document.getElementById('val-sleep').value)*10 + parseInt(document.getElementById('val-mood').value)*10 + (10-parseInt(document.getElementById('val-sore').value))*10)/3);
+        const el = document.getElementById('score-display');
+        el.innerText = score + '%';
+        el.style.color = score > 80 ? 'var(--success)' : (score > 50 ? 'var(--warn)' : 'var(--danger)');
+        document.getElementById('score-text').innerText = score > 80 ? "Go for a PR!" : "Listen to your body";
     }
-    
-    logs.push(entry);
-    localStorage.setItem('nimbleReadiness', JSON.stringify(logs));
-    sendToCloud('readiness', entry);
-    alert('✅ Check-in logged!');
-}
-    
-    let logs = JSON.parse(localStorage.getItem('nimbleReadiness')) || [];
-    logs.push(entry);
-    localStorage.setItem('nimbleReadiness', JSON.stringify(logs));
-    sendToCloud('readiness', entry);
-    alert('✅ Check-in logged!');
-}
+
+    function saveReadiness() {
+        const g = document.getElementById('garmin-score').value;
+        let score = g ? parseInt(g) : Math.round((parseInt(document.getElementById('val-sleep').value)*10 + parseInt(document.getElementById('val-mood').value)*10 + (10-parseInt(document.getElementById('val-sore').value))*10)/3);
+        
+        const entry = {
+            date: new Date().toISOString(),
+            score: score,
+            sleep: parseInt(document.getElementById('val-sleep').value),
+            pain: parseInt(document.getElementById('val-sore').value),
+            energy: parseInt(document.getElementById('val-mood').value),
+            garmin: g || null
+        };
+        
+        let logs = safeParse('nimbleReadiness');
+        if(!Array.isArray(logs)) logs = [];
+        logs.push(entry);
+        localStorage.setItem('nimbleReadiness', JSON.stringify(logs));
+        sendToCloud('readiness', entry);
+        alert('✅ Check-in logged!');
+    }
+
     function updateStreak() {
-        let sCount = parseInt(localStorage.getItem('streakCount')) || 0;
+        let sCount = parseInt(localStorage.getItem('streakCount') || 0);
         document.getElementById('streak-count').innerText = sCount;
     }
 
@@ -431,8 +399,8 @@ function saveReadiness() {
         const container = document.getElementById('trophy-case');
         container.innerHTML = '';
         const badges = [
-            {id: 'first', icon: '🥇', name: 'First Step', check: () => state.history.length > 0},
-            {id: 'hundo', icon: '💯', name: '100 Club', check: () => state.history.length > 100}
+            {icon: '🥇', check: () => state.history.length > 0},
+            {icon: '💯', check: () => state.history.length > 100}
         ];
         badges.forEach(b => {
             const div = document.createElement('div');
@@ -472,6 +440,7 @@ function saveReadiness() {
         toggleGoalSetter();
         alert('Goals saved!');
     }
+
     function toggleApiSettings() { 
         document.getElementById('api-settings').classList.toggle('hidden'); 
     }
@@ -511,13 +480,13 @@ function saveReadiness() {
                     });
                 }
             } catch(e) {
-                console.error('USDA API Error:', e);
+                console.error('USDA error:', e);
             }
         }
         
         resDiv.innerHTML = '';
         if(results.length === 0) {
-            resDiv.innerHTML = '<div style="padding:10px; color:#aaa;">No results found</div>';
+            resDiv.innerHTML = '<div style="padding:10px; color:#aaa;">No results</div>';
             return;
         }
         
@@ -534,7 +503,7 @@ function saveReadiness() {
 
     function addFoodLog(food) {
         const log = { date: new Date().toLocaleDateString(), ...food };
-        let cl = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
+        let cl = safeParse('nimbleNutrition') || [];
         cl.push(log);
         localStorage.setItem('nimbleNutrition', JSON.stringify(cl));
         sendToCloud('nutrition', log);
@@ -545,7 +514,7 @@ function saveReadiness() {
 
     function updateMacrosUI() {
         const today = new Date().toLocaleDateString();
-        const logs = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
+        const logs = safeParse('nimbleNutrition') || [];
         const t = logs.filter(l => l.date === today).reduce((acc, l) => ({ 
             c: acc.c+(l.c||0), 
             p: acc.p+(l.p||0), 
@@ -571,7 +540,7 @@ function saveReadiness() {
         document.getElementById('bar-carb').style.width = Math.min(100, calcPercent(t.ch, goals.carb)) + '%';
         document.getElementById('bar-fat').style.width = Math.min(100, calcPercent(t.f, goals.fat)) + '%';
         
-        const waterCount = parseInt(localStorage.getItem('nimbleWater')) || 0;
+        const waterCount = parseInt(localStorage.getItem('nimbleWater') || 0);
         document.getElementById('water-count').innerText = waterCount;
     }
 
@@ -596,6 +565,7 @@ function saveReadiness() {
         localStorage.setItem('nimbleWater', w);
         document.getElementById('water-count').innerText = w;
     }
+
     function loadTemplate(type) {
         let filter = [];
         if(type==='push') filter = ['Chest','Shoulders','Triceps'];
@@ -617,15 +587,13 @@ function saveReadiness() {
         activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
         renderWorkout(activeRoutine);
         document.getElementById('setup-panel').classList.add('hidden');
-        document.getElementById('setup-panel').style.display = 'none';
         document.getElementById('active-workout').classList.remove('hidden');
-        document.getElementById('active-workout').style.display = 'block';
     }
 
     function renderWorkout(exercises) {
         const list = document.getElementById('workout-list');
         list.innerHTML = '';
-        const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+        const history = safeParse('nimbleHistory') || [];
 
         exercises.forEach((ex, i) => {
             const lastLog = history.filter(h => h.name === ex.name).sort((a,b) => new Date(b.date) - new Date(a.date))[0];
@@ -635,20 +603,18 @@ function saveReadiness() {
             const hasGif = gifOverrides[ex.name];
             const searchUrl = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(ex.name + ' exercise form gif')}`;
             const uniqueId = `desc-${i}`;
-            let demoBtn = `<a href="${searchUrl}" target="_blank" class="btn-guide">🎥 Find GIF</a>`;
-           if(hasGif) {
-    const escapedName = ex.name.replace(/'/g, "\\'");
-    demoBtn = `<span class="btn-guide" style="color:var(--sec); border-color:var(--sec);" onclick="showGif('${escapedName}')">🎥 Watch</span>`;
-}
+            const escapedName = ex.name.replace(/'/g, "\\'");
+            let demoBtn = `<a href="${searchUrl}" target="_blank" class="btn-guide">🎥 Find</a>`;
+            if(hasGif) demoBtn = `<span class="btn-guide" style="color:var(--sec);" onclick="showGif('${escapedName}')">🎥 Watch</span>`;
 
             const div = document.createElement('div');
-            div.className = `card exercise-card ${ex.type}`;
+            div.className = `card exercise-card`;
             div.id = `exercise-${i}`;
             div.innerHTML = `
                 <div class="exercise-header">
                     <strong>${ex.name}</strong>
                     <div style="display:flex; gap:5px;">
-                        <span class="btn-guide" onclick="document.getElementById('${uniqueId}').classList.toggle('visible')">📝 Guide</span>
+                        <span class="btn-guide" onclick="document.getElementById('${uniqueId}').classList.toggle('visible')">📝</span>
                         ${demoBtn}
                         <div class="mic-btn" onclick="startVoiceLog(this, ${i})">🎤</div>
                     </div>
@@ -656,8 +622,8 @@ function saveReadiness() {
                 
                 <div id="${uniqueId}" class="instruction-box">
                     ${ex.desc}
-                    <input type="text" id="gif-input-${i}" class="gif-input" placeholder="Paste GIF URL here..." value="${hasGif || ''}">
-                    <span class="btn-sm btn-guide" onclick="saveGifOverride('${ex.name}', 'gif-input-${i}')">Save GIF</span>
+                    <input type="text" id="gif-input-${i}" class="gif-input" placeholder="Paste GIF URL..." value="${hasGif || ''}">
+                    <span class="btn-sm btn-guide" onclick="saveGifOverride('${escapedName}', 'gif-input-${i}')">Save</span>
                 </div>
 
                 <div class="suggestion-text">💡 ${suggestion}</div>
@@ -671,7 +637,7 @@ function saveReadiness() {
                     </div>
                     <div style="flex:1"><input type="number" id="r-${i}" placeholder="Reps"></div>
                 </div>
-                <button class="btn btn-action" style="margin-top:10px; padding:8px;" onclick="logSet('${ex.name}', ${i})">✅ Log Set</button>
+                <button class="btn btn-action" style="margin-top:10px; padding:8px;" onclick="logSet('${escapedName}', ${i})">✅ Log</button>
             `;
             list.appendChild(div);
         });
@@ -688,50 +654,49 @@ function saveReadiness() {
         if(!w || !r) return alert('Enter weight and reps!');
         
         const entry = { date: new Date().toISOString(), name: name, weight: parseFloat(w), reps: parseFloat(r), unit: state.unit };
-        let h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+        let h = safeParse('nimbleHistory') || [];
         
         const lastLog = h.filter(log => log.name === name).sort((a,b) => new Date(b.date) - new Date(a.date))[0];
         if(lastLog && parseFloat(w) > lastLog.weight) {
             const card = document.getElementById(`exercise-${idx}`);
-            card.classList.add('pr-highlight');
-            setTimeout(() => card.classList.remove('pr-highlight'), 2000);
+            if(card) {
+                card.classList.add('pr-highlight');
+                setTimeout(() => card.classList.remove('pr-highlight'), 2000);
+            }
         }
         
         h.push(entry);
         localStorage.setItem('nimbleHistory', JSON.stringify(h));
         sendToCloud("workout", entry);
-        document.getElementById(`r-${idx}`).style.border = "2px solid var(--success)";
+        const repsInput = document.getElementById(`r-${idx}`);
+        if(repsInput) repsInput.style.border = "2px solid var(--success)";
         
-        if(autoTimerEnabled) startTimer(90);
+        startTimer(90);
     }
 
     function finishSession() {
         if(confirm("Finish & Save?")) {
             document.getElementById('active-workout').classList.add('hidden');
-            document.getElementById('active-workout').style.display='none';
             document.getElementById('setup-panel').classList.remove('hidden');
-            document.getElementById('setup-panel').style.display='block';
             
-            let streak = parseInt(localStorage.getItem('streakCount')) || 0;
+            let streak = parseInt(localStorage.getItem('streakCount') || 0);
             streak++;
             localStorage.setItem('streakCount', streak);
             updateStreak();
             
-            alert("🔥 Workout Saved! Streak: " + streak + " days!");
+            alert("🔥 Workout Saved! Streak: " + streak);
         }
     }
 
     function cancelWorkout() {
-        if(confirm("Discard Session?")) {
+        if(confirm("Discard?")) {
             document.getElementById('active-workout').classList.add('hidden');
-            document.getElementById('active-workout').style.display='none';
             document.getElementById('setup-panel').classList.remove('hidden');
-            document.getElementById('setup-panel').style.display='block';
         }
     }
 
     function startVoiceLog(btn, idx) {
-        if (!('webkitSpeechRecognition' in window)) return alert("Browser not supported. Use Chrome.");
+        if (!('webkitSpeechRecognition' in window)) return alert("Use Chrome");
         const recognition = new webkitSpeechRecognition();
         recognition.lang = 'en-US';
         btn.classList.add('listening');
@@ -753,7 +718,7 @@ function saveReadiness() {
         const weight = document.getElementById('body-weight').value;
         if(!weight) return;
         sendToCloud("wellness", {type:"weight", val: weight, date: new Date().toISOString()}); 
-        alert("Weight logged!"); 
+        alert("Logged!"); 
         document.getElementById('body-weight').value = '';
     }
     
@@ -761,7 +726,7 @@ function saveReadiness() {
         const note = document.getElementById('pain-log').value;
         if(!note) return;
         sendToCloud("wellness", {type:"pain", note: note, date: new Date().toISOString()}); 
-        alert("Pain log saved!"); 
+        alert("Logged!"); 
         document.getElementById('pain-log').value = '';
     }
 
@@ -774,43 +739,33 @@ function saveReadiness() {
             body: JSON.stringify({ type: type, data: data }) 
         }).catch(e=>console.log(e));
     }
+
     function saveGifOverride(name, inputId) {
         const url = document.getElementById(inputId).value;
-        if(!url) return alert("Paste a URL first");
+        if(!url) return alert("Paste URL first");
         gifOverrides[name] = url;
         localStorage.setItem('nimbleGifOverrides', JSON.stringify(gifOverrides));
         renderWorkout(activeRoutine);
         alert("GIF Saved!");
     }
     
-   function showGif(name) {
-    const url = gifOverrides[name];
-    if(url) {
+    function showGif(name) {
+        const url = gifOverrides[name];
+        if(!url) return alert("No GIF saved yet!");
+        
         document.getElementById('gif-player').src = url;
         document.getElementById('gif-modal-title').innerText = name;
         const modal = document.getElementById('gif-modal');
         modal.classList.remove('hidden');
         modal.style.display = 'flex';
-        
-        // Force image reload if it's cached
-        const img = document.getElementById('gif-player');
-        img.onload = function() {
-            console.log('GIF loaded successfully');
-        };
-        img.onerror = function() {
-            alert('Failed to load GIF. Check the URL is valid.');
-        };
-    } else {
-        alert('No GIF saved for this exercise yet!');
     }
-}
     
     function closeGifModal() { 
         document.getElementById('gif-modal').classList.add('hidden'); 
         document.getElementById('gif-modal').style.display = 'none'; 
     }
 
-    function openBuilder(add) {
+    function openBuilder() {
         document.getElementById('builder-overlay').classList.remove('hidden');
         document.getElementById('builder-overlay').style.display = 'block';
         const list = document.getElementById('builder-list-content');
@@ -863,13 +818,16 @@ function saveReadiness() {
         const mins = Math.floor(timerSeconds / 60);
         const secs = timerSeconds % 60;
         const display = `${mins}:${secs.toString().padStart(2, '0')}`;
-        document.getElementById('timer-badge').innerText = display;
-        document.getElementById('timer-display').innerText = display;
+        const badge = document.getElementById('timer-badge');
+        if(badge) badge.innerText = display;
+        const displayEl = document.getElementById('timer-display');
+        if(displayEl) displayEl.innerText = display;
     }
 
     function stopTimer() {
         clearInterval(timerInterval);
-        document.getElementById('timer-badge').classList.remove('active');
+        const badge = document.getElementById('timer-badge');
+        if(badge) badge.classList.remove('active');
     }
 
     function closeTimer() { 
@@ -886,15 +844,22 @@ function saveReadiness() {
     function addTime(seconds) {
         timerSeconds += seconds;
         updateTimerDisplay();
-        if(!timerInterval) {
-            startTimer(timerSeconds);
-        }
+        if(!timerInterval) startTimer(timerSeconds);
     }
 
     function populateChartSelect() {
-        const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+        const history = safeParse('nimbleHistory') || [];
         const exercises = [...new Set(history.map(h => h.name))];
         const select = document.getElementById('chart-select');
+        if(!select) return;
+        select.innerHTML = '<option>Select Exercise...</option>';
+        exercises.forEach(ex => {
+            const
+                function populateChartSelect() {
+        const history = safeParse('nimbleHistory') || [];
+        const exercises = [...new Set(history.map(h => h.name))];
+        const select = document.getElementById('chart-select');
+        if(!select) return;
         select.innerHTML = '<option>Select Exercise...</option>';
         exercises.forEach(ex => {
             const opt = document.createElement('option');
@@ -905,24 +870,28 @@ function saveReadiness() {
     }
 
     function renderChart() {
-        const selected = document.getElementById('chart-select').value;
+        const select = document.getElementById('chart-select');
+        if(!select) return;
+        const selected = select.value;
         if(selected === 'Select Exercise...') return;
         
-        const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+        const history = safeParse('nimbleHistory') || [];
         const filtered = history.filter(h => h.name === selected).slice(-10);
         
         const labels = filtered.map(h => new Date(h.date).toLocaleDateString());
         const weights = filtered.map(h => h.weight);
         
-        const ctx = document.getElementById('progressChart').getContext('2d');
+        const ctx = document.getElementById('progressChart');
+        if(!ctx) return;
+        const context = ctx.getContext('2d');
         if(myChart) myChart.destroy();
         
-        myChart = new Chart(ctx, { 
+        myChart = new Chart(context, { 
             type:'line', 
             data:{
                 labels: labels, 
                 datasets:[{
-                    label: selected + ' Weight Progress', 
+                    label: selected, 
                     data: weights, 
                     borderColor:'#BB86FC',
                     backgroundColor: 'rgba(187, 134, 252, 0.1)',
@@ -931,22 +900,10 @@ function saveReadiness() {
             },
             options: {
                 responsive: true,
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: '#fff'
-                        }
-                    }
-                },
+                plugins: { legend: { labels: { color: '#fff' } } },
                 scales: {
-                    x: {
-                        ticks: { color: '#aaa' },
-                        grid: { color: '#333' }
-                    },
-                    y: {
-                        ticks: { color: '#aaa' },
-                        grid: { color: '#333' }
-                    }
+                    x: { ticks: { color: '#aaa' }, grid: { color: '#333' } },
+                    y: { ticks: { color: '#aaa' }, grid: { color: '#333' } }
                 }
             }
         });
@@ -954,9 +911,9 @@ function saveReadiness() {
 
     function exportData() {
         const data = {
-            history: JSON.parse(localStorage.getItem('nimbleHistory')) || [],
-            nutrition: JSON.parse(localStorage.getItem('nimbleNutrition')) || [],
-            wellness: JSON.parse(localStorage.getItem('nimbleWellness')) || [],
+            history: safeParse('nimbleHistory') || [],
+            nutrition: safeParse('nimbleNutrition') || [],
+            wellness: safeParse('nimbleWellness') || [],
             goals: state.goals,
             streak: localStorage.getItem('streakCount') || 0
         };
@@ -965,7 +922,7 @@ function saveReadiness() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `nimble-shred-backup-${new Date().toISOString().split('T')[0]}.json`;
+        a.download = `nimble-backup-${new Date().toISOString().split('T')[0]}.json`;
         a.click();
         URL.revokeObjectURL(url);
     }
