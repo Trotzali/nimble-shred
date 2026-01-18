@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -6,20 +6,27 @@
     <meta name="theme-color" content="#1e1e1e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Nimble Shred v25.0</title>
+    <title>Nimble Shred v25.1</title>
     <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiTmltYmxlIFNocmVkIiwiYmFja2dyb3VuZF9jb2xvciI6IiMxMjEyMTIiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiIzFlMWUxZSIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2ltZy5pY29uczguY29tL2ZsdWVuY3kvOTYvbnVsbC9kdW1iYmVsbC5wbmciLCJzaXplcyI6Ijk2eDk2IiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
     <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/96/null/dumbbell.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --bg: #121212; --card: #1e1e1e; --primary: #BB86FC; --sec: #03DAC6; --text: #fff; --gold: #FFD700; --danger: #CF6679; --success: #00C853; --warn: #FF9800; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 120px; -webkit-tap-highlight-color: transparent; }
-        .container { max-width: 600px; margin: 0 auto; display: none; padding-bottom: 50px; } 
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 100px; -webkit-tap-highlight-color: transparent; }
+        
+        /* Container Logic */
+        .container { max-width: 600px; margin: 0 auto; display: none; padding-bottom: 80px; } 
         .container.active { display: block; }
+        
         h1, h2 { text-align: center; margin: 10px 0; }
+        
+        /* Navigation Bar - Fixed Z-Index */
         .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a1a; display: flex; justify-content: space-around; padding: 15px 10px; border-top: 1px solid #333; z-index: 9999; padding-bottom: max(15px, env(safe-area-inset-bottom)); box-shadow: 0 -5px 10px rgba(0,0,0,0.5); }
         .nav-btn { background: none; color: #777; border: none; font-size: 0.75em; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
         .nav-btn.active { color: var(--sec); }
         .nav-icon { font-size: 1.5em; }
+        
+        /* General UI */
         .card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); position: relative; }
         .btn { display: block; width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; transition: 0.1s; }
         .btn:active { transform: scale(0.98); }
@@ -30,6 +37,8 @@
         .row { display: flex; gap: 10px; align-items: center; }
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .unit-toggle { background: #333; padding: 5px 12px; border-radius: 20px; font-size: 0.8em; border: 1px solid #555; color: #aaa; cursor: pointer; }
+        
+        /* Exercise Cards */
         .exercise-card { border-left: 4px solid var(--primary); margin-bottom: 15px; }
         .exercise-card.Mobility { border-left-color: var(--sec); }
         .exercise-card.Strength { border-left-color: var(--danger); }
@@ -37,36 +46,54 @@
         .suggestion-text { color: var(--success); font-size: 0.85em; margin: 5px 0; font-style: italic; display: flex; align-items: center; gap: 5px; }
         .pr-highlight { animation: prGlow 2s ease-in-out; }
         @keyframes prGlow { 0%, 100% { background: var(--card); } 50% { background: rgba(0, 200, 83, 0.2); } }
+        
+        /* Interactive Elements */
         .smart-inc { background: #333; color: #fff; border: 1px solid #555; padding: 8px 12px; border-radius: 4px; font-size: 0.8em; margin-left: 5px; cursor: pointer; }
         .mic-btn { background: #333; border: 1px solid #555; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2em; cursor: pointer; }
         .mic-btn.listening { background: var(--danger); animation: pulse 1s infinite; border: none; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(207, 102, 121, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(207, 102, 121, 0); } 100% { box-shadow: 0 0 0 0 rgba(207, 102, 121, 0); } }
+        
+        /* Overlays */
         .fs-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 5000; padding: 20px; overflow-y: auto; box-sizing: border-box; display: none; }
         .fs-overlay.flex-center { display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.95); }
         .hidden { display: none !important; }
+        
+        /* Macros */
         .macro-bar-container { background: #333; height: 12px; border-radius: 6px; margin-top: 5px; overflow: hidden; position: relative; }
         .macro-fill { height: 100%; transition: width 0.5s; }
         .macro-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; text-align: center; font-size: 0.85em; }
         .macro-item { position: relative; }
         .macro-percent { font-size: 0.7em; color: #aaa; margin-top: 2px; }
+        
+        /* Water Tracker */
         .water-tracker { display: flex; justify-content: center; align-items: center; gap: 20px; margin: 15px 0; }
         .water-btn { background: var(--primary); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5em; cursor: pointer; border: none; color: #000; }
         .water-display { font-size: 2em; font-weight: bold; color: var(--sec); }
+        
+        /* Gamification */
         .badge-grid { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
         .badge { min-width: 60px; height: 60px; background: #252525; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5em; opacity: 0.3; border: 2px solid #444; }
         .badge.unlocked { opacity: 1; border-color: var(--gold); box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+        
+        /* Templates */
         .template-tag { background: #333; padding: 8px 12px; border-radius: 8px; font-size: 0.9em; border: 1px solid #555; cursor: pointer; white-space: nowrap; }
         .template-scroll { display: flex; gap: 10px; overflow-x: auto; margin: 10px 0; padding-bottom: 5px; }
+        
+        /* Instructions & Inputs */
         .instruction-box { background: #252525; padding: 10px; border-radius: 5px; margin-top: 10px; margin-bottom: 10px; font-size: 0.9em; color: #ddd; border-left: 2px solid #777; display: none; line-height: 1.4; }
         .instruction-box.visible { display: block; }
         .gif-input { width: 100%; padding: 5px; background: #111; border: 1px solid #444; color: #fff; border-radius: 4px; margin-top: 5px; margin-bottom: 5px; font-size: 0.8em; }
         .btn-sm { padding: 5px 10px; font-size: 0.8em; width: auto; display: inline-block; margin-top: 5px; }
         .btn-guide { background: #333; color: #aaa; border: 1px solid #444; padding: 5px 10px; border-radius: 5px; font-size: 0.8em; cursor: pointer; }
+        
+        /* Modals */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 6000; }
         .modal-content { background: var(--card); padding: 20px; border-radius: 10px; width: 95%; max-width: 500px; text-align: center; position: relative; }
         .close-modal { position: absolute; top: 10px; right: 15px; color: #fff; font-size: 24px; cursor: pointer; }
         .goal-setter { display: flex; gap: 10px; margin: 10px 0; flex-wrap: wrap; }
         .goal-input { flex: 1; min-width: 60px; }
+        
+        /* Floating Timer Badge */
         .timer-badge { position: fixed; bottom: 80px; right: 20px; background: var(--danger); color: #fff; padding: 15px; border-radius: 50%; width: 60px; height: 60px; display: none; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2em; box-shadow: 0 4px 8px rgba(0,0,0,0.5); z-index: 4000; cursor: pointer; }
         .timer-badge.active { display: flex; animation: timerPulse 1s infinite; }
         @keyframes timerPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
@@ -90,9 +117,10 @@
         <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
         <div class="row"><input type="number" id="garmin-score" placeholder="Garmin Body Battery (Optional)" oninput="calcReadiness()"></div>
         <div style="text-align:center; margin-top:15px;"><div style="font-size:2.5em; font-weight:bold; color:var(--sec);" id="score-display">--</div><div style="color:#aaa; font-style:italic;" id="score-text">Move sliders to calculate</div></div>
-<button class="btn btn-main" onclick="saveReadiness()" style="margin-top:15px;">💾 Log Today's Check-In</button>
+        <button class="btn btn-main" onclick="saveReadiness()" style="margin-top:15px;">💾 Log Today's Check-In</button>
+    </div>
     <div style="text-align:center; margin-top:30px; opacity:0.5;">
-        <small style="color:#777;">Version 25.0 - Phase 1</small><br>
+        <small style="color:#777;">Version 25.1 - Fixed Tabs</small><br>
         <button class="btn-danger" style="width:auto; display:inline-block; font-size:0.8em; margin-top:5px;" onclick="factoryReset()">⚠️ Reset App</button>
     </div>
 </div>
@@ -156,30 +184,22 @@
         <div class="macro-grid">
             <div class="macro-item">
                 🔥 <span id="disp-cals">0</span>/<span id="goal-cals-disp">2000</span>
-                <div class="macro-bar-container">
-                    <div id="bar-cals" class="macro-fill" style="width:0%; background:var(--sec);"></div>
-                </div>
+                <div class="macro-bar-container"><div id="bar-cals" class="macro-fill" style="width:0%; background:var(--sec);"></div></div>
                 <div class="macro-percent" id="percent-cals">0%</div>
             </div>
             <div class="macro-item">
                 🥩 <span id="disp-pro">0</span>/<span id="goal-pro-disp">150</span>g
-                <div class="macro-bar-container">
-                    <div id="bar-pro" class="macro-fill" style="width:0%; background:var(--primary);"></div>
-                </div>
+                <div class="macro-bar-container"><div id="bar-pro" class="macro-fill" style="width:0%; background:var(--primary);"></div></div>
                 <div class="macro-percent" id="percent-pro">0%</div>
             </div>
             <div class="macro-item">
                 🍚 <span id="disp-carb">0</span>/<span id="goal-carb-disp">200</span>g
-                <div class="macro-bar-container">
-                    <div id="bar-carb" class="macro-fill" style="width:0%; background:var(--warn);"></div>
-                </div>
+                <div class="macro-bar-container"><div id="bar-carb" class="macro-fill" style="width:0%; background:var(--warn);"></div></div>
                 <div class="macro-percent" id="percent-carb">0%</div>
             </div>
             <div class="macro-item">
                 🥑 <span id="disp-fat">0</span>/<span id="goal-fat-disp">60</span>g
-                <div class="macro-bar-container">
-                    <div id="bar-fat" class="macro-fill" style="width:0%; background:var(--danger);"></div>
-                </div>
+                <div class="macro-bar-container"><div id="bar-fat" class="macro-fill" style="width:0%; background:var(--danger);"></div></div>
                 <div class="macro-percent" id="percent-fat">0%</div>
             </div>
         </div>
@@ -249,6 +269,7 @@
         <button class="btn-action" onclick="addTime(30)">+30s</button>
     </div>
 </div>
+
 <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/a/macros/tjkcivil.com.au/s/AKfycbwG0PbAwqkX3EbWki7vjewgP-FIwCt11_ybFsFJrYmmgq6_QpfKrbPfRxeSEJGu7Ovg/exec"; 
     let state = { unit: 'lbs', history: [], food: [], wellness: [], readiness: [], goals: {cals: 2000, pro: 150, carb: 200, fat: 60} };
@@ -260,7 +281,7 @@
     let timerSeconds = 0;
 
     const allExercises = [
-      {"name": "Low Cable Chest Fly", "categories": ["Chest", "Shoulders"], "type": "Muscle Build", "desc": "Set pulleys low. Scoop hands up."},
+     {"name": "Low Cable Chest Fly", "categories": ["Chest", "Shoulders"], "type": "Muscle Build", "desc": "Set pulleys low. Scoop hands up."},
       {"name": "High Cable Chest Fly", "categories": ["Chest"], "type": "Muscle Build", "desc": "Set pulleys high. Press hands down."},
       {"name": "Cable Lateral Raise", "categories": ["Shoulders"], "type": "Muscle Build", "desc": "Raise arm to side."},
       {"name": "Face Pulls", "categories": ["Shoulders", "Back", "Mobility"], "type": "Mobility", "desc": "Pull to forehead."},
@@ -269,6 +290,13 @@
       {"name": "Tricep Pushdown", "categories": ["Triceps"], "type": "Muscle Build", "desc": "Elbows pinned. Push down."},
       {"name": "Bicep Cable Curl", "categories": ["Biceps"], "type": "Muscle Build", "desc": "Elbows pinned. Curl up."},
       {"name": "Cable Crunch", "categories": ["Abs", "Core"], "type": "Muscle Build", "desc": "Kneel. Curl down."},
+      {"name": "Cable Pull-through", "categories": ["Glutes", "Hamstrings"], "type": "Muscle Build", "desc": "Face away. Hinge back."},
+      {"name": "Cable Kickbacks", "categories": ["Glutes"], "type": "Muscle Build", "desc": "Kick back."},
+      {"name": "Single Arm Lat Pulldown", "categories": ["Back", "Biceps"], "type": "Muscle Build", "desc": "One arm pull."},
+      {"name": "Woodchopper", "categories": ["Core", "Shoulders"], "type": "Mobility", "desc": "Rotate diagonally."},
+      {"name": "Cable Shrugs", "categories": ["Traps"], "type": "Muscle Build", "desc": "Shrug shoulders."},
+      {"name": "Cable Upright Row", "categories": ["Shoulders", "Traps"], "type": "Muscle Build", "desc": "Pull high."},
+      {"name": "Cable Rear Delt Fly", "categories": ["Shoulders", "Back"], "type": "Muscle Build", "desc": "Pull apart."},
       {"name": "Dumbbell Chest Press", "categories": ["Chest", "Triceps"], "type": "Strength", "desc": "Press weights over chest."},
       {"name": "Dumbbell Shoulder Press", "categories": ["Shoulders", "Triceps"], "type": "Strength", "desc": "Press overhead."},
       {"name": "Goblet Squat", "categories": ["Legs", "Glutes"], "type": "Strength", "desc": "Hold weight at chest. Squat."},
@@ -278,11 +306,127 @@
       {"name": "Bulgarian Split Squat", "categories": ["Legs", "Glutes"], "type": "Strength", "desc": "Back foot up. Drive up."},
       {"name": "Push-ups", "categories": ["Chest", "Triceps", "Core"], "type": "Calisthenics", "desc": "Chest to floor."},
       {"name": "Pull-ups", "categories": ["Back", "Biceps"], "type": "Calisthenics", "desc": "Chin over bar."},
+      {"name": "Dips", "categories": ["Chest", "Triceps", "Shoulders"], "type": "Calisthenics", "desc": "Lower until shoulders below elbows."},
+      {"name": "Bodyweight Squats", "categories": ["Legs"], "type": "Calisthenics", "desc": "Hips back and down."},
+      {"name": "Planks", "categories": ["Core", "Abs"], "type": "Calisthenics", "desc": "Hold tight.", "isTimed": true, "duration": 60},
       {"name": "Burpees", "categories": ["Full Body", "Cardio"], "type": "Calisthenics", "desc": "Chest to floor, jump."},
+      {"name": "Mountain Climbers", "categories": ["Core", "Cardio"], "type": "Calisthenics", "desc": "Knees to chest.", "isTimed": true, "duration": 45},
       {"name": "Barbell Squat", "categories": ["Legs", "Glutes"], "type": "Strength", "desc": "Bar on back. Squat deep."},
-      {"name": "Barbell Bench Press", "categories": ["Chest", "Triceps"], "type": "Strength", "desc": "Bar to chest. Press."}
-    ];
-
+      {"name": "Barbell Bench Press", "categories": ["Chest", "Triceps"], "type": "Strength", "desc": "Bar to chest. Press."},
+      {"name": "Barbell Deadlift", "categories": ["Back", "Hamstrings"], "type": "Strength", "desc": "Lift from floor."},
+      {"name": "Overhead Press", "categories": ["Shoulders", "Triceps"], "type": "Strength", "desc": "Press bar overhead."},
+      {"name": "Pistol Squats", "categories": ["Legs", "Balance"], "type": "Mobility", "desc": "One leg squat."},
+      {"name": "Hanging Leg Raises", "categories": ["Core", "Abs"], "type": "Calisthenics", "desc": "Lift legs to 90."},
+      {"name": "Muscle-ups", "categories": ["Back", "Chest", "Triceps"], "type": "Calisthenics", "desc": "Pull high, transition to dip."},
+      {"name": "Front Lever", "categories": ["Back", "Core"], "type": "Calisthenics", "desc": "Hold body horizontal."},
+      {"name": "Handstand Push-ups", "categories": ["Shoulders", "Triceps"], "type": "Calisthenics", "desc": "Invert and press."},
+      {"name": "Nordic Curls", "categories": ["Hamstrings"], "type": "Calisthenics", "desc": "Lower forward slowly."},
+      {"name": "Pike Push-ups", "categories": ["Shoulders"], "type": "Calisthenics", "desc": "Hips high push up."},
+      {"name": "Inchworms", "categories": ["Mobility", "Hamstrings"], "type": "Mobility", "desc": "Walk hands out."},
+      {"name": "Cossack Squats", "categories": ["Mobility", "Legs"], "type": "Mobility", "desc": "Side lunge deep."},
+      {"name": "Kettlebell Swing", "categories": ["Glutes", "Hamstrings"], "type": "Strength", "desc": "Hinge snap."},
+      {"name": "Turkish Get-up", "categories": ["Full Body", "Mobility"], "type": "Mobility", "desc": "Stand up with weight."},
+      {"name": "Farmers Walk", "categories": ["Core", "Traps"], "type": "Strength", "desc": "Walk heavy.", "isTimed": true, "duration": 60},
+      {"name": "Dumbbell Lunges", "categories": ["Legs", "Glutes"], "type": "Strength", "desc": "Step forward."},
+      {"name": "Bicep Curls", "categories": ["Biceps"], "type": "Muscle Build", "desc": "Curl to shoulder."},
+      {"name": "Tricep Kickbacks", "categories": ["Triceps"], "type": "Muscle Build", "desc": "Kick back."},
+      {"name": "Hammer Curls", "categories": ["Biceps", "Forearms"], "type": "Muscle Build", "desc": "Neutral grip."},
+      {"name": "Arnold Press", "categories": ["Shoulders", "Triceps"], "type": "Strength", "desc": "Rotate palms out."},
+      {"name": "Dumbbell Shrugs", "categories": ["Traps"], "type": "Muscle Build", "desc": "Shrug up."},
+      {"name": "Dumbbell Flys", "categories": ["Chest"], "type": "Muscle Build", "desc": "Fly out."},
+      {"name": "Step-ups", "categories": ["Legs", "Glutes"], "type": "Strength", "desc": "Step up."},
+      {"name": "Renegade Row", "categories": ["Core", "Back"], "type": "Strength", "desc": "Plank row."},
+      {"name": "Skull Crushers", "categories": ["Triceps"], "type": "Muscle Build", "desc": "Weight to forehead."},
+      {"name": "Front Raises", "categories": ["Shoulders"], "type": "Muscle Build", "desc": "Lift front."},
+      {"name": "Chin-ups", "categories": ["Back", "Biceps"], "type": "Calisthenics", "desc": "Palms facing you."},
+      {"name": "Leg Raises", "categories": ["Core", "Abs"], "type": "Calisthenics", "desc": "Lift legs."},
+      {"name": "Bench Dips", "categories": ["Triceps"], "type": "Calisthenics", "desc": "Hands behind back."},
+      {"name": "Box Jumps", "categories": ["Legs", "Cardio"], "type": "Calisthenics", "desc": "Jump on box."},
+      {"name": "Glute Bridge", "categories": ["Glutes"], "type": "Calisthenics", "desc": "Hips up."},
+      {"name": "Superman", "categories": ["Lower Back"], "type": "Mobility", "desc": "Lift limbs.", "isTimed": true, "duration": 30},
+      {"name": "Inverted Row", "categories": ["Back", "Biceps"], "type": "Calisthenics", "desc": "Pull chest to bar."},
+      {"name": "Bear Crawl", "categories": ["Full Body", "Mobility"], "type": "Mobility", "desc": "Crawl.", "isTimed": true, "duration": 45},
+      {"name": "Hollow Body Hold", "categories": ["Core", "Abs"], "type": "Calisthenics", "desc": "Hold hollow.", "isTimed": true, "duration": 30},
+      {"name": "Cat-Cow", "categories": ["Core", "Mobility"], "type": "Mobility", "desc": "Arch back."},
+      {"name": "World's Greatest Stretch", "categories": ["Full Body", "Mobility"], "type": "Mobility", "desc": "Lunge twist.", "isTimed": true, "duration": 45},
+      {"name": "Barbell Row", "categories": ["Back", "Biceps"], "type": "Strength", "desc": "Bent row."},
+      {"name": "Walking Lunges", "categories": ["Legs", "Cardio"], "type": "Calisthenics", "desc": "Walk lunge."},
+      {"name": "Side Plank", "categories": ["Core", "Obliques"], "type": "Calisthenics", "desc": "Side hold.", "isTimed": true, "duration": 45},
+      {"name": "Bird Dog", "categories": ["Core", "Mobility"], "type": "Mobility", "desc": "Opposite arm leg.", "isTimed": true, "duration": 30},
+      {"name": "Dead Bug", "categories": ["Core", "Abs"], "type": "Mobility", "desc": "Lower opposite.", "isTimed": true, "duration": 45},
+      {"name": "Glute Bridge March", "categories": ["Glutes", "Core"], "type": "Mobility", "desc": "March in bridge."},
+      {"name": "Scapular Pull-ups", "categories": ["Back", "Mobility"], "type": "Mobility", "desc": "Shrug on bar."},
+      {"name": "Wall Slides", "categories": ["Shoulders", "Mobility"], "type": "Mobility", "desc": "Slide arms."},
+      {"name": "90/90 Hip Switches", "categories": ["Hips", "Mobility"], "type": "Mobility", "desc": "Switch hips.", "isTimed": true, "duration": 60},
+      {"name": "Archer Push-ups", "categories": ["Chest", "Triceps"], "type": "Calisthenics", "desc": "Side to side."},
+      {"name": "L-Sit Hold", "categories": ["Core", "Abs"], "type": "Calisthenics", "desc": "Legs out.", "isTimed": true, "duration": 20},
+      {"name": "Hanging Knee Raises", "categories": ["Core", "Abs"], "type": "Calisthenics", "desc": "Knees up."},
+      {"name": "Negative Pull-ups", "categories": ["Back", "Biceps"], "type": "Calisthenics", "desc": "Lower slow."},
+      {"name": "Bulgarian Split Squat (BW)", "categories": ["Legs"], "type": "Calisthenics", "desc": "No weight."},
+      {"name": "Single Leg RDL", "categories": ["Hamstrings", "Balance"], "type": "Mobility", "desc": "One leg hinge."},
+      {"name": "Incline Push-ups", "categories": ["Chest"], "type": "Calisthenics", "desc": "Hands up."},
+      {"name": "Decline Push-ups", "categories": ["Chest"], "type": "Calisthenics", "desc": "Feet up."},
+      {"name": "Diamond Push-ups", "categories": ["Triceps"], "type": "Calisthenics", "desc": "Hands close."},
+      {"name": "Close Grip DB Press", "categories": ["Triceps", "Chest"], "type": "Muscle Build", "desc": "DBs touching."},
+      {"name": "Dumbbell Pullover", "categories": ["Back", "Chest"], "type": "Muscle Build", "desc": "Over head."},
+      {"name": "Concentration Curls", "categories": ["Biceps"], "type": "Muscle Build", "desc": "Elbow thigh."},
+      {"name": "Reverse DB Flys", "categories": ["Shoulders", "Back"], "type": "Muscle Build", "desc": "Bent fly."},
+      {"name": "Standing Calf Raises", "categories": ["Calves"], "type": "Muscle Build", "desc": "Calf raise."},
+      {"name": "Tibialis Raise", "categories": ["Legs", "Mobility"], "type": "Mobility", "desc": "Lift toes to shins."},
+      {"name": "Couch Stretch", "categories": ["Hips", "Mobility"], "type": "Mobility", "desc": "Hip flexor.", "isTimed": true, "duration": 60},
+      {"name": "Pigeon Pose", "categories": ["Hips", "Mobility"], "type": "Mobility", "desc": "Glute stretch.", "isTimed": true, "duration": 60},
+      {"name": "Child's Pose", "categories": ["Back", "Mobility"], "type": "Mobility", "desc": "Rest pose.", "isTimed": true, "duration": 60},
+      {"name": "Deep Squat Hold", "categories": ["Hips", "Mobility"], "type": "Mobility", "desc": "Sit deep.", "isTimed": true, "duration": 120},
+      {"name": "Prone Y-W-T Raises", "categories": ["Back", "Shoulders"], "type": "Mobility", "desc": "Arm shapes."},
+      {"name": "Suitcase Carry", "categories": ["Core"], "type": "Strength", "desc": "One hand walk.", "isTimed": true, "duration": 60},
+      {"name": "Pallof Press", "categories": ["Core"], "type": "Strength", "desc": "Anti rotate.", "isTimed": true, "duration": 30},
+      {"name": "Face Away Cable Curl", "categories": ["Biceps"], "type": "Muscle Build", "desc": "Arms back."},
+      {"name": "Cable Pullover", "categories": ["Back", "Lats"], "type": "Muscle Build", "desc": "Straight arm push."},
+      {"name": "Air Squats", "categories": ["Legs"], "type": "Calisthenics", "desc": "Squat."},
+      {"name": "Jump Squats", "categories": ["Legs", "Cardio"], "type": "Calisthenics", "desc": "Jump."},
+      {"name": "Lunges (Forward)", "categories": ["Legs"], "type": "Calisthenics", "desc": "Forward."},
+      {"name": "Lunges (Reverse)", "categories": ["Legs"], "type": "Calisthenics", "desc": "Back."},
+      {"name": "Curtsy Lunges", "categories": ["Legs", "Glutes"], "type": "Calisthenics", "desc": "Side back."},
+      {"name": "Lateral Lunges", "categories": ["Legs"], "type": "Calisthenics", "desc": "Side."},
+      {"name": "Step-Ups (Chair)", "categories": ["Legs"], "type": "Calisthenics", "desc": "Step up."},
+      {"name": "Calf Raises", "categories": ["Calves", "Legs"], "type": "Calisthenics", "desc": "Raise."},
+      {"name": "Single Leg Calf Raises", "categories": ["Calves"], "type": "Calisthenics", "desc": "One leg."},
+      {"name": "Wall Sit", "categories": ["Legs"], "type": "Calisthenics", "desc": "Sit.", "isTimed": true, "duration": 60},
+      {"name": "Glute Bridges (Single Leg)", "categories": ["Glutes"], "type": "Calisthenics", "desc": "One leg."},
+      {"name": "Donkey Kicks", "categories": ["Glutes"], "type": "Calisthenics", "desc": "Kick up."},
+      {"name": "Fire Hydrants", "categories": ["Glutes"], "type": "Calisthenics", "desc": "Side lift."},
+      {"name": "Push-ups (Wide)", "categories": ["Chest"], "type": "Calisthenics", "desc": "Wide."},
+      {"name": "Push-ups (Diamond)", "categories": ["Triceps"], "type": "Calisthenics", "desc": "Close."},
+      {"name": "Push-ups (Decline)", "categories": ["Chest", "Shoulders"], "type": "Calisthenics", "desc": "Feet elevated."},
+      {"name": "Push-ups (Incline)", "categories": ["Chest"], "type": "Calisthenics", "desc": "Hands elevated."},
+      {"name": "Tricep Dips", "categories": ["Triceps"], "type": "Calisthenics", "desc": "Dips."},
+      {"name": "Plank (Forearm)", "categories": ["Core"], "type": "Calisthenics", "desc": "Low.", "isTimed": true, "duration": 60},
+      {"name": "Plank (High)", "categories": ["Core"], "type": "Calisthenics", "desc": "High.", "isTimed": true, "duration": 60},
+      {"name": "Side Plank (Left)", "categories": ["Core", "Obliques"], "type": "Calisthenics", "desc": "Left.", "isTimed": true, "duration": 45},
+      {"name": "Side Plank (Right)", "categories": ["Core", "Obliques"], "type": "Calisthenics", "desc": "Right.", "isTimed": true, "duration": 45},
+      {"name": "Plank Jacks", "categories": ["Core", "Cardio"], "type": "Calisthenics", "desc": "Jacks."},
+      {"name": "Mountain Climbers (Twisting)", "categories": ["Core"], "type": "Calisthenics", "desc": "Twist.", "isTimed": true, "duration": 45},
+      {"name": "Bicycle Crunches", "categories": ["Core", "Abs"], "type": "Calisthenics", "desc": "Cycle."},
+      {"name": "Leg Raises (Lying)", "categories": ["Core", "Abs"], "type": "Calisthenics", "desc": "Lying."},
+      {"name": "Flutter Kicks", "categories": ["Core"], "type": "Calisthenics", "desc": "Kicks.", "isTimed": true, "duration": 45},
+      {"name": "Russian Twists", "categories": ["Core", "Obliques"], "type": "Calisthenics", "desc": "Twist."},
+      {"name": "V-Ups", "categories": ["Core"], "type": "Calisthenics", "desc": "V up."},
+      {"name": "Superman Hold", "categories": ["Lower Back"], "type": "Calisthenics", "desc": "Hold.", "isTimed": true, "duration": 45},
+      {"name": "Pull-ups (Wide)", "categories": ["Back"], "type": "Calisthenics", "desc": "Wide."},
+      {"name": "Inverted Row (Under table)", "categories": ["Back"], "type": "Calisthenics", "desc": "Table row."},
+      {"name": "Doorframe Row", "categories": ["Back"], "type": "Calisthenics", "desc": "Door row."},
+      {"name": "Scapular Push-ups", "categories": ["Back"], "type": "Calisthenics", "desc": "Scap."},
+      {"name": "Burpees (No Push-up)", "categories": ["Cardio"], "type": "Calisthenics", "desc": "No push."},
+      {"name": "Jumping Jacks", "categories": ["Cardio"], "type": "Calisthenics", "desc": "Jacks.", "isTimed": true, "duration": 60},
+      {"name": "High Knees", "categories": ["Cardio", "Legs"], "type": "Calisthenics", "desc": "Run.", "isTimed": true, "duration": 45},
+      {"name": "Bear Crawl (Reverse)", "categories": ["Full Body"], "type": "Calisthenics", "desc": "Reverse.", "isTimed": true, "duration": 45},
+      {"name": "Crab Walk", "categories": ["Full Body"], "type": "Calisthenics", "desc": "Crab.", "isTimed": true, "duration": 45},
+      {"name": "Hindu Push-ups", "categories": ["Shoulders"], "type": "Calisthenics", "desc": "Swoop."},
+      {"name": "Box Jumps (Step down)", "categories": ["Legs"], "type": "Calisthenics", "desc": "Step down."},
+      {"name": "Broad Jumps", "categories": ["Legs"], "type": "Calisthenics", "desc": "Jump far."},
+      {"name": "Skater Hops", "categories": ["Legs", "Cardio"], "type": "Calisthenics", "desc": "Skate."},
+      {"name": "Hollow Body Rock", "categories": ["Core"], "type": "Calisthenics", "desc": "Rock."}
+];
     const internalFoodDB = [
         {name:"Chicken Breast", c:165, p:31, f:3.6, ch:0}, 
         {name:"Rice (Cup)", c:200, p:4, f:0.4, ch:44},
@@ -608,7 +752,7 @@
             if(hasGif) demoBtn = `<span class="btn-guide" style="color:var(--sec);" onclick="showGif('${escapedName}')">🎥 Watch</span>`;
 
             const div = document.createElement('div');
-            div.className = `card exercise-card`;
+            div.className = `card exercise-card ${ex.type}`;
             div.id = `exercise-${i}`;
             div.innerHTML = `
                 <div class="exercise-header">
@@ -622,7 +766,7 @@
                 
                 <div id="${uniqueId}" class="instruction-box">
                     ${ex.desc}
-                    <input type="text" id="gif-input-${i}" class="gif-input" placeholder="Paste GIF URL..." value="${hasGif || ''}">
+                    <input type="text" id="gif-input-${i}" class="gif-input" placeholder="Paste GIF URL here..." value="${hasGif || ''}">
                     <span class="btn-sm btn-guide" onclick="saveGifOverride('${escapedName}', 'gif-input-${i}')">Save</span>
                 </div>
 
@@ -848,14 +992,6 @@
     }
 
     function populateChartSelect() {
-        const history = safeParse('nimbleHistory') || [];
-        const exercises = [...new Set(history.map(h => h.name))];
-        const select = document.getElementById('chart-select');
-        if(!select) return;
-        select.innerHTML = '<option>Select Exercise...</option>';
-        exercises.forEach(ex => {
-            const
-                function populateChartSelect() {
         const history = safeParse('nimbleHistory') || [];
         const exercises = [...new Set(history.map(h => h.name))];
         const select = document.getElementById('chart-select');
