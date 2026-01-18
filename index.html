@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -273,7 +273,7 @@
 <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/a/macros/tjkcivil.com.au/s/AKfycbwG0PbAwqkX3EbWki7vjewgP-FIwCt11_ybFsFJrYmmgq6_QpfKrbPfRxeSEJGu7Ovg/exec"; 
     let state = { unit: 'lbs', history: [], food: [], wellness: [], readiness: [], goals: {cals: 2000, pro: 150, carb: 200, fat: 60} };
-    let apiKey = "";
+    let apiKey = "p61IM61sZf897clBskMhwLftfBccew4ZcgsatflX"; 
     let activeRoutine = [];
     let gifOverrides = {};
     let myChart = null;
@@ -281,7 +281,7 @@
     let timerSeconds = 0;
 
     const allExercises = [
-     {"name": "Low Cable Chest Fly", "categories": ["Chest", "Shoulders"], "type": "Muscle Build", "desc": "Set pulleys low. Scoop hands up."},
+      {"name": "Low Cable Chest Fly", "categories": ["Chest", "Shoulders"], "type": "Muscle Build", "desc": "Set pulleys low. Scoop hands up."},
       {"name": "High Cable Chest Fly", "categories": ["Chest"], "type": "Muscle Build", "desc": "Set pulleys high. Press hands down."},
       {"name": "Cable Lateral Raise", "categories": ["Shoulders"], "type": "Muscle Build", "desc": "Raise arm to side."},
       {"name": "Face Pulls", "categories": ["Shoulders", "Back", "Mobility"], "type": "Mobility", "desc": "Pull to forehead."},
@@ -389,7 +389,7 @@
       {"name": "Curtsy Lunges", "categories": ["Legs", "Glutes"], "type": "Calisthenics", "desc": "Side back."},
       {"name": "Lateral Lunges", "categories": ["Legs"], "type": "Calisthenics", "desc": "Side."},
       {"name": "Step-Ups (Chair)", "categories": ["Legs"], "type": "Calisthenics", "desc": "Step up."},
-      {"name": "Calf Raises", "categories": ["Calves", "Legs"], "type": "Calisthenics", "desc": "Raise."},
+      {"name": "Calf Raises", "categories": ["Calves"], "type": "Calisthenics", "desc": "Raise."},
       {"name": "Single Leg Calf Raises", "categories": ["Calves"], "type": "Calisthenics", "desc": "One leg."},
       {"name": "Wall Sit", "categories": ["Legs"], "type": "Calisthenics", "desc": "Sit.", "isTimed": true, "duration": 60},
       {"name": "Glute Bridges (Single Leg)", "categories": ["Glutes"], "type": "Calisthenics", "desc": "One leg."},
@@ -426,7 +426,8 @@
       {"name": "Broad Jumps", "categories": ["Legs"], "type": "Calisthenics", "desc": "Jump far."},
       {"name": "Skater Hops", "categories": ["Legs", "Cardio"], "type": "Calisthenics", "desc": "Skate."},
       {"name": "Hollow Body Rock", "categories": ["Core"], "type": "Calisthenics", "desc": "Rock."}
-];
+    ];
+
     const internalFoodDB = [
         {name:"Chicken Breast", c:165, p:31, f:3.6, ch:0}, 
         {name:"Rice (Cup)", c:200, p:4, f:0.4, ch:44},
