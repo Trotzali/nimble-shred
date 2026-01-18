@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#1e1e1e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Nimble Shred v35.0</title>
+    <title>Nimble Shred v36.0</title>
     <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiTmltYmxlIFNocmVkIiwiYmFja2dyb3VuZF9jb2xvciI6IiMxMjEyMTIiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiIzFlMWUxZSIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2ltZy5pY29uczguY29tL2ZsdWVuY3kvOTYvbnVsbC9kdW1iYmVsbC5wbmciLCJzaXplcyI6Ijk2eDk2IiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
     <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/96/null/dumbbell.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -191,13 +191,14 @@
 <div id="guide-modal" class="fs-overlay hidden">
     <div class="top-bar"><h2 id="guide-title">Exercise Name</h2><button class="btn-danger" style="width:auto;" onclick="closeGuideModal()">Close</button></div>
     <div class="card">
-        <div class="guide-section">
+        <div id="f9-setup-section" class="guide-section">
             <span class="guide-label">⚙️ Torque F9 Setup</span>
             <div class="row">
                 <div style="flex:1"><span style="color:#777;">Arms:</span> <span class="guide-val" id="guide-arms">--</span></div>
                 <div style="flex:1"><span style="color:#777;">Pulleys:</span> <span class="guide-val" id="guide-pulleys">--</span></div>
             </div>
         </div>
+        
         <div class="guide-section">
             <span class="guide-label">📝 Instructions</span>
             <ul class="step-list" id="guide-steps"></ul>
@@ -282,8 +283,8 @@
     let searchSource = "usda";
     let activeRoutine = [];
     let activeFilters = { muscle: [], equip: ['Cable'] }; 
-    let pendingFood = null; // Stores food item temporarily
-    let selectedMeal = 'Snacks'; // Default meal
+    let pendingFood = null; 
+    let selectedMeal = 'Snacks';
     let gifOverrides = {};
     let timerInterval = null;
     let timerSeconds = 0;
@@ -356,11 +357,11 @@
       {name: "Dumbbell Lunge", cat: ["Legs"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Step lunge"], cue: "Knee tracking"},
       {name: "Bulgarian Split Squat", cat: ["Legs"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Foot up", "Squat"], cue: "Painful but good"},
       {name: "Romanian Deadlift (DB)", cat: ["Legs"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Hinge"], cue: "Back flat"},
-      {name: "Dumbbell Curl", cat: ["Arms"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Curl"], cue: "Squeeze"},
+      {name: "Dumbbell Curl", cat: ["Arms", "Biceps"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Curl"], cue: "Squeeze"},
       {name: "Hammer Curl", cat: ["Arms"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Neutral curl"], cue: "Forearms"},
       {name: "Tricep Kickback", cat: ["Arms"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Kick back"], cue: "Lockout"},
       {name: "Skull Crusher (DB)", cat: ["Arms"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Lower to head"], cue: "Elbows in"},
-      {name: "Farmers Walk", cat: ["Core"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Walk"], cue: "Tall posture"},
+      {name: "Farmers Walk", cat: ["Core", "Traps"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Walk"], cue: "Tall posture"},
       // BODYWEIGHT
       {name: "Push-ups", cat: ["Chest"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Push floor"], cue: "Plank position"},
       {name: "Pull-ups", cat: ["Back"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Pull up"], cue: "Chest to bar"},
@@ -368,7 +369,7 @@
       {name: "Dips", cat: ["Chest"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Dip down"], cue: "90 degrees"},
       {name: "Bodyweight Squat", cat: ["Legs"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Squat"], cue: "Depth"},
       {name: "Lunge (BW)", cat: ["Legs"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Lunge"], cue: "Balance"},
-      {name: "Glute Bridge", cat: ["Legs"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Hips up"], cue: "Squeeze"},
+      {name: "Glute Bridge", cat: ["Legs", "Glutes"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Hips up"], cue: "Squeeze"},
       {name: "Plank", cat: ["Core"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Hold"], cue: "Tight core"},
       {name: "Side Plank", cat: ["Core"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Hold side"], cue: "Hips high"},
       {name: "Mountain Climbers", cat: ["Core"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Run"], cue: "Fast"},
@@ -377,6 +378,15 @@
       {name: "Pike Push-up", cat: ["Shoulders"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Hips high push"], cue: "Shoulders"},
       {name: "Cat-Cow", cat: ["Core"], equip: "Bodyweight", type: "Mobility", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Flex spine"], cue: "Breathe"},
       {name: "Dead Bug", cat: ["Core"], equip: "Bodyweight", type: "Mobility", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Opposite limbs"], cue: "Flat back"}
+    ];
+
+    const internalFoodDB = [
+        {name:"Chicken Breast", c:165, p:31, f:3.6, ch:0}, 
+        {name:"Rice (Cup)", c:200, p:4, f:0.4, ch:44},
+        {name:"Egg", c:70, p:6, f:5, ch:0}, 
+        {name:"Whey Scoop", c:120, p:24, f:1, ch:3},
+        {name:"Banana", c:105, p:1, f:0, ch:27}, 
+        {name:"Salmon", c:208, p:20, f:13, ch:0}
     ];
 
     // --- INIT ---
@@ -417,7 +427,7 @@
         gifOverrides = JSON.parse(localStorage.getItem('nimbleGifOverrides')) || {};
     }
 
-    // --- FOOD ENGINE (UPDATED) ---
+    // --- FOOD ENGINE (RELAXED) ---
     function setSearchSource(src) {
         searchSource = src;
         document.getElementById('src-usda').classList.toggle('active', src === 'usda');
@@ -438,12 +448,7 @@
                 if(data.foods) {
                     data.foods.forEach(f => {
                         const getNut = (id) => (f.foodNutrients.find(x => x.nutrientId === id) || {}).value || 0;
-                        const cals = getNut(208);
-                        const pro = getNut(203);
-                        // Filter out Garbage Data (0 cal & 0 pro)
-                        if (cals > 0 || pro > 0) {
-                            results.push({ name: f.description, c: cals, p: pro, f: getNut(204), ch: getNut(205) });
-                        }
+                        results.push({ name: f.description, c: getNut(208), p: getNut(203), f: getNut(204), ch: getNut(205) });
                     });
                 }
             } else {
@@ -451,24 +456,23 @@
                 const data = await req.json();
                 if(data.products) {
                     data.products.forEach(p => {
-                        const cals = p.nutriments['energy-kcal_100g'] || 0;
-                        const pro = p.nutriments.proteins_100g || 0;
-                        if (cals > 0 || pro > 0) {
-                            results.push({
-                                name: p.product_name,
-                                c: cals,
-                                p: pro,
-                                f: p.nutriments.fat_100g || 0,
-                                ch: p.nutriments.carbohydrates_100g || 0
-                            });
-                        }
+                        results.push({
+                            name: p.product_name,
+                            c: p.nutriments['energy-kcal_100g'] || 0,
+                            p: p.nutriments.proteins_100g || 0,
+                            f: p.nutriments.fat_100g || 0,
+                            ch: p.nutriments.carbohydrates_100g || 0
+                        });
                     });
                 }
             }
         } catch(e) { console.log(e); }
         
+        // Always show fallback
+        if (results.length === 0) results = [...internalFoodDB.filter(f => f.name.toLowerCase().includes(query.toLowerCase()))];
+        
         resDiv.innerHTML = '';
-        if (results.length === 0) resDiv.innerHTML = "No valid results found.";
+        if (results.length === 0) resDiv.innerHTML = "No results found from API.";
         
         results.forEach(f => {
             const div = document.createElement('div');
@@ -497,7 +501,6 @@
 
     function selectMeal(meal, btn) {
         selectedMeal = meal;
-        // visual toggle
         document.querySelectorAll('.btn-guide').forEach(b => b.style.borderColor = '#444');
         btn.style.borderColor = 'var(--primary)';
     }
@@ -676,12 +679,21 @@
         if(!ex) return;
         currentGuideExercise = exName;
         document.getElementById('guide-title').innerText = ex.name;
-        document.getElementById('guide-arms').innerText = ex.setup ? ex.setup.arms : "N/A";
-        document.getElementById('guide-pulleys').innerText = ex.setup ? ex.setup.pulleys : "N/A";
         document.getElementById('guide-cue').innerText = ex.cue || "Focus on form.";
+        
+        // Setup Logic
+        if (ex.equip === 'Cable') {
+            document.getElementById('f9-setup-section').style.display = 'block';
+            document.getElementById('guide-arms').innerText = ex.setup ? ex.setup.arms : "N/A";
+            document.getElementById('guide-pulleys').innerText = ex.setup ? ex.setup.pulleys : "N/A";
+        } else {
+            document.getElementById('f9-setup-section').style.display = 'none';
+        }
+
         const ul = document.getElementById('guide-steps');
         ul.innerHTML = "";
         if(ex.steps) ex.steps.forEach(s => ul.innerHTML += `<li>${s}</li>`);
+        
         const gifUrl = gifOverrides[exName];
         const img = document.getElementById('guide-gif');
         if (gifUrl) { img.src = gifUrl; img.style.display = 'block'; } else { img.style.display = 'none'; }
