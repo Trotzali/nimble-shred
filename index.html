@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#1e1e1e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Nimble Shred v30.0</title>
+    <title>Nimble Shred v31.0</title>
     <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiTmltYmxlIFNocmVkIiwiYmFja2dyb3VuZF9jb2xvciI6IiMxMjEyMTIiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiIzFlMWUxZSIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2ltZy5pY29uczguY29tL2ZsdWVuY3kvOTYvbnVsbC9kdW1iYmVsbC5wbmciLCJzaXplcyI6Ijk2eDk2IiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
     <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/96/null/dumbbell.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -108,7 +108,7 @@
         <button class="btn btn-main" onclick="saveReadiness()" style="margin-top:15px;">💾 Log</button>
     </div>
     <div style="text-align:center; margin-top:30px; opacity:0.5;">
-        <small style="color:#777;">Version 30.0 - Full Features</small><br>
+        <small style="color:#777;">Version 30.0 - Fix Logic</small><br>
         <button class="btn-danger" style="width:auto; display:inline-block; font-size:0.8em; margin-top:5px;" onclick="factoryReset()">⚠️ Reset App</button>
     </div>
 </div>
@@ -125,7 +125,7 @@
                 <div class="chip" onclick="loadTemplate('full')">Full Body</div>
                 <div class="chip" onclick="loadTemplate('f9')">Torque F9 Only</div>
             </div>
-            <button class="btn btn-main" onclick="generateWorkout()">🎲 Random F9 Workout</button>
+            <button class="btn btn-main" onclick="generateRandomWorkout()">🎲 Random Workout</button>
             <button class="btn btn-action" onclick="openBuilder()">🛠️ Build Custom</button>
         </div>
     </div>
@@ -147,14 +147,11 @@
             <div>🥑 <span id="disp-fat">0</span>g<div class="macro-bar-container"><div id="bar-fat" class="macro-fill" style="width:0%; background:var(--danger);"></div></div></div>
         </div>
     </div>
-    
     <div class="card">
         <div class="row"><input type="text" id="food-search" placeholder="Search Food..."><button class="btn-action" style="width:auto;" onclick="searchFood()">🔎</button></div>
         <div id="search-results" style="margin-top:10px; max-height:200px; overflow-y:auto;"></div>
     </div>
-
-    <div class="card" id="meal-container">
-        </div>
+    <div class="card" id="meal-container"></div>
 </div>
 
 <div class="container" id="view-wellness">
@@ -179,7 +176,7 @@
 <div id="builder-overlay" class="fs-overlay hidden">
     <div class="top-bar"><h2>Exercise Builder</h2><button class="btn-danger" style="width:auto;" onclick="closeBuilder()">Close</button></div>
     <div class="card">
-        <label style="font-size:0.8em; color:#777;">Target Muscle</label>
+        <label style="font-size:0.8em; color:#777; margin-bottom:5px; display:block;">Target Muscle</label>
         <div class="chip-container" id="filter-muscle">
             <div class="chip" onclick="toggleFilter('muscle', 'Chest', this)">Chest</div>
             <div class="chip" onclick="toggleFilter('muscle', 'Back', this)">Back</div>
@@ -188,7 +185,8 @@
             <div class="chip" onclick="toggleFilter('muscle', 'Arms', this)">Arms</div>
             <div class="chip" onclick="toggleFilter('muscle', 'Core', this)">Core</div>
         </div>
-        <label style="font-size:0.8em; color:#777;">Equipment</label>
+        
+        <label style="font-size:0.8em; color:#777; margin-bottom:5px; display:block;">Equipment</label>
         <div class="chip-container" id="filter-equip">
             <div class="chip active" onclick="toggleFilter('equip', 'Cable', this)">F9 Cable</div>
             <div class="chip" onclick="toggleFilter('equip', 'Dumbbell', this)">Dumbbell</div>
@@ -202,7 +200,7 @@
 
 <div id="meal-modal" class="fs-overlay flex-center hidden">
     <div class="card" style="width:80%; max-width:300px; text-align:center;">
-        <h3>Add to which meal?</h3>
+        <h3>Which Meal?</h3>
         <button class="btn btn-main" onclick="confirmAddFood('Breakfast')">🌅 Breakfast</button>
         <button class="btn btn-main" onclick="confirmAddFood('Lunch')">☀️ Lunch</button>
         <button class="btn btn-main" onclick="confirmAddFood('Dinner')">🌙 Dinner</button>
@@ -232,7 +230,7 @@
     let state = { unit: 'lbs', history: [], food: [], wellness: [], readiness: [], routine: [] };
     let apiKey = "p61IM61sZf897clBskMhwLftfBccew4ZcgsatflX"; 
     let activeRoutine = [];
-    let activeFilters = { muscle: [], equip: ['Cable'] }; // Default to Cable
+    let activeFilters = { muscle: [], equip: ['Cable'] }; 
     let pendingFood = null;
     let gifOverrides = {};
     let timerInterval = null;
@@ -664,16 +662,24 @@
         if(type==='f9') return generateWorkoutByFilter(e => e.equip === 'Cable');
         if(type==='bw') return generateWorkoutByFilter(e => e.equip === 'Bodyweight');
         if(type==='core') filter = ['Core','Mobility'];
-        generateWorkoutByFilter(e => e.categories.some(c => filter.includes(c)));
+        generateWorkoutByFilter(e => e.cat.some(c => filter.includes(c)));
     }
 
-    function generateWorkout() {
-        const split = document.getElementById('split-selector').value;
-        loadTemplate(split);
+    function generateRandomWorkout() {
+        // Pure random selection
+        const shuffled = [...allExercises].sort(() => 0.5 - Math.random());
+        activeRoutine = shuffled.slice(0, 6);
+        renderWorkout(activeRoutine);
+        document.getElementById('setup-panel').classList.add('hidden');
+        document.getElementById('active-workout').classList.remove('hidden');
     }
 
     function generateWorkoutByFilter(filterFn) {
         const pool = allExercises.filter(filterFn);
+        if (pool.length === 0) {
+            alert("No exercises found for this category! Check database.");
+            return;
+        }
         activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
         renderWorkout(activeRoutine);
         document.getElementById('setup-panel').classList.add('hidden');
