@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#1e1e1e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Nimble Shred v31.0</title>
+    <title>Nimble Shred v32.0</title>
     <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiTmltYmxlIFNocmVkIiwiYmFja2dyb3VuZF9jb2xvciI6IiMxMjEyMTIiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiIzFlMWUxZSIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2ltZy5pY29uczguY29tL2ZsdWVuY3kvOTYvbnVsbC9kdW1iYmVsbC5wbmciLCJzaXplcyI6Ijk2eDk2IiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
     <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/96/null/dumbbell.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -14,24 +14,25 @@
         :root { --bg: #121212; --card: #1e1e1e; --primary: #BB86FC; --sec: #03DAC6; --text: #fff; --gold: #FFD700; --danger: #CF6679; --success: #00C853; --warn: #FF9800; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 120px; -webkit-tap-highlight-color: transparent; }
         
-        /* Layout */
-        .container { max-width: 600px; margin: 0 auto; display: none; padding-bottom: 80px; } 
+        /* Layout & Z-Index Management */
+        .container { max-width: 600px; margin: 0 auto; display: none; padding-bottom: 80px; position: relative; z-index: 1; } 
         .container.active { display: block; }
-        h1, h2 { text-align: center; margin: 10px 0; }
         
-        /* Nav */
+        /* Nav Bar - Top Layer */
         .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a1a; display: flex; justify-content: space-around; padding: 15px 10px; border-top: 1px solid #333; z-index: 9999; padding-bottom: max(15px, env(safe-area-inset-bottom)); box-shadow: 0 -5px 10px rgba(0,0,0,0.5); }
         .nav-btn { background: none; color: #777; border: none; font-size: 0.75em; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
         .nav-btn.active { color: var(--sec); }
         .nav-icon { font-size: 1.5em; }
         
-        /* UI Elements */
+        /* UI Components */
+        h1, h2 { text-align: center; margin: 10px 0; }
         .card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); position: relative; }
-        .btn { display: block; width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; transition: 0.1s; }
+        .btn { display: block; width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; transition: 0.1s; position: relative; z-index: 10; }
         .btn:active { transform: scale(0.98); }
         .btn-main { background: var(--sec); color: #000; }
         .btn-action { background: var(--primary); color: #000; }
         .btn-danger { background: var(--danger); color: #fff; }
+        
         input, select, textarea { width: 100%; padding: 10px; background: #2c2c2c; border: 1px solid #444; border-radius: 6px; color: #fff; font-size: 16px; box-sizing: border-box; }
         .row { display: flex; gap: 10px; align-items: center; }
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -42,46 +43,39 @@
         .chip { padding: 6px 12px; background: #333; border: 1px solid #555; border-radius: 20px; font-size: 0.8em; cursor: pointer; color: #aaa; transition: 0.2s; }
         .chip.active { background: var(--primary); color: #000; border-color: var(--primary); font-weight: bold; }
         
-        /* Meal Sections */
-        .meal-section { border-top: 1px solid #333; margin-top: 15px; padding-top: 10px; }
-        .meal-header { font-weight: bold; color: var(--gold); display: flex; justify-content: space-between; margin-bottom: 5px; }
-        .food-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2a2a2a; font-size: 0.9em; cursor: pointer; }
-        
-        /* Exercise Cards */
+        /* Workout Cards */
         .exercise-card { border-left: 4px solid var(--primary); margin-bottom: 15px; }
         .exercise-card.Mobility { border-left-color: var(--sec); }
         .exercise-card.Strength { border-left-color: var(--danger); }
         .exercise-header { display: flex; justify-content: space-between; align-items: flex-start; }
         .suggestion-text { color: var(--success); font-size: 0.85em; margin: 5px 0; font-style: italic; display: flex; align-items: center; gap: 5px; }
-        .pr-highlight { animation: prGlow 2s ease-in-out; }
-        @keyframes prGlow { 0%, 100% { background: var(--card); } 50% { background: rgba(0, 200, 83, 0.2); } }
         
-        /* Interactive */
-        .smart-inc { background: #333; color: #fff; border: 1px solid #555; padding: 8px 12px; border-radius: 4px; font-size: 0.8em; margin-left: 5px; cursor: pointer; }
-        .mic-btn { background: #333; border: 1px solid #555; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2em; cursor: pointer; }
-        .mic-btn.listening { background: var(--danger); animation: pulse 1s infinite; border: none; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(207, 102, 121, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(207, 102, 121, 0); } 100% { box-shadow: 0 0 0 0 rgba(207, 102, 121, 0); } }
-        
-        /* Overlays */
+        /* Utility Classes */
+        .hidden { display: none !important; }
         .fs-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 5000; padding: 20px; overflow-y: auto; box-sizing: border-box; display: none; }
         .fs-overlay.flex-center { display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.95); }
-        .hidden { display: none !important; }
         
-        /* Macros & Misc */
+        /* Macros */
         .macro-bar-container { background: #333; height: 12px; border-radius: 6px; margin-top: 5px; overflow: hidden; position: relative; }
         .macro-fill { height: 100%; transition: width 0.5s; }
         .macro-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; text-align: center; font-size: 0.85em; }
         .macro-percent { font-size: 0.7em; color: #aaa; margin-top: 2px; }
+        
+        /* Misc */
+        .meal-section { border-top: 1px solid #333; margin-top: 15px; padding-top: 10px; }
+        .meal-header { font-weight: bold; color: var(--gold); display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .food-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2a2a2a; font-size: 0.9em; cursor: pointer; }
         .badge-grid { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
         .badge { min-width: 60px; height: 60px; background: #252525; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5em; opacity: 0.3; border: 2px solid #444; }
         .badge.unlocked { opacity: 1; border-color: var(--gold); box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
         .instruction-box { background: #252525; padding: 10px; border-radius: 5px; margin-top: 10px; margin-bottom: 10px; font-size: 0.9em; color: #ddd; border-left: 2px solid #777; display: none; line-height: 1.4; }
         .instruction-box.visible { display: block; }
         .gif-input { width: 100%; padding: 5px; background: #111; border: 1px solid #444; color: #fff; border-radius: 4px; margin-top: 5px; margin-bottom: 5px; font-size: 0.8em; }
-        .btn-sm { padding: 5px 10px; font-size: 0.8em; width: auto; display: inline-block; margin-top: 5px; }
         .btn-guide { background: #333; color: #aaa; border: 1px solid #444; padding: 5px 10px; border-radius: 5px; font-size: 0.8em; cursor: pointer; }
+        .btn-sm { padding: 5px 10px; font-size: 0.8em; width: auto; display: inline-block; margin-top: 5px; }
+        .mic-btn { background: #333; border: 1px solid #555; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2em; cursor: pointer; }
         
-        /* Floating Timer Badge */
+        /* Timer Badge */
         .timer-badge { position: fixed; bottom: 80px; right: 20px; background: var(--danger); color: #fff; padding: 15px; border-radius: 50%; width: 60px; height: 60px; display: none; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2em; box-shadow: 0 4px 8px rgba(0,0,0,0.5); z-index: 4000; cursor: pointer; }
         .timer-badge.active { display: flex; animation: timerPulse 1s infinite; }
         @keyframes timerPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
@@ -105,10 +99,10 @@
         <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
         <div class="row"><input type="number" id="garmin-score" placeholder="Garmin Body Battery (Optional)" oninput="calcReadiness()"></div>
         <div style="text-align:center; margin-top:15px;"><div style="font-size:2.5em; font-weight:bold; color:var(--sec);" id="score-display">--</div><div style="color:#aaa; font-style:italic;" id="score-text">Move sliders to calculate</div></div>
-        <button class="btn btn-main" onclick="saveReadiness()" style="margin-top:15px;">💾 Log</button>
+        <button class="btn btn-main" onclick="saveReadiness()" style="margin-top:15px;">💾 Log Today's Check-In</button>
     </div>
     <div style="text-align:center; margin-top:30px; opacity:0.5;">
-        <small style="color:#777;">Version 30.0 - Fix Logic</small><br>
+        <small style="color:#777;">Version 32.0 - Stabilized</small><br>
         <button class="btn-danger" style="width:auto; display:inline-block; font-size:0.8em; margin-top:5px;" onclick="factoryReset()">⚠️ Reset App</button>
     </div>
 </div>
@@ -125,15 +119,15 @@
                 <div class="chip" onclick="loadTemplate('full')">Full Body</div>
                 <div class="chip" onclick="loadTemplate('f9')">Torque F9 Only</div>
             </div>
-            <button class="btn btn-main" onclick="generateRandomWorkout()">🎲 Random Workout</button>
-            <button class="btn btn-action" onclick="openBuilder()">🛠️ Build Custom</button>
+            <button type="button" class="btn btn-main" onclick="generateRandomWorkout()">🎲 Random Workout</button>
+            <button type="button" class="btn btn-action" onclick="openBuilder()">🛠️ Build Custom</button>
         </div>
     </div>
     <div id="active-workout" class="hidden">
-        <div class="top-bar"><h3>Active Session</h3><button class="btn-danger" style="width:auto; padding:5px 10px;" onclick="cancelWorkout()">End</button></div>
+        <div class="top-bar"><h3>Active Session</h3><button type="button" class="btn-danger" style="width:auto; padding:5px 10px;" onclick="cancelWorkout()">End</button></div>
         <div id="workout-list"></div>
-        <button class="btn btn-action" onclick="openBuilder(true)">➕ Add Exercise</button>
-        <button class="btn btn-main" onclick="finishSession()">💾 Finish & Save</button>
+        <button type="button" class="btn btn-action" onclick="openBuilder(true)">➕ Add Exercise</button>
+        <button type="button" class="btn btn-main" onclick="finishSession()">💾 Finish & Save</button>
     </div>
 </div>
 
@@ -176,7 +170,7 @@
 <div id="builder-overlay" class="fs-overlay hidden">
     <div class="top-bar"><h2>Exercise Builder</h2><button class="btn-danger" style="width:auto;" onclick="closeBuilder()">Close</button></div>
     <div class="card">
-        <label style="font-size:0.8em; color:#777; margin-bottom:5px; display:block;">Target Muscle</label>
+        <label style="font-size:0.8em; color:#777;">Filters</label>
         <div class="chip-container" id="filter-muscle">
             <div class="chip" onclick="toggleFilter('muscle', 'Chest', this)">Chest</div>
             <div class="chip" onclick="toggleFilter('muscle', 'Back', this)">Back</div>
@@ -185,14 +179,11 @@
             <div class="chip" onclick="toggleFilter('muscle', 'Arms', this)">Arms</div>
             <div class="chip" onclick="toggleFilter('muscle', 'Core', this)">Core</div>
         </div>
-        
-        <label style="font-size:0.8em; color:#777; margin-bottom:5px; display:block;">Equipment</label>
         <div class="chip-container" id="filter-equip">
             <div class="chip active" onclick="toggleFilter('equip', 'Cable', this)">F9 Cable</div>
             <div class="chip" onclick="toggleFilter('equip', 'Dumbbell', this)">Dumbbell</div>
             <div class="chip" onclick="toggleFilter('equip', 'Bodyweight', this)">Bodyweight</div>
         </div>
-        
         <input type="text" id="builder-search-inp" placeholder="Search..." onkeyup="filterBuilderList()">
         <div id="builder-list-content" style="margin-top:10px;"></div>
     </div>
@@ -225,6 +216,31 @@
 </div>
 
 <script>
+    // --- TOP LEVEL FUNCTIONS (GLOBAL) ---
+    function cancelWorkout() {
+        if(confirm("Discard Session?")) {
+            document.getElementById('active-workout').classList.add('hidden');
+            document.getElementById('active-workout').style.display = 'none';
+            document.getElementById('setup-panel').classList.remove('hidden');
+            document.getElementById('setup-panel').style.display = 'block';
+            activeRoutine = [];
+        }
+    }
+
+    function finishSession() {
+        if(confirm("Finish & Save?")) {
+            document.getElementById('active-workout').classList.add('hidden');
+            document.getElementById('active-workout').style.display = 'none';
+            document.getElementById('setup-panel').classList.remove('hidden');
+            document.getElementById('setup-panel').style.display = 'block';
+            let streak = parseInt(localStorage.getItem('streakCount') || 0);
+            streak++;
+            localStorage.setItem('streakCount', streak);
+            document.getElementById('streak-count').innerText = streak;
+            alert("🔥 Workout Saved! Streak: " + streak);
+        }
+    }
+
     // --- GLOBAL ---
     const GOOGLE_SCRIPT_URL = "https://script.google.com/a/macros/tjkcivil.com.au/s/AKfycbwG0PbAwqkX3EbWki7vjewgP-FIwCt11_ybFsFJrYmmgq6_QpfKrbPfRxeSEJGu7Ovg/exec"; 
     let state = { unit: 'lbs', history: [], food: [], wellness: [], readiness: [], routine: [] };
@@ -237,9 +253,8 @@
     let timerSeconds = 0;
     let myChart = null;
 
-    // --- FULL 162 EXERCISE DATABASE ---
+    // --- FULL DATABASE ---
     const allExercises = [
-      // --- CABLE (F9) CHEST ---
       {name: "Cable Chest Press", cat: ["Chest"], equip: "Cable", type: "Strength", desc: "Mid pulley. Press forward."},
       {name: "Cable Chest Fly (High)", cat: ["Chest"], equip: "Cable", type: "Muscle Build", desc: "High pulley. Fly down/in."},
       {name: "Cable Chest Fly (Low)", cat: ["Chest"], equip: "Cable", type: "Muscle Build", desc: "Low pulley. Fly up/in."},
@@ -247,8 +262,6 @@
       {name: "Single Arm Cable Chest Press", cat: ["Chest"], equip: "Cable", type: "Strength", desc: "One arm press."},
       {name: "Cable Crossover", cat: ["Chest"], equip: "Cable", type: "Muscle Build", desc: "Cross hands at end."},
       {name: "Cable Pullover (Bench)", cat: ["Chest", "Lats"], equip: "Cable", type: "Muscle Build", desc: "Lying on bench. Pull over."},
-      
-      // --- CABLE (F9) BACK ---
       {name: "Lat Pulldown (Standing)", cat: ["Back"], equip: "Cable", type: "Strength", desc: "High pulley. Kneel or squat."},
       {name: "Seated Cable Row", cat: ["Back"], equip: "Cable", type: "Strength", desc: "Low/Mid pulley. Pull to abs."},
       {name: "Face Pulls", cat: ["Back", "Shoulders"], equip: "Cable", type: "Mobility", desc: "High pulley. Pull to face."},
@@ -258,16 +271,12 @@
       {name: "Cable Rear Delt Fly", cat: ["Back", "Shoulders"], equip: "Cable", type: "Muscle Build", desc: "High pulley. Pull apart."},
       {name: "Cable Y-Raise", cat: ["Back", "Shoulders"], equip: "Cable", type: "Mobility", desc: "Low pulley. Raise to Y."},
       {name: "High Row (Rope)", cat: ["Back"], equip: "Cable", type: "Strength", desc: "High pulley. Pull to chin."},
-      
-      // --- CABLE (F9) SHOULDERS ---
       {name: "Cable Overhead Press", cat: ["Shoulders"], equip: "Cable", type: "Strength", desc: "Low pulley. Press up."},
       {name: "Cable Lateral Raise", cat: ["Shoulders"], equip: "Cable", type: "Muscle Build", desc: "Low pulley. Raise to side."},
       {name: "Cable Front Raise", cat: ["Shoulders"], equip: "Cable", type: "Muscle Build", desc: "Low pulley. Raise to front."},
       {name: "Cable Upright Row", cat: ["Shoulders", "Traps"], equip: "Cable", type: "Muscle Build", desc: "Low pulley. Pull to chin."},
       {name: "Cable External Rotation", cat: ["Shoulders", "Mobility"], equip: "Cable", type: "Mobility", desc: "Elbow at side. Rotate out."},
       {name: "Cable Internal Rotation", cat: ["Shoulders", "Mobility"], equip: "Cable", type: "Mobility", desc: "Elbow at side. Rotate in."},
-      
-      // --- CABLE (F9) ARMS ---
       {name: "Tricep Pushdown (Rope)", cat: ["Arms", "Triceps"], equip: "Cable", type: "Muscle Build", desc: "High pulley. Spread rope."},
       {name: "Tricep Pushdown (Bar)", cat: ["Arms", "Triceps"], equip: "Cable", type: "Muscle Build", desc: "High pulley. Straight bar."},
       {name: "Overhead Cable Extension", cat: ["Arms", "Triceps"], equip: "Cable", type: "Muscle Build", desc: "Mid pulley. Lean forward."},
@@ -276,8 +285,6 @@
       {name: "Cable Hammer Curl", cat: ["Arms", "Biceps"], equip: "Cable", type: "Muscle Build", desc: "Low pulley. Rope attachment."},
       {name: "Bayesian Curl", cat: ["Arms", "Biceps"], equip: "Cable", type: "Muscle Build", desc: "Face away. Curl forward."},
       {name: "Reverse Grip Pushdown", cat: ["Arms", "Triceps"], equip: "Cable", type: "Muscle Build", desc: "Palms up."},
-      
-      // --- CABLE (F9) LEGS ---
       {name: "Cable Squat", cat: ["Legs"], equip: "Cable", type: "Strength", desc: "Low pulleys. Hold at shoulders."},
       {name: "Cable Pull-Through", cat: ["Legs", "Glutes", "Hamstrings"], equip: "Cable", type: "Strength", desc: "Low pulley. Face away. Hinge."},
       {name: "Cable RDL", cat: ["Legs", "Hamstrings"], equip: "Cable", type: "Strength", desc: "Low pulley. Deadlift motion."},
@@ -286,15 +293,11 @@
       {name: "Cable Abductor", cat: ["Legs", "Glutes"], equip: "Cable", type: "Mobility", desc: "Low pulley. Leg out to side."},
       {name: "Cable Adductor", cat: ["Legs"], equip: "Cable", type: "Mobility", desc: "Low pulley. Leg across body."},
       {name: "Cable Calf Raise", cat: ["Legs", "Calves"], equip: "Cable", type: "Muscle Build", desc: "Low pulley. Stand on block."},
-      
-      // --- CABLE (F9) CORE ---
       {name: "Cable Crunch", cat: ["Core"], equip: "Cable", type: "Muscle Build", desc: "High pulley. Kneel. Curl."},
       {name: "Woodchopper (High to Low)", cat: ["Core"], equip: "Cable", type: "Mobility", desc: "High pulley. Rotate down."},
       {name: "Woodchopper (Low to High)", cat: ["Core"], equip: "Cable", type: "Mobility", desc: "Low pulley. Rotate up."},
       {name: "Pallof Press", cat: ["Core"], equip: "Cable", type: "Strength", desc: "Mid pulley. Press out. Resist rotation."},
       {name: "Cable Side Bend", cat: ["Core"], equip: "Cable", type: "Mobility", desc: "Low pulley. Lean side."},
-
-      // --- DUMBBELL (Free Weight) ---
       {name: "Dumbbell Bench Press", cat: ["Chest"], equip: "Dumbbell", type: "Strength", desc: "Flat bench."},
       {name: "Dumbbell Incline Press", cat: ["Chest"], equip: "Dumbbell", type: "Strength", desc: "Incline bench."},
       {name: "Dumbbell Fly", cat: ["Chest"], equip: "Dumbbell", type: "Muscle Build", desc: "Fly open."},
@@ -313,8 +316,6 @@
       {name: "Tricep Kickback", cat: ["Arms", "Triceps"], equip: "Dumbbell", type: "Muscle Build", desc: "Bent over."},
       {name: "Skull Crusher (DB)", cat: ["Arms", "Triceps"], equip: "Dumbbell", type: "Muscle Build", desc: "Lying down."},
       {name: "Farmers Walk", cat: ["Core", "Traps"], equip: "Dumbbell", type: "Strength", desc: "Walk heavy."},
-      
-      // --- BODYWEIGHT ---
       {name: "Push-ups", cat: ["Chest"], equip: "Bodyweight", type: "Calisthenics", desc: "Chest to floor."},
       {name: "Pull-ups", cat: ["Back"], equip: "Bodyweight", type: "Calisthenics", desc: "Chin over bar."},
       {name: "Chin-ups", cat: ["Back", "Biceps"], equip: "Bodyweight", type: "Calisthenics", desc: "Underhand grip."},
@@ -335,8 +336,6 @@
       {name: "Inverted Row", cat: ["Back"], equip: "Bodyweight", type: "Calisthenics", desc: "Pull chest to bar."},
       {name: "Pike Push-up", cat: ["Shoulders"], equip: "Bodyweight", type: "Calisthenics", desc: "Hips high."},
       {name: "Handstand Hold", cat: ["Shoulders"], equip: "Bodyweight", type: "Calisthenics", desc: "Against wall."},
-      
-      // --- MOBILITY & WARMUP ---
       {name: "Cat-Cow", cat: ["Core"], equip: "Bodyweight", type: "Mobility", desc: "Spine flex."},
       {name: "World's Greatest Stretch", cat: ["Full Body"], equip: "Bodyweight", type: "Mobility", desc: "Lunge twist."},
       {name: "90/90 Hip Switch", cat: ["Legs"], equip: "Bodyweight", type: "Mobility", desc: "Hip rotation."},
@@ -403,8 +402,6 @@
         const index = activeFilters[type].indexOf(val);
         if (index > -1) activeFilters[type].splice(index, 1);
         else activeFilters[type].push(val);
-        
-        // Visual toggle
         el.classList.toggle('active');
         filterBuilderList();
     }
@@ -430,7 +427,7 @@
         });
     }
 
-    // --- FOOD & MEALS ---
+    // --- FOOD ---
     async function searchFood() {
         const query = document.getElementById('food-search').value;
         const resDiv = document.getElementById('search-results');
@@ -445,7 +442,6 @@
                 data.foods.forEach(f => {
                     const getNut = (id) => (f.foodNutrients.find(x => x.nutrientId === id) || {}).value || 0;
                     const item = { name: f.description, c: getNut(208), p: getNut(203), f: getNut(204), ch: getNut(205) };
-                    
                     const d = document.createElement('div');
                     d.className = 'food-item';
                     d.innerHTML = `<span>${item.name} <small>(${Math.round(item.c)} cal)</small></span> <span>+</span>`;
@@ -476,7 +472,6 @@
         localStorage.setItem('nimbleNutrition', JSON.stringify(cl));
         closeMealModal();
         renderMealLog();
-        updateMacrosUI();
     }
 
     function renderMealLog() {
@@ -497,23 +492,20 @@
             
             let html = `<div class="meal-section">
                 <div class="meal-header"><span>${meal}</span> <span>${Math.round(subtotal)} cal</span></div>`;
-            
             items.forEach(i => {
                 html += `<div class="food-item"><span>${i.name}</span> <small>${Math.round(i.c)}</small></div>`;
             });
-            
             html += `</div>`;
             container.innerHTML += html;
         });
         
-        // Update Macro Bars
         document.getElementById('disp-cals').innerText = Math.round(grandTotal);
         document.getElementById('disp-pro').innerText = Math.round(grandPro);
         document.getElementById('bar-cals').style.width = Math.min(100, grandTotal/25) + '%';
         document.getElementById('bar-pro').style.width = Math.min(100, grandPro/2) + '%';
     }
 
-    // --- WORKOUT RENDER ---
+    // --- WORKOUT ---
     function renderWorkout(exercises) {
         const list = document.getElementById('workout-list');
         list.innerHTML = '';
@@ -534,16 +526,12 @@
             div.className = `card exercise-card ${ex.type}`;
             div.innerHTML = `
                 <div class="exercise-header"><strong>${ex.name}</strong> <small>${ex.equip}</small> 
-                    <div style="display:flex; gap:5px;">
-                        <span class="btn-guide" onclick="document.getElementById('${uniqueId}').classList.toggle('visible')">📝</span>
-                        ${demoBtn} 
-                        <div class="mic-btn" onclick="startVoiceLog(this, ${i})">🎤</div>
-                    </div>
+                    <div style="display:flex; gap:5px;">${demoBtn} <div class="mic-btn" onclick="startVoiceLog(this, ${i})">🎤</div></div>
                 </div>
                 
                 <div id="${uniqueId}" class="instruction-box">
                     ${ex.desc}
-                    <input type="text" id="gif-input-${i}" class="gif-input" placeholder="Paste GIF URL here..." value="${hasGif || ''}">
+                    <input type="text" id="gif-input-${i}" class="gif-input" placeholder="Paste GIF URL..." value="${hasGif || ''}">
                     <span class="btn-sm btn-guide" onclick="saveGifOverride('${ex.name}', 'gif-input-${i}')">Save</span>
                 </div>
 
@@ -552,7 +540,7 @@
                     <div style="flex:1"><input type="number" id="w-${i}" value="${val}" placeholder="Wt"></div>
                     <div style="flex:1"><input type="number" id="r-${i}" placeholder="Reps"></div>
                 </div>
-                <button class="btn btn-action" style="margin-top:10px; padding:5px;" onclick="logSet('${ex.name}', ${i})">✅ Log Set</button>
+                <button class="btn btn-action" style="margin-top:10px; padding:5px;" onclick="logSet('${ex.name}', ${i})">Log Set</button>
             `;
             list.appendChild(div);
         });
@@ -562,17 +550,24 @@
         const w = document.getElementById(`w-${idx}`).value;
         const r = document.getElementById(`r-${idx}`).value;
         if(w && r) {
-            const entry = { date: new Date().toISOString(), name: name, weight: w, reps: r, unit: state.unit };
+            const entry = { date: new Date().toISOString(), name: name, weight: w, reps: r };
             let h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
             h.push(entry);
             localStorage.setItem('nimbleHistory', JSON.stringify(h));
             sendToCloud("workout", entry);
             startTimer(90);
-            alert("Logged!");
+            
+            // Visual feedback
+            const btn = document.activeElement;
+            const originalText = btn.innerText;
+            btn.innerText = "✅ Logged";
+            btn.style.background = "var(--success)";
+            setTimeout(() => { btn.innerText = originalText; btn.style.background = ""; }, 1500);
+        } else {
+            alert("Enter weight and reps!");
         }
     }
 
-    // --- UTILS ---
     function factoryReset() { if(confirm("Reset App?")) { localStorage.clear(); location.reload(); } }
     function toggleUnit() { state.unit = state.unit === 'lbs' ? 'kg' : 'lbs'; localStorage.setItem('nimbleUnit', state.unit); location.reload(); }
     function saveReadiness() { alert("Saved"); }
@@ -652,7 +647,7 @@
         alert("Logged");
     }
     
-    // --- TEMPLATES ---
+    // --- TEMPLATES & GENERATOR ---
     function loadTemplate(type) {
         let filter = [];
         if(type==='push') filter = ['Chest','Shoulders','Triceps'];
@@ -660,30 +655,29 @@
         if(type==='legs') filter = ['Legs'];
         if(type==='full') filter = ['Chest','Back','Legs'];
         if(type==='f9') return generateWorkoutByFilter(e => e.equip === 'Cable');
-        if(type==='bw') return generateWorkoutByFilter(e => e.equip === 'Bodyweight');
         if(type==='core') filter = ['Core','Mobility'];
         generateWorkoutByFilter(e => e.cat.some(c => filter.includes(c)));
     }
 
     function generateRandomWorkout() {
-        // Pure random selection
         const shuffled = [...allExercises].sort(() => 0.5 - Math.random());
         activeRoutine = shuffled.slice(0, 6);
         renderWorkout(activeRoutine);
         document.getElementById('setup-panel').classList.add('hidden');
+        document.getElementById('setup-panel').style.display = 'none';
         document.getElementById('active-workout').classList.remove('hidden');
+        document.getElementById('active-workout').style.display = 'block';
     }
 
     function generateWorkoutByFilter(filterFn) {
         const pool = allExercises.filter(filterFn);
-        if (pool.length === 0) {
-            alert("No exercises found for this category! Check database.");
-            return;
-        }
+        if(pool.length === 0) return alert("No exercises found!");
         activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
         renderWorkout(activeRoutine);
         document.getElementById('setup-panel').classList.add('hidden');
+        document.getElementById('setup-panel').style.display = 'none';
         document.getElementById('active-workout').classList.remove('hidden');
+        document.getElementById('active-workout').style.display = 'block';
     }
 </script>
 </body>
