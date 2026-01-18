@@ -382,14 +382,14 @@
     }
 
     function calcReadiness() {
-        const g = document.getElementById('garmin-score').value;
-        let score = g ? parseInt(g) : Math.round((parseInt(document.getElementById('val-sleep').value)*10 + parseInt(document.getElementById('val-mood').value)*10 + (10-parseInt(document.getElementById('val-sore').value))*10)/3);
-        const el = document.getElementById('score-display');
-        el.innerText = score + '%';
-        el.style.color = score > 80 ? 'var(--success)' : (score > 50 ? 'var(--warn)' : 'var(--danger)');
-        document.getElementById('score-text').innerText = score > 80 ? "Go for a PR!" : "Listen to your body";
-        localStorage.setItem('nimbleReadiness', JSON.stringify({date: new Date().toDateString(), score: score}));
-    }
+    const g = document.getElementById('garmin-score').value;
+    let score = g ? parseInt(g) : Math.round((parseInt(document.getElementById('val-sleep').value)*10 + parseInt(document.getElementById('val-mood').value)*10 + (10-parseInt(document.getElementById('val-sore').value))*10)/3);
+    const el = document.getElementById('score-display');
+    el.innerText = score + '%';
+    el.style.color = score > 80 ? 'var(--success)' : (score > 50 ? 'var(--warn)' : 'var(--danger)');
+    document.getElementById('score-text').innerText = score > 80 ? "Go for a PR!" : "Listen to your body";
+    // Removed the localStorage line that was causing conflicts
+}
     
 function saveReadiness() {
     const g = document.getElementById('garmin-score').value;
@@ -403,6 +403,18 @@ function saveReadiness() {
         energy: parseInt(document.getElementById('val-mood').value),
         garmin: g || null
     };
+    
+    // FIX: Ensure logs is always an array
+    let logs = JSON.parse(localStorage.getItem('nimbleReadiness'));
+    if(!Array.isArray(logs)) {
+        logs = []; // Force it to be an array
+    }
+    
+    logs.push(entry);
+    localStorage.setItem('nimbleReadiness', JSON.stringify(logs));
+    sendToCloud('readiness', entry);
+    alert('✅ Check-in logged!');
+}
     
     let logs = JSON.parse(localStorage.getItem('nimbleReadiness')) || [];
     logs.push(entry);
