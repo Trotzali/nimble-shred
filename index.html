@@ -90,7 +90,7 @@
         <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
         <div class="row"><input type="number" id="garmin-score" placeholder="Garmin Body Battery (Optional)" oninput="calcReadiness()"></div>
         <div style="text-align:center; margin-top:15px;"><div style="font-size:2.5em; font-weight:bold; color:var(--sec);" id="score-display">--</div><div style="color:#aaa; font-style:italic;" id="score-text">Move sliders to calculate</div></div>
-    </div>
+<button class="btn btn-main" onclick="saveReadiness()" style="margin-top:15px;">💾 Log Today's Check-In</button>
     <div style="text-align:center; margin-top:30px; opacity:0.5;">
         <small style="color:#777;">Version 25.0 - Phase 1</small><br>
         <button class="btn-danger" style="width:auto; display:inline-block; font-size:0.8em; margin-top:5px;" onclick="factoryReset()">⚠️ Reset App</button>
@@ -390,7 +390,26 @@
         document.getElementById('score-text').innerText = score > 80 ? "Go for a PR!" : "Listen to your body";
         localStorage.setItem('nimbleReadiness', JSON.stringify({date: new Date().toDateString(), score: score}));
     }
-
+    
+function saveReadiness() {
+    const g = document.getElementById('garmin-score').value;
+    let score = g ? parseInt(g) : Math.round((parseInt(document.getElementById('val-sleep').value)*10 + parseInt(document.getElementById('val-mood').value)*10 + (10-parseInt(document.getElementById('val-sore').value))*10)/3);
+    
+    const entry = {
+        date: new Date().toISOString(),
+        score: score,
+        sleep: parseInt(document.getElementById('val-sleep').value),
+        pain: parseInt(document.getElementById('val-sore').value),
+        energy: parseInt(document.getElementById('val-mood').value),
+        garmin: g || null
+    };
+    
+    let logs = JSON.parse(localStorage.getItem('nimbleReadiness')) || [];
+    logs.push(entry);
+    localStorage.setItem('nimbleReadiness', JSON.stringify(logs));
+    sendToCloud('readiness', entry);
+    alert('✅ Check-in logged!');
+}
     function updateStreak() {
         let sCount = parseInt(localStorage.getItem('streakCount')) || 0;
         document.getElementById('streak-count').innerText = sCount;
@@ -605,7 +624,10 @@
             const searchUrl = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(ex.name + ' exercise form gif')}`;
             const uniqueId = `desc-${i}`;
             let demoBtn = `<a href="${searchUrl}" target="_blank" class="btn-guide">🎥 Find GIF</a>`;
-            if(hasGif) demoBtn = `<span class="btn-guide" style="color:var(--sec); border-color:var(--sec);" onclick="showGif('${ex.name}')">🎥 Watch</span>`;
+           if(hasGif) {
+    const escapedName = ex.name.replace(/'/g, "\\'");
+    demoBtn = `<span class="btn-guide" style="color:var(--sec); border-color:var(--sec);" onclick="showGif('${escapedName}')">🎥 Watch</span>`;
+}
 
             const div = document.createElement('div');
             div.className = `card exercise-card ${ex.type}`;
@@ -749,15 +771,27 @@
         alert("GIF Saved!");
     }
     
-    function showGif(name) {
-        const url = gifOverrides[name];
-        if(url) {
-            document.getElementById('gif-player').src = url;
-            document.getElementById('gif-modal-title').innerText = name;
-            document.getElementById('gif-modal').classList.remove('hidden');
-            document.getElementById('gif-modal').style.display = 'flex';
-        }
+   function showGif(name) {
+    const url = gifOverrides[name];
+    if(url) {
+        document.getElementById('gif-player').src = url;
+        document.getElementById('gif-modal-title').innerText = name;
+        const modal = document.getElementById('gif-modal');
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
+        
+        // Force image reload if it's cached
+        const img = document.getElementById('gif-player');
+        img.onload = function() {
+            console.log('GIF loaded successfully');
+        };
+        img.onerror = function() {
+            alert('Failed to load GIF. Check the URL is valid.');
+        };
+    } else {
+        alert('No GIF saved for this exercise yet!');
     }
+}
     
     function closeGifModal() { 
         document.getElementById('gif-modal').classList.add('hidden'); 
