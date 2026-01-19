@@ -1581,7 +1581,15 @@ function saveGuideGif() {
 function closeGuideModal() {
     document.getElementById('guide-modal').classList.add('hidden');
     document.getElementById('guide-modal').style.display = 'none';
-    document.getElementById('visual-content-iframe').src = "";
+
+    // Clear previous media to prevent carry-over
+    document.getElementById('visual-content-img').src = '';
+    document.getElementById('visual-content-iframe').src = '';
+    document.getElementById('visual-content-img').style.display = 'none';
+    document.getElementById('visual-content-iframe').style.display = 'none';
+    document.getElementById('visual-error').style.display = 'block';
+
+    currentGuideExercise = null;  // optional but good hygiene
 }
 
 function startTimer(s) { 
