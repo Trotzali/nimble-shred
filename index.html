@@ -1294,16 +1294,21 @@ function createEx(name, cat, equip, type, prep, exec, tips, benefits, muscles, s
 // FIXED FUNCTIONS (all 9 fixes included)
 // ─────────────────────────────────────────────────────────────
 
-window.onload = async () => {
-    try { await syncFromCloud(); } 
-    catch (e) { console.error("Cloud sync failed, loading local.", e); safeLoadLocal(); }
-    finally {
-        document.getElementById('sync-loader').style.display = 'none';
-        state.unit = localStorage.getItem('nimbleUnit') || 'lbs';
-        document.getElementById('unit-disp-1').innerText = state.unit.toUpperCase();
-        document.getElementById('unit-disp-2').innerText = state.unit.toUpperCase();
-        switchTab('readiness');
-    }
+window.onload = () => {  // ← no more async
+    // Comment out cloud sync so it doesn't hang
+    // try { await syncFromCloud(); } catch(e) { console.error(e); safeLoadLocal(); }
+
+    // Directly load local data (fast & reliable)
+    safeLoadLocal();
+
+    // Hide loader immediately
+    document.getElementById('sync-loader').style.display = 'none';
+
+    // Rest of your onload code (units + tab switch)
+    state.unit = localStorage.getItem('nimbleUnit') || 'lbs';
+    document.getElementById('unit-disp-1').innerText = state.unit.toUpperCase();
+    document.getElementById('unit-disp-2').innerText = state.unit.toUpperCase();
+    switchTab('readiness');
 };
 
 async function syncFromCloud() {
