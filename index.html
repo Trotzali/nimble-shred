@@ -1291,30 +1291,31 @@ function createEx(name, cat, equip, type, prep, exec, tips, benefits, muscles, s
             ["Abs"], {arms: "Narrow", pulleys: "Top"})
     ];
 
-   // ─────────────────────────────────────────────────────────────
-// FIXED FUNCTIONS (all 9 fixes included)
-// ─────────────────────────────────────────────────────────────
-
-// ─────────────────────────────────────────────────────────────
+ // ─────────────────────────────────────────────────────────────
 // LOAD THE APP (NO CLOUD SYNC ON STARTUP - FAST & NO HANG)
 // ─────────────────────────────────────────────────────────────
 window.onload = function() {
-    try {
-        safeLoadLocal();
-    } catch (e) {
-        console.error("Local load failed:", e);
-    }
+    // Wait a tiny bit for DOM to be 100% ready (fixes most loader-stuck cases)
+    setTimeout(() => {
+        try {
+            safeLoadLocal();
+        } catch (e) {
+            console.error("Local load failed:", e);
+        }
 
-    // Force hide the loader — this will run even if something else fails
-    const loader = document.getElementById('sync-loader');
-    if (loader) loader.style.display = 'none';
+        // Force hide loader
+        const loader = document.getElementById('sync-loader');
+        if (loader) {
+            loader.style.display = 'none';
+        }
 
-    state.unit = localStorage.getItem('nimbleUnit') || 'lbs';
-    document.getElementById('unit-disp-1').innerText = state.unit.toUpperCase();
-    document.getElementById('unit-disp-2').innerText = state.unit.toUpperCase();
-    switchTab('readiness');
+        state.unit = localStorage.getItem('nimbleUnit') || 'lbs';
+        document.getElementById('unit-disp-1').innerText = state.unit.toUpperCase();
+        document.getElementById('unit-disp-2').innerText = state.unit.toUpperCase();
+        switchTab('readiness');
 
-    console.log("App fully loaded — loader hidden");
+        console.log("App fully loaded — loader hidden");
+    }, 100);  // 100ms delay — safe and tiny
 };
 
 function safeLoadLocal() {
@@ -1330,8 +1331,6 @@ function safeLoadLocal() {
         localStorage.clear();
     }
 }
-
-
 function updateStreak() {
     const readiness = JSON.parse(localStorage.getItem('nimbleReadiness')) || [];
     if (readiness.length === 0) {
