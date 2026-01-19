@@ -1297,20 +1297,25 @@ function createEx(name, cat, equip, type, prep, exec, tips, benefits, muscles, s
 // ─────────────────────────────────────────────────────────────
 // LOAD THE APP (NO CLOUD SYNC ON STARTUP - FAST & NO HANG)
 // ─────────────────────────────────────────────────────────────
-window.onload = () => {
-    // Directly load from localStorage (instant)
-    safeLoadLocal();
+window.onload = function() {  // no async needed anymore
+    try {
+        safeLoadLocal();
+    } catch (e) {
+        console.error("Local load failed:", e);
+    }
 
-    // Hide the loader immediately - no waiting
-    document.getElementById('sync-loader').style.display = 'none';
+    // Force hide loader - this MUST run
+    const loader = document.getElementById('sync-loader');
+    if (loader) {
+        loader.style.display = 'none';
+    }
 
-    // Set unit and show main tab
     state.unit = localStorage.getItem('nimbleUnit') || 'lbs';
     document.getElementById('unit-disp-1').innerText = state.unit.toUpperCase();
     document.getElementById('unit-disp-2').innerText = state.unit.toUpperCase();
     switchTab('readiness');
 
-    console.log("App loaded from local storage - cloud sync disabled on startup");
+    console.log("App loaded - loader should be gone");
 };
 
 // Remove or comment out the entire syncFromCloud function
