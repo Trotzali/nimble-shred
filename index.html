@@ -1438,11 +1438,11 @@ function renderChart() {
 }
 
 function sendToCloud(type, data) {
-    fetch(GOOGLE_SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, data })
-    })
+  fetch(GOOGLE_SCRIPT_URL, {
+  method: "POST",
+  headers: { "Content-Type": "text/plain;charset=utf-8" },  // ← key change!
+  body: JSON.stringify({ type: type, data: data })          // still JSON inside
+})
     .then(r => { if (!r.ok) throw new Error(); console.log(`${type} synced`); })
     .catch(e => {
         console.error(e);
