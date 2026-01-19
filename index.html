@@ -1294,33 +1294,41 @@ function createEx(name, cat, equip, type, prep, exec, tips, benefits, muscles, s
 // FIXED FUNCTIONS (all 9 fixes included)
 // ─────────────────────────────────────────────────────────────
 
-window.onload = () => {  // ← no more async
-    // Comment out cloud sync so it doesn't hang
-    // try { await syncFromCloud(); } catch(e) { console.error(e); safeLoadLocal(); }
-
-    // Directly load local data (fast & reliable)
+// ─────────────────────────────────────────────────────────────
+// LOAD THE APP (NO CLOUD SYNC ON STARTUP - FAST & NO HANG)
+// ─────────────────────────────────────────────────────────────
+window.onload = () => {
+    // Directly load from localStorage (instant)
     safeLoadLocal();
 
-    // Hide loader immediately
+    // Hide the loader immediately - no waiting
     document.getElementById('sync-loader').style.display = 'none';
 
-    // Rest of your onload code (units + tab switch)
+    // Set unit and show main tab
     state.unit = localStorage.getItem('nimbleUnit') || 'lbs';
     document.getElementById('unit-disp-1').innerText = state.unit.toUpperCase();
     document.getElementById('unit-disp-2').innerText = state.unit.toUpperCase();
     switchTab('readiness');
+
+    console.log("App loaded from local storage - cloud sync disabled on startup");
 };
 
-async function syncFromCloud() {
-    const res = await fetch(GOOGLE_SCRIPT_URL);
-    const data = await res.json();
-    if(data.history) localStorage.setItem('nimbleHistory', JSON.stringify(data.history));
-    if(data.nutrition) localStorage.setItem('nimbleNutrition', JSON.stringify(data.nutrition));
-    if(data.gifs) {
-        let g = {};
-        data.gifs.forEach(row => { if(row.key && row.value) g[row.key] = row.value; });
-        localStorage.setItem('nimbleGifOverrides', JSON.stringify(g));
+// Remove or comment out the entire syncFromCloud function
+// async function syncFromCloud() { ... }  ← DELETE or COMMENT THIS WHOLE BLOCK
+
+// Keep safeLoadLocal as is (it's working fine)
+function safeLoadLocal() {
+    try {
+        state.history   = JSON.parse(localStorage.getItem('nimbleHistory'))   || [];
+        state.food      = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
+        state.wellness  = JSON.parse(localStorage.getItem('nimbleWellness'))  || [];
+        state.readiness = JSON.parse(localStorage.getItem('nimbleReadiness')) || [];
+        gifOverrides    = JSON.parse(localStorage.getItem('nimbleGifOverrides')) || {};
+    } catch(e) {
+        console.error("Local data corrupt, resetting.", e);
+        localStorage.clear();
     }
+}
     safeLoadLocal();
 }
 
