@@ -302,30 +302,34 @@
 
 <script>
  
-    // --- GLOBAL ---
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzrJx09CB_N0PO8FDTNbugokJK7CEHqJ4Zk3197Agcew_QNkMBZZ2C61vb53ctcna80dQ/exec";
-    let state = { unit: 'lbs', history: [], food: [], wellness: [], readiness: [], routine: [] };
-    let apiKey = "p61IM61sZf897clBskMhwLftfBccew4ZcgsatflX"; 
-    let searchSource = "usda";
-    let activeRoutine = [];
-    let activeFilters = { muscle: [], equip: ['Cable'] }; 
-    let pendingFood = null; 
-    let selectedMeal = 'Snacks';
-    let gifOverrides = {};
-    let timerInterval = null;
-    let timerSeconds = 0;
-    let myChart = null;
-    let currentGuideExercise = null;
-    let modifyVolume = false;
+   // ─────────────────────────────────────────────────────────────
+// GLOBALS + MACRO GOALS + HELPER
+// ─────────────────────────────────────────────────────────────
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzrJx09CB_N0PO8FDTNbugokJK7CEHqJ4Zk3197Agcew_QNkMBZZ2C61vb53ctcna80dQ/exec";
+let state = { unit: 'lbs', history: [], food: [], wellness: [], readiness: [], routine: [] };
+let apiKey = "p61IM61sZf897clBskMhwLftfBccew4ZcgsatflX";
+let searchSource = "usda";
+let activeRoutine = [];
+let activeFilters = { muscle: [], equip: ['Cable'] };
+let pendingFood = null;
+let selectedMeal = 'Snacks';
+let gifOverrides = {};
+let timerInterval = null;
+let timerSeconds = 0;
+let myChart = null;
+let currentGuideExercise = null;
+let modifyVolume = false;
 
-    // --- HELPER FOR DATABASE ---
-    function createEx(name, cat, equip, type, prep, exec, tips, benefits, muscles, setupF9) {
-        return {
-            name: name, cat: cat, equip: equip, type: type,
-            guide: { prep: prep, exec: exec, tips: tips, benefits: benefits, muscles: muscles },
-            setup: setupF9 || { arms: "N/A", pulleys: "N/A" }
-        };
-    }
+// Default macro goals — edit these if you want different targets
+let macroGoals = { cals: 2500, pro: 180, carb: 300, fat: 80 };
+
+function createEx(name, cat, equip, type, prep, exec, tips, benefits, muscles, setupF9) {
+    return {
+        name: name, cat: cat, equip: equip, type: type,
+        guide: { prep: prep, exec: exec, tips: tips, benefits: benefits, muscles: muscles },
+        setup: setupF9 || { arms: "N/A", pulleys: "N/A" }
+    };
+}
 
     // --- EXERCISE DATABASE (PLACEHOLDER - PASTE STEP 2 HERE) ---
     const allExercises = [
@@ -1286,240 +1290,584 @@
             ["Abs"], {arms: "Narrow", pulleys: "Top"})
     ];
 
-    // --- INIT & CRASH PROTECTION ---
-    window.onload = async () => {
-        try {
-            // Attempt Cloud Sync
-            await syncFromCloud();
-        } catch (e) { 
-            console.error("Cloud sync failed, loading local.", e);
-            safeLoadLocal();
-        } finally {
-            // ALWAYS hide loader, even if errors occur
-            document.getElementById('sync-loader').style.display = 'none';
-            // Set units and defaults
-            state.unit = localStorage.getItem('nimbleUnit') || 'lbs';
-            document.getElementById('unit-disp-1').innerText = state.unit.toUpperCase();
-            document.getElementById('unit-disp-2').innerText = state.unit.toUpperCase();
-            switchTab('readiness');
+   // ─────────────────────────────────────────────────────────────
+// FIXED FUNCTIONS (all 9 fixes included)
+// ─────────────────────────────────────────────────────────────
+
+window.onload = async () => {
+    try { await syncFromCloud(); } 
+    catch (e) { console.error("Cloud sync failed, loading local.", e); safeLoadLocal(); }
+    finally {
+        document.getElementById('sync-loader').style.display = 'none';
+        state.unit = localStorage.getItem('nimbleUnit') || 'lbs';
+        document.getElementById('unit-disp-1').innerText = state.unit.toUpperCase();
+        document.getElementById('unit-disp-2').innerText = state.unit.toUpperCase();
+        switchTab('readiness');
+    }
+};
+
+async function syncFromCloud() {
+    const res = await fetch(GOOGLE_SCRIPT_URL);
+    const data = await res.json();
+    if(data.history) localStorage.setItem('nimbleHistory', JSON.stringify(data.history));
+    if(data.nutrition) localStorage.setItem('nimbleNutrition', JSON.stringify(data.nutrition));
+    if(data.gifs) {
+        let g = {};
+        data.gifs.forEach(row => { if(row.key && row.value) g[row.key] = row.value; });
+        localStorage.setItem('nimbleGifOverrides', JSON.stringify(g));
+    }
+    safeLoadLocal();
+}
+
+function safeLoadLocal() {
+    try {
+        state.history   = JSON.parse(localStorage.getItem('nimbleHistory'))   || [];
+        state.food      = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
+        state.wellness  = JSON.parse(localStorage.getItem('nimbleWellness'))  || [];
+        state.readiness = JSON.parse(localStorage.getItem('nimbleReadiness')) || [];
+        gifOverrides    = JSON.parse(localStorage.getItem('nimbleGifOverrides')) || {};
+    } catch(e) {
+        console.error("Local data corrupt, resetting.", e);
+        localStorage.clear();
+    }
+}
+
+function updateStreak() {
+    const readiness = JSON.parse(localStorage.getItem('nimbleReadiness')) || [];
+    if (readiness.length === 0) {
+        document.getElementById('streak-count').textContent = '0';
+        return;
+    }
+    readiness.sort((a,b) => new Date(b.date) - new Date(a.date));
+    let streak = 1;
+    let current = new Date(readiness[0].date);
+    for (let i = 1; i < readiness.length; i++) {
+        const prev = new Date(readiness[i].date);
+        const expected = new Date(current);
+        expected.setDate(expected.getDate() - 1);
+        if (prev.toDateString() === expected.toDateString()) {
+            streak++;
+            current = prev;
+        } else break;
+    }
+    document.getElementById('streak-count').textContent = streak;
+}
+
+function saveReadinessData(score) {
+    const entry = { date: new Date().toISOString(), score };
+    let r = JSON.parse(localStorage.getItem('nimbleReadiness')) || [];
+    r.push(entry);
+    localStorage.setItem('nimbleReadiness', JSON.stringify(r));
+    sendToCloud('readiness', entry);
+}
+
+function saveBodyStat() {
+    const val = document.getElementById('body-weight').value;
+    if (!val || isNaN(val)) return;
+    const entry = { date: new Date().toISOString(), type: "weight", value: parseFloat(val), unit: state.unit };
+    let w = JSON.parse(localStorage.getItem('nimbleWellness')) || [];
+    w.push(entry);
+    localStorage.setItem('nimbleWellness', JSON.stringify(w));
+    sendToCloud("wellness", entry);
+    alert("Weight logged!");
+    document.getElementById('body-weight').value = '';
+}
+
+function calcReadiness() {
+    const g = document.getElementById('garmin-score').value;
+    let score = g ? parseInt(g) : Math.round(
+        (parseInt(document.getElementById('val-sleep').value)*10 +
+         parseInt(document.getElementById('val-mood').value)*10 +
+         (10 - parseInt(document.getElementById('val-sore').value))*10) / 3
+    );
+    document.getElementById('score-display').innerText = score + '%';
+    document.getElementById('score-display').style.color = 
+        score > 70 ? 'var(--success)' : score > 40 ? 'var(--warn)' : 'var(--danger)';
+    const badge = document.getElementById('readiness-badge');
+    badge.innerText = score >= 80 ? '🔥' : score >= 60 ? '⚡' : score >= 40 ? '🟡' : '😴';
+}
+
+function logSet(name, idx) {
+    const w = parseFloat(document.getElementById(`w-${idx}`).value);
+    const r = parseInt(document.getElementById(`r-${idx}`).value);
+    if (isNaN(w) || w <= 0 || isNaN(r) || r <= 0) {
+        alert("Please enter valid positive weight and reps.");
+        return;
+    }
+    const entry = { date: new Date().toISOString(), name, weight: w, reps: r, unit: state.unit };
+    let h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+    h.push(entry);
+    localStorage.setItem('nimbleHistory', JSON.stringify(h));
+    sendToCloud("workout", entry);
+    startTimer(90);
+    const btn = document.activeElement;
+    btn.innerText = "Saved!";
+    btn.style.backgroundColor = "var(--success)";
+    setTimeout(() => { btn.innerText = "✅ Log Set"; btn.style.backgroundColor = ""; }, 1500);
+}
+
+function populateProgressSelect() {
+    const select = document.getElementById('chart-select');
+    const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+    const unique = [...new Set(history.map(h => h.name))].sort();
+    select.innerHTML = '<option value="">Select Exercise...</option>' + 
+        unique.map(ex => `<option value="${ex}">${ex}</option>`).join('');
+}
+
+function renderChart() {
+    const selected = document.getElementById('chart-select').value;
+    if (!selected) return;
+    const ctx = document.getElementById('progressChart').getContext('2d');
+    if (myChart) myChart.destroy();
+    const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+    const data = history.filter(h => h.name === selected)
+                       .sort((a,b) => new Date(a.date) - new Date(b.date));
+    myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.map(h => new Date(h.date).toLocaleDateString()),
+            datasets: [{
+                label: selected + ' Weight (' + state.unit + ')',
+                data: data.map(h => parseFloat(h.weight)),
+                borderColor: 'var(--primary)',
+                tension: 0.1
+            }]
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: false } } }
+    });
+}
+
+function sendToCloud(type, data) {
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, data })
+    })
+    .then(r => { if (!r.ok) throw new Error(); console.log(`${type} synced`); })
+    .catch(e => {
+        console.error(e);
+        alert("⚠️ Cloud sync failed — saved locally only.\nCheck your internet.");
+    });
+}
+
+function updateMacrosUI() {
+    const today = new Date().toLocaleDateString();
+    const logs = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
+    const t = logs.filter(l => l.date === today).reduce((acc, l) => ({
+        c: acc.c + (l.c||0), p: acc.p + (l.p||0), f: acc.f + (l.f||0), ch: acc.ch + (l.ch||0)
+    }), {c:0,p:0,f:0,ch:0});
+    ['cals','pro','carb','fat'].forEach(k => {
+        const key = k==='cals'?'c':(k==='pro'?'p':(k==='carb'?'ch':'f'));
+        const val = Math.round(t[key]);
+        const goal = macroGoals[k];
+        const pct = goal ? Math.min(100, Math.round(val / goal * 100)) : 0;
+        document.getElementById('disp-'+k).innerHTML = `${val} <small>(${pct}%)</small>`;
+        document.getElementById('bar-'+k).style.width = pct + '%';
+    });
+}
+
+function switchTab(id) {
+    document.querySelectorAll('.container').forEach(d => d.classList.remove('active'));
+    document.getElementById('view-' + id).classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('nav-' + id).classList.add('active');
+    if (id === 'food')     { renderMealLog(); updateMacrosUI(); }
+    if (id === 'progress') { populateProgressSelect(); renderChart(); }
+    if (id === 'readiness') { updateStreak(); }
+}
+
+// ─────────────────────────────────────────────────────────────
+// ALL YOUR ORIGINAL FUNCTIONS (updated & fixed versions)
+// ─────────────────────────────────────────────────────────────
+
+function renderWorkout(exercises) {
+    const list = document.getElementById('workout-list');
+    list.innerHTML = '';
+    const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+    exercises.forEach((ex, i) => {
+        const lastLog = history.filter(h => h.name === ex.name).sort((a,b) => new Date(b.date) - new Date(a.date))[0];
+        let suggestion = "New Exercise";
+        let val = "";
+        if (lastLog) {
+            let targetWeight = lastLog.weight;
+            if (modifyVolume) targetWeight = Math.round(targetWeight * 0.8);
+            suggestion = `Beat: ${targetWeight}${state.unit} x ${lastLog.reps}`;
+            val = targetWeight;
         }
+        const div = document.createElement('div');
+        div.className = `card exercise-card ${ex.type}`;
+        div.innerHTML = `
+            <div class="exercise-header">
+                <strong>${ex.name}</strong>
+                <div style="display:flex; gap:5px;">
+                    <span class="btn-guide" onclick="openGuideModal(this.getAttribute('data-name'))" data-name="${ex.name}">📘 Guide</span>
+                    <div class="mic-btn" onclick="startVoiceLog(this, ${i})">🎤</div>
+                </div>
+            </div>
+            <div class="suggestion-text">💡 ${suggestion}</div>
+            <div class="row" style="margin-top:10px;">
+                <div style="flex:1"><input type="number" id="w-${i}" value="${val}" placeholder="Wt"></div>
+                <div style="flex:1"><input type="number" id="r-${i}" placeholder="Reps"></div>
+            </div>
+            <button type="button" class="btn btn-action" style="margin-top:10px; padding:5px;" onclick="logSet(this.getAttribute('data-name'), ${i})" data-name="${ex.name}">✅ Log Set</button>
+        `;
+        list.appendChild(div);
+    });
+}
+
+function openGuideModal(exName) {
+    const ex = allExercises.find(e => e.name === exName);
+    if(!ex) return;
+    currentGuideExercise = exName;
+    document.getElementById('guide-title').innerText = ex.name;
+    document.getElementById('gif-search-btn').href = "https://www.google.com/search?tbm=isch&q=" + encodeURIComponent(exName + " gif");
+    if (ex.equip === 'Cable') {
+        document.getElementById('f9-setup-section').style.display = 'block';
+        document.getElementById('guide-arms').innerText = ex.setup.arms;
+        document.getElementById('guide-pulleys').innerText = ex.setup.pulleys;
+    } else {
+        document.getElementById('f9-setup-section').style.display = 'none';
+    }
+    const fillList = (id, arr) => {
+        const el = document.getElementById(id);
+        el.innerHTML = "";
+        if(!arr) { el.innerHTML = "<li>No data available.</li>"; return; }
+        arr.forEach(txt => el.innerHTML += `<li>• ${txt}</li>`);
     };
-
-    async function syncFromCloud() {
-        const res = await fetch(GOOGLE_SCRIPT_URL);
-        const data = await res.json();
-        if(data.history) localStorage.setItem('nimbleHistory', JSON.stringify(data.history));
-        if(data.nutrition) localStorage.setItem('nimbleNutrition', JSON.stringify(data.nutrition));
-        if(data.gifs) {
-            let g = {};
-            data.gifs.forEach(row => { if(row.key && row.value) g[row.key] = row.value; });
-            localStorage.setItem('nimbleGifOverrides', JSON.stringify(g));
-        }
-        safeLoadLocal();
-    }
-
-    function safeLoadLocal() {
-        try {
-            state.history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-            state.food = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
-            state.wellness = JSON.parse(localStorage.getItem('nimbleWellness')) || [];
-            state.readiness = JSON.parse(localStorage.getItem('nimbleReadiness')) || [];
-            gifOverrides = JSON.parse(localStorage.getItem('nimbleGifOverrides')) || {};
-        } catch(e) {
-            console.error("Local data corrupt, resetting.", e);
-            localStorage.clear(); // Nuclear option if local data crashes app
-        }
-    }
-
-    // --- RENDER WORKOUT (FIXED BUTTON) ---
-    function renderWorkout(exercises) {
-        const list = document.getElementById('workout-list');
-        list.innerHTML = '';
-        const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-
-        exercises.forEach((ex, i) => {
-            const lastLog = history.filter(h => h.name === ex.name).sort((a,b) => new Date(b.date) - new Date(a.date))[0];
-            let suggestion = "New Exercise";
-            let val = "";
-            if (lastLog) {
-                let targetWeight = lastLog.weight;
-                if (modifyVolume) targetWeight = Math.round(targetWeight * 0.8);
-                suggestion = `Beat: ${targetWeight}${state.unit} x ${lastLog.reps}`;
-                val = targetWeight;
-            }
-
-            const div = document.createElement('div');
-            div.className = `card exercise-card ${ex.type}`;
-            // FIX: Using data-name attribute to handle quotes in names safely
-            div.innerHTML = `
-                <div class="exercise-header">
-                    <strong>${ex.name}</strong> 
-                    <div style="display:flex; gap:5px;">
-                        <span class="btn-guide" onclick="openGuideModal(this.getAttribute('data-name'))" data-name="${ex.name}">📘 Guide</span>
-                        <div class="mic-btn" onclick="startVoiceLog(this, ${i})">🎤</div>
-                    </div>
-                </div>
-                <div class="suggestion-text">💡 ${suggestion}</div>
-                <div class="row" style="margin-top:10px;">
-                    <div style="flex:1"><input type="number" id="w-${i}" value="${val}" placeholder="Wt"></div>
-                    <div style="flex:1"><input type="number" id="r-${i}" placeholder="Reps"></div>
-                </div>
-                <button type="button" class="btn btn-action" style="margin-top:10px; padding:5px;" onclick="logSet(this.getAttribute('data-name'), ${i})" data-name="${ex.name}">✅ Log Set</button>
-            `;
-            list.appendChild(div);
-        });
-    }
-
-    // --- GUIDE MODAL ---
-    function openGuideModal(exName) {
-        const ex = allExercises.find(e => e.name === exName);
-        if(!ex) return;
-        currentGuideExercise = exName;
-        document.getElementById('guide-title').innerText = ex.name;
-        document.getElementById('gif-search-btn').href = "https://www.google.com/search?tbm=isch&q=" + encodeURIComponent(exName + " gif");
-        if (ex.equip === 'Cable') {
-            document.getElementById('f9-setup-section').style.display = 'block';
-            document.getElementById('guide-arms').innerText = ex.setup.arms;
-            document.getElementById('guide-pulleys').innerText = ex.setup.pulleys;
+    fillList('guide-prep', ex.guide.prep);
+    fillList('guide-exec', ex.guide.exec);
+    fillList('guide-tips', ex.guide.tips);
+    fillList('guide-musc', ex.guide.muscles);
+    const url = gifOverrides[exName];
+    const img = document.getElementById('visual-content-img');
+    const iframe = document.getElementById('visual-content-iframe');
+    const err = document.getElementById('visual-error');
+    img.style.display = 'none';
+    iframe.style.display = 'none';
+    err.style.display = 'block';
+    if (url) {
+        err.style.display = 'none';
+        if (url.includes('youtube.com') || url.includes('youtu.be')) {
+            let vidId = url.split('v=')[1] || url.split('/').pop();
+            const ampersandPosition = vidId.indexOf('&');
+            if(ampersandPosition != -1) vidId = vidId.substring(0, ampersandPosition);
+            iframe.src = `https://www.youtube.com/embed/${vidId}?rel=0&modestbranding=1&autohide=1&showinfo=0&controls=1`;
+            iframe.style.display = 'block';
         } else {
-            document.getElementById('f9-setup-section').style.display = 'none';
-        }
-
-        const fillList = (id, arr) => {
-            const el = document.getElementById(id);
-            el.innerHTML = "";
-            if(!arr) { el.innerHTML = "<li>No data available.</li>"; return; }
-            arr.forEach(txt => el.innerHTML += `<li>• ${txt}</li>`);
-        };
-        
-        fillList('guide-prep', ex.guide.prep);
-        fillList('guide-exec', ex.guide.exec);
-        fillList('guide-tips', ex.guide.tips);
-        fillList('guide-musc', ex.guide.muscles);
-
-        const url = gifOverrides[exName];
-        const img = document.getElementById('visual-content-img');
-        const iframe = document.getElementById('visual-content-iframe');
-        const err = document.getElementById('visual-error');
-        
-        img.style.display = 'none';
-        iframe.style.display = 'none';
-        err.style.display = 'block';
-
-        if (url) {
-            err.style.display = 'none';
-            if (url.includes('youtube.com') || url.includes('youtu.be')) {
-                let vidId = url.split('v=')[1] || url.split('/').pop();
-                const ampersandPosition = vidId.indexOf('&');
-                if(ampersandPosition != -1) vidId = vidId.substring(0, ampersandPosition);
-                iframe.src = `https://www.youtube.com/embed/${vidId}?rel=0&modestbranding=1&autohide=1&showinfo=0&controls=1`;
-                iframe.style.display = 'block';
-            } else {
-                img.src = url;
-                img.style.display = 'block';
-            }
-        }
-        document.getElementById('guide-modal').classList.remove('hidden');
-        document.getElementById('guide-modal').style.display = 'block';
-    }
-
-    function saveGuideGif() {
-        const url = document.getElementById('guide-gif-input').value.trim();
-        if(!url) return;
-        gifOverrides[currentGuideExercise] = url;
-        localStorage.setItem('nimbleGifOverrides', JSON.stringify(gifOverrides));
-        sendToCloud('gif', {name: currentGuideExercise, url: url});
-        alert("Media Saved!");
-        openGuideModal(currentGuideExercise);
-    }
-    function closeGuideModal() {
-        document.getElementById('guide-modal').classList.add('hidden');
-        document.getElementById('guide-modal').style.display = 'none';
-        document.getElementById('visual-content-iframe').src = "";
-    }
-
-    // --- OTHER UTILS ---
-    function logSet(name, idx) {
-        const w = document.getElementById(`w-${idx}`).value;
-        const r = document.getElementById(`r-${idx}`).value;
-        if(w && r) {
-            const entry = { date: new Date().toISOString(), name: name, weight: w, reps: r, unit: state.unit };
-            let h = JSON.parse(localStorage.getItem('nimbleHistory')) || []; h.push(entry);
-            localStorage.setItem('nimbleHistory', JSON.stringify(h));
-            sendToCloud("workout", entry);
-            startTimer(90);
-            const btn = document.activeElement; btn.innerText = "Saved!"; btn.style.backgroundColor = "var(--success)";
+            img.src = url;
+            img.style.display = 'block';
         }
     }
-    function startTimer(s) { document.getElementById('timer-overlay').classList.remove('hidden'); document.getElementById('timer-overlay').style.display = 'flex'; document.getElementById('timer-display').innerText = s; let t = s; clearInterval(timerInterval); timerInterval = setInterval(()=>{ t--; document.getElementById('timer-display').innerText = t; if(t<=0) closeTimer(); }, 1000); }
-    function closeTimer() { document.getElementById('timer-overlay').classList.add('hidden'); document.getElementById('timer-overlay').style.display = 'none'; clearInterval(timerInterval); }
-    function addTime(s) { startTimer(parseInt(document.getElementById('timer-display').innerText)+s); }
-    function openTimerOverlay() { document.getElementById('timer-overlay').classList.remove('hidden'); document.getElementById('timer-overlay').style.display = 'flex'; }
-    function switchTab(id) { document.querySelectorAll('.container').forEach(d => d.classList.remove('active')); document.getElementById('view-' + id).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); document.getElementById('nav-' + id).classList.add('active'); if(id === 'food') { renderMealLog(); updateMacrosUI(); } if(id === 'progress') renderChart(); }
-   // --- UPDATED SLIDER LOGIC ---
-    function updateTimeLabel(val) {
-        document.getElementById('time-val').innerText = (val * 7) + "m (" + val + " Ex)";
-    }
+    document.getElementById('guide-modal').classList.remove('hidden');
+    document.getElementById('guide-modal').style.display = 'block';
+}
 
-    function loadTemplate(type) {
-        let filter = [];
-        if(type==='push') filter = ['Chest','Shoulders','Triceps'];
-        if(type==='pull') filter = ['Back','Biceps'];
-        if(type==='legs') filter = ['Legs'];
-        if(type==='full') filter = ['Chest','Back','Legs'];
-        if(type==='f9') return generateWorkoutByFilter(e => e.equip === 'Cable');
-        if(type==='core') filter = ['Core','Mobility'];
-        generateWorkoutByFilter(e => e.cat.some(c => filter.includes(c)));
-    }
+function saveGuideGif() {
+    const url = document.getElementById('guide-gif-input').value.trim();
+    if(!url) return;
+    gifOverrides[currentGuideExercise] = url;
+    localStorage.setItem('nimbleGifOverrides', JSON.stringify(gifOverrides));
+    sendToCloud('gif', {name: currentGuideExercise, url: url});
+    alert("Media Saved!");
+    openGuideModal(currentGuideExercise);
+}
 
-    function generateRandomWorkout() {
-        // Read slider value (default to 6 if not found)
-        const count = parseInt(document.getElementById('slider-time').value) || 6;
-        const shuffled = [...allExercises].sort(() => 0.5 - Math.random());
-        activeRoutine = shuffled.slice(0, count);
-        renderWorkout(activeRoutine); 
-        showWorkoutScreen();
-    }
+function closeGuideModal() {
+    document.getElementById('guide-modal').classList.add('hidden');
+    document.getElementById('guide-modal').style.display = 'none';
+    document.getElementById('visual-content-iframe').src = "";
+}
 
-    function generateWorkoutByFilter(filterFn) {
-        // Read slider value
-        const count = parseInt(document.getElementById('slider-time').value) || 6;
-        const pool = allExercises.filter(filterFn);
-        if(pool.length === 0) return alert("No exercises found.");
-        
-        // Shuffle and pick exactly 'count' exercises
-        activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, count);
-        renderWorkout(activeRoutine); 
-        showWorkoutScreen();
-    }    function showWorkoutScreen() { document.getElementById('setup-panel').classList.add('hidden'); document.getElementById('setup-panel').style.display = 'none'; document.getElementById('active-workout').classList.remove('hidden'); document.getElementById('active-workout').style.display = 'block'; }
-    function cancelWorkout() { if(confirm("Discard?")) { document.getElementById('active-workout').classList.add('hidden'); document.getElementById('active-workout').style.display='none'; document.getElementById('setup-panel').classList.remove('hidden'); document.getElementById('setup-panel').style.display='block'; } }
-    function finishSession() { if(confirm("Save?")) { cancelWorkout(); alert("Saved!"); } }
-    function openBuilder() { document.getElementById('builder-overlay').classList.remove('hidden'); document.getElementById('builder-overlay').style.display = 'block'; filterBuilderList(); }
-    function closeBuilder() { document.getElementById('builder-overlay').classList.add('hidden'); document.getElementById('builder-overlay').style.display = 'none'; }
-    function toggleFilter(type, val, el) { const index = activeFilters[type].indexOf(val); if (index > -1) activeFilters[type].splice(index, 1); else activeFilters[type].push(val); el.classList.toggle('active'); filterBuilderList(); }
-    function filterBuilderList() { const q = document.getElementById('builder-search-inp').value.toLowerCase(); const list = document.getElementById('builder-list-content'); list.innerHTML = ""; const filtered = allExercises.filter(ex => { const matchesSearch = ex.name.toLowerCase().includes(q); const matchesMuscle = activeFilters.muscle.length === 0 || ex.cat.some(c => activeFilters.muscle.includes(c)); const matchesEquip = activeFilters.equip.length === 0 || activeFilters.equip.includes(ex.equip); return matchesSearch && matchesMuscle && matchesEquip; }); filtered.forEach(ex => { const d = document.createElement('div'); d.className = 'food-item'; d.innerHTML = `<div><b>${ex.name}</b> <small style="color:#777">(${ex.equip})</small></div> <button type="button" class="btn-action" style="width:auto; padding:2px 8px;">+</button>`; d.onclick = () => { activeRoutine.push(ex); renderWorkout(activeRoutine); closeBuilder(); showWorkoutScreen(); }; list.appendChild(d); }); }
-    function saveBodyStat() { const val = document.getElementById('body-weight').value; if(val) sendToCloud("wellness", {type:"weight", val: val}); alert("Logged"); }
-    function toggleUnit() { state.unit = state.unit === 'lbs' ? 'kg' : 'lbs'; localStorage.setItem('nimbleUnit', state.unit); location.reload(); }
-    function renderChart() { const ctx = document.getElementById('progressChart').getContext('2d'); if(myChart) myChart.destroy(); myChart = new Chart(ctx, { type:'line', data:{labels:['Jan','Feb','Mar'], datasets:[{label:'Demo Data', data:[100,110,115], borderColor:'#BB86FC'}]} }); }
-    function exportData() { const data = localStorage.getItem('nimbleHistory'); const blob = new Blob([data], {type: 'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'nimble_backup.json'; a.click(); }
-    function startVoiceLog() { alert("Use Chrome for Voice"); }
-    function handleReadinessLog() { const g = document.getElementById('garmin-score').value; let score = g ? parseInt(g) : Math.round((parseInt(document.getElementById('val-sleep').value)*10 + parseInt(document.getElementById('val-mood').value)*10 + (10-parseInt(document.getElementById('val-sore').value))*10)/3); saveReadinessData(score); if (score < 40) showReadinessModal("Recovery Mode", "⚠️ Low Readiness", "Your body needs rest. Modify intensity?"); else if (score < 70) showReadinessModal("Maintenance", "⚡ Moderate Readiness", "Good to go, but maybe not a PR day."); else { alert("🚀 Prime Condition! Go crush it."); switchTab('coach'); } }
-    function showReadinessModal(title, icon, desc) { document.getElementById('readiness-title').innerText = title; document.getElementById('readiness-desc').innerText = desc; document.getElementById('readiness-modal').classList.remove('hidden'); document.getElementById('readiness-modal').style.display = 'flex'; }
-    function applyReadinessStrategy(strategy) { if (strategy === 'modify') { modifyVolume = true; alert("📉 Weights will be reduced by 20% today."); } else { modifyVolume = false; } closeReadinessModal(); switchTab('coach'); }
-    function closeReadinessModal() { document.getElementById('readiness-modal').classList.add('hidden'); document.getElementById('readiness-modal').style.display = 'none'; }
-    function saveReadinessData(score) { const entry = { date: new Date().toISOString(), score: score }; localStorage.setItem('nimbleReadiness', JSON.stringify([entry])); sendToCloud('readiness', entry); }
-    function calcReadiness() { const g = document.getElementById('garmin-score').value; let score = g ? parseInt(g) : Math.round((parseInt(document.getElementById('val-sleep').value)*10 + parseInt(document.getElementById('val-mood').value)*10 + (10-parseInt(document.getElementById('val-sore').value))*10)/3); document.getElementById('score-display').innerText = score + '%'; document.getElementById('score-display').style.color = score > 70 ? 'var(--success)' : 'var(--warn)'; }
-    function setSearchSource(src) { searchSource = src; document.getElementById('src-usda').classList.toggle('active', src === 'usda'); document.getElementById('src-off').classList.toggle('active', src === 'off'); }
-    async function searchFood() { const query = document.getElementById('food-search').value; const resDiv = document.getElementById('search-results'); resDiv.innerHTML = 'Searching...'; let results = []; try { if (searchSource === 'usda') { const req = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=10&api_key=${apiKey}`); const data = await req.json(); if(data.foods) data.foods.forEach(f => { const getNut = (id) => (f.foodNutrients.find(x => x.nutrientId === id) || {}).value || 0; results.push({ name: f.description, c: getNut(208), p: getNut(203), f: getNut(204), ch: getNut(205) }); }); } else { const req = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${query}&search_simple=1&action=process&json=1&page_size=10`); const data = await req.json(); if(data.products) data.products.forEach(p => { results.push({ name: p.product_name, c: p.nutriments['energy-kcal_100g']||0, p: p.nutriments.proteins_100g||0, f: p.nutriments.fat_100g||0, ch: p.nutriments.carbohydrates_100g||0 }); }); } } catch(e) { console.log(e); } if (results.length === 0) results = [{name: "Manual Entry (Edit me)", c:0, p:0}]; resDiv.innerHTML = ''; results.forEach(f => { const div = document.createElement('div'); div.className = 'food-item'; div.innerHTML = `<span>${f.name}</span> <small>${Math.round(f.c)} cal</small>`; div.onclick = () => openFoodModal(f); resDiv.appendChild(div); }); }
-    function openFoodModal(item) { pendingFood = item; document.getElementById('food-modal-name').innerText = item.name; document.getElementById('food-qty').value = 1; updateFoodCalc(); document.getElementById('food-modal').classList.remove('hidden'); document.getElementById('food-modal').style.display = 'flex'; }
-    function updateFoodCalc() { if (!pendingFood) return; const qty = parseFloat(document.getElementById('food-qty').value) || 0; document.getElementById('food-calc-cals').innerText = Math.round(pendingFood.c * qty); document.getElementById('food-calc-pro').innerText = Math.round(pendingFood.p * qty); }
-    function selectMeal(meal, btn) { selectedMeal = meal; document.querySelectorAll('.btn-guide').forEach(b => b.style.borderColor = '#444'); btn.style.borderColor = 'var(--primary)'; }
-    function confirmAddFood() { if (!pendingFood) return; const qty = parseFloat(document.getElementById('food-qty').value) || 1; const log = { date: new Date().toLocaleDateString(), meal: selectedMeal, name: pendingFood.name, c: pendingFood.c * qty, p: pendingFood.p * qty, f: pendingFood.f * qty, ch: pendingFood.ch * qty }; let cl = JSON.parse(localStorage.getItem('nimbleNutrition')) || []; cl.push(log); localStorage.setItem('nimbleNutrition', JSON.stringify(cl)); sendToCloud('nutrition', log); closeFoodModal(); renderMealLog(); updateMacrosUI(); }
-    function closeFoodModal() { document.getElementById('food-modal').classList.add('hidden'); document.getElementById('food-modal').style.display = 'none'; pendingFood = null; }
-    function renderMealLog() { const container = document.getElementById('meal-container'); container.innerHTML = ''; const today = new Date().toLocaleDateString(); const logs = JSON.parse(localStorage.getItem('nimbleNutrition')) || []; const todaysLogs = logs.filter(l => l.date === today); let grandTotal = 0; let grandPro = 0; ['Breakfast', 'Lunch', 'Dinner', 'Snacks'].forEach(meal => { const items = todaysLogs.filter(l => l.meal === meal); const subtotal = items.reduce((sum, i) => sum + (i.c || 0), 0); grandTotal += subtotal; items.forEach(i => grandPro += (i.p || 0)); let html = `<div class="meal-section"><div class="meal-header"><span>${meal}</span> <span>${Math.round(subtotal)} cal</span></div>`; items.forEach(i => { html += `<div class="food-item"><span>${i.name}</span> <small>${Math.round(i.c)}</small></div>`; }); html += `</div>`; container.innerHTML += html; }); document.getElementById('disp-cals').innerText = Math.round(grandTotal); document.getElementById('disp-pro').innerText = Math.round(grandPro); document.getElementById('bar-cals').style.width = Math.min(100, grandTotal/25) + '%'; document.getElementById('bar-pro').style.width = Math.min(100, grandPro/2) + '%'; }
-    function updateMacrosUI() { const today = new Date().toLocaleDateString(); const logs = JSON.parse(localStorage.getItem('nimbleNutrition')) || []; const t = logs.filter(l => l.date === today).reduce((acc, l) => ({ c: acc.c+(l.c||0), p: acc.p+(l.p||0), f: acc.f+(l.f||0), ch: acc.ch+(l.ch||0) }), {c:0, p:0, f:0, ch:0}); ['cals','pro','fat','carb'].forEach(k => { const val = Math.round(t[k==='cals'?'c':(k==='pro'?'p':(k==='fat'?'f':'ch'))]); document.getElementById('disp-'+k).innerText = val; document.getElementById('bar-'+k).style.width = Math.min(100, val/20) + '%'; }); }
-    function sendToCloud(type, data) { fetch(GOOGLE_SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: type, data: data }) }).catch(e=>console.log(e)); }
+function startTimer(s) { 
+    document.getElementById('timer-overlay').classList.remove('hidden'); 
+    document.getElementById('timer-overlay').style.display = 'flex'; 
+    document.getElementById('timer-display').innerText = s; 
+    let t = s; 
+    clearInterval(timerInterval); 
+    timerInterval = setInterval(()=>{ 
+        t--; 
+        document.getElementById('timer-display').innerText = t; 
+        if(t<=0) closeTimer(); 
+    }, 1000); 
+}
 
+function closeTimer() { 
+    document.getElementById('timer-overlay').classList.add('hidden'); 
+    document.getElementById('timer-overlay').style.display = 'none'; 
+    clearInterval(timerInterval); 
+}
+
+function addTime(s) { 
+    startTimer(parseInt(document.getElementById('timer-display').innerText)+s); 
+}
+
+function openTimerOverlay() { 
+    document.getElementById('timer-overlay').classList.remove('hidden'); 
+    document.getElementById('timer-overlay').style.display = 'flex'; 
+}
+
+function updateTimeLabel(val) {
+    document.getElementById('time-val').innerText = (val * 7) + "m (" + val + " Ex)";
+}
+
+function loadTemplate(type) {
+    let filter = [];
+    if(type==='push') filter = ['Chest','Shoulders','Triceps'];
+    if(type==='pull') filter = ['Back','Biceps'];
+    if(type==='legs') filter = ['Legs'];
+    if(type==='full') filter = ['Chest','Back','Legs'];
+    if(type==='f9') return generateWorkoutByFilter(e => e.equip === 'Cable');
+    if(type==='core') filter = ['Core','Mobility'];
+    generateWorkoutByFilter(e => e.cat.some(c => filter.includes(c)));
+}
+
+function generateRandomWorkout() {
+    const count = parseInt(document.getElementById('slider-time').value) || 6;
+    const shuffled = [...allExercises].sort(() => 0.5 - Math.random());
+    activeRoutine = shuffled.slice(0, count);
+    renderWorkout(activeRoutine);
+    showWorkoutScreen();
+}
+
+function generateWorkoutByFilter(filterFn) {
+    const count = parseInt(document.getElementById('slider-time').value) || 6;
+    const pool = allExercises.filter(filterFn);
+    if(pool.length === 0) return alert("No exercises found.");
+    activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, count);
+    renderWorkout(activeRoutine);
+    showWorkoutScreen();
+}
+
+function showWorkoutScreen() { 
+    document.getElementById('setup-panel').classList.add('hidden'); 
+    document.getElementById('setup-panel').style.display = 'none'; 
+    document.getElementById('active-workout').classList.remove('hidden'); 
+    document.getElementById('active-workout').style.display = 'block'; 
+}
+
+function cancelWorkout() { 
+    if(confirm("Discard?")) { 
+        document.getElementById('active-workout').classList.add('hidden'); 
+        document.getElementById('active-workout').style.display='none'; 
+        document.getElementById('setup-panel').classList.remove('hidden'); 
+        document.getElementById('setup-panel').style.display='block'; 
+    } 
+}
+
+function finishSession() { 
+    if(confirm("Save?")) { 
+        cancelWorkout(); 
+        alert("Saved!"); 
+    } 
+}
+
+function openBuilder() { 
+    document.getElementById('builder-overlay').classList.remove('hidden'); 
+    document.getElementById('builder-overlay').style.display = 'block'; 
+    filterBuilderList(); 
+}
+
+function closeBuilder() { 
+    document.getElementById('builder-overlay').classList.add('hidden'); 
+    document.getElementById('builder-overlay').style.display = 'none'; 
+}
+
+function toggleFilter(type, val, el) { 
+    const index = activeFilters[type].indexOf(val); 
+    if (index > -1) activeFilters[type].splice(index, 1); 
+    else activeFilters[type].push(val); 
+    el.classList.toggle('active'); 
+    filterBuilderList(); 
+}
+
+function filterBuilderList() { 
+    const q = document.getElementById('builder-search-inp').value.toLowerCase(); 
+    const list = document.getElementById('builder-list-content'); 
+    list.innerHTML = ""; 
+    const filtered = allExercises.filter(ex => { 
+        const matchesSearch = ex.name.toLowerCase().includes(q); 
+        const matchesMuscle = activeFilters.muscle.length === 0 || ex.cat.some(c => activeFilters.muscle.includes(c)); 
+        const matchesEquip = activeFilters.equip.length === 0 || activeFilters.equip.includes(ex.equip); 
+        return matchesSearch && matchesMuscle && matchesEquip; 
+    }); 
+    filtered.forEach(ex => { 
+        const d = document.createElement('div'); 
+        d.className = 'food-item'; 
+        d.innerHTML = `<div><b>${ex.name}</b> <small style="color:#777">(${ex.equip})</small></div> <button type="button" class="btn-action" style="width:auto; padding:2px 8px;">+</button>`; 
+        d.onclick = () => { 
+            activeRoutine.push(ex); 
+            renderWorkout(activeRoutine); 
+            closeBuilder(); 
+            showWorkoutScreen(); 
+        }; 
+        list.appendChild(d); 
+    }); 
+}
+
+function toggleUnit() { 
+    state.unit = state.unit === 'lbs' ? 'kg' : 'lbs'; 
+    localStorage.setItem('nimbleUnit', state.unit); 
+    location.reload(); 
+}
+
+function exportData() { 
+    const data = localStorage.getItem('nimbleHistory'); 
+    const blob = new Blob([data], {type: 'application/json'}); 
+    const url = URL.createObjectURL(blob); 
+    const a = document.createElement('a'); 
+    a.href = url; 
+    a.download = 'nimble_backup.json'; 
+    a.click(); 
+}
+
+function startVoiceLog() { 
+    alert("Use Chrome for Voice"); 
+}
+
+function handleReadinessLog() { 
+    const g = document.getElementById('garmin-score').value; 
+    let score = g ? parseInt(g) : Math.round((parseInt(document.getElementById('val-sleep').value)*10 + parseInt(document.getElementById('val-mood').value)*10 + (10-parseInt(document.getElementById('val-sore').value))*10)/3); 
+    saveReadinessData(score); 
+    if (score < 40) showReadinessModal("Recovery Mode", "⚠️ Low Readiness", "Your body needs rest. Modify intensity?"); 
+    else if (score < 70) showReadinessModal("Maintenance", "⚡ Moderate Readiness", "Good to go, but maybe not a PR day."); 
+    else { alert("🚀 Prime Condition! Go crush it."); switchTab('coach'); } 
+}
+
+function showReadinessModal(title, icon, desc) { 
+    document.getElementById('readiness-title').innerText = title; 
+    document.getElementById('readiness-desc').innerText = desc; 
+    document.getElementById('readiness-modal').classList.remove('hidden'); 
+    document.getElementById('readiness-modal').style.display = 'flex'; 
+}
+
+function applyReadinessStrategy(strategy) { 
+    if (strategy === 'modify') { 
+        modifyVolume = true; 
+        alert("📉 Weights will be reduced by 20% today."); 
+    } else { 
+        modifyVolume = false; 
+    } 
+    closeReadinessModal(); 
+    switchTab('coach'); 
+}
+
+function closeReadinessModal() { 
+    document.getElementById('readiness-modal').classList.add('hidden'); 
+    document.getElementById('readiness-modal').style.display = 'none'; 
+}
+
+function setSearchSource(src) { 
+    searchSource = src; 
+    document.getElementById('src-usda').classList.toggle('active', src === 'usda'); 
+    document.getElementById('src-off').classList.toggle('active', src === 'off'); 
+}
+
+async function searchFood() { 
+    const query = document.getElementById('food-search').value; 
+    const resDiv = document.getElementById('search-results'); 
+    resDiv.innerHTML = 'Searching...'; 
+    let results = []; 
+    try { 
+        if (searchSource === 'usda') { 
+            const req = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=10&api_key=${apiKey}`); 
+            const data = await req.json(); 
+            if(data.foods) data.foods.forEach(f => { 
+                const getNut = (id) => (f.foodNutrients.find(x => x.nutrientId === id) || {}).value || 0; 
+                results.push({ name: f.description, c: getNut(208), p: getNut(203), f: getNut(204), ch: getNut(205) }); 
+            }); 
+        } else { 
+            const req = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${query}&search_simple=1&action=process&json=1&page_size=10`); 
+            const data = await req.json(); 
+            if(data.products) data.products.forEach(p => { 
+                results.push({ name: p.product_name, c: p.nutriments['energy-kcal_100g']||0, p: p.nutriments.proteins_100g||0, f: p.nutriments.fat_100g||0, ch: p.nutriments.carbohydrates_100g||0 }); 
+            }); 
+        } 
+    } catch(e) { console.log(e); } 
+    if (results.length === 0) results = [{name: "Manual Entry (Edit me)", c:0, p:0}]; 
+    resDiv.innerHTML = ''; 
+    results.forEach(f => { 
+        const div = document.createElement('div'); 
+        div.className = 'food-item'; 
+        div.innerHTML = `<span>${f.name}</span> <small>${Math.round(f.c)} cal</small>`; 
+        div.onclick = () => openFoodModal(f); 
+        resDiv.appendChild(div); 
+    }); 
+}
+
+function openFoodModal(item) { 
+    pendingFood = item; 
+    document.getElementById('food-modal-name').innerText = item.name; 
+    document.getElementById('food-qty').value = 1; 
+    updateFoodCalc(); 
+    document.getElementById('food-modal').classList.remove('hidden'); 
+    document.getElementById('food-modal').style.display = 'flex'; 
+}
+
+function updateFoodCalc() { 
+    if (!pendingFood) return; 
+    const qty = parseFloat(document.getElementById('food-qty').value) || 0; 
+    document.getElementById('food-calc-cals').innerText = Math.round(pendingFood.c * qty); 
+    document.getElementById('food-calc-pro').innerText = Math.round(pendingFood.p * qty); 
+}
+
+function selectMeal(meal, btn) { 
+    selectedMeal = meal; 
+    document.querySelectorAll('.btn-guide').forEach(b => b.style.borderColor = '#444'); 
+    btn.style.borderColor = 'var(--primary)'; 
+}
+
+function confirmAddFood() { 
+    if (!pendingFood) return; 
+    const qty = parseFloat(document.getElementById('food-qty').value) || 1; 
+    const log = { 
+        date: new Date().toLocaleDateString(), 
+        meal: selectedMeal, 
+        name: pendingFood.name, 
+        c: pendingFood.c * qty, 
+        p: pendingFood.p * qty, 
+        f: pendingFood.f * qty, 
+        ch: pendingFood.ch * qty 
+    }; 
+    let cl = JSON.parse(localStorage.getItem('nimbleNutrition')) || []; 
+    cl.push(log); 
+    localStorage.setItem('nimbleNutrition', JSON.stringify(cl)); 
+    sendToCloud('nutrition', log); 
+    closeFoodModal(); 
+    renderMealLog(); 
+    updateMacrosUI(); 
+}
+
+function closeFoodModal() { 
+    document.getElementById('food-modal').classList.add('hidden'); 
+    document.getElementById('food-modal').style.display = 'none'; 
+    pendingFood = null; 
+}
+
+function renderMealLog() { 
+    const container = document.getElementById('meal-container'); 
+    container.innerHTML = ''; 
+    const today = new Date().toLocaleDateString(); 
+    const logs = JSON.parse(localStorage.getItem('nimbleNutrition')) || []; 
+    const todaysLogs = logs.filter(l => l.date === today); 
+    let grandTotal = 0; 
+    let grandPro = 0; 
+    ['Breakfast', 'Lunch', 'Dinner', 'Snacks'].forEach(meal => { 
+        const items = todaysLogs.filter(l => l.meal === meal); 
+        const subtotal = items.reduce((sum, i) => sum + (i.c || 0), 0); 
+        grandTotal += subtotal; 
+        items.forEach(i => grandPro += (i.p || 0)); 
+        let html = `<div class="meal-section"><div class="meal-header"><span>${meal}</span> <span>${Math.round(subtotal)} cal</span></div>`; 
+        items.forEach(i => { html += `<div class="food-item"><span>${i.name}</span> <small>${Math.round(i.c)}</small></div>`; }); 
+        html += `</div>`; 
+        container.innerHTML += html; 
+    }); 
+    document.getElementById('disp-cals').innerText = Math.round(grandTotal); 
+    document.getElementById('disp-pro').innerText = Math.round(grandPro); 
+    document.getElementById('bar-cals').style.width = Math.min(100, grandTotal/25) + '%'; 
+    document.getElementById('bar-pro').style.width = Math.min(100, grandPro/2) + '%'; 
+}
+
+// (end of script)
 </script>
 </body>
 </html>
