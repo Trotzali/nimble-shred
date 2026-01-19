@@ -1298,31 +1298,25 @@ function createEx(name, cat, equip, type, prep, exec, tips, benefits, muscles, s
 // ─────────────────────────────────────────────────────────────
 // LOAD THE APP (NO CLOUD SYNC ON STARTUP - FAST & NO HANG)
 // ─────────────────────────────────────────────────────────────
-window.onload = function() {  // no async needed anymore
+window.onload = function() {
     try {
         safeLoadLocal();
     } catch (e) {
         console.error("Local load failed:", e);
     }
 
-    // Force hide loader - this MUST run
+    // Force hide the loader — this will run even if something else fails
     const loader = document.getElementById('sync-loader');
-    if (loader) {
-        loader.style.display = 'none';
-    }
+    if (loader) loader.style.display = 'none';
 
     state.unit = localStorage.getItem('nimbleUnit') || 'lbs';
     document.getElementById('unit-disp-1').innerText = state.unit.toUpperCase();
     document.getElementById('unit-disp-2').innerText = state.unit.toUpperCase();
     switchTab('readiness');
 
-    console.log("App loaded - loader should be gone");
+    console.log("App fully loaded — loader hidden");
 };
 
-// Remove or comment out the entire syncFromCloud function
-// async function syncFromCloud() { ... }  ← DELETE or COMMENT THIS WHOLE BLOCK
-
-// Keep safeLoadLocal as is (it's working fine)
 function safeLoadLocal() {
     try {
         state.history   = JSON.parse(localStorage.getItem('nimbleHistory'))   || [];
@@ -1330,12 +1324,11 @@ function safeLoadLocal() {
         state.wellness  = JSON.parse(localStorage.getItem('nimbleWellness'))  || [];
         state.readiness = JSON.parse(localStorage.getItem('nimbleReadiness')) || [];
         gifOverrides    = JSON.parse(localStorage.getItem('nimbleGifOverrides')) || {};
-    } catch(e) {
-        console.error("Local data corrupt, resetting.", e);
+        console.log("Local data loaded successfully");
+    } catch (e) {
+        console.error("Local data corrupt — resetting", e);
         localStorage.clear();
     }
-}
-    safeLoadLocal();
 }
 
 function safeLoadLocal() {
