@@ -1331,18 +1331,6 @@ function safeLoadLocal() {
     }
 }
 
-function safeLoadLocal() {
-    try {
-        state.history   = JSON.parse(localStorage.getItem('nimbleHistory'))   || [];
-        state.food      = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
-        state.wellness  = JSON.parse(localStorage.getItem('nimbleWellness'))  || [];
-        state.readiness = JSON.parse(localStorage.getItem('nimbleReadiness')) || [];
-        gifOverrides    = JSON.parse(localStorage.getItem('nimbleGifOverrides')) || {};
-    } catch(e) {
-        console.error("Local data corrupt, resetting.", e);
-        localStorage.clear();
-    }
-}
 
 function updateStreak() {
     const readiness = JSON.parse(localStorage.getItem('nimbleReadiness')) || [];
