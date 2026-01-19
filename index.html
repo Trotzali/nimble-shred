@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#1e1e1e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Nimble Shred v39.0</title>
+    <title>Nimble Shred v41.0</title>
     <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiTmltYmxlIFNocmVkIiwiYmFja2dyb3VuZF9jb2xvciI6IiMxMjEyMTIiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiIzFlMWUxZSIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2ltZy5pY29uczguY29tL2ZsdWVuY3kvOTYvbnVsbC9kdW1iYmVsbC5wbmciLCJzaXplcyI6Ijk2eDk2IiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
     <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/96/null/dumbbell.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -49,33 +49,34 @@
         .exercise-header { display: flex; justify-content: space-between; align-items: flex-start; }
         .suggestion-text { color: var(--success); font-size: 0.85em; margin: 5px 0; font-style: italic; display: flex; align-items: center; gap: 5px; }
         
-        /* Guide Modal (Two Column Layout) */
-        .guide-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
-        @media (min-width: 600px) { .guide-grid { grid-template-columns: 1fr 1fr; } }
+        /* Accordion Styles (The Encyclopedia) */
+        details { background: #252525; margin-bottom: 10px; border-radius: 8px; overflow: hidden; border: 1px solid #333; }
+        summary { padding: 12px; cursor: pointer; font-weight: bold; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+        summary::-webkit-details-marker { display: none; }
+        summary:after { content: '+'; font-size: 1.2em; color: var(--sec); }
+        details[open] summary:after { content: '-'; }
+        details[open] summary { border-bottom: 1px solid #333; background: rgba(255,255,255,0.05); }
+        .detail-content { padding: 15px; font-size: 0.9em; line-height: 1.5; color: #ddd; }
+        .detail-content ul { padding-left: 20px; margin: 0; }
+        .detail-content li { margin-bottom: 5px; }
         
-        .guide-section { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #333; }
-        .guide-label { color: var(--gold); font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; display: block; }
-        .guide-val { font-size: 1.1em; color: #fff; }
-        .step-list { padding-left: 20px; color: #ddd; line-height: 1.5; }
-        .step-list li { margin-bottom: 8px; }
+        /* Smart Viewer */
+        .visual-container { background: #000; border-radius: 8px; overflow: hidden; height: 250px; display: flex; align-items: center; justify-content: center; border: 1px solid #333; position: relative; margin-bottom: 15px; }
+        #visual-content-img { width: 100%; height: 100%; object-fit: contain; display: none; }
+        #visual-content-iframe { width: 100%; height: 100%; border: none; display: none; }
+        .visual-placeholder { color: #555; text-align: center; padding: 20px; font-size: 0.9em; position: absolute; }
         
-        .visual-container { background: #000; border-radius: 8px; overflow: hidden; min-height: 250px; display: flex; align-items: center; justify-content: center; border: 1px solid #333; }
-        #guide-gif { width: 100%; height: auto; display: block; }
-        .visual-placeholder { color: #555; text-align: center; padding: 20px; font-size: 0.9em; }
-        
-        /* Overlays */
+        /* Overlays & Macros */
         .fs-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 10000; padding: 20px; overflow-y: auto; box-sizing: border-box; display: none; }
         .fs-overlay.flex-center { display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.95); }
         .hidden { display: none !important; }
         #sync-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 20000; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s; }
         
-        /* Macros & Misc */
         .macro-bar-container { background: #333; height: 12px; border-radius: 6px; margin-top: 5px; overflow: hidden; position: relative; }
         .macro-fill { height: 100%; transition: width 0.5s; }
         .macro-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; text-align: center; font-size: 0.85em; }
         .gif-input { width: 100%; padding: 10px; background: #111; border: 1px solid #444; color: #fff; border-radius: 4px; margin-top: 5px; margin-bottom: 5px; font-size: 0.8em; }
         .btn-guide { background: #333; color: #aaa; border: 1px solid #444; padding: 5px 10px; border-radius: 5px; font-size: 0.8em; cursor: pointer; }
-        .btn-sm { padding: 5px 10px; font-size: 0.8em; width: auto; display: inline-block; margin-top: 5px; }
         .mic-btn { background: #333; border: 1px solid #555; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2em; cursor: pointer; }
         .meal-section { border-top: 1px solid #333; margin-top: 15px; padding-top: 10px; }
         .meal-header { font-weight: bold; color: var(--gold); display: flex; justify-content: space-between; margin-bottom: 5px; }
@@ -84,7 +85,6 @@
         .source-opt { cursor: pointer; padding: 5px 10px; border-radius: 5px; border: 1px solid #333; color: #777; }
         .source-opt.active { background: var(--primary); color: #000; border-color: var(--primary); font-weight: bold; }
         
-        /* Floating Timer */
         .timer-badge { position: fixed; bottom: 80px; right: 20px; background: var(--danger); color: #fff; padding: 15px; border-radius: 50%; width: 60px; height: 60px; display: none; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2em; box-shadow: 0 4px 8px rgba(0,0,0,0.5); z-index: 8000; cursor: pointer; }
         .timer-badge.active { display: flex; animation: timerPulse 1s infinite; }
         @keyframes timerPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
@@ -196,44 +196,43 @@
 <div id="guide-modal" class="fs-overlay hidden">
     <div class="top-bar"><h2 id="guide-title">Exercise Name</h2><button class="btn-danger" style="width:auto;" onclick="closeGuideModal()">Close</button></div>
     <div class="card">
-        <div class="guide-grid">
-            <div>
-                <div id="f9-setup-section" class="guide-section">
-                    <span class="guide-label">⚙️ Torque F9 Setup</span>
-                    <div class="row">
-                        <div style="flex:1"><span style="color:#777;">Arms:</span> <span class="guide-val" id="guide-arms">--</span></div>
-                        <div style="flex:1"><span style="color:#777;">Pulleys:</span> <span class="guide-val" id="guide-pulleys">--</span></div>
-                    </div>
-                </div>
-                
-                <div class="guide-section">
-                    <span class="guide-label">📝 Instructions</span>
-                    <ul class="step-list" id="guide-steps"></ul>
-                </div>
-                <div class="guide-section">
-                    <span class="guide-label">💡 Pro Tip</span>
-                    <div id="guide-cue" style="color:#fff; font-style:italic;">--</div>
-                </div>
+        
+        <span class="guide-label">🎥 Visual Guide</span>
+        <div class="visual-container">
+            <div id="visual-error" class="visual-placeholder">
+                No Visual Saved.<br>
+                <small>Paste GIF or YouTube Link below.</small>
             </div>
+            <img id="visual-content-img" src="">
+            <iframe id="visual-content-iframe" src="" allowfullscreen></iframe>
+        </div>
+        
+        <div id="accordion-container">
+            <details id="det-prep">
+                <summary>⚙️ Preparation</summary>
+                <div class="detail-content" id="guide-prep"></div>
+            </details>
             
-            <div>
-                <span class="guide-label">🎥 Visual Guide</span>
-                <div class="visual-container">
-                    <img id="guide-gif" src="" onerror="this.style.display='none'; document.getElementById('visual-error').style.display='block';">
-                    <div id="visual-error" class="visual-placeholder" style="display:none;">
-                        No Visual Saved.<br>
-                        <small>Click "Find" below to add one.</small>
-                    </div>
-                </div>
-                
-                <div style="background:#252525; padding:15px; border-radius:8px; margin-top:15px;">
-                    <a id="gif-search-btn" href="#" target="_blank" class="btn-guide" style="display:block; text-align:center; text-decoration:none; margin-bottom:10px;">🔎 Find on Google (GIFs)</a>
-                    <small style="display:block; text-align:center; color:#777; margin-bottom:10px;">Tip: Long-press image & select "Copy Image Address"</small>
-                    
-                    <input type="text" id="guide-gif-input" class="gif-input" placeholder="Paste direct image link here...">
-                    <button class="btn btn-action" style="margin-top:5px;" onclick="saveGuideGif()">💾 Save to Cloud</button>
-                </div>
-            </div>
+            <details id="det-exec" open>
+                <summary>🚀 Execution</summary>
+                <div class="detail-content" id="guide-exec"></div>
+            </details>
+            
+            <details id="det-tips">
+                <summary>🎓 Coaching Tips</summary>
+                <div class="detail-content" id="guide-tips"></div>
+            </details>
+            
+            <details id="det-musc">
+                <summary>💪 Muscles & Benefits</summary>
+                <div class="detail-content" id="guide-musc"></div>
+            </details>
+        </div>
+
+        <div style="background:#252525; padding:15px; border-radius:8px; margin-top:20px; border-top:1px solid #444;">
+            <a id="gif-search-btn" href="#" target="_blank" class="btn-guide" style="display:block; text-align:center; text-decoration:none; margin-bottom:10px;">🔎 Find on Google (GIFs)</a>
+            <input type="text" id="guide-gif-input" class="gif-input" placeholder="Paste YouTube or GIF URL...">
+            <button class="btn btn-action" style="margin-top:5px;" onclick="saveGuideGif()">💾 Save Media</button>
         </div>
     </div>
 </div>
@@ -242,26 +241,16 @@
     <div class="card" style="width:85%; max-width:350px;">
         <h3>Adjust Portion</h3>
         <h4 id="food-modal-name" style="color:var(--primary);">Food Name</h4>
-        
         <div class="row" style="margin:15px 0;">
-            <div style="flex:1">
-                <label style="font-size:0.8em; color:#aaa;">Qty</label>
-                <input type="number" id="food-qty" value="1" step="0.25" oninput="updateFoodCalc()">
-            </div>
-            <div style="flex:2; text-align:right;">
-                <div style="font-size:1.5em; font-weight:bold; color:var(--sec);"><span id="food-calc-cals">0</span> kcal</div>
-                <div style="font-size:0.9em; color:#aaa;"><span id="food-calc-pro">0</span>g Pro</div>
-            </div>
+            <div style="flex:1"><label style="font-size:0.8em; color:#aaa;">Qty</label><input type="number" id="food-qty" value="1" step="0.25" oninput="updateFoodCalc()"></div>
+            <div style="flex:2; text-align:right;"><div style="font-size:1.5em; font-weight:bold; color:var(--sec);"><span id="food-calc-cals">0</span> kcal</div><div style="font-size:0.9em; color:#aaa;"><span id="food-calc-pro">0</span>g Pro</div></div>
         </div>
-        
-        <label style="font-size:0.8em; color:#aaa; margin-bottom:5px; display:block;">Select Meal</label>
         <div class="row">
             <button class="btn-guide" onclick="selectMeal('Breakfast', this)">Breakfast</button>
             <button class="btn-guide" onclick="selectMeal('Lunch', this)">Lunch</button>
             <button class="btn-guide" onclick="selectMeal('Dinner', this)">Dinner</button>
             <button class="btn-guide" onclick="selectMeal('Snacks', this)">Snack</button>
         </div>
-        
         <button class="btn btn-main" style="margin-top:15px;" onclick="confirmAddFood()">✅ Add to Log</button>
         <button class="btn btn-danger" style="margin-top:10px;" onclick="closeFoodModal()">Cancel</button>
     </div>
@@ -315,104 +304,770 @@
     let currentGuideExercise = null;
     let modifyVolume = false;
 
-    // --- FULL 162 EXERCISE DB ---
+  // --- ENCYCLOPEDIA DATABASE GENERATOR ---
+    // Helper function to compress the code size
+    function createEx(name, cat, equip, type, prep, exec, tips, benefits, muscles, setupF9) {
+        return {
+            name: name, 
+            cat: cat, 
+            equip: equip, 
+            type: type,
+            guide: { 
+                prep: prep, 
+                exec: exec, 
+                tips: tips, 
+                benefits: benefits, 
+                muscles: muscles 
+            },
+            setup: setupF9 || { arms: "N/A", pulleys: "N/A" }
+        };
+    }
+
     const allExercises = [
-      // CABLE CHEST
-      {name: "Cable Chest Press", cat: ["Chest"], equip: "Cable", type: "Strength", setup: {arms: "Wide (Pos 8-9)", pulleys: "Chest Height"}, steps: ["Step forward", "Press"], cue: "Squeeze pecs"},
-      {name: "Cable Chest Fly (High)", cat: ["Chest"], equip: "Cable", type: "Muscle Build", setup: {arms: "Wide", pulleys: "Top"}, steps: ["Lean forward", "Fly down"], cue: "Hug a tree"},
-      {name: "Cable Chest Fly (Low)", cat: ["Chest"], equip: "Cable", type: "Muscle Build", setup: {arms: "Wide", pulleys: "Bottom"}, steps: ["Palms up", "Fly high"], cue: "Scoop up"},
-      {name: "Cable Chest Fly (Mid)", cat: ["Chest"], equip: "Cable", type: "Muscle Build", setup: {arms: "Wide", pulleys: "Mid"}, steps: ["Fly center"], cue: "Squeeze middle"},
-      {name: "Single Arm Cable Chest Press", cat: ["Chest"], equip: "Cable", type: "Strength", setup: {arms: "Standard", pulleys: "Chest"}, steps: ["One arm press"], cue: "Anti-rotation"},
-      {name: "Cable Crossover", cat: ["Chest"], equip: "Cable", type: "Muscle Build", setup: {arms: "Wide", pulleys: "Top"}, steps: ["Cross hands at bottom"], cue: "Maximum squeeze"},
-      {name: "Cable Pullover (Bench)", cat: ["Chest", "Lats"], equip: "Cable", type: "Muscle Build", setup: {arms: "Narrow", pulleys: "Mid"}, steps: ["Lie on bench", "Pull over head"], cue: "Stretch lats"},
-      // CABLE BACK
-      {name: "Lat Pulldown (Standing)", cat: ["Back"], equip: "Cable", type: "Strength", setup: {arms: "Top", pulleys: "Top"}, steps: ["Kneel down", "Pull to chest"], cue: "Elbows to pockets"},
-      {name: "Seated Cable Row", cat: ["Back"], equip: "Cable", type: "Strength", setup: {arms: "Narrow", pulleys: "Low"}, steps: ["Sit on floor", "Row to waist"], cue: "Chest up"},
-      {name: "Face Pulls", cat: ["Back", "Shoulders"], equip: "Cable", type: "Mobility", setup: {arms: "Narrow", pulleys: "Face"}, steps: ["Pull to forehead", "Rotate up"], cue: "Thumbs back"},
-      {name: "Straight Arm Pulldown", cat: ["Back"], equip: "Cable", type: "Muscle Build", setup: {arms: "Top", pulleys: "Top"}, steps: ["Arms straight", "Push down"], cue: "Lats only"},
-      {name: "Single Arm Cable Row", cat: ["Back"], equip: "Cable", type: "Strength", setup: {arms: "Mid", pulleys: "Mid"}, steps: ["Row one arm", "Rotate torso"], cue: "Reach and pull"},
-      {name: "Cable Shrugs", cat: ["Back", "Traps"], equip: "Cable", type: "Muscle Build", setup: {arms: "Low", pulleys: "Low"}, steps: ["Shrug up"], cue: "Touch ears"},
-      {name: "Cable Rear Delt Fly", cat: ["Back", "Shoulders"], equip: "Cable", type: "Muscle Build", setup: {arms: "Wide", pulleys: "Eye"}, steps: ["Cross cables", "Pull apart"], cue: "Touch walls"},
-      {name: "Cable Y-Raise", cat: ["Back", "Shoulders"], equip: "Cable", type: "Mobility", setup: {arms: "Low", pulleys: "Low"}, steps: ["Raise into Y shape"], cue: "Lower traps"},
-      {name: "High Row (Rope)", cat: ["Back"], equip: "Cable", type: "Strength", setup: {arms: "Top", pulleys: "Top"}, steps: ["Pull to chin"], cue: "High elbows"},
-      // CABLE SHOULDERS
-      {name: "Cable Overhead Press", cat: ["Shoulders"], equip: "Cable", type: "Strength", setup: {arms: "Wide", pulleys: "Low"}, steps: ["Press up"], cue: "Biceps by ears"},
-      {name: "Cable Lateral Raise", cat: ["Shoulders"], equip: "Cable", type: "Muscle Build", setup: {arms: "Low", pulleys: "Low"}, steps: ["Cross cables", "Raise to side"], cue: "Pour pitcher"},
-      {name: "Cable Front Raise", cat: ["Shoulders"], equip: "Cable", type: "Muscle Build", setup: {arms: "Low", pulleys: "Low"}, steps: ["Raise front"], cue: "Control down"},
-      {name: "Cable Upright Row", cat: ["Shoulders", "Traps"], equip: "Cable", type: "Muscle Build", setup: {arms: "Low", pulleys: "Low"}, steps: ["Pull to chin"], cue: "Elbows high"},
-      {name: "Cable External Rotation", cat: ["Shoulders"], equip: "Cable", type: "Mobility", setup: {arms: "Mid", pulleys: "Mid"}, steps: ["Rotate out"], cue: "Pinned elbow"},
-      {name: "Cable Internal Rotation", cat: ["Shoulders"], equip: "Cable", type: "Mobility", setup: {arms: "Mid", pulleys: "Mid"}, steps: ["Rotate in"], cue: "Pinned elbow"},
-      // CABLE ARMS
-      {name: "Tricep Pushdown (Rope)", cat: ["Arms", "Triceps"], equip: "Cable", type: "Muscle Build", setup: {arms: "Top", pulleys: "Top"}, steps: ["Push down", "Spread rope"], cue: "Lock elbows"},
-      {name: "Tricep Pushdown (Bar)", cat: ["Arms", "Triceps"], equip: "Cable", type: "Muscle Build", setup: {arms: "Top", pulleys: "Top"}, steps: ["Push down"], cue: "Lock elbows"},
-      {name: "Overhead Cable Extension", cat: ["Arms", "Triceps"], equip: "Cable", type: "Muscle Build", setup: {arms: "Mid", pulleys: "Mid"}, steps: ["Lean forward", "Extend over head"], cue: "Stretch tricep"},
-      {name: "Cable Kickback", cat: ["Arms", "Triceps"], equip: "Cable", type: "Muscle Build", setup: {arms: "Low", pulleys: "Low"}, steps: ["Extend back"], cue: "Squeeze"},
-      {name: "Cable Bicep Curl", cat: ["Arms", "Biceps"], equip: "Cable", type: "Muscle Build", setup: {arms: "Low", pulleys: "Low"}, steps: ["Curl up"], cue: "Squeeze pinkies"},
-      {name: "Cable Hammer Curl", cat: ["Arms", "Biceps"], equip: "Cable", type: "Muscle Build", setup: {arms: "Low", pulleys: "Low"}, steps: ["Neutral grip curl"], cue: "Forearms"},
-      {name: "Bayesian Curl", cat: ["Arms", "Biceps"], equip: "Cable", type: "Muscle Build", setup: {arms: "Low", pulleys: "Low"}, steps: ["Face away", "Curl"], cue: "Long head"},
-      {name: "Reverse Grip Pushdown", cat: ["Arms", "Triceps"], equip: "Cable", type: "Muscle Build", setup: {arms: "Top", pulleys: "Top"}, steps: ["Palms up push"], cue: "Control"},
-      // CABLE LEGS
-      {name: "Cable Squat", cat: ["Legs"], equip: "Cable", type: "Strength", setup: {arms: "Low", pulleys: "Low"}, steps: ["Hold at shoulders", "Squat"], cue: "Chest up"},
-      {name: "Cable Pull-Through", cat: ["Legs", "Glutes"], equip: "Cable", type: "Strength", setup: {arms: "Low", pulleys: "Low"}, steps: ["Face away", "Hinge hips"], cue: "Push butt back"},
-      {name: "Cable RDL", cat: ["Legs", "Hamstrings"], equip: "Cable", type: "Strength", setup: {arms: "Low", pulleys: "Low"}, steps: ["Hinge hips"], cue: "Stretch hams"},
-      {name: "Cable Lunge", cat: ["Legs"], equip: "Cable", type: "Strength", setup: {arms: "Low", pulleys: "Low"}, steps: ["Hold handles", "Lunge"], cue: "Knee stability"},
-      {name: "Cable Kickback (Glute)", cat: ["Legs", "Glutes"], equip: "Cable", type: "Muscle Build", setup: {arms: "Low", pulleys: "Low"}, steps: ["Kick back"], cue: "Squeeze glute"},
-      {name: "Cable Abductor", cat: ["Legs", "Glutes"], equip: "Cable", type: "Mobility", setup: {arms: "Low", pulleys: "Low"}, steps: ["Leg out side"], cue: "Outer glute"},
-      {name: "Cable Adductor", cat: ["Legs"], equip: "Cable", type: "Mobility", setup: {arms: "Low", pulleys: "Low"}, steps: ["Leg across"], cue: "Inner thigh"},
-      {name: "Cable Calf Raise", cat: ["Legs", "Calves"], equip: "Cable", type: "Muscle Build", setup: {arms: "Low", pulleys: "Low"}, steps: ["Raise toes"], cue: "High squeeze"},
-      // CABLE CORE
-      {name: "Cable Crunch", cat: ["Core"], equip: "Cable", type: "Muscle Build", setup: {arms: "Top", pulleys: "Top"}, steps: ["Kneel", "Curl down"], cue: "Ribs to hips"},
-      {name: "Woodchopper (High to Low)", cat: ["Core"], equip: "Cable", type: "Mobility", setup: {arms: "Top", pulleys: "Top"}, steps: ["Rotate down"], cue: "Core twist"},
-      {name: "Woodchopper (Low to High)", cat: ["Core"], equip: "Cable", type: "Mobility", setup: {arms: "Low", pulleys: "Low"}, steps: ["Rotate up"], cue: "Core twist"},
-      {name: "Pallof Press", cat: ["Core"], equip: "Cable", type: "Strength", setup: {arms: "Mid", pulleys: "Mid"}, steps: ["Press out", "Hold"], cue: "Anti-rotation"},
-      {name: "Cable Side Bend", cat: ["Core"], equip: "Cable", type: "Mobility", setup: {arms: "Low", pulleys: "Low"}, steps: ["Lean side"], cue: "Obliques"},
-      // DUMBBELL
-      {name: "Dumbbell Bench Press", cat: ["Chest"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Press up"], cue: "Drive feet"},
-      {name: "Dumbbell Incline Press", cat: ["Chest"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Incline press"], cue: "Upper chest"},
-      {name: "Dumbbell Fly", cat: ["Chest"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Fly open"], cue: "Stretch"},
-      {name: "Dumbbell Shoulder Press", cat: ["Shoulders"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Press up"], cue: "Core tight"},
-      {name: "Arnold Press", cat: ["Shoulders"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Rotate and press"], cue: "Smooth rotation"},
-      {name: "Lateral Raise", cat: ["Shoulders"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Raise side"], cue: "Lead with elbows"},
-      {name: "Front Raise", cat: ["Shoulders"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Raise front"], cue: "Control"},
-      {name: "Dumbbell Row", cat: ["Back"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Row back"], cue: "Elbow back"},
-      {name: "Dumbbell Pullover", cat: ["Back"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Pull over"], cue: "Lats stretch"},
-      {name: "Goblet Squat", cat: ["Legs"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Hold chest", "Squat"], cue: "Deep"},
-      {name: "Dumbbell Lunge", cat: ["Legs"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Step lunge"], cue: "Knee tracking"},
-      {name: "Bulgarian Split Squat", cat: ["Legs"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Foot up", "Squat"], cue: "Painful but good"},
-      {name: "Romanian Deadlift (DB)", cat: ["Legs"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Hinge"], cue: "Back flat"},
-      {name: "Dumbbell Curl", cat: ["Arms", "Biceps"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Curl"], cue: "Squeeze"},
-      {name: "Hammer Curl", cat: ["Arms"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Neutral curl"], cue: "Forearms"},
-      {name: "Tricep Kickback", cat: ["Arms", "Triceps"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Kick back"], cue: "Lockout"},
-      {name: "Skull Crusher (DB)", cat: ["Arms", "Triceps"], equip: "Dumbbell", type: "Muscle Build", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Lower to head"], cue: "Elbows in"},
-      {name: "Farmers Walk", cat: ["Core", "Traps"], equip: "Dumbbell", type: "Strength", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Walk"], cue: "Tall posture"},
-      // BODYWEIGHT
-      {name: "Push-ups", cat: ["Chest"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Push floor"], cue: "Plank position"},
-      {name: "Pull-ups", cat: ["Back"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Pull up"], cue: "Chest to bar"},
-      {name: "Chin-ups", cat: ["Back"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Underhand pull"], cue: "Biceps"},
-      {name: "Dips", cat: ["Chest"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Dip down"], cue: "90 degrees"},
-      {name: "Bodyweight Squat", cat: ["Legs"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Squat"], cue: "Depth"},
-      {name: "Lunge (BW)", cat: ["Legs"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Lunge"], cue: "Balance"},
-      {name: "Glute Bridge", cat: ["Legs", "Glutes"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Hips up"], cue: "Squeeze"},
-      {name: "Plank", cat: ["Core"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Hold"], cue: "Tight core"},
-      {name: "Side Plank", cat: ["Core"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Hold side"], cue: "Hips high"},
-      {name: "Mountain Climbers", cat: ["Core"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Run"], cue: "Fast"},
-      {name: "Burpees", cat: ["Full Body"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Drop jump"], cue: "Explode"},
-      {name: "Hanging Leg Raise", cat: ["Core"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Legs up"], cue: "Control"},
-      {name: "Pike Push-up", cat: ["Shoulders"], equip: "Bodyweight", type: "Calisthenics", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Hips high push"], cue: "Shoulders"},
-      {name: "Cat-Cow", cat: ["Core"], equip: "Bodyweight", type: "Mobility", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Flex spine"], cue: "Breathe"},
-      {name: "Dead Bug", cat: ["Core"], equip: "Bodyweight", type: "Mobility", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Opposite limbs"], cue: "Flat back"},
-      {name: "Thoracic Extension", cat: ["Back"], equip: "Bodyweight", type: "Mobility", setup: {arms: "N/A", pulleys: "N/A"}, steps: ["Roll back"], cue: "Relax"}
-    ];
+        // ==================== CABLE CHEST (TORQUE F9) ====================
+        createEx("Cable Chest Press", ["Chest"], "Cable", "Strength", 
+            ["Set Arms to Wide (Pos 8-9). Pulleys at Chest Height.", "Grab handles and step forward into a split stance (one foot forward).", "Brace core and lean slightly forward."],
+            ["Press handles forward until arms are extended.", "Bring hands together at the center.", "Slowly return elbows to 45-degree angle."],
+            ["Don't flare elbows wide.", "Keep shoulders down (depressed).", "Don't lean bodyweight into the press."],
+            ["Constant tension on pecs.", "Reduced shoulder strain.", "Core stability."],
+            ["Pectoralis Major", "Triceps", "Front Delts"], {arms: "Wide (Pos 8-9)", pulleys: "Chest Height"}),
 
-    const internalFoodDB = [
-        {name:"Chicken Breast", c:165, p:31, f:3.6, ch:0}, 
-        {name:"Rice (Cup)", c:200, p:4, f:0.4, ch:44},
-        {name:"Egg", c:70, p:6, f:5, ch:0}, 
-        {name:"Whey Scoop", c:120, p:24, f:1, ch:3},
-        {name:"Banana", c:105, p:1, f:0, ch:27}, 
-        {name:"Salmon", c:208, p:20, f:13, ch:0}
-    ];
+        createEx("Cable Chest Fly (High)", ["Chest"], "Cable", "Muscle Build",
+            ["Set Pulleys to Top. Arms Wide.", "Step forward, torso leaned 30° forward.", "Start with arms open wide."],
+            ["Fly hands down and together towards waist level.", "Keep elbows fixed with a slight bend.", "Squeeze inner chest hard."],
+            ["Imagine hugging a large tree.", "Don't turn it into a press.", "Control the negative."],
+            ["Targets lower/sternal chest.", "Great for definition."],
+            ["Lower Pectorals", "Anterior Delts"], {arms: "Wide", pulleys: "Top"}),
 
+        createEx("Cable Chest Fly (Low)", ["Chest"], "Cable", "Muscle Build",
+            ["Set Pulleys to Bottom. Arms Wide.", "Stand centrally, palms facing forward/up.", "Chest proud."],
+            ["Scoop hands up and together to eye level.", "Squeeze upper chest at top.", "Lower slowly."],
+            ["Don't swing body to lift.", "Keep elbows soft.", "Focus on the 'scoop'."],
+            ["Targets upper chest (Clavicular).", "Fills out upper pecs."],
+            ["Upper Pectorals", "Front Delts"], {arms: "Wide", pulleys: "Bottom"}),
+
+        createEx("Cable Chest Fly (Mid)", ["Chest"], "Cable", "Muscle Build",
+            ["Set Pulleys to Chest Height. Arms Wide.", "Step forward slightly.", "Palms facing each other."],
+            ["Bring hands together in front of chest.", "Squeeze hard for 1s.", "Open arms wide until chest stretches."],
+            ["Retract shoulder blades.", "Don't lock elbows."],
+            ["Overall chest mass.", "Peak contraction."],
+            ["Pectoralis Major"], {arms: "Wide", pulleys: "Chest Height"}),
+
+        createEx("Single Arm Cable Chest Press", ["Chest"], "Cable", "Strength",
+            ["Set Pulley to Chest Height.", "Split stance.", "Hold one handle at chest."],
+            ["Press straight out while keeping hips/shoulders square.", "Resist torso rotation.", "Return slowly."],
+            ["Fight the urge to twist.", "Engage core heavily."],
+            ["Fixes imbalances.", "Massive anti-rotation core work."],
+            ["Pecs", "Obliques"], {arms: "Standard", pulleys: "Chest Height"}),
+
+        createEx("Cable Crossover", ["Chest"], "Cable", "Muscle Build",
+            ["Set Pulleys Top. Arms Wide.", "Step forward aggressively.", "Lean torso forward."],
+            ["Bring hands down and across each other.", "Cross wrists at the bottom.", "Alternate top hand each rep."],
+            ["Focus on inner chest squeeze.", "Full range of motion."],
+            ["Inner chest definition.", "Maximum contraction."],
+            ["Inner Pectorals"], {arms: "Wide", pulleys: "Top"}),
+
+        createEx("Cable Pullover (Bench)", ["Chest", "Lats"], "Cable", "Muscle Build",
+            ["Set Pulley Mid. Arms Narrow.", "Place bench perpendicular to machine.", "Lie on back, head near machine."],
+            ["Grab bar/rope overhead.", "Pull straight arms over chest to hips.", "Slowly return overhead."],
+            ["Keep arms straight but not locked.", "Feel deep stretch in armpits."],
+            ["Expands ribcage.", "Hits both chest and lats."],
+            ["Serratus", "Lats", "Pecs"], {arms: "Narrow", pulleys: "Mid"}),
+
+        // ==================== CABLE BACK (TORQUE F9) ====================
+        createEx("Lat Pulldown (Standing)", ["Back"], "Cable", "Strength",
+            ["Set Pulleys Top. Arms Narrow/Top.", "Kneel or squat down.", "Palms forward."],
+            ["Drive elbows down to hips.", "Squeeze lats at bottom.", "Full stretch at top."],
+            ["Think 'Elbows to pockets'.", "Keep chest proud.", "Don't round back."],
+            ["Back width.", "Vertical pull pattern."],
+            ["Lats", "Biceps"], {arms: "Narrow", pulleys: "Top"}),
+
+        createEx("Seated Cable Row", ["Back"], "Cable", "Strength",
+            ["Set Pulleys Low. Arms Narrow.", "Sit on floor/bench.", "Feet braced."],
+            ["Pull handles to stomach.", "Drive elbows back past torso.", "Squeeze shoulder blades."],
+            ["Keep spine neutral.", "Don't rock excessively."],
+            ["Back thickness.", "Posture correction."],
+            ["Rhomboids", "Traps", "Lats"], {arms: "Narrow", pulleys: "Low"}),
+
+        createEx("Face Pulls", ["Back", "Shoulders"], "Cable", "Mobility",
+            ["Set Pulley to Face Height. Rope.", "Thumbs facing back.", "Staggered stance."],
+            ["Pull rope to forehead.", "Externally rotate hands back.", "Squeeze rear delts."],
+            ["Don't shrug shoulders.", "Lead with wrists."],
+            ["Shoulder health.", "Rotator cuff strength."],
+            ["Rear Delts", "Rotator Cuff"], {arms: "Narrow", pulleys: "Face Height"}),
+
+        createEx("Straight Arm Pulldown", ["Back"], "Cable", "Muscle Build",
+            ["Set Pulleys Top. Arms Top.", "Hinge hips slightly.", "Arms straight out."],
+            ["Push bar/handles down to thighs.", "Keep arms straight.", "Squeeze lats."],
+            ["Don't use triceps to push.", "Initiate with armpits."],
+            ["Lat isolation.", "Pre-exhaust."],
+            ["Latissimus Dorsi"], {arms: "Top", pulleys: "Top"}),
+
+        createEx("Single Arm Cable Row", ["Back"], "Cable", "Strength",
+            ["Set Pulley Waist Height. Arms Standard.", "Split stance.", "Reach forward."],
+            ["Row elbow back.", "Allow torso to rotate slightly forward on stretch.", "Rotate back on pull."],
+            ["Deep stretch.", "Hard contraction."],
+            ["Unilateral back growth.", "Core integration."],
+            ["Lats", "Obliques"], {arms: "Standard", pulleys: "Waist Height"}),
+
+        createEx("Cable Shrugs", ["Back", "Traps"], "Cable", "Muscle Build",
+            ["Set Pulleys Low. Arms Low.", "Stand center.", "Hold handles."],
+            ["Shrug shoulders straight up to ears.", "Hold for 1s.", "Lower fully."],
+            ["Don't roll shoulders.", "Keep arms straight."],
+            ["Trap size.", "Neck strength."],
+            ["Trapezius"], {arms: "Low", pulleys: "Low"}),
+
+        createEx("Cable Rear Delt Fly", ["Back", "Shoulders"], "Cable", "Muscle Build",
+            ["Set Pulleys Eye Level. Arms Wide.", "Cross cables (Left hand holds Right cable).", "Stand tall."],
+            ["Pull arms apart horizontally.", "Squeeze rear shoulders.", "Control return."],
+            ["Keep arms straight.", "Don't use traps."],
+            ["3D Delts.", "Posture."],
+            ["Posterior Delts"], {arms: "Wide", pulleys: "Eye Level"}),
+
+        createEx("Cable Y-Raise", ["Back", "Shoulders"], "Cable", "Mobility",
+            ["Set Pulleys Low. Arms Low.", "Cross cables.", "Stand tall."],
+            ["Raise arms up and out into 'Y' shape.", "Squeeze lower traps.", "Lower slowly."],
+            ["Thumbs up.", "Don't arch back."],
+            ["Lower trap activation.", "Scapular health."],
+            ["Lower Traps", "Side Delts"], {arms: "Low", pulleys: "Low"}),
+
+        createEx("High Row (Rope)", ["Back"], "Cable", "Strength",
+            ["Set Pulleys Top. Arms Narrow.", "Rope attachment.", "Step back."],
+            ["Pull rope to neck/chin.", "Elbows high and wide.", "Squeeze upper back."],
+            ["Focus on upper back, not lats."],
+            ["Upper back thickness.", "Rear delts."],
+            ["Rhomboids", "Rear Delts"], {arms: "Narrow", pulleys: "Top"}),
+
+        // ==================== CABLE SHOULDERS ====================
+        createEx("Cable Overhead Press", ["Shoulders"], "Cable", "Strength",
+            ["Set Pulleys Low. Arms Wide.", "Hold handles at shoulders.", "Stand strong."],
+            ["Press straight up.", "Biceps by ears at top.", "Lower to ears."],
+            ["Core tight.", "Don't arch back."],
+            ["Shoulder mass.", "Constant tension."],
+            ["Anterior Delts", "Triceps"], {arms: "Wide", pulleys: "Low"}),
+
+        createEx("Cable Lateral Raise", ["Shoulders"], "Cable", "Muscle Build",
+            ["Set Pulleys Low. Arms Low.", "Cross cables.", "Stand center."],
+            ["Raise arms out to sides.", "Stop at shoulder height.", "Lower slowly."],
+            ["Lead with elbows.", "Pour the pitcher."],
+            ["Side delt width.", "Caped shoulders."],
+            ["Lateral Delts"], {arms: "Low", pulleys: "Low"}),
+
+        createEx("Cable Front Raise", ["Shoulders"], "Cable", "Muscle Build",
+            ["Set Pulleys Low. Arms Low.", "Face away from machine.", "Cable between legs."],
+            ["Raise straight arms to front.", "Stop at eye level.", "Lower."],
+            ["No swinging.", "Keep chest up."],
+            ["Front delt isolation."],
+            ["Anterior Delts"], {arms: "Low", pulleys: "Low"}),
+
+        createEx("Cable Upright Row", ["Shoulders", "Traps"], "Cable", "Muscle Build",
+            ["Set Pulleys Low. Arms Low.", "Bar or Handles.", "Stand close."],
+            ["Pull hands up body to chest.", "Elbows lead movement high.", "Lower."],
+            ["Don't go too heavy.", "Watch wrists."],
+            ["Side delts and Traps."],
+            ["Lateral Delts", "Traps"], {arms: "Low", pulleys: "Low"}),
+
+        createEx("Cable External Rotation", ["Shoulders", "Mobility"], "Cable", "Mobility",
+            ["Set Pulley Elbow Height.", "Stand sideways.", "Elbow pinned to side."],
+            ["Rotate hand away from body.", "Keep elbow glued to ribs.", "Return."],
+            ["Use light weight.", "Focus on cuff."],
+            ["Rotator cuff health.", "Prehab."],
+            ["Infraspinatus"], {arms: "Mid", pulleys: "Mid"}),
+
+        createEx("Cable Internal Rotation", ["Shoulders", "Mobility"], "Cable", "Mobility",
+            ["Set Pulley Elbow Height.", "Stand sideways.", "Elbow pinned."],
+            ["Rotate hand inward to stomach.", "Keep elbow glued.", "Return."],
+            ["Control the motion."],
+            ["Subscapularis strength."],
+            ["Subscapularis"], {arms: "Mid", pulleys: "Mid"}),
+
+        // ==================== CABLE ARMS ====================
+        createEx("Tricep Pushdown (Rope)", ["Arms", "Triceps"], "Cable", "Muscle Build",
+            ["Set Pulley Top.", "Elbows pinned to ribs.", "Hinge at elbow."],
+            ["Push down.", "Spread rope at bottom.", "Return to 90 deg."],
+            ["Lock elbows in place.", "Squeeze triceps."],
+            ["Lateral head focus."],
+            ["Triceps"], {arms: "Narrow", pulleys: "Top"}),
+
+        createEx("Tricep Pushdown (Bar)", ["Arms", "Triceps"], "Cable", "Muscle Build",
+            ["Set Pulley Top.", "Straight bar.", "Elbows pinned."],
+            ["Push straight down.", "Lockout.", "Control up."],
+            ["Go heavier than rope."],
+            ["Overall tricep mass."],
+            ["Triceps"], {arms: "Narrow", pulleys: "Top"}),
+
+        createEx("Overhead Cable Extension", ["Arms", "Triceps"], "Cable", "Muscle Build",
+            ["Set Pulley Mid/Top.", "Lean forward away from machine.", "Rope behind head."],
+            ["Extend arms forward/overhead.", "Keep elbows by ears.", "Stretch back."],
+            ["Deep stretch is key.", "Don't flare elbows."],
+            ["Long head emphasis.", "Arm size."],
+            ["Triceps (Long Head)"], {arms: "Mid", pulleys: "Mid"}),
+
+        createEx("Cable Kickback", ["Arms", "Triceps"], "Cable", "Muscle Build",
+            ["Set Pulley Low.", "Bent over.", "No attachment."],
+            ["Extend arm back.", "Squeeze hard.", "Bend elbow only."],
+            ["Don't swing shoulder."],
+            ["Peak contraction."],
+            ["Triceps"], {arms: "Low", pulleys: "Low"}),
+
+        createEx("Cable Bicep Curl", ["Arms", "Biceps"], "Cable", "Muscle Build",
+            ["Set Pulley Low.", "Bar or Handles.", "Stand tall."],
+            ["Curl up to chin.", "Squeeze.", "Lower."],
+            ["Keep elbows slightly forward."],
+            ["Constant tension curls."],
+            ["Biceps"], {arms: "Low", pulleys: "Low"}),
+
+        createEx("Cable Hammer Curl", ["Arms", "Biceps"], "Cable", "Muscle Build",
+            ["Set Pulley Low.", "Rope.", "Neutral grip."],
+            ["Curl up.", "Thumbs to shoulders.", "Lower."],
+            ["Forearm focus."],
+            ["Brachialis width."],
+            ["Brachialis", "Forearms"], {arms: "Low", pulleys: "Low"}),
+
+        createEx("Bayesian Curl", ["Arms", "Biceps"], "Cable", "Muscle Build",
+            ["Set Pulley Low. Face away.", "Arm extended behind torso.", "Walk forward."],
+            ["Curl forward while keeping elbow back.", "Deep stretch."],
+            ["Unique stretch angle."],
+            ["Long head growth."],
+            ["Biceps"], {arms: "Low", pulleys: "Low"}),
+
+        createEx("Reverse Grip Pushdown", ["Arms", "Triceps"], "Cable", "Muscle Build",
+            ["Set Pulley Top.", "Palms up (Supinated).", "Elbows pinned."],
+            ["Push down.", "Squeeze."],
+            ["Don't loose grip."],
+            ["Medial head focus."],
+            ["Triceps"], {arms: "Top", pulleys: "Top"}),
+
+        // ==================== CABLE LEGS ====================
+        createEx("Cable Squat", ["Legs"], "Cable", "Strength",
+            ["Set Pulleys Low. Arms Narrow.", "Hold handles at shoulders.", "Stance shoulder width."],
+            ["Squat deep.", "Drive up.", "Keep upright."],
+            ["Safer on back than barbell."],
+            ["Quad focus."],
+            ["Quads", "Glutes"], {arms: "Narrow", pulleys: "Low"}),
+
+        createEx("Cable Pull-Through", ["Legs", "Glutes"], "Cable", "Strength",
+            ["Set Pulley Low. Rope.", "Face away.", "Rope between legs."],
+            ["Hinge hips back.", "Stretch hams.", "Snap hips forward."],
+            ["Squeeze glutes at top.", "Don't pull with arms."],
+            ["Glute builder.", "Hinge pattern."],
+            ["Glutes", "Hamstrings"], {arms: "Narrow", pulleys: "Low"}),
+
+        createEx("Cable RDL", ["Legs", "Hamstrings"], "Cable", "Strength",
+            ["Set Pulleys Low.", "Face machine.", "Hold handles."],
+            ["Hinge hips back.", "Knees soft.", "Back flat."],
+            ["Feel hamstring stretch.", "Stand tall."],
+            ["Posterior chain."],
+            ["Hamstrings"], {arms: "Narrow", pulleys: "Low"}),
+
+        createEx("Cable Lunge", ["Legs"], "Cable", "Strength",
+            ["Set Pulleys Low.", "Hold handles.", "Step back."],
+            ["Drop back knee.", "Drive up.", "Chest up."],
+            ["Stability challenge."],
+            ["Unilateral leg strength."],
+            ["Quads", "Glutes"], {arms: "Low", pulleys: "Low"}),
+
+        createEx("Cable Kickback (Glute)", ["Legs", "Glutes"], "Cable", "Muscle Build",
+            ["Set Pulley Low. Ankle strap.", "Face machine.", "Lean forward."],
+            ["Kick straight back.", "Squeeze glute.", "Lower."],
+            ["Don't rotate hips."],
+            ["Glute isolation."],
+            ["Glute Maximus"], {arms: "Narrow", pulleys: "Low"}),
+
+        createEx("Cable Abductor", ["Legs", "Glutes"], "Cable", "Mobility",
+            ["Set Pulley Low. Ankle strap.", "Stand sideways.", "Leg furthest from machine."],
+            ["Kick leg out to side.", "Control return."],
+            ["Stabilize with other leg."],
+            ["Side glute.", "Hip health."],
+            ["Glute Medius"], {arms: "Low", pulleys: "Low"}),
+
+        createEx("Cable Adductor", ["Legs"], "Cable", "Mobility",
+            ["Set Pulley Low. Ankle strap.", "Stand sideways.", "Leg closest to machine."],
+            ["Pull leg across body.", "Control return."],
+            ["Balance key."],
+            ["Inner thigh."],
+            ["Adductors"], {arms: "Low", pulleys: "Low"}),
+
+        createEx("Cable Calf Raise", ["Legs", "Calves"], "Cable", "Muscle Build",
+            ["Set Pulleys Low.", "Stand on block/plate.", "Hold handles."],
+            ["Heels down.", "Drive onto toes.", "Squeeze."],
+            ["Full range."],
+            ["Calf size."],
+            ["Calves"], {arms: "Low", pulleys: "Low"}),
+
+        // ==================== CABLE CORE ====================
+        createEx("Cable Crunch", ["Core"], "Cable", "Muscle Build",
+            ["Set Pulley Top. Rope.", "Kneel.", "Hands at head."],
+            ["Curl spine down.", "Elbows to knees.", "Squeeze abs."],
+            ["Don't hinge hips.", "All abs."],
+            ["Weighted abs."],
+            ["Rectus Abdominis"], {arms: "Narrow", pulleys: "Top"}),
+
+        createEx("Woodchopper (High to Low)", ["Core"], "Cable", "Mobility",
+            ["Set Pulley Top.", "Stand sideways.", "Both hands on handle."],
+            ["Rotate down across body.", "Pivot back foot.", "Return."],
+            ["Explosive down, slow up."],
+            ["Oblique power."],
+            ["Obliques"], {arms: "Narrow", pulleys: "Top"}),
+
+        createEx("Woodchopper (Low to High)", ["Core"], "Cable", "Mobility",
+            ["Set Pulley Low.", "Stand sideways.", "Hands on handle."],
+            ["Rotate up across body.", "Pivot foot.", "Return."],
+            ["Full rotation."],
+            ["Functional core."],
+            ["Obliques"], {arms: "Narrow", pulleys: "Low"}),
+
+        createEx("Pallof Press", ["Core"], "Cable", "Strength",
+            ["Set Pulley Chest.", "Stand sideways.", "Handle at chest."],
+            ["Press straight out.", "Hold.", "Return."],
+            ["Resist rotation."],
+            ["Anti-rotation."],
+            ["Core Stabilizers"], {arms: "Narrow", pulleys: "Chest Height"}),
+
+        createEx("Cable Side Bend", ["Core"], "Cable", "Mobility",
+            ["Set Pulley Low.", "Stand sideways.", "One hand holds handle."],
+            ["Lean away from machine.", "Crunch side.", "Return."],
+            ["Oblique isolation."],
+            ["Waist strength."],
+            ["Obliques"], {arms: "Low", pulleys: "Low"}),
+
+        // ==================== DUMBBELLS ====================
+        createEx("Dumbbell Bench Press", ["Chest"], "Dumbbell", "Strength",
+            ["Lie on flat bench.", "DBs at chest.", "Feet flat."],
+            ["Press up to lockout.", "Lower to chest line.", "Elbows 45 deg."],
+            ["Drive through feet.", "Arch back slightly."],
+            ["Chest mass builder.", "Stabilizer recruitment."],
+            ["Pectoralis Major", "Triceps"]),
+
+        createEx("Dumbbell Incline Press", ["Chest"], "Dumbbell", "Strength",
+            ["Bench at 30-45 degrees.", "DBs at shoulders."],
+            ["Press up.", "Lower to upper chest."],
+            ["Don't flare elbows."],
+            ["Upper chest focus."],
+            ["Upper Pecs", "Front Delts"]),
+
+        createEx("Dumbbell Fly", ["Chest"], "Dumbbell", "Muscle Build",
+            ["Flat bench.", "Palms facing each other.", "Arms slightly bent."],
+            ["Lower wide.", "Stretch.", "Hug up."],
+            ["Don't go too deep.", "Squeeze at top."],
+            ["Chest stretch.", "Width."],
+            ["Pectoralis Major"]),
+
+        createEx("Dumbbell Shoulder Press", ["Shoulders"], "Dumbbell", "Strength",
+            ["Seated or standing.", "DBs at shoulders.", "Palms forward."],
+            ["Press overhead.", "Lockout.", "Lower to ears."],
+            ["Core tight.", "No leg drive."],
+            ["Shoulder mass."],
+            ["Deltoids"]),
+
+        createEx("Arnold Press", ["Shoulders"], "Dumbbell", "Strength",
+            ["Seated.", "Palms facing you at start.", "Elbows forward."],
+            ["Press up while rotating palms out.", "Palms forward at top.", "Reverse down."],
+            ["Smooth rotation."],
+            ["Hits all 3 delt heads."],
+            ["Deltoids"]),
+
+        createEx("Lateral Raise", ["Shoulders"], "Dumbbell", "Muscle Build",
+            ["Stand tall.", "DBs at sides.", "Slight elbow bend."],
+            ["Raise to side.", "Pinkies up.", "Stop at shoulder height."],
+            ["No swinging.", "Control down."],
+            ["Side delt width."],
+            ["Lateral Delts"]),
+
+        createEx("Front Raise", ["Shoulders"], "Dumbbell", "Muscle Build",
+            ["Stand tall.", "DBs at thighs."],
+            ["Raise to front.", "Eye level.", "Lower."],
+            ["Control."],
+            ["Front delt isolation."],
+            ["Anterior Delts"]),
+
+        createEx("Dumbbell Row", ["Back"], "Dumbbell", "Strength",
+            ["One knee on bench.", "Flat back.", "Support with hand."],
+            ["Row DB to hip.", "Elbow close.", "Lower."],
+            ["Don't rotate spine."],
+            ["Lat thickness."],
+            ["Lats", "Rhomboids"]),
+
+        createEx("Dumbbell Pullover", ["Back"], "Dumbbell", "Muscle Build",
+            ["Cross bench upper back.", "Hold one DB overhead."],
+            ["Lower behind head.", "Stretch.", "Pull over."],
+            ["Hips low."],
+            ["Serratus and Lats."],
+            ["Lats", "Serratus"]),
+
+        createEx("Goblet Squat", ["Legs"], "Dumbbell", "Strength",
+            ["Hold one DB at chest.", "Stance shoulder width."],
+            ["Squat deep.", "Elbows inside knees.", "Drive up."],
+            ["Chest up.", "Heels down."],
+            ["Leg size.", "Mobility."],
+            ["Quads", "Glutes"]),
+
+        createEx("Dumbbell Lunge", ["Legs"], "Dumbbell", "Strength",
+            ["Hold DBs at sides.", "Step forward."],
+            ["Drop back knee.", "Push back up."],
+            ["Torso upright."],
+            ["Unilateral legs."],
+            ["Quads", "Glutes"]),
+
+        createEx("Bulgarian Split Squat", ["Legs"], "Dumbbell", "Strength",
+            ["Rear foot on bench.", "Hop forward.", "DBs at sides."],
+            ["Squat down.", "Knee to floor.", "Drive up."],
+            ["Painful but effective."],
+            ["Glute/Quad builder."],
+            ["Quads", "Glutes"]),
+
+        createEx("Romanian Deadlift (DB)", ["Legs"], "Dumbbell", "Strength",
+            ["DBs in front of thighs.", "Feet hip width."],
+            ["Hinge hips back.", "DBs slide down legs.", "Stretch."],
+            ["Back flat.", "Squeeze glutes up."],
+            ["Hamstring mass."],
+            ["Hamstrings", "Glutes"]),
+
+        createEx("Dumbbell Curl", ["Arms", "Biceps"], "Dumbbell", "Muscle Build",
+            ["Stand tall.", "Palms up."],
+            ["Curl to shoulder.", "Squeeze.", "Lower."],
+            ["Elbows fixed."],
+            ["Bicep mass."],
+            ["Biceps"]),
+
+        createEx("Hammer Curl", ["Arms"], "Dumbbell", "Muscle Build",
+            ["Palms facing body."],
+            ["Curl up.", "Thumbs to shoulder.", "Lower."],
+            ["No swing."],
+            ["Forearm/Brachialis."],
+            ["Brachialis"]),
+
+        createEx("Tricep Kickback", ["Arms"], "Dumbbell", "Muscle Build",
+            ["Bent over.", "Elbow high."],
+            ["Extend arm back.", "Lockout.", "Bend."],
+            ["Don't drop elbow."],
+            ["Tricep detail."],
+            ["Triceps"]),
+
+        createEx("Skull Crusher (DB)", ["Arms"], "Dumbbell", "Muscle Build",
+            ["Lie on bench.", "Arms up.", "Neutral grip."],
+            ["Bend elbows.", "DBs to ears.", "Extend."],
+            ["Elbows in."],
+            ["Tricep mass."],
+            ["Triceps"]),
+
+        createEx("Farmers Walk", ["Core", "Traps"], "Dumbbell", "Strength",
+            ["Heavy DBs.", "Stand tall."],
+            ["Walk.", "No swaying.", "Grip tight."],
+            ["Shoulders back."],
+            ["Full body stability."],
+            ["Core", "Grip", "Traps"]),
+
+        // ==================== BODYWEIGHT ====================
+        createEx("Push-ups", ["Chest"], "Bodyweight", "Calisthenics",
+            ["Plank position.", "Hands under shoulders.", "Core tight."],
+            ["Lower chest to floor.", "Elbows 45 deg.", "Push up."],
+            ["No sagging hips."],
+            ["Chest endurance."],
+            ["Pecs", "Triceps", "Core"]),
+
+        createEx("Pull-ups", ["Back"], "Bodyweight", "Calisthenics",
+            ["Overhand grip.", "Hang."],
+            ["Pull chin over bar.", "Control down."],
+            ["No kipping."],
+            ["Back width."],
+            ["Lats", "Biceps"]),
+
+        createEx("Chin-ups", ["Back"], "Bodyweight", "Calisthenics",
+            ["Underhand grip.", "Hang."],
+            ["Pull chest to bar.", "Lower."],
+            ["Bicep focus."],
+            ["Arm size."],
+            ["Biceps", "Lats"]),
+
+        createEx("Dips", ["Chest", "Triceps"], "Bodyweight", "Calisthenics",
+            ["Parallel bars.", "Support weight."],
+            ["Lower until 90 deg.", "Push up."],
+            ["Lean forward for chest.", "Upright for triceps."],
+            ["Upper body squat."],
+            ["Pecs", "Triceps"]),
+
+        createEx("Bodyweight Squat", ["Legs"], "Bodyweight", "Calisthenics",
+            ["Shoulder width.", "Arms out."],
+            ["Squat deep.", "Knees out.", "Stand."],
+            ["Heels down."],
+            ["Leg endurance."],
+            ["Quads", "Glutes"]),
+
+        createEx("Lunge (BW)", ["Legs"], "Bodyweight", "Calisthenics",
+            ["Step forward."],
+            ["Drop knee.", "Push back."],
+            ["Torso up."],
+            ["Balance."],
+            ["Quads"]),
+
+        createEx("Glute Bridge", ["Legs", "Glutes"], "Bodyweight", "Calisthenics",
+            ["Lie on back.", "Knees bent."],
+            ["Drive hips up.", "Squeeze glutes.", "Lower."],
+            ["Don't arch back."],
+            ["Glute activation."],
+            ["Glutes"]),
+
+        createEx("Plank", ["Core"], "Bodyweight", "Calisthenics",
+            ["Forearms.", "Toes.", "Flat back."],
+            ["Hold.", "Squeeze glutes/abs."],
+            ["Don't sag."],
+            ["Core stability."],
+            ["Core"]),
+
+        createEx("Side Plank", ["Core"], "Bodyweight", "Calisthenics",
+            ["On side.", "Elbow under shoulder."],
+            ["Hips up.", "Hold."],
+            ["Straight line."],
+            ["Oblique stability."],
+            ["Obliques"]),
+
+        createEx("Mountain Climbers", ["Core"], "Bodyweight", "Calisthenics",
+            ["Pushup position."],
+            ["Run knees to chest.", "Alternating."],
+            ["Keep hips low."],
+            ["Cardio core."],
+            ["Core", "Cardio"]),
+
+        createEx("Burpees", ["Full Body"], "Bodyweight", "Calisthenics",
+            ["Stand.", "Drop to chest.", "Jump up."],
+            ["Explosive."],
+            ["Full ROM."],
+            ["Conditioning."],
+            ["Full Body"]),
+
+        createEx("Hanging Leg Raise", ["Core"], "Bodyweight", "Calisthenics",
+            ["Hang from bar."],
+            ["Lift legs to L shape.", "Lower slowly."],
+            ["No swinging."],
+            ["Lower abs."],
+            ["Abs"]),
+
+        createEx("Pike Push-up", ["Shoulders"], "Bodyweight", "Calisthenics",
+            ["Downward dog position.", "Hips high."],
+            ["Lower head to floor.", "Push back up."],
+            ["Vertical push."],
+            ["Shoulder strength."],
+            ["Deltoids"]),
+
+        createEx("Cat-Cow", ["Core"], "Bodyweight", "Mobility",
+            ["Hands and knees."],
+            ["Arch back up (Cat).", "Sag belly down (Cow)."],
+            ["Breathe."],
+            ["Spine health."],
+            ["Spine"]),
+
+        createEx("Dead Bug", ["Core"], "Bodyweight", "Mobility",
+            ["Lie on back.", "Arms/Legs up."],
+            ["Lower opposite arm/leg.", "Keep back flat.", "Return."],
+            ["Core control."],
+            ["Anti-extension."],
+            ["Core"]),
+
+        createEx("Thoracic Extension", ["Back"], "Bodyweight", "Mobility",
+            ["Foam roller on upper back.", "Hips down."],
+            ["Lean back over roller.", "Hands behind head."],
+            ["Open chest."],
+            ["Posture."],
+            ["Thoracic Spine"]),
+        // ==================== MOBILITY & WARMUP (DETAILED) ====================
+    createEx("World's Greatest Stretch", ["Full Body"], "Bodyweight", "Mobility", 
+        ["Start in a high plank position.", "Step left foot outside left hand.", "Keep back leg straight and strong."],
+        ["Rotate left arm up to ceiling, looking at hand.", "Bring elbow down toward floor inside foot.", "Switch sides."],
+        ["Move slowly and deliberately.", "Breathe deep into the tight spots."],
+        ["Opens hips, t-spine, and ankles.", "The ultimate warmup."],
+        ["Hips", "Thoracic Spine", "Hamstrings"]),
+
+    createEx("90/90 Hip Switch", ["Legs"], "Bodyweight", "Mobility", 
+        ["Sit on floor.", "Front leg bent 90° in front, back leg 90° to side.", "Torso upright."],
+        ["Rotate hips to switch leg positions to the other side.", "Keep heels driven into the floor.", "Try not to use hands for support."],
+        ["Stay tall through the spine.", "Move from the hips, not the lower back."],
+        ["Internal and external hip rotation.", "Unlocks tight hips."],
+        ["Glutes", "Hip Rotators"]),
+
+    createEx("Shoulder Dislocates", ["Shoulders"], "Bodyweight", "Mobility", 
+        ["Hold a broomstick or band with a very wide grip.", "Arms straight."],
+        ["Raise arms over head and behind back.", "Touch lower back/glutes.", "Return over head to front."],
+        ["Do not bend elbows.", "Shrug shoulders at the top if needed."],
+        ["Shoulder girdle mobility.", "Chest opener."],
+        ["Shoulders", "Pecs"]),
+
+    createEx("Wall Slides", ["Shoulders"], "Bodyweight", "Mobility", 
+        ["Stand with back against a wall.", "Feet 6 inches away.", "Press lower back, head, elbows, and wrists into wall."],
+        ["Slide arms up into a 'W' then 'Y' shape.", "Maintain contact with wall at all times.", "Slide back down."],
+        ["Don't let lower back arch.", "Tuck chin."],
+        ["Scapular control.", "Posture correction."],
+        ["Lower Traps", "External Rotators"]),
+
+    createEx("Deep Squat Hold", ["Legs"], "Bodyweight", "Mobility", 
+        ["Stand shoulder width.", "Hold a weight plate for counterbalance if needed."],
+        ["Squat as deep as anatomically possible.", "Keep heels flat.", "Chest up."],
+        ["Hold for 30-60 seconds.", "Use elbows to push knees out."],
+        ["Ankle mobility.", "Hip opening."],
+        ["Hips", "Ankles"]),
+
+    createEx("Couch Stretch", ["Legs"], "Bodyweight", "Mobility", 
+        ["Place knee against base of a wall/couch.", "Shin vertical up the wall.", "Other foot lunges forward."],
+        ["Squeeze glute of the back leg.", "Raise torso upright.", "Hold."],
+        ["Don't hyperextend lower back.", "Squeeze abs."],
+        ["Fixes tight hip flexors from sitting.", "Quad stretch."],
+        ["Hip Flexors", "Quads"]),
+
+    createEx("Bird Dog", ["Core"], "Bodyweight", "Mobility", 
+        ["Start on hands and knees (Tabletop).", "Neutral spine."],
+        ["Reach opposite arm and leg straight out.", "Hold for 3s.", "Switch sides."],
+        ["Imagine balancing a glass of water on your back.", "Don't rotate hips."],
+        ["Core stability.", "Anti-rotation."],
+        ["Core", "Glutes", "Shoulders"]),
+
+    // ==================== CALISTHENICS (ADVANCED) ====================
+    createEx("Pistol Squat", ["Legs"], "Bodyweight", "Strength", 
+        ["Stand on one leg.", "Extend other leg forward.", "Arms out for balance."],
+        ["Squat down on standing leg.", "Go as deep as possible.", "Drive back up."],
+        ["Keep heel planted.", "Use a box/bench for regression if needed."],
+        ["Mastery of leg strength.", "Balance."],
+        ["Quads", "Glutes", "Stabilizers"]),
+
+    createEx("Nordic Curl", ["Legs", "Hamstrings"], "Bodyweight", "Strength", 
+        ["Kneel on pad.", "Anchor feet under something heavy (or partner)."],
+        ["Lower torso forward slowly using hamstrings.", "Control the fall as long as possible.", "Catch yourself with hands."],
+        ["Push back up to start.", "Keep hips extended (no hinge)."],
+        ["Bulletproofs hamstrings.", "Prevents injury."],
+        ["Hamstrings"], {arms: "N/A", pulleys: "N/A"}),
+
+    createEx("Inverted Row", ["Back"], "Bodyweight", "Calisthenics", 
+        ["Set a bar at waist height.", "Lie under bar.", "Grab wide."],
+        ["Pull chest to bar.", "Keep body in straight plank line.", "Lower slow."],
+        ["Squeeze shoulder blades together.", "Don't sag hips."],
+        ["Horizontal pull.", "Back thickness."],
+        ["Lats", "Rhomboids"]),
+
+    createEx("Handstand Hold", ["Shoulders"], "Bodyweight", "Calisthenics", 
+        ["Place hands near wall.", "Kick up so heels touch wall.", "Arms locked."],
+        ["Push floor away aggressively.", "Squeeze glutes and abs.", "Hold."],
+        ["Look between hands.", "Breathe."],
+        ["Overhead stability.", "Shoulder strength."],
+        ["Shoulders", "Triceps"]),
+
+    createEx("Calf Raise (BW)", ["Legs", "Calves"], "Bodyweight", "Calisthenics", 
+        ["Stand on edge of step.", "Heels hanging off.", "Hold wall for balance."],
+        ["Drive up onto toes.", "Hold squeeze.", "Lower into deep stretch."],
+        ["Full range of motion is key.", "Don't bounce."],
+        ["Ankle strength.", "Calf size."],
+        ["Gastrocnemius"]),
+
+    // ==================== DUMBBELL VARIATIONS ====================
+    createEx("Zottman Curl", ["Arms", "Biceps"], "Dumbbell", "Muscle Build", 
+        ["Stand tall with DBs.", "Palms up."],
+        ["Curl up with palms up.", "At the top, rotate palms DOWN.", "Lower slowly with palms down."],
+        ["Control the rotation.", "Elbows pinned."],
+        ["Hits biceps (up) and forearms (down)."],
+        ["Biceps", "Brachioradialis"]),
+
+    createEx("Concentration Curl", ["Arms", "Biceps"], "Dumbbell", "Muscle Build", 
+        ["Sit on bench.", "Legs wide.", "One DB in hand."],
+        ["Rest elbow against inner thigh.", "Curl weight up.", "Squeeze."],
+        ["Do not swing body.", "Pure isolation."],
+        ["Peak of the bicep."],
+        ["Biceps"]),
+
+    createEx("DB Floor Press", ["Chest"], "Dumbbell", "Strength", 
+        ["Lie on floor with DBs.", "Knees bent.", "Feet flat."],
+        ["Press DBs up.", "Lower until triceps touch floor.", "Pause."],
+        ["Don't bounce elbows off floor.", "Explode up."],
+        ["Lockout strength.", "Shoulder safe pressing."],
+        ["Triceps", "Pecs"]),
+
+    createEx("Renegade Row", ["Back", "Core"], "Dumbbell", "Strength", 
+        ["High plank position holding DBs.", "Feet wide for balance."],
+        ["Row one DB to hip while balancing on other.", "Alternate sides.", "Keep hips level."],
+        ["Fight hip rotation.", "Core tight."],
+        ["Full body tension.", "Anti-rotation."],
+        ["Lats", "Core", "Obliques"]),
+
+    createEx("DB Step Up", ["Legs"], "Dumbbell", "Strength", 
+        ["Stand in front of box/bench.", "Hold DBs at sides."],
+        ["Step one foot up.", "Drive through heel to stand.", "Control descent."],
+        ["Don't push off the bottom leg.", "Keep torso upright."],
+        ["Unilateral leg strength.", "Glute focus."],
+        ["Glutes", "Quads"]),
+
+    createEx("DB Shrugs", ["Back", "Traps"], "Dumbbell", "Muscle Build", 
+        ["Hold heavy DBs at sides.", "Stand tall."],
+        ["Shrug shoulders to ears.", "Hold 1s.", "Lower fully."],
+        ["Do not roll shoulders.", "Straight up and down."],
+        ["Upper trap size."],
+        ["Upper Traps"]),
+
+    createEx("Seated Calf Raise", ["Legs", "Calves"], "Dumbbell", "Muscle Build", 
+        ["Sit on bench.", "Place toes on block.", "Hold heavy DBs on knees."],
+        ["Raise heels high.", "Lower to stretch.", "High reps."],
+        ["Soleus focus.", "Width of calf."],
+        ["Soleus"]),
+
+    // ==================== CABLE VARIATIONS (TORQUE F9) ====================
+    createEx("Cable Front Squat", ["Legs"], "Cable", "Strength", 
+        ["Set Pulleys Low. Arms Narrow.", "Hold bar/handles at collarbone (rack).", "Elbows high."],
+        ["Squat deep.", "Keep torso vertical.", "Drive up."],
+        ["Core works hard to stay upright.", "Fight the pull forward."],
+        ["Quad dominance.", "Core strength."],
+        ["Quads", "Core"], {arms: "Narrow", pulleys: "Low"}),
+
+    createEx("Cable Zercher Squat", ["Legs"], "Cable", "Strength", 
+        ["Set Pulleys Low. Arms Narrow.", "Hold straight bar in crooks of elbows.", "Hands clasped."],
+        ["Squat down.", "Keep bar close to body.", "Drive up."],
+        ["Brutal on core and upper back.", "Bicep isometric."],
+        ["Upper back strength.", "Leg drive."],
+        ["Quads", "Upper Back"], {arms: "Narrow", pulleys: "Low"}),
+
+    createEx("Cable Donkey Kick", ["Legs", "Glutes"], "Cable", "Muscle Build", 
+        ["Set Pulley Low. Ankle strap.", "Hands on machine for support.", "Bent over."],
+        ["Keep knee bent 90°.", "Drive heel up to ceiling.", "Squeeze."],
+        ["Don't extend knee.", "Movement comes from hip."],
+        ["Upper glute focus.", "Shelf builder."],
+        ["Glute Maximus"], {arms: "Narrow", pulleys: "Low"}),
+
+    createEx("Standing Cable Row", ["Back"], "Cable", "Strength", 
+        ["Set Pulleys Mid. Arms Mid.", "Squat stance.", "Reach forward."],
+        ["Row handles to ribs.", "Stand up slightly as you pull (dynamic).", "Sink back on return."],
+        ["Use legs to stabilize.", "Fluid motion."],
+        ["Functional pulling.", "Athleticism."],
+        ["Lats", "Legs", "Core"], {arms: "Mid", pulleys: "Mid"}),
+
+    createEx("Lying Cable Curl", ["Arms", "Biceps"], "Cable", "Muscle Build", 
+        ["Set Pulley Low. Short Bar.", "Lie on back.", "Feet braced on machine."],
+        ["Curl bar to forehead/chin.", "Keep elbows fixed.", "Lower."],
+        ["Strict isolation.", "No cheating."],
+        ["Bicep peaks.", "Form strictness."],
+        ["Biceps"], {arms: "Narrow", pulleys: "Low"}),
+
+    createEx("Cable French Press", ["Arms", "Triceps"], "Cable", "Muscle Build", 
+        ["Set Pulley Low. Rope/Bar.", "Bench/Kneel facing away.", "Arms overhead."],
+        ["Bend elbows to lower weight behind head.", "Extend to ceiling.", "Keep elbows close."],
+        ["Deep stretch.", "Long head focus."],
+        ["Tricep size.", "Overhead strength."],
+        ["Triceps (Long Head)"], {arms: "Narrow", pulleys: "Low"}),
+
+    createEx("Cable Hip Abduction (Standing)", ["Legs"], "Cable", "Mobility", 
+        ["Set Pulley Low. Ankle strap.", "Stand sideways.", "Outer leg attached."],
+        ["Lift leg out to side.", "Keep toes forward.", "Return."],
+        ["Don't lean away.", "Use glute medius."],
+        ["Hip stability.", "Glute shape."],
+        ["Glute Medius"], {arms: "Low", pulleys: "Low"}),
+
+    createEx("Cable Hip Adduction (Standing)", ["Legs"], "Cable", "Mobility", 
+        ["Set Pulley Low. Ankle strap.", "Stand sideways.", "Inner leg attached."],
+        ["Pull leg across body.", "Squeeze inner thigh.", "Return."],
+        ["Balance on outer leg."],
+        ["Adductor strength.", "Injury prevention."],
+        ["Adductors"], {arms: "Low", pulleys: "Low"}),
+
+    createEx("Cable Wrist Curl", ["Arms"], "Cable", "Muscle Build", 
+        ["Set Pulley Low. Short bar.", "Sit on bench/floor.", "Forearms on knees."],
+        ["Curl wrists up.", "Squeeze.", "Lower."],
+        ["Range of motion is small."],
+        ["Forearm size.", "Grip."],
+    ];
     // --- INIT ---
     window.onload = async () => {
         try {
@@ -451,7 +1106,85 @@
         gifOverrides = JSON.parse(localStorage.getItem('nimbleGifOverrides')) || {};
     }
 
-    // --- FOOD ENGINE (RELAXED) ---
+    // --- GUIDE MODAL (ENCYCLOPEDIA) ---
+    function openGuideModal(exName) {
+        const ex = allExercises.find(e => e.name === exName);
+        if(!ex) return;
+        currentGuideExercise = exName;
+        document.getElementById('guide-title').innerText = ex.name;
+        
+        // F9 Setup
+        if (ex.equip === 'Cable') {
+            document.getElementById('f9-setup-section').style.display = 'block';
+            document.getElementById('guide-arms').innerText = ex.setup.arms;
+            document.getElementById('guide-pulleys').innerText = ex.setup.pulleys;
+        } else {
+            document.getElementById('f9-setup-section').style.display = 'none';
+        }
+
+        // Accordion Content
+        const fillList = (id, arr) => {
+            const el = document.getElementById(id);
+            el.innerHTML = "";
+            if(!arr) { el.innerHTML = "No data available."; return; }
+            arr.forEach(txt => el.innerHTML += `<li>• ${txt}</li>`);
+        };
+        
+        fillList('guide-prep', ex.guide.prep);
+        fillList('guide-exec', ex.guide.exec);
+        fillList('guide-tips', ex.guide.tips);
+        fillList('guide-musc', ex.guide.muscles ? [...ex.guide.muscles, ...(ex.guide.benefits||[])] : ex.guide.benefits);
+
+        // Smart Viewer Logic
+        const url = gifOverrides[exName];
+        const img = document.getElementById('visual-content-img');
+        const iframe = document.getElementById('visual-content-iframe');
+        const err = document.getElementById('visual-error');
+        
+        img.style.display = 'none';
+        iframe.style.display = 'none';
+        err.style.display = 'block';
+
+        if (url) {
+            err.style.display = 'none';
+            if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                // YouTube Embed
+                let vidId = url.split('v=')[1] || url.split('/').pop();
+                const ampersandPosition = vidId.indexOf('&');
+                if(ampersandPosition != -1) vidId = vidId.substring(0, ampersandPosition);
+                iframe.src = `https://www.youtube.com/embed/${vidId}?rel=0&modestbranding=1&autohide=1&showinfo=0&controls=1`;
+                iframe.style.display = 'block';
+            } else {
+                // Image/GIF
+                img.src = url;
+                img.style.display = 'block';
+            }
+        }
+
+        document.getElementById('guide-modal').classList.remove('hidden');
+        document.getElementById('guide-modal').style.display = 'block';
+    }
+
+    function saveGuideGif() {
+        const url = document.getElementById('guide-gif-input').value.trim();
+        if(!url) return;
+        
+        gifOverrides[currentGuideExercise] = url;
+        localStorage.setItem('nimbleGifOverrides', JSON.stringify(gifOverrides));
+        sendToCloud('gif', {name: currentGuideExercise, url: url});
+        
+        alert("Media Saved!");
+        openGuideModal(currentGuideExercise);
+    }
+
+    function closeGuideModal() {
+        document.getElementById('guide-modal').classList.add('hidden');
+        document.getElementById('guide-modal').style.display = 'none';
+        // Stop video
+        document.getElementById('visual-content-iframe').src = "";
+    }
+
+    // --- FOOD ENGINE ---
     function setSearchSource(src) {
         searchSource = src;
         document.getElementById('src-usda').classList.toggle('active', src === 'usda');
@@ -462,42 +1195,25 @@
         const query = document.getElementById('food-search').value;
         const resDiv = document.getElementById('search-results');
         resDiv.innerHTML = 'Searching...';
-        
         let results = [];
-        
         try {
             if (searchSource === 'usda') {
                 const req = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=10&api_key=${apiKey}`);
                 const data = await req.json();
-                if(data.foods) {
-                    data.foods.forEach(f => {
-                        const getNut = (id) => (f.foodNutrients.find(x => x.nutrientId === id) || {}).value || 0;
-                        results.push({ name: f.description, c: getNut(208), p: getNut(203), f: getNut(204), ch: getNut(205) });
-                    });
-                }
+                if(data.foods) data.foods.forEach(f => {
+                    const getNut = (id) => (f.foodNutrients.find(x => x.nutrientId === id) || {}).value || 0;
+                    results.push({ name: f.description, c: getNut(208), p: getNut(203), f: getNut(204), ch: getNut(205) });
+                });
             } else {
                 const req = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${query}&search_simple=1&action=process&json=1&page_size=10`);
                 const data = await req.json();
-                if(data.products) {
-                    data.products.forEach(p => {
-                        results.push({
-                            name: p.product_name,
-                            c: p.nutriments['energy-kcal_100g'] || 0,
-                            p: p.nutriments.proteins_100g || 0,
-                            f: p.nutriments.fat_100g || 0,
-                            ch: p.nutriments.carbohydrates_100g || 0
-                        });
-                    });
-                }
+                if(data.products) data.products.forEach(p => {
+                    results.push({ name: p.product_name, c: p.nutriments['energy-kcal_100g']||0, p: p.nutriments.proteins_100g||0, f: p.nutriments.fat_100g||0, ch: p.nutriments.carbohydrates_100g||0 });
+                });
             }
         } catch(e) { console.log(e); }
-        
-        // Always show fallback
-        if (results.length === 0) results = [...internalFoodDB.filter(f => f.name.toLowerCase().includes(query.toLowerCase()))];
-        
+        if (results.length === 0) results = [{name: "Manual Entry (Edit me)", c:0, p:0}];
         resDiv.innerHTML = '';
-        if (results.length === 0) resDiv.innerHTML = "No results found from API.";
-        
         results.forEach(f => {
             const div = document.createElement('div');
             div.className = 'food-item';
@@ -532,32 +1248,17 @@
     function confirmAddFood() {
         if (!pendingFood) return;
         const qty = parseFloat(document.getElementById('food-qty').value) || 1;
-        
-        const log = { 
-            date: new Date().toLocaleDateString(), 
-            meal: selectedMeal, 
-            name: pendingFood.name,
-            c: pendingFood.c * qty,
-            p: pendingFood.p * qty,
-            f: pendingFood.f * qty,
-            ch: pendingFood.ch * qty
-        };
-        
+        const log = { date: new Date().toLocaleDateString(), meal: selectedMeal, name: pendingFood.name, c: pendingFood.c * qty, p: pendingFood.p * qty, f: pendingFood.f * qty, ch: pendingFood.ch * qty };
         let cl = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
         cl.push(log);
         localStorage.setItem('nimbleNutrition', JSON.stringify(cl));
         sendToCloud('nutrition', log);
-        
         closeFoodModal();
         renderMealLog();
         updateMacrosUI();
     }
     
-    function closeFoodModal() {
-        document.getElementById('food-modal').classList.add('hidden');
-        document.getElementById('food-modal').style.display = 'none';
-        pendingFood = null;
-    }
+    function closeFoodModal() { document.getElementById('food-modal').classList.add('hidden'); document.getElementById('food-modal').style.display = 'none'; pendingFood = null; }
 
     function renderMealLog() {
         const container = document.getElementById('meal-container');
@@ -565,68 +1266,42 @@
         const today = new Date().toLocaleDateString();
         const logs = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
         const todaysLogs = logs.filter(l => l.date === today);
-        
-        let grandTotal = 0;
-        let grandPro = 0;
-
+        let grandTotal = 0; let grandPro = 0;
         ['Breakfast', 'Lunch', 'Dinner', 'Snacks'].forEach(meal => {
             const items = todaysLogs.filter(l => l.meal === meal);
             const subtotal = items.reduce((sum, i) => sum + (i.c || 0), 0);
-            grandTotal += subtotal;
-            items.forEach(i => grandPro += (i.p || 0));
-            
-            let html = `<div class="meal-section">
-                <div class="meal-header"><span>${meal}</span> <span>${Math.round(subtotal)} cal</span></div>`;
-            items.forEach(i => {
-                html += `<div class="food-item"><span>${i.name}</span> <small>${Math.round(i.c)}</small></div>`;
-            });
+            grandTotal += subtotal; items.forEach(i => grandPro += (i.p || 0));
+            let html = `<div class="meal-section"><div class="meal-header"><span>${meal}</span> <span>${Math.round(subtotal)} cal</span></div>`;
+            items.forEach(i => { html += `<div class="food-item"><span>${i.name}</span> <small>${Math.round(i.c)}</small></div>`; });
             html += `</div>`;
             container.innerHTML += html;
         });
-        
         document.getElementById('disp-cals').innerText = Math.round(grandTotal);
         document.getElementById('disp-pro').innerText = Math.round(grandPro);
         document.getElementById('bar-cals').style.width = Math.min(100, grandTotal/25) + '%';
         document.getElementById('bar-pro').style.width = Math.min(100, grandPro/2) + '%';
     }
 
-    // --- READINESS & WORKOUT LOGIC ---
+    // --- STANDARD LOGIC ---
     function handleReadinessLog() {
         const g = document.getElementById('garmin-score').value;
         let score = g ? parseInt(g) : Math.round((parseInt(document.getElementById('val-sleep').value)*10 + parseInt(document.getElementById('val-mood').value)*10 + (10-parseInt(document.getElementById('val-sore').value))*10)/3);
         saveReadinessData(score);
-        if (score < 40) {
-            showReadinessModal("Recovery Mode", "⚠️ Low Readiness", "Your body needs rest. Modify intensity?");
-        } else if (score < 70) {
-            showReadinessModal("Maintenance", "⚡ Moderate Readiness", "Good to go, but maybe not a PR day.");
-        } else {
-            alert("🚀 Prime Condition! Go crush it.");
-            switchTab('coach');
-        }
+        if (score < 40) showReadinessModal("Recovery Mode", "⚠️ Low Readiness", "Your body needs rest. Modify intensity?");
+        else if (score < 70) showReadinessModal("Maintenance", "⚡ Moderate Readiness", "Good to go, but maybe not a PR day.");
+        else { alert("🚀 Prime Condition! Go crush it."); switchTab('coach'); }
     }
-
     function showReadinessModal(title, icon, desc) {
         document.getElementById('readiness-title').innerText = title;
         document.getElementById('readiness-desc').innerText = desc;
         document.getElementById('readiness-modal').classList.remove('hidden');
         document.getElementById('readiness-modal').style.display = 'flex';
     }
-
     function applyReadinessStrategy(strategy) {
-        if (strategy === 'modify') {
-            modifyVolume = true; 
-            alert("📉 Weights will be reduced by 20% today.");
-        } else {
-            modifyVolume = false;
-        }
-        closeReadinessModal();
-        switchTab('coach');
+        if (strategy === 'modify') { modifyVolume = true; alert("📉 Weights will be reduced by 20% today."); } else { modifyVolume = false; }
+        closeReadinessModal(); switchTab('coach');
     }
-
-    function closeReadinessModal() {
-        document.getElementById('readiness-modal').classList.add('hidden');
-        document.getElementById('readiness-modal').style.display = 'none';
-    }
+    function closeReadinessModal() { document.getElementById('readiness-modal').classList.add('hidden'); document.getElementById('readiness-modal').style.display = 'none'; }
 
     function loadTemplate(type) {
         let filter = [];
@@ -638,150 +1313,50 @@
         if(type==='core') filter = ['Core','Mobility'];
         generateWorkoutByFilter(e => e.cat.some(c => filter.includes(c)));
     }
-
     function generateRandomWorkout() {
         const shuffled = [...allExercises].sort(() => 0.5 - Math.random());
         activeRoutine = shuffled.slice(0, 6);
-        renderWorkout(activeRoutine);
-        showWorkoutScreen();
+        renderWorkout(activeRoutine); showWorkoutScreen();
     }
-
     function generateWorkoutByFilter(filterFn) {
         const pool = allExercises.filter(filterFn);
-        if(pool.length === 0) return alert("No exercises found for criteria.");
+        if(pool.length === 0) return alert("No exercises found.");
         activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
-        renderWorkout(activeRoutine);
-        showWorkoutScreen();
+        renderWorkout(activeRoutine); showWorkoutScreen();
     }
-
     function showWorkoutScreen() {
-        document.getElementById('setup-panel').classList.add('hidden');
-        document.getElementById('setup-panel').style.display = 'none';
-        document.getElementById('active-workout').classList.remove('hidden');
-        document.getElementById('active-workout').style.display = 'block';
+        document.getElementById('setup-panel').classList.add('hidden'); document.getElementById('setup-panel').style.display = 'none';
+        document.getElementById('active-workout').classList.remove('hidden'); document.getElementById('active-workout').style.display = 'block';
     }
-
     function renderWorkout(exercises) {
-        const list = document.getElementById('workout-list');
-        list.innerHTML = '';
+        const list = document.getElementById('workout-list'); list.innerHTML = '';
         const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-
         exercises.forEach((ex, i) => {
             const lastLog = history.filter(h => h.name === ex.name).sort((a,b) => new Date(b.date) - new Date(a.date))[0];
-            let suggestion = "New Exercise";
-            let val = "";
+            let suggestion = "New Exercise"; let val = "";
             if (lastLog) {
                 let targetWeight = lastLog.weight;
                 if (modifyVolume) targetWeight = Math.round(targetWeight * 0.8);
-                suggestion = `Beat: ${targetWeight}${state.unit} x ${lastLog.reps}`;
-                val = targetWeight;
+                suggestion = `Beat: ${targetWeight}${state.unit} x ${lastLog.reps}`; val = targetWeight;
             }
-
             const div = document.createElement('div');
             div.className = `card exercise-card ${ex.type}`;
-            div.innerHTML = `
-                <div class="exercise-header">
-                    <strong>${ex.name}</strong> 
-                    <div style="display:flex; gap:5px;">
-                        <span class="btn-guide" onclick="openGuideModal('${ex.name}')">📘 Guide</span>
-                        <div class="mic-btn" onclick="startVoiceLog(this, ${i})">🎤</div>
-                    </div>
-                </div>
-                <div class="suggestion-text">💡 ${suggestion}</div>
-                <div class="row" style="margin-top:10px;">
-                    <div style="flex:1"><input type="number" id="w-${i}" value="${val}" placeholder="Wt"></div>
-                    <div style="flex:1"><input type="number" id="r-${i}" placeholder="Reps"></div>
-                </div>
-                <button type="button" class="btn btn-action" style="margin-top:10px; padding:5px;" onclick="logSet('${ex.name}', ${i})">✅ Log Set</button>
-            `;
+            div.innerHTML = `<div class="exercise-header"><strong>${ex.name}</strong><div style="display:flex; gap:5px;"><span class="btn-guide" onclick="openGuideModal('${ex.name}')">📘 Guide</span><div class="mic-btn" onclick="startVoiceLog(this, ${i})">🎤</div></div></div><div class="suggestion-text">💡 ${suggestion}</div><div class="row" style="margin-top:10px;"><div style="flex:1"><input type="number" id="w-${i}" value="${val}" placeholder="Wt"></div><div style="flex:1"><input type="number" id="r-${i}" placeholder="Reps"></div></div><button type="button" class="btn btn-action" style="margin-top:10px; padding:5px;" onclick="logSet('${ex.name}', ${i})">✅ Log Set</button>`;
             list.appendChild(div);
         });
     }
-
-    function openGuideModal(exName) {
-        const ex = allExercises.find(e => e.name === exName);
-        if(!ex) return;
-        currentGuideExercise = exName;
-        document.getElementById('guide-title').innerText = ex.name;
-        document.getElementById('guide-cue').innerText = ex.cue || "Focus on form.";
-        
-        // Setup Logic
-        if (ex.equip === 'Cable') {
-            document.getElementById('f9-setup-section').style.display = 'block';
-            document.getElementById('guide-arms').innerText = ex.setup ? ex.setup.arms : "N/A";
-            document.getElementById('guide-pulleys').innerText = ex.setup ? ex.setup.pulleys : "N/A";
-        } else {
-            document.getElementById('f9-setup-section').style.display = 'none';
-        }
-
-        const ul = document.getElementById('guide-steps');
-        ul.innerHTML = "";
-        if(ex.steps) ex.steps.forEach(s => ul.innerHTML += `<li>${s}</li>`);
-        
-        const gifUrl = gifOverrides[exName];
-        const img = document.getElementById('guide-gif');
-        const err = document.getElementById('visual-error');
-        
-        if (gifUrl) { 
-            img.src = gifUrl; 
-            img.style.display = 'block'; 
-            err.style.display = 'none';
-        } else { 
-            img.style.display = 'none'; 
-            err.style.display = 'block';
-        }
-        
-        // Update Search Button Link
-        const searchUrl = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(ex.name + ' exercise filetype:gif')}`;
-        document.getElementById('gif-search-btn').href = searchUrl;
-
-        document.getElementById('guide-modal').classList.remove('hidden');
-        document.getElementById('guide-modal').style.display = 'block';
-    }
-
-    function saveGuideGif() {
-        const input = document.getElementById('guide-gif-input');
-        const url = input.value.trim();
-        
-        // Basic Validation
-        const isImage = /\.(gif|jpg|jpeg|png|webp)($|\?)/i.test(url) || url.includes('media.giphy.com') || url.includes('tenor.com');
-        
-        if(!url || !isImage) {
-            input.style.border = "2px solid var(--danger)";
-            alert("⚠️ Invalid Link! URL must end in .gif, .jpg, or be a direct image link.");
-            return;
-        }
-        
-        input.style.border = "1px solid #444"; // Reset
-        gifOverrides[currentGuideExercise] = url;
-        localStorage.setItem('nimbleGifOverrides', JSON.stringify(gifOverrides));
-        sendToCloud('gif', {name: currentGuideExercise, url: url});
-        alert("GIF Saved!");
-        openGuideModal(currentGuideExercise);
-    }
-
-    function closeGuideModal() {
-        document.getElementById('guide-modal').classList.add('hidden');
-        document.getElementById('guide-modal').style.display = 'none';
-    }
-
     function logSet(name, idx) {
-        const w = document.getElementById(`w-${idx}`).value;
-        const r = document.getElementById(`r-${idx}`).value;
+        const w = document.getElementById(`w-${idx}`).value; const r = document.getElementById(`r-${idx}`).value;
         if(w && r) {
             const entry = { date: new Date().toISOString(), name: name, weight: w, reps: r, unit: state.unit };
-            let h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-            h.push(entry);
+            let h = JSON.parse(localStorage.getItem('nimbleHistory')) || []; h.push(entry);
             localStorage.setItem('nimbleHistory', JSON.stringify(h));
             sendToCloud("workout", entry);
             startTimer(90);
-            const btn = document.activeElement;
-            btn.innerText = "Saved!";
-            btn.style.backgroundColor = "var(--success)";
+            const btn = document.activeElement; btn.innerText = "Saved!"; btn.style.backgroundColor = "var(--success)";
         }
     }
 
-    // --- STANDARD UTILS ---
     function switchTab(id) {
         document.querySelectorAll('.container').forEach(d => d.classList.remove('active'));
         document.getElementById('view-' + id).classList.add('active');
@@ -790,88 +1365,26 @@
         if(id === 'food') { renderMealLog(); updateMacrosUI(); }
         if(id === 'progress') renderChart();
     }
-    
     function cancelWorkout() { if(confirm("Discard?")) { document.getElementById('active-workout').classList.add('hidden'); document.getElementById('active-workout').style.display='none'; document.getElementById('setup-panel').classList.remove('hidden'); document.getElementById('setup-panel').style.display='block'; } }
     function finishSession() { if(confirm("Save?")) { cancelWorkout(); alert("Saved!"); } }
     function factoryReset() { if(confirm("Reset?")) { localStorage.clear(); location.reload(); } }
-    
-    function startTimer(s) {
-        document.getElementById('timer-overlay').classList.remove('hidden');
-        document.getElementById('timer-overlay').style.display = 'flex';
-        document.getElementById('timer-display').innerText = s;
-        let t = s; clearInterval(timerInterval);
-        timerInterval = setInterval(()=>{ t--; document.getElementById('timer-display').innerText = t; if(t<=0) closeTimer(); }, 1000);
-    }
+    function startTimer(s) { document.getElementById('timer-overlay').classList.remove('hidden'); document.getElementById('timer-overlay').style.display = 'flex'; document.getElementById('timer-display').innerText = s; let t = s; clearInterval(timerInterval); timerInterval = setInterval(()=>{ t--; document.getElementById('timer-display').innerText = t; if(t<=0) closeTimer(); }, 1000); }
     function closeTimer() { document.getElementById('timer-overlay').classList.add('hidden'); document.getElementById('timer-overlay').style.display = 'none'; clearInterval(timerInterval); }
     function addTime(s) { startTimer(parseInt(document.getElementById('timer-display').innerText)+s); }
     function openTimerOverlay() { document.getElementById('timer-overlay').classList.remove('hidden'); document.getElementById('timer-overlay').style.display = 'flex'; }
-
     function openBuilder() { document.getElementById('builder-overlay').classList.remove('hidden'); document.getElementById('builder-overlay').style.display = 'block'; filterBuilderList(); }
     function closeBuilder() { document.getElementById('builder-overlay').classList.add('hidden'); document.getElementById('builder-overlay').style.display = 'none'; }
-    function toggleFilter(type, val, el) {
-        const index = activeFilters[type].indexOf(val);
-        if (index > -1) activeFilters[type].splice(index, 1); else activeFilters[type].push(val);
-        el.classList.toggle('active');
-        filterBuilderList();
-    }
-    function filterBuilderList() {
-        const q = document.getElementById('builder-search-inp').value.toLowerCase();
-        const list = document.getElementById('builder-list-content');
-        list.innerHTML = "";
-        const filtered = allExercises.filter(ex => {
-            const matchesSearch = ex.name.toLowerCase().includes(q);
-            const matchesMuscle = activeFilters.muscle.length === 0 || ex.cat.some(c => activeFilters.muscle.includes(c));
-            const matchesEquip = activeFilters.equip.length === 0 || activeFilters.equip.includes(ex.equip);
-            return matchesSearch && matchesMuscle && matchesEquip;
-        });
-        filtered.forEach(ex => {
-            const d = document.createElement('div');
-            d.className = 'food-item';
-            d.innerHTML = `<div><b>${ex.name}</b> <small style="color:#777">(${ex.equip})</small></div> <button type="button" class="btn-action" style="width:auto; padding:2px 8px;">+</button>`;
-            d.onclick = () => { activeRoutine.push(ex); renderWorkout(activeRoutine); closeBuilder(); showWorkoutScreen(); };
-            list.appendChild(d);
-        });
-    }
-
-    function saveReadinessData(score) {
-        const entry = { date: new Date().toISOString(), score: score };
-        localStorage.setItem('nimbleReadiness', JSON.stringify([entry]));
-        sendToCloud('readiness', entry);
-    }
-    function calcReadiness() {
-        const g = document.getElementById('garmin-score').value;
-        let score = g ? parseInt(g) : Math.round((parseInt(document.getElementById('val-sleep').value)*10 + parseInt(document.getElementById('val-mood').value)*10 + (10-parseInt(document.getElementById('val-sore').value))*10)/3);
-        document.getElementById('score-display').innerText = score + '%';
-        document.getElementById('score-display').style.color = score > 70 ? 'var(--success)' : 'var(--warn)';
-    }
-    
+    function toggleFilter(type, val, el) { const index = activeFilters[type].indexOf(val); if (index > -1) activeFilters[type].splice(index, 1); else activeFilters[type].push(val); el.classList.toggle('active'); filterBuilderList(); }
+    function filterBuilderList() { const q = document.getElementById('builder-search-inp').value.toLowerCase(); const list = document.getElementById('builder-list-content'); list.innerHTML = ""; const filtered = allExercises.filter(ex => { const matchesSearch = ex.name.toLowerCase().includes(q); const matchesMuscle = activeFilters.muscle.length === 0 || ex.cat.some(c => activeFilters.muscle.includes(c)); const matchesEquip = activeFilters.equip.length === 0 || activeFilters.equip.includes(ex.equip); return matchesSearch && matchesMuscle && matchesEquip; }); filtered.forEach(ex => { const d = document.createElement('div'); d.className = 'food-item'; d.innerHTML = `<div><b>${ex.name}</b> <small style="color:#777">(${ex.equip})</small></div> <button type="button" class="btn-action" style="width:auto; padding:2px 8px;">+</button>`; d.onclick = () => { activeRoutine.push(ex); renderWorkout(activeRoutine); closeBuilder(); showWorkoutScreen(); }; list.appendChild(d); }); }
+    function saveReadinessData(score) { const entry = { date: new Date().toISOString(), score: score }; localStorage.setItem('nimbleReadiness', JSON.stringify([entry])); sendToCloud('readiness', entry); }
+    function calcReadiness() { const g = document.getElementById('garmin-score').value; let score = g ? parseInt(g) : Math.round((parseInt(document.getElementById('val-sleep').value)*10 + parseInt(document.getElementById('val-mood').value)*10 + (10-parseInt(document.getElementById('val-sore').value))*10)/3); document.getElementById('score-display').innerText = score + '%'; document.getElementById('score-display').style.color = score > 70 ? 'var(--success)' : 'var(--warn)'; }
     function sendToCloud(type, data) { fetch(GOOGLE_SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: type, data: data }) }).catch(e=>console.log(e)); }
     function saveBodyStat() { const val = document.getElementById('body-weight').value; if(val) sendToCloud("wellness", {type:"weight", val: val}); alert("Logged"); }
     function toggleUnit() { state.unit = state.unit === 'lbs' ? 'kg' : 'lbs'; localStorage.setItem('nimbleUnit', state.unit); location.reload(); }
-    
-    function renderChart() {
-        const ctx = document.getElementById('progressChart').getContext('2d');
-        if(myChart) myChart.destroy();
-        myChart = new Chart(ctx, { type:'line', data:{labels:['Jan','Feb','Mar'], datasets:[{label:'Demo Data', data:[100,110,115], borderColor:'#BB86FC'}]} });
-    }
-    function exportData() {
-        const data = localStorage.getItem('nimbleHistory');
-        const blob = new Blob([data], {type: 'application/json'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = 'nimble_backup.json'; a.click();
-    }
+    function renderChart() { const ctx = document.getElementById('progressChart').getContext('2d'); if(myChart) myChart.destroy(); myChart = new Chart(ctx, { type:'line', data:{labels:['Jan','Feb','Mar'], datasets:[{label:'Demo Data', data:[100,110,115], borderColor:'#BB86FC'}]} }); }
+    function exportData() { const data = localStorage.getItem('nimbleHistory'); const blob = new Blob([data], {type: 'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'nimble_backup.json'; a.click(); }
     function startVoiceLog() { alert("Use Chrome for Voice"); }
-    function updateMacrosUI() {
-        const today = new Date().toLocaleDateString();
-        const logs = JSON.parse(localStorage.getItem('nimbleNutrition')) || [];
-        const t = logs.filter(l => l.date === today).reduce((acc, l) => ({ c: acc.c+(l.c||0), p: acc.p+(l.p||0), f: acc.f+(l.f||0), ch: acc.ch+(l.ch||0) }), {c:0, p:0, f:0, ch:0});
-        ['cals','pro','fat','carb'].forEach(k => {
-            const val = Math.round(t[k==='cals'?'c':(k==='pro'?'p':(k==='fat'?'f':'ch'))]);
-            document.getElementById('disp-'+k).innerText = val;
-            document.getElementById('bar-'+k).style.width = Math.min(100, val/20) + '%'; 
-        });
-    }
+    function updateMacrosUI() { const today = new Date().toLocaleDateString(); const logs = JSON.parse(localStorage.getItem('nimbleNutrition')) || []; const t = logs.filter(l => l.date === today).reduce((acc, l) => ({ c: acc.c+(l.c||0), p: acc.p+(l.p||0), f: acc.f+(l.f||0), ch: acc.ch+(l.ch||0) }), {c:0, p:0, f:0, ch:0}); ['cals','pro','fat','carb'].forEach(k => { const val = Math.round(t[k==='cals'?'c':(k==='pro'?'p':(k==='fat'?'f':'ch'))]); document.getElementById('disp-'+k).innerText = val; document.getElementById('bar-'+k).style.width = Math.min(100, val/20) + '%'; }); }
 </script>
 </body>
 </html>
