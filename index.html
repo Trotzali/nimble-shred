@@ -123,6 +123,13 @@
         <div class="top-bar"><h2>Workout Strategy</h2><button class="unit-toggle" onclick="toggleUnit()"><span id="unit-disp-2">LBS</span></button></div>
         <div class="card">
             <h3>Quick Start</h3>
+            
+            <div class="row" style="margin-bottom:10px; justify-content:space-between;">
+                <label style="color:#aaa;">⏱️ Duration</label>
+                <span id="time-val" style="color:var(--sec); font-weight:bold;">45m (6 Ex)</span>
+            </div>
+            <input type="range" id="slider-time" min="3" max="12" value="6" step="1" style="margin-bottom:20px;" oninput="updateTimeLabel(this.value)">
+
             <div class="chip-container">
                 <div class="chip" onclick="loadTemplate('push')">Push</div>
                 <div class="chip" onclick="loadTemplate('pull')">Pull</div>
@@ -130,10 +137,10 @@
                 <div class="chip" onclick="loadTemplate('full')">Full Body</div>
                 <div class="chip" onclick="loadTemplate('f9')">Torque F9 Only</div>
             </div>
-            <button type="button" class="btn btn-main" onclick="generateRandomWorkout()">🎲 Random F9 Workout</button>
+
+            <button type="button" class="btn btn-main" onclick="generateRandomWorkout()">🎲 Random Workout</button>
             <button type="button" class="btn btn-action" onclick="openBuilder()">🛠️ Build Custom</button>
         </div>
-    </div>
     <div id="active-workout" class="hidden">
         <div class="top-bar"><h3>Active Session</h3><button type="button" class="btn-danger" style="width:auto; padding:5px 10px;" onclick="cancelWorkout()">End</button></div>
         <div id="workout-list"></div>
@@ -1449,6 +1456,11 @@
     function addTime(s) { startTimer(parseInt(document.getElementById('timer-display').innerText)+s); }
     function openTimerOverlay() { document.getElementById('timer-overlay').classList.remove('hidden'); document.getElementById('timer-overlay').style.display = 'flex'; }
     function switchTab(id) { document.querySelectorAll('.container').forEach(d => d.classList.remove('active')); document.getElementById('view-' + id).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); document.getElementById('nav-' + id).classList.add('active'); if(id === 'food') { renderMealLog(); updateMacrosUI(); } if(id === 'progress') renderChart(); }
+   // --- UPDATED SLIDER LOGIC ---
+    function updateTimeLabel(val) {
+        document.getElementById('time-val').innerText = (val * 7) + "m (" + val + " Ex)";
+    }
+
     function loadTemplate(type) {
         let filter = [];
         if(type==='push') filter = ['Chest','Shoulders','Triceps'];
@@ -1459,9 +1471,27 @@
         if(type==='core') filter = ['Core','Mobility'];
         generateWorkoutByFilter(e => e.cat.some(c => filter.includes(c)));
     }
-    function generateRandomWorkout() { const shuffled = [...allExercises].sort(() => 0.5 - Math.random()); activeRoutine = shuffled.slice(0, 6); renderWorkout(activeRoutine); showWorkoutScreen(); }
-    function generateWorkoutByFilter(filterFn) { const pool = allExercises.filter(filterFn); if(pool.length === 0) return alert("No exercises found."); activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, 6); renderWorkout(activeRoutine); showWorkoutScreen(); }
-    function showWorkoutScreen() { document.getElementById('setup-panel').classList.add('hidden'); document.getElementById('setup-panel').style.display = 'none'; document.getElementById('active-workout').classList.remove('hidden'); document.getElementById('active-workout').style.display = 'block'; }
+
+    function generateRandomWorkout() {
+        // Read slider value (default to 6 if not found)
+        const count = parseInt(document.getElementById('slider-time').value) || 6;
+        const shuffled = [...allExercises].sort(() => 0.5 - Math.random());
+        activeRoutine = shuffled.slice(0, count);
+        renderWorkout(activeRoutine); 
+        showWorkoutScreen();
+    }
+
+    function generateWorkoutByFilter(filterFn) {
+        // Read slider value
+        const count = parseInt(document.getElementById('slider-time').value) || 6;
+        const pool = allExercises.filter(filterFn);
+        if(pool.length === 0) return alert("No exercises found.");
+        
+        // Shuffle and pick exactly 'count' exercises
+        activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, count);
+        renderWorkout(activeRoutine); 
+        showWorkoutScreen();
+    }    function showWorkoutScreen() { document.getElementById('setup-panel').classList.add('hidden'); document.getElementById('setup-panel').style.display = 'none'; document.getElementById('active-workout').classList.remove('hidden'); document.getElementById('active-workout').style.display = 'block'; }
     function cancelWorkout() { if(confirm("Discard?")) { document.getElementById('active-workout').classList.add('hidden'); document.getElementById('active-workout').style.display='none'; document.getElementById('setup-panel').classList.remove('hidden'); document.getElementById('setup-panel').style.display='block'; } }
     function finishSession() { if(confirm("Save?")) { cancelWorkout(); alert("Saved!"); } }
     function openBuilder() { document.getElementById('builder-overlay').classList.remove('hidden'); document.getElementById('builder-overlay').style.display = 'block'; filterBuilderList(); }
