@@ -1291,31 +1291,40 @@ function createEx(name, cat, equip, type, prep, exec, tips, benefits, muscles, s
             ["Abs"], {arms: "Narrow", pulleys: "Top"})
     ];
 
- // ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
 // LOAD THE APP (NO CLOUD SYNC ON STARTUP - FAST & NO HANG)
 // ─────────────────────────────────────────────────────────────
+function initApp() {
+    try {
+        safeLoadLocal();
+    } catch (e) {
+        console.error("Local load failed:", e);
+    }
+
+    const loader = document.getElementById('sync-loader');
+    if (loader) {
+        loader.style.display = 'none';
+        console.log("Loader hidden successfully");
+    } else {
+        console.warn("Loader element not found yet — retrying...");
+        setTimeout(initApp, 200); // retry once after 200ms
+        return;
+    }
+
+    state.unit = localStorage.getItem('nimbleUnit') || 'lbs';
+    const disp1 = document.getElementById('unit-disp-1');
+    const disp2 = document.getElementById('unit-disp-2');
+    if (disp1) disp1.innerText = state.unit.toUpperCase();
+    if (disp2) disp2.innerText = state.unit.toUpperCase();
+
+    switchTab('readiness');
+
+    console.log("App fully initialized — welcome to Nimble Shred!");
+}
+
 window.onload = function() {
-    // Wait a tiny bit for DOM to be 100% ready (fixes most loader-stuck cases)
-    setTimeout(() => {
-        try {
-            safeLoadLocal();
-        } catch (e) {
-            console.error("Local load failed:", e);
-        }
-
-        // Force hide loader
-        const loader = document.getElementById('sync-loader');
-        if (loader) {
-            loader.style.display = 'none';
-        }
-
-        state.unit = localStorage.getItem('nimbleUnit') || 'lbs';
-        document.getElementById('unit-disp-1').innerText = state.unit.toUpperCase();
-        document.getElementById('unit-disp-2').innerText = state.unit.toUpperCase();
-        switchTab('readiness');
-
-        console.log("App fully loaded — loader hidden");
-    }, 100);  // 100ms delay — safe and tiny
+    // Give DOM a tiny moment + call init
+    setTimeout(initApp, 50);
 };
 
 function safeLoadLocal() {
