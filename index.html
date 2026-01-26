@@ -2141,55 +2141,6 @@ function renderMealLog() {
 // MASTER SYSTEM CORE (Features #8, #12, #13, #17, #20)
 // ─────────────────────────────────────────────────────────────
 
-// --- FEATURE #8 & #12: SMART LOGGING & VOICE COACH ---
-function logSet(name, idx) {
-    const w = parseFloat(document.getElementById(`w-${idx}`).value);
-    const r = parseInt(document.getElementById(`r-${idx}`).value);
-    
-    if (isNaN(w) || w <= 0 || isNaN(r) || r <= 0) return alert("Enter valid weight/reps");
-
-    const entry = { date: new Date().toISOString(), name, weight: w, reps: r, unit: state.unit };
-    
-    // Save Local
-    let h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-    h.push(entry);
-    localStorage.setItem('nimbleHistory', JSON.stringify(h));
-    
-    // Sync
-    sendToCloud("workout", entry);
-
-    // Visual Feedback
-    const btn = document.activeElement;
-    btn.innerText = "Saved!";
-    btn.style.backgroundColor = "var(--success)";
-    setTimeout(() => { btn.innerText = "✅ Log Set"; btn.style.backgroundColor = ""; }, 1500);
-
-    // Smart Timer Logic (Based on Exercise Type)
-    const ex = allExercises.find(e => e.name === name);
-    let restTime = 90; // Default
-    if (ex) {
-        if (ex.type === 'Strength') restTime = 120; // Heavy compound
-        if (ex.type === 'Mobility' || ex.type === 'Calisthenics') restTime = 45; // Nimble flow
-        if (ex.cat.includes('Cardio')) restTime = 30; // HIIT
-    }
-    
-    startTimer(restTime);
-
-    // Voice Coach
-    if ('speechSynthesis' in window) {
-        const msg = new SpeechSynthesisUtterance(`Set logged. Rest for ${restTime} seconds.`);
-        msg.rate = 1.1; 
-        window.speechSynthesis.speak(msg);
-    }
-}
-
-function queueOffline(type, data) {
-    let q = JSON.parse(localStorage.getItem('nimbleQueue')) || [];
-    q.push({ type, data, time: Date.now() });
-    localStorage.setItem('nimbleQueue', JSON.stringify(q));
-    // Alert deleted. It will now save silently in the background.
-    console.log("Silent offline save.");
-}
 
 // --- FEATURE #8: TIMER UTILS ---
 function startTimer(s) { 
@@ -2221,7 +2172,50 @@ function openTimerOverlay() {
     document.getElementById('timer-overlay').style.display = 'flex'; 
 }
 
-// --- FEATURE #13: OFFLINE SYNC QUEUE ---
+// --- SILENT SYSTEM CORE (No Popups) ---
+
+function logSet(name, idx) {
+    const w = parseFloat(document.getElementById(`w-${idx}`).value);
+    const r = parseInt(document.getElementById(`r-${idx}`).value);
+    
+    // 1. Silent Validation (Just stops if empty, no popup)
+    if (isNaN(w) || w <= 0 || isNaN(r) || r <= 0) return;
+
+    const entry = { date: new Date().toISOString(), name, weight: w, reps: r, unit: state.unit };
+    
+    // Save Local
+    let h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+    h.push(entry);
+    localStorage.setItem('nimbleHistory', JSON.stringify(h));
+    
+    // Sync (Silent)
+    sendToCloud("workout", entry);
+
+    // Visual Feedback Only (Button turns Green, no popup)
+    const btn = document.activeElement;
+    btn.innerText = "Saved!";
+    btn.style.backgroundColor = "var(--success)";
+    setTimeout(() => { btn.innerText = "✅ Log Set"; btn.style.backgroundColor = ""; }, 1500);
+
+    // Smart Timer Logic
+    const ex = allExercises.find(e => e.name === name);
+    let restTime = 90; 
+    if (ex) {
+        if (ex.type === 'Strength') restTime = 120;
+        if (ex.type === 'Mobility' || ex.type === 'Calisthenics') restTime = 45;
+        if (ex.cat.includes('Cardio')) restTime = 30;
+    }
+    
+    startTimer(restTime);
+
+    // Voice Coach (Optional)
+    if ('speechSynthesis' in window) {
+        const msg = new SpeechSynthesisUtterance(`Set logged. Rest for ${restTime} seconds.`);
+        msg.rate = 1.1; 
+        window.speechSynthesis.speak(msg);
+    }
+}
+
 function sendToCloud(type, data) {
     if (!navigator.onLine) {
         queueOffline(type, data);
@@ -2234,9 +2228,18 @@ function sendToCloud(type, data) {
     })
     .then(r => { if (!r.ok) throw new Error(); console.log('Synced'); processOfflineQueue(); })
     .catch(e => {
-        console.log('Sync failed, queuing.', e);
+        // Silently fail to offline queue
         queueOffline(type, data);
     });
+}
+
+function queueOffline(type, data) {
+    let q = JSON.parse(localStorage.getItem('nimbleQueue')) || [];
+    q.push({ type, data, time: Date.now() });
+    localStorage.setItem('nimbleQueue', JSON.stringify(q));
+    
+    // SILENT: No Alert here anymore
+    console.log("Saved offline (Silent)");
 }
 
 function queueOffline(type, data) {
