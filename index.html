@@ -1946,20 +1946,19 @@ function setSearchSource(src) {
 async function searchFood() {
     const query = document.getElementById('food-search').value;
     const resDiv = document.getElementById('search-results');
-    resDiv.innerHTML = '<div style="padding:10px; color:#aaa;">Searching USDA Database...</div>';
+    resDiv.innerHTML = '<div style="padding:10px; color:#aaa;">Calculating Average...</div>';
     let results = [];
     
     try {
         if (searchSource === 'usda') {
-            // FIX 1: We added "&dataType=Foundation,SR Legacy" to ignore branded junk
-            const req = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=20&dataType=Foundation,SR Legacy&api_key=${apiKey}`);
+            const req = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=25&dataType=Foundation,SR Legacy&api_key=${apiKey}`);
             const data = await req.json();
             
             if(data.foods) data.foods.forEach(f => {
                 const getNut = (...ids) => (f.foodNutrients.find(x => ids.includes(x.nutrientId)) || {}).value || 0;
                 results.push({ 
-                    name: f.description.replace(/, raw/gi, '').replace(/, cooked/gi, ''), // Clean up names
-                    desc: f.description, // Keep full name for checking
+                    name: f.description, 
+                    desc: f.description, 
                     c: getNut(1008, 208, 2047), 
                     p: getNut(1003, 203),       
                     f: getNut(1004, 204),       
@@ -1983,22 +1982,54 @@ async function searchFood() {
         }
     } catch(e) { console.log(e); }
     
-    if (results.length === 0) results = [{name: "Manual Entry (Tap to Edit)", c:0, p:0, f:0, ch:0}];
+    // Filter out items with 0 calories to prevent skewing the average down
+    let validResults = results.filter(r => r.c > 5);
+
+    if (validResults.length === 0) {
+        resDiv.innerHTML = '<div style="padding:10px;">No results found.</div>';
+        return;
+    }
+    
+    // --- THE MAGIC: CALCULATE AVERAGE ---
+    if (validResults.length > 1) {
+        // Take top 10 relevant results
+        const subset = validResults.slice(0, 10);
+        const count = subset.length;
+        
+        const avg = {
+            name: `Average: "${query}"`,
+            desc: `Composite of top ${count} results`,
+            c: subset.reduce((sum, item) => sum + item.c, 0) / count,
+            p: subset.reduce((sum, item) => sum + item.p, 0) / count,
+            f: subset.reduce((sum, item) => sum + item.f, 0) / count,
+            ch: subset.reduce((sum, item) => sum + item.ch, 0) / count,
+            isAverage: true // Flag for styling
+        };
+        
+        // Add the average as the VERY FIRST item
+        validResults.unshift(avg);
+    }
     
     resDiv.innerHTML = '';
     
-    // FIX 2: Sort results so high-protein items (real food) appear higher for generic searches
-    results.sort((a,b) => b.p - a.p);
-
-    results.forEach(f => {
+    validResults.forEach(f => {
         const div = document.createElement('div');
         div.className = 'food-item';
         div.style.flexDirection = "column";
         div.style.alignItems = "flex-start";
         
-        // FIX 3: Display Macros (Pro/Carb/Fat) in the list so you can choose the right one
+        // Special Styling for the Average Card
+        if (f.isAverage) {
+            div.style.background = "linear-gradient(45deg, #2c2c2c, #3a3a3a)";
+            div.style.border = "1px solid var(--gold)";
+            div.style.marginBottom = "10px";
+        }
+        
         div.innerHTML = `
-            <div style="font-weight:bold; color:#fff;">${f.desc}</div> 
+            <div style="font-weight:bold; color:#fff; display:flex; justify-content:space-between; width:100%;">
+                <span>${f.name}</span>
+                ${f.isAverage ? '<span style="color:var(--gold); font-size:0.8em;">⭐ QUICK ADD</span>' : ''}
+            </div> 
             <div style="font-size:0.8em; color:#aaa; display:flex; gap:10px; margin-top:2px;">
                 <span style="color:var(--sec);">⚡ ${Math.round(f.c)} cal</span>
                 <span style="color:var(--primary);">🥩 ${Math.round(f.p)}g</span>
@@ -2010,7 +2041,6 @@ async function searchFood() {
         resDiv.appendChild(div);
     });
 }
-
 function openFoodModal(item) { 
     pendingFood = item; 
     document.getElementById('food-modal-name').innerText = item.name; 
