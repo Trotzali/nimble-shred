@@ -174,10 +174,7 @@
         </div>
     </div>
     <div class="card">
-        <div class="source-switch">
-            <div id="src-usda" class="source-opt active" onclick="setSearchSource('usda')">USDA</div>
-            <div id="src-off" class="source-opt" onclick="setSearchSource('off')">OpenFoodFacts</div>
-        </div>
+    
         <div class="row"><input type="text" id="food-search" placeholder="Search Food..."><button class="btn-action" style="width:auto;" onclick="searchFood()">🔎</button></div>
         <div id="search-results" style="margin-top:10px; max-height:200px; overflow-y:auto;"></div>
     </div>
@@ -1946,79 +1943,102 @@ function setSearchSource(src) {
 async function searchFood() {
     const query = document.getElementById('food-search').value;
     const resDiv = document.getElementById('search-results');
-    resDiv.innerHTML = '<div style="padding:10px; color:#aaa;">Calculating Average...</div>';
-    let results = [];
+    resDiv.innerHTML = '<div style="padding:10px; color:#aaa;">Scanning Global & AU Databases...</div>';
+    
+    let combinedResults = [];
     
     try {
-        if (searchSource === 'usda') {
-            const req = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=25&dataType=Foundation,SR Legacy&api_key=${apiKey}`);
-            const data = await req.json();
-            
+        // 1. FIRE BOTH REQUESTS IN PARALLEL
+        const [usdaRes, offRes] = await Promise.allSettled([
+            // USDA: Best for generic foods (Chicken, Rice, Apple)
+            fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=20&dataType=Foundation,SR Legacy&api_key=${apiKey}`),
+            // OFF: Best for Barcodes & AU Brands (Coles, Woolies)
+            fetch(`https://au.openfoodfacts.org/cgi/search.pl?search_terms=${query}&search_simple=1&action=process&json=1&page_size=20`)
+        ]);
+
+        // 2. PROCESS USDA RESULTS
+        if (usdaRes.status === 'fulfilled') {
+            const data = await usdaRes.value.json();
             if(data.foods) data.foods.forEach(f => {
                 const getNut = (...ids) => (f.foodNutrients.find(x => ids.includes(x.nutrientId)) || {}).value || 0;
-                results.push({ 
-                    name: f.description, 
-                    desc: f.description, 
+                combinedResults.push({ 
+                    name: f.description.replace(/, raw/gi, '').replace(/, cooked/gi, ''), 
+                    desc: f.description, // Keep full desc for context
+                    source: 'USDA',      // Tag the source
                     c: getNut(1008, 208, 2047), 
                     p: getNut(1003, 203),       
                     f: getNut(1004, 204),       
                     ch: getNut(1005, 205)       
                 });
             });
-        } else {
-            // OpenFoodFacts Fallback
-            const req = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${query}&search_simple=1&action=process&json=1&page_size=10`);
-            const data = await req.json();
+        }
+
+        // 3. PROCESS OPENFOODFACTS RESULTS (AUSTRALIA PRIORITY)
+        if (offRes.status === 'fulfilled') {
+            const data = await offRes.value.json();
             if(data.products) data.products.forEach(p => {
-                results.push({ 
+                // OFF data can be messy, so we sanitize it
+                const c = p.nutriments['energy-kcal_100g'] || p.nutriments['energy-kcal_value'] || 
+                          (p.nutriments['energy-kj_100g'] ? p.nutriments['energy-kj_100g'] / 4.184 : 0);
+                
+                combinedResults.push({ 
                     name: p.product_name,
-                    desc: p.product_name, 
-                    c: p.nutriments['energy-kcal_100g'] || p.nutriments['energy-kcal_value'] || 0, 
+                    desc: p.product_name + (p.brands ? ` (${p.brands})` : ''), // Add Brand Name
+                    source: 'AU/Global',
+                    c: c || 0, 
                     p: p.nutriments.proteins_100g || 0, 
                     f: p.nutriments.fat_100g || 0, 
                     ch: p.nutriments.carbohydrates_100g || 0 
                 });
             });
         }
-    } catch(e) { console.log(e); }
+
+    } catch(e) { console.log("Search error", e); }
     
-    // Filter out items with 0 calories to prevent skewing the average down
-    let validResults = results.filter(r => r.c > 5);
+    // Filter out "Ghost" items (0 calories)
+    let validResults = combinedResults.filter(r => r.c > 5);
 
     if (validResults.length === 0) {
         resDiv.innerHTML = '<div style="padding:10px;">No results found.</div>';
         return;
     }
     
-    // --- THE MAGIC: CALCULATE AVERAGE ---
+    // 4. GENERATE THE SMART AVERAGE
+    // We take the top 15 results from both databases to create a "Composite"
     if (validResults.length > 1) {
-        // Take top 10 relevant results
-        const subset = validResults.slice(0, 10);
+        const subset = validResults.slice(0, 15);
         const count = subset.length;
         
         const avg = {
-            name: `Average: "${query}"`,
-            desc: `Composite of top ${count} results`,
+            name: `Smart Average: "${query}"`,
+            desc: `Composite of ${count} Global & AU sources`,
             c: subset.reduce((sum, item) => sum + item.c, 0) / count,
             p: subset.reduce((sum, item) => sum + item.p, 0) / count,
             f: subset.reduce((sum, item) => sum + item.f, 0) / count,
             ch: subset.reduce((sum, item) => sum + item.ch, 0) / count,
-            isAverage: true // Flag for styling
+            isAverage: true 
         };
-        
-        // Add the average as the VERY FIRST item
+        // Add Average to the top
         validResults.unshift(avg);
     }
     
     resDiv.innerHTML = '';
     
+    // 5. SORT: Average first, then High Protein items (Real Food)
+    validResults.sort((a,b) => {
+        if(a.isAverage) return -1;
+        if(b.isAverage) return 1;
+        return b.p - a.p;
+    });
+
+    // 6. RENDER
     validResults.forEach(f => {
         const div = document.createElement('div');
         div.className = 'food-item';
         div.style.flexDirection = "column";
         div.style.alignItems = "flex-start";
         
-        // Special Styling for the Average Card
+        // Style the Average Card specifically
         if (f.isAverage) {
             div.style.background = "linear-gradient(45deg, #2c2c2c, #3a3a3a)";
             div.style.border = "1px solid var(--gold)";
@@ -2028,10 +2048,11 @@ async function searchFood() {
         div.innerHTML = `
             <div style="font-weight:bold; color:#fff; display:flex; justify-content:space-between; width:100%;">
                 <span>${f.name}</span>
-                ${f.isAverage ? '<span style="color:var(--gold); font-size:0.8em;">⭐ QUICK ADD</span>' : ''}
+                ${f.isAverage ? '<span style="color:var(--gold); font-size:0.8em;">⭐ QUICK ADD</span>' : `<span style="font-size:0.7em; color:#555; border:1px solid #333; padding:1px 4px; border-radius:4px;">${f.source}</span>`}
             </div> 
-            <div style="font-size:0.8em; color:#aaa; display:flex; gap:10px; margin-top:2px;">
-                <span style="color:var(--sec);">⚡ ${Math.round(f.c)} cal</span>
+            <div style="font-size:0.75em; color:#aaa; margin-bottom:4px;">${f.desc}</div>
+            <div style="font-size:0.8em; color:#aaa; display:flex; gap:10px;">
+                <span style="color:var(--sec);">⚡ ${Math.round(f.c)}</span>
                 <span style="color:var(--primary);">🥩 ${Math.round(f.p)}g</span>
                 <span style="color:var(--warn);">🍚 ${Math.round(f.ch)}g</span>
                 <span style="color:var(--danger);">🥑 ${Math.round(f.f)}g</span>
