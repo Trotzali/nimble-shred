@@ -1946,22 +1946,24 @@ function setSearchSource(src) {
 async function searchFood() {
     const query = document.getElementById('food-search').value;
     const resDiv = document.getElementById('search-results');
-    resDiv.innerHTML = 'Searching...';
+    resDiv.innerHTML = '<div style="padding:10px; color:#aaa;">Searching USDA Database...</div>';
     let results = [];
+    
     try {
         if (searchSource === 'usda') {
-            const req = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=10&api_key=${apiKey}`);
+            // FIX 1: We added "&dataType=Foundation,SR Legacy" to ignore branded junk
+            const req = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=20&dataType=Foundation,SR Legacy&api_key=${apiKey}`);
             const data = await req.json();
+            
             if(data.foods) data.foods.forEach(f => {
-                // HELPER: Checks for Modern (1000s) AND Legacy (200s) IDs
                 const getNut = (...ids) => (f.foodNutrients.find(x => ids.includes(x.nutrientId)) || {}).value || 0;
-                
                 results.push({ 
-                    name: f.description, 
-                    c: getNut(1008, 208, 2047), // Energy (KCAL) - checks 3 different common IDs
-                    p: getNut(1003, 203),       // Protein
-                    f: getNut(1004, 204),       // Fat
-                    ch: getNut(1005, 205)       // Carbs
+                    name: f.description.replace(/, raw/gi, '').replace(/, cooked/gi, ''), // Clean up names
+                    desc: f.description, // Keep full name for checking
+                    c: getNut(1008, 208, 2047), 
+                    p: getNut(1003, 203),       
+                    f: getNut(1004, 204),       
+                    ch: getNut(1005, 205)       
                 });
             });
         } else {
@@ -1970,8 +1972,8 @@ async function searchFood() {
             const data = await req.json();
             if(data.products) data.products.forEach(p => {
                 results.push({ 
-                    name: p.product_name, 
-                    // Check standard 100g field OR value field
+                    name: p.product_name,
+                    desc: p.product_name, 
                     c: p.nutriments['energy-kcal_100g'] || p.nutriments['energy-kcal_value'] || 0, 
                     p: p.nutriments.proteins_100g || 0, 
                     f: p.nutriments.fat_100g || 0, 
@@ -1981,13 +1983,29 @@ async function searchFood() {
         }
     } catch(e) { console.log(e); }
     
-    if (results.length === 0) results = [{name: "Manual Entry (Edit me)", c:0, p:0}];
+    if (results.length === 0) results = [{name: "Manual Entry (Tap to Edit)", c:0, p:0, f:0, ch:0}];
     
     resDiv.innerHTML = '';
+    
+    // FIX 2: Sort results so high-protein items (real food) appear higher for generic searches
+    results.sort((a,b) => b.p - a.p);
+
     results.forEach(f => {
         const div = document.createElement('div');
         div.className = 'food-item';
-        div.innerHTML = `<span>${f.name}</span> <small>${Math.round(f.c)} cal</small>`;
+        div.style.flexDirection = "column";
+        div.style.alignItems = "flex-start";
+        
+        // FIX 3: Display Macros (Pro/Carb/Fat) in the list so you can choose the right one
+        div.innerHTML = `
+            <div style="font-weight:bold; color:#fff;">${f.desc}</div> 
+            <div style="font-size:0.8em; color:#aaa; display:flex; gap:10px; margin-top:2px;">
+                <span style="color:var(--sec);">⚡ ${Math.round(f.c)} cal</span>
+                <span style="color:var(--primary);">🥩 ${Math.round(f.p)}g</span>
+                <span style="color:var(--warn);">🍚 ${Math.round(f.ch)}g</span>
+                <span style="color:var(--danger);">🥑 ${Math.round(f.f)}g</span>
+            </div>
+        `;
         div.onclick = () => openFoodModal(f);
         resDiv.appendChild(div);
     });
