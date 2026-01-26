@@ -122,6 +122,18 @@
 <div class="container" id="view-coach">
     <div id="setup-panel">
         <div class="top-bar"><h2>Workout Strategy</h2><button class="unit-toggle" onclick="toggleUnit()"><span id="unit-disp-2">LBS</span></button></div>
+       <div class="card" style="border-left: 4px solid var(--danger); margin-bottom:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleInjuryPanel()">
+                <h3 style="margin:0; font-size:1.1em;">🩹 Injury / Pain Mode</h3>
+                <span id="injury-status" style="font-size:0.8em; color:#777;">None</span>
+            </div>
+            <div id="injury-chips" class="chip-container" style="display:none; margin-top:10px; padding-top:10px; border-top:1px solid #333;">
+                <div class="chip" onclick="toggleInjury('Shoulders', this)">Shoulders</div>
+                <div class="chip" onclick="toggleInjury('Knees', this)">Knees</div>
+                <div class="chip" onclick="toggleInjury('Lower Back', this)">Lower Back</div>
+                <div class="chip" onclick="toggleInjury('Wrists', this)">Wrists</div>
+            </div>
+        </div>
         <div class="card">
             <h3>Quick Start</h3>
             
@@ -178,9 +190,31 @@
 </div>
 
 <div class="container" id="view-progress">
-    <h2>Stats</h2>
-    <div class="card"><select id="chart-select" onchange="renderChart()"><option>Select Exercise...</option></select><canvas id="progressChart"></canvas></div>
-    <button class="btn btn-action" onclick="exportData()">⬇️ Export</button>
+    <h2>Command Center</h2>
+    
+    <div class="card">
+        <h3>🎨 App Theme</h3>
+        <div class="chip-container">
+            <div class="chip" onclick="setTheme('cyber')">Cyberpunk</div>
+            <div class="chip" onclick="setTheme('tactical')">Tactical</div>
+            <div class="chip" onclick="setTheme('zen')">Zen White</div>
+            <div class="chip" onclick="setTheme('midnight')">Midnight</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>🔥 Muscle Heatmap (Last 30 Days)</h3>
+        <div id="muscle-heatmap" class="macro-grid" style="grid-template-columns: 1fr 1fr;">
+            </div>
+    </div>
+
+    <div class="card">
+        <h3>📈 Strength Progress</h3>
+        <select id="chart-select" onchange="renderChart()"><option>Select Exercise...</option></select>
+        <canvas id="progressChart"></canvas>
+    </div>
+    
+    <button class="btn btn-action" onclick="exportData()">⬇️ Export Data</button>
 </div>
 
 <div class="nav-bar">
@@ -1461,25 +1495,6 @@ function calcReadiness() {
     badge.innerText = score >= 80 ? '🔥' : score >= 60 ? '⚡' : score >= 40 ? '🟡' : '😴';
 }
 
-function logSet(name, idx) {
-    const w = parseFloat(document.getElementById(`w-${idx}`).value);
-    const r = parseInt(document.getElementById(`r-${idx}`).value);
-    if (isNaN(w) || w <= 0 || isNaN(r) || r <= 0) {
-        alert("Please enter valid positive weight and reps.");
-        return;
-    }
-    const entry = { date: new Date().toISOString(), name, weight: w, reps: r, unit: state.unit };
-    let h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-    h.push(entry);
-    localStorage.setItem('nimbleHistory', JSON.stringify(h));
-    sendToCloud("workout", entry);
-    startTimer(90);
-    const btn = document.activeElement;
-    btn.innerText = "Saved!";
-    btn.style.backgroundColor = "var(--success)";
-    setTimeout(() => { btn.innerText = "✅ Log Set"; btn.style.backgroundColor = ""; }, 1500);
-}
-
 function populateProgressSelect() {
     const select = document.getElementById('chart-select');
     const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
@@ -1509,17 +1524,6 @@ function renderChart() {
         },
         options: { responsive: true, scales: { y: { beginAtZero: false } } }
     });
-}
-
-function sendToCloud(type, data) {
-  fetch(GOOGLE_SCRIPT_URL, {
-    method: "POST",
-    mode: "no-cors",                    // ← This disables CORS checks completely
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify({ type: type, data: data })
-  })
-  .then(() => console.log(`${type} sent (no-cors mode - success assumed)`))
-  .catch(e => console.error("Send failed (no-cors):", e));
 }
 
 function updateMacrosUI() {
@@ -1556,18 +1560,65 @@ function renderWorkout(exercises) {
     const list = document.getElementById('workout-list');
     list.innerHTML = '';
     const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+
     exercises.forEach((ex, i) => {
-        const lastLog = history.filter(h => h.name === ex.name).sort((a,b) => new Date(b.date) - new Date(a.date))[0];
+        // 1. Get History (Newest first)
+        const exHistory = history.filter(h => h.name === ex.name).sort((a,b) => new Date(b.date) - new Date(a.date));
+        const lastLog = exHistory[0];
+        
+        // 2. Default Visuals
         let suggestion = "New Exercise";
-        let val = "";
+        let valWeight = "";
+        let ghostReps = "Reps"; 
+        let ghostBadge = "";    
+        let isDeload = false;
+        let oneRepMaxBadge = ""; // Feature #7 Variable
+
         if (lastLog) {
-            let targetWeight = lastLog.weight;
+            let targetWeight = parseFloat(lastLog.weight);
             if (modifyVolume) targetWeight = Math.round(targetWeight * 0.8);
+            
             suggestion = `Beat: ${targetWeight}${state.unit} x ${lastLog.reps}`;
-            val = targetWeight;
+            valWeight = targetWeight;
+            ghostReps = lastLog.reps;
+            
+            // --- FEATURE #7: 1RM PROJECTOR ---
+            // Formula: Weight * (1 + Reps/30)
+            const w = parseFloat(lastLog.weight);
+            const r = parseInt(lastLog.reps);
+            if(w > 0 && r > 0) {
+                const max = Math.round(w * (1 + r/30));
+                // Only show if meaningful (e.g., > 0)
+                oneRepMaxBadge = `<div style="margin-top:2px;"><span style="color:var(--gold); font-size:0.9em; border:1px solid var(--gold); padding:1px 4px; border-radius:4px;">🏆 Est 1RM: ${max}</span></div>`;
+            }
+
+            // Updated Ghost Badge to include 1RM
+            ghostBadge = `<div style="font-size:0.75em; color:#777; display:flex; flex-direction:column; align-items:flex-end; gap:2px; margin-bottom:5px;">
+                            <span>👻 Last: <strong>${lastLog.weight}</strong>${state.unit} x <strong>${lastLog.reps}</strong></span>
+                            ${oneRepMaxBadge}
+                          </div>`;
+
+            // --- FEATURE #6: AUTO-DELOAD LOGIC ---
+            if (exHistory.length >= 3) {
+                const w0 = parseFloat(exHistory[0].weight);
+                const w1 = parseFloat(exHistory[1].weight);
+                const w2 = parseFloat(exHistory[2].weight);
+                
+                if (w0 <= w1 && w1 <= w2) {
+                    isDeload = true;
+                    const deloadWt = Math.round(w0 * 0.9); 
+                    suggestion = `📉 Plateau. Deload to <b>${deloadWt}${state.unit}</b>`;
+                    valWeight = deloadWt; 
+                }
+            }
         }
+
         const div = document.createElement('div');
         div.className = `card exercise-card ${ex.type}`;
+        
+        // Visual Cue for Deload
+        if(isDeload) div.style.borderLeft = "4px solid var(--warn)";
+
         div.innerHTML = `
             <div class="exercise-header">
                 <strong>${ex.name}</strong>
@@ -1576,11 +1627,23 @@ function renderWorkout(exercises) {
                     <div class="mic-btn" onclick="startVoiceLog(this, ${i})">🎤</div>
                 </div>
             </div>
-            <div class="suggestion-text">💡 ${suggestion}</div>
-            <div class="row" style="margin-top:10px;">
-                <div style="flex:1"><input type="number" id="w-${i}" value="${val}" placeholder="Wt"></div>
-                <div style="flex:1"><input type="number" id="r-${i}" placeholder="Reps"></div>
+            
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-top:5px;">
+                <div class="suggestion-text" style="${isDeload ? 'color:var(--warn);' : ''}">💡 ${suggestion}</div>
+                ${ghostBadge}
             </div>
+
+            <div class="row" style="margin-top:5px;">
+                <div style="flex:1">
+                    <label style="font-size:0.7em; color:#aaa;">Weight</label>
+                    <input type="number" id="w-${i}" value="${valWeight}" placeholder="Wt">
+                </div>
+                <div style="flex:1">
+                    <label style="font-size:0.7em; color:#aaa;">Reps</label>
+                    <input type="number" id="r-${i}" placeholder="${ghostReps}" style="border: 1px solid #444;"> 
+                </div>
+            </div>
+            
             <button type="button" class="btn btn-action" style="margin-top:10px; padding:5px;" onclick="logSet(this.getAttribute('data-name'), ${i})" data-name="${ex.name}">✅ Log Set</button>
         `;
         list.appendChild(div);
@@ -1658,33 +1721,7 @@ function closeGuideModal() {
     currentGuideExercise = null;  // optional but good hygiene
 }
 
-function startTimer(s) { 
-    document.getElementById('timer-overlay').classList.remove('hidden'); 
-    document.getElementById('timer-overlay').style.display = 'flex'; 
-    document.getElementById('timer-display').innerText = s; 
-    let t = s; 
-    clearInterval(timerInterval); 
-    timerInterval = setInterval(()=>{ 
-        t--; 
-        document.getElementById('timer-display').innerText = t; 
-        if(t<=0) closeTimer(); 
-    }, 1000); 
-}
 
-function closeTimer() { 
-    document.getElementById('timer-overlay').classList.add('hidden'); 
-    document.getElementById('timer-overlay').style.display = 'none'; 
-    clearInterval(timerInterval); 
-}
-
-function addTime(s) { 
-    startTimer(parseInt(document.getElementById('timer-display').innerText)+s); 
-}
-
-function openTimerOverlay() { 
-    document.getElementById('timer-overlay').classList.remove('hidden'); 
-    document.getElementById('timer-overlay').style.display = 'flex'; 
-}
 
 function updateTimeLabel(val) {
     document.getElementById('time-val').innerText = (val * 7) + "m (" + val + " Ex)";
@@ -1724,10 +1761,61 @@ function generateRandomWorkout() {
     showWorkoutScreen();
 }
 
+// --- INJURY LOGIC ---
+let activeInjuries = [];
+
+function toggleInjuryPanel() {
+    const p = document.getElementById('injury-chips');
+    p.style.display = p.style.display === 'none' ? 'flex' : 'none';
+}
+
+function toggleInjury(part, el) {
+    if (activeInjuries.includes(part)) {
+        activeInjuries = activeInjuries.filter(i => i !== part);
+        el.style.backgroundColor = "#333";
+        el.style.color = "#aaa";
+        el.style.borderColor = "#555";
+    } else {
+        activeInjuries.push(part);
+        el.style.backgroundColor = "var(--danger)";
+        el.style.color = "#fff";
+        el.style.borderColor = "var(--danger)";
+    }
+    const count = activeInjuries.length;
+    document.getElementById('injury-status').innerText = count > 0 ? `${count} Active` : "None";
+    document.getElementById('injury-status').style.color = count > 0 ? "var(--danger)" : "#777";
+}
+
 function generateWorkoutByFilter(filterFn) {
     const count = parseInt(document.getElementById('slider-time').value) || 6;
-    const pool = allExercises.filter(filterFn);
+    
+    // 1. Start with the standard requested pool (e.g., "Push" or "Nimble")
+    let pool = allExercises.filter(filterFn);
+
+    // 2. Apply Injury Filters (Blacklist)
+    if (activeInjuries.length > 0) {
+        const injuryRules = {
+            "Shoulders": ["Overhead", "Press", "Dip", "Push-up", "Burpee", "Handstand", "Lateral Raise", "Front Raise", "Lu Raise", "Powell Raise"],
+            "Knees": ["Squat", "Lunge", "Jump", "Step Up", "Pistol", "Bulgarian", "Burpee", "Box", "Skater", "High Knees", "Duck", "Cossack"],
+            "Lower Back": ["Deadlift", "RDL", "Row", "Good Morning", "Bent Over", "Superman", "Jefferson", "Swing"],
+            "Wrists": ["Push-up", "Burpee", "Dip", "Plank", "Mountain Climber", "Handstand", "Crawl", "Crab", "L-Sit"]
+        };
+
+        pool = pool.filter(ex => {
+            for (let injury of activeInjuries) {
+                const badWords = injuryRules[injury] || [];
+                // If exercise name contains a "Bad Word", ban it
+                if (badWords.some(word => ex.name.includes(word))) return false;
+            }
+            return true;
+        });
+        
+        if(pool.length === 0) return alert("⚠️ Injury Conflict: No exercises match your criteria safely.");
+    }
+
     if(pool.length === 0) return alert("No exercises found.");
+    
+    // 3. Generate
     activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, count);
     renderWorkout(activeRoutine);
     showWorkoutScreen();
@@ -1815,9 +1903,7 @@ function exportData() {
     a.click(); 
 }
 
-function startVoiceLog() { 
-    alert("Use Chrome for Voice"); 
-}
+
 
 function handleReadinessLog() { 
     const g = document.getElementById('garmin-score').value; 
@@ -1963,6 +2049,220 @@ function renderMealLog() {
 }
 
 // (end of script)
+    // ─────────────────────────────────────────────────────────────
+// MASTER SYSTEM CORE (Features #8, #12, #13, #17, #20)
+// ─────────────────────────────────────────────────────────────
+
+// --- FEATURE #8 & #12: SMART LOGGING & VOICE COACH ---
+function logSet(name, idx) {
+    const w = parseFloat(document.getElementById(`w-${idx}`).value);
+    const r = parseInt(document.getElementById(`r-${idx}`).value);
+    
+    if (isNaN(w) || w <= 0 || isNaN(r) || r <= 0) return alert("Enter valid weight/reps");
+
+    const entry = { date: new Date().toISOString(), name, weight: w, reps: r, unit: state.unit };
+    
+    // Save Local
+    let h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+    h.push(entry);
+    localStorage.setItem('nimbleHistory', JSON.stringify(h));
+    
+    // Sync
+    sendToCloud("workout", entry);
+
+    // Visual Feedback
+    const btn = document.activeElement;
+    btn.innerText = "Saved!";
+    btn.style.backgroundColor = "var(--success)";
+    setTimeout(() => { btn.innerText = "✅ Log Set"; btn.style.backgroundColor = ""; }, 1500);
+
+    // Smart Timer Logic (Based on Exercise Type)
+    const ex = allExercises.find(e => e.name === name);
+    let restTime = 90; // Default
+    if (ex) {
+        if (ex.type === 'Strength') restTime = 120; // Heavy compound
+        if (ex.type === 'Mobility' || ex.type === 'Calisthenics') restTime = 45; // Nimble flow
+        if (ex.cat.includes('Cardio')) restTime = 30; // HIIT
+    }
+    
+    startTimer(restTime);
+
+    // Voice Coach
+    if ('speechSynthesis' in window) {
+        const msg = new SpeechSynthesisUtterance(`Set logged. Rest for ${restTime} seconds.`);
+        msg.rate = 1.1; 
+        window.speechSynthesis.speak(msg);
+    }
+}
+
+function startVoiceLog() {
+    // Placeholder - Browser handles actual voice dictation via keyboard microphone
+    // But this keeps the button from crashing the app
+    alert("Tap the microphone on your keyboard to dictate.");
+}
+
+// --- FEATURE #8: TIMER UTILS ---
+function startTimer(s) { 
+    document.getElementById('timer-overlay').classList.remove('hidden'); 
+    document.getElementById('timer-overlay').style.display = 'flex'; 
+    let t = s; 
+    document.getElementById('timer-display').innerText = formatTime(t);
+    clearInterval(timerInterval); 
+    timerInterval = setInterval(()=>{ 
+        t--; 
+        document.getElementById('timer-display').innerText = formatTime(t); 
+        if(t<=0) closeTimer(); 
+    }, 1000); 
+}
+function formatTime(s) { return s < 60 ? s : Math.floor(s/60) + ":" + (s%60 < 10 ? '0' : '') + (s%60); }
+function closeTimer() { 
+    document.getElementById('timer-overlay').classList.add('hidden'); 
+    document.getElementById('timer-overlay').style.display = 'none'; 
+    clearInterval(timerInterval); 
+}
+function addTime(s) { 
+    // Hack to parse current time back to seconds
+    let curr = document.getElementById('timer-display').innerText;
+    let sec = curr.includes(":") ? parseInt(curr.split(":")[0])*60 + parseInt(curr.split(":")[1]) : parseInt(curr);
+    startTimer(sec + s); 
+}
+function openTimerOverlay() { 
+    document.getElementById('timer-overlay').classList.remove('hidden'); 
+    document.getElementById('timer-overlay').style.display = 'flex'; 
+}
+
+// --- FEATURE #13: OFFLINE SYNC QUEUE ---
+function sendToCloud(type, data) {
+    if (!navigator.onLine) {
+        queueOffline(type, data);
+        return;
+    }
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, data })
+    })
+    .then(r => { if (!r.ok) throw new Error(); console.log('Synced'); processOfflineQueue(); })
+    .catch(e => {
+        console.log('Sync failed, queuing.', e);
+        queueOffline(type, data);
+    });
+}
+
+function queueOffline(type, data) {
+    let q = JSON.parse(localStorage.getItem('nimbleQueue')) || [];
+    q.push({ type, data, time: Date.now() });
+    localStorage.setItem('nimbleQueue', JSON.stringify(q));
+    alert("⚠️ Offline: Data saved to queue.");
+}
+
+function processOfflineQueue() {
+    let q = JSON.parse(localStorage.getItem('nimbleQueue')) || [];
+    if (q.length === 0) return;
+    
+    // Process one by one (FIFO)
+    const item = q[0];
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: item.type, data: item.data })
+    }).then(r => {
+        if(r.ok) {
+            q.shift(); // Remove if successful
+            localStorage.setItem('nimbleQueue', JSON.stringify(q));
+            console.log("Queue item processed");
+            if(q.length > 0) processOfflineQueue(); // Keep going
+        }
+    });
+}
+
+// --- FEATURE #17: HEATMAP RENDERER ---
+function renderHeatmap() {
+    const map = { 'Chest':0, 'Back':0, 'Legs':0, 'Shoulders':0, 'Arms':0, 'Core':0, 'Nimble':0 };
+    const h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+    const now = new Date();
+    
+    // Only look at last 30 days
+    const recent = h.filter(x => (now - new Date(x.date)) < (30 * 24 * 60 * 60 * 1000));
+    
+    recent.forEach(log => {
+        const ex = allExercises.find(e => e.name === log.name);
+        if (ex) {
+            ex.cat.forEach(c => {
+                // Map sub-categories to main 6
+                if(map[c] !== undefined) map[c]++;
+                else if(c === 'Glutes' || c === 'Quads' || c === 'Hamstrings' || c === 'Calves') map['Legs']++;
+                else if(c === 'Triceps' || c === 'Biceps' || c === 'Forearms') map['Arms']++;
+            });
+        }
+    });
+
+    // Find max for scaling
+    let max = 1;
+    for(let k in map) if(map[k] > max) max = map[k];
+
+    const grid = document.getElementById('muscle-heatmap');
+    if(!grid) return; // Safety check
+    grid.innerHTML = '';
+    
+    for (let muscle in map) {
+        const pct = Math.round((map[muscle] / max) * 100);
+        let color = '#333';
+        if (pct > 75) color = 'var(--danger)'; // Hot
+        else if (pct > 40) color = 'var(--warn)'; // Warm
+        else if (pct > 10) color = 'var(--sec)'; // Active
+        
+        grid.innerHTML += `
+            <div style="text-align:left; margin-bottom:5px;">
+                <div style="font-size:0.8em; color:#aaa; display:flex; justify-content:space-between;">
+                    <span>${muscle}</span> <span>${map[muscle]} sets</span>
+                </div>
+                <div class="macro-bar-container">
+                    <div class="macro-fill" style="width:${pct}%; background:${color};"></div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+// --- FEATURE #20: THEME ENGINE ---
+function setTheme(name) {
+    const r = document.querySelector(':root');
+    if(name === 'cyber') {
+        r.style.setProperty('--bg', '#121212');
+        r.style.setProperty('--card', '#1e1e1e');
+        r.style.setProperty('--primary', '#BB86FC');
+        r.style.setProperty('--sec', '#03DAC6');
+    }
+    if(name === 'tactical') {
+        r.style.setProperty('--bg', '#0d1117');
+        r.style.setProperty('--card', '#161b22');
+        r.style.setProperty('--primary', '#58a6ff');
+        r.style.setProperty('--sec', '#238636');
+    }
+    if(name === 'zen') {
+        r.style.setProperty('--bg', '#f0f2f5');
+        r.style.setProperty('--card', '#ffffff');
+        r.style.setProperty('--primary', '#6200ee');
+        r.style.setProperty('--sec', '#018786');
+        r.style.setProperty('--text', '#000000');
+    }
+    if(name === 'midnight') {
+        r.style.setProperty('--bg', '#000000');
+        r.style.setProperty('--card', '#111111');
+        r.style.setProperty('--primary', '#ff0055');
+        r.style.setProperty('--sec', '#00e5ff');
+    }
+    // Save preference
+    localStorage.setItem('nimbleTheme', name);
+}
+
+// Update the Tab Switcher to load the Heatmap
+const originalSwitch = switchTab;
+switchTab = function(id) {
+    originalSwitch(id);
+    if(id === 'progress') renderHeatmap();
+};
 </script>
 </body>
 </html>
