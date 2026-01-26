@@ -2182,10 +2182,12 @@ function logSet(name, idx) {
     }
 }
 
-function startVoiceLog() {
-    // Placeholder - Browser handles actual voice dictation via keyboard microphone
-    // But this keeps the button from crashing the app
-    alert("Tap the microphone on your keyboard to dictate.");
+function queueOffline(type, data) {
+    let q = JSON.parse(localStorage.getItem('nimbleQueue')) || [];
+    q.push({ type, data, time: Date.now() });
+    localStorage.setItem('nimbleQueue', JSON.stringify(q));
+    // Alert deleted. It will now save silently in the background.
+    console.log("Silent offline save.");
 }
 
 // --- FEATURE #8: TIMER UTILS ---
