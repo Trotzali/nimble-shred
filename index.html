@@ -1652,7 +1652,8 @@ function openGuideModal(exName) {
     if(!ex) return;
     currentGuideExercise = exName;
     document.getElementById('guide-title').innerText = ex.name;
-    document.getElementById('gif-search-btn').href = "https://www.google.com/search?tbm=isch&q=" + encodeURIComponent(exName + " gif");
+  // UPDATED SEARCH QUERY FOR SPECIFIC STYLE
+    document.getElementById('gif-search-btn').href = "https://www.google.com/search?tbm=isch&q=" + encodeURIComponent(exName + " workout anatomy gif male muscles red");
     if (ex.equip === 'Cable') {
         document.getElementById('f9-setup-section').style.display = 'block';
         document.getElementById('guide-arms').innerText = ex.setup.arms;
