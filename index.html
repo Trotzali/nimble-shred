@@ -1943,36 +1943,54 @@ function setSearchSource(src) {
     document.getElementById('src-off').classList.toggle('active', src === 'off'); 
 }
 
-async function searchFood() { 
-    const query = document.getElementById('food-search').value; 
-    const resDiv = document.getElementById('search-results'); 
-    resDiv.innerHTML = 'Searching...'; 
-    let results = []; 
-    try { 
-        if (searchSource === 'usda') { 
-            const req = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=10&api_key=${apiKey}`); 
-            const data = await req.json(); 
-            if(data.foods) data.foods.forEach(f => { 
-                const getNut = (id) => (f.foodNutrients.find(x => x.nutrientId === id) || {}).value || 0; 
-                results.push({ name: f.description, c: getNut(208), p: getNut(203), f: getNut(204), ch: getNut(205) }); 
-            }); 
-        } else { 
-            const req = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${query}&search_simple=1&action=process&json=1&page_size=10`); 
-            const data = await req.json(); 
-            if(data.products) data.products.forEach(p => { 
-                results.push({ name: p.product_name, c: p.nutriments['energy-kcal_100g']||0, p: p.nutriments.proteins_100g||0, f: p.nutriments.fat_100g||0, ch: p.nutriments.carbohydrates_100g||0 }); 
-            }); 
-        } 
-    } catch(e) { console.log(e); } 
-    if (results.length === 0) results = [{name: "Manual Entry (Edit me)", c:0, p:0}]; 
-    resDiv.innerHTML = ''; 
-    results.forEach(f => { 
-        const div = document.createElement('div'); 
-        div.className = 'food-item'; 
-        div.innerHTML = `<span>${f.name}</span> <small>${Math.round(f.c)} cal</small>`; 
-        div.onclick = () => openFoodModal(f); 
-        resDiv.appendChild(div); 
-    }); 
+async function searchFood() {
+    const query = document.getElementById('food-search').value;
+    const resDiv = document.getElementById('search-results');
+    resDiv.innerHTML = 'Searching...';
+    let results = [];
+    try {
+        if (searchSource === 'usda') {
+            const req = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=10&api_key=${apiKey}`);
+            const data = await req.json();
+            if(data.foods) data.foods.forEach(f => {
+                // HELPER: Checks for Modern (1000s) AND Legacy (200s) IDs
+                const getNut = (...ids) => (f.foodNutrients.find(x => ids.includes(x.nutrientId)) || {}).value || 0;
+                
+                results.push({ 
+                    name: f.description, 
+                    c: getNut(1008, 208, 2047), // Energy (KCAL) - checks 3 different common IDs
+                    p: getNut(1003, 203),       // Protein
+                    f: getNut(1004, 204),       // Fat
+                    ch: getNut(1005, 205)       // Carbs
+                });
+            });
+        } else {
+            // OpenFoodFacts Fallback
+            const req = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${query}&search_simple=1&action=process&json=1&page_size=10`);
+            const data = await req.json();
+            if(data.products) data.products.forEach(p => {
+                results.push({ 
+                    name: p.product_name, 
+                    // Check standard 100g field OR value field
+                    c: p.nutriments['energy-kcal_100g'] || p.nutriments['energy-kcal_value'] || 0, 
+                    p: p.nutriments.proteins_100g || 0, 
+                    f: p.nutriments.fat_100g || 0, 
+                    ch: p.nutriments.carbohydrates_100g || 0 
+                });
+            });
+        }
+    } catch(e) { console.log(e); }
+    
+    if (results.length === 0) results = [{name: "Manual Entry (Edit me)", c:0, p:0}];
+    
+    resDiv.innerHTML = '';
+    results.forEach(f => {
+        const div = document.createElement('div');
+        div.className = 'food-item';
+        div.innerHTML = `<span>${f.name}</span> <small>${Math.round(f.c)} cal</small>`;
+        div.onclick = () => openFoodModal(f);
+        resDiv.appendChild(div);
+    });
 }
 
 function openFoodModal(item) { 
