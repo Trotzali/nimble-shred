@@ -131,12 +131,13 @@
             </div>
             <input type="range" id="slider-time" min="3" max="12" value="6" step="1" style="margin-bottom:20px;" oninput="updateTimeLabel(this.value)">
 
-            <div class="chip-container">
+           <div class="chip-container">
                 <div class="chip" onclick="loadTemplate('push')">Push</div>
                 <div class="chip" onclick="loadTemplate('pull')">Pull</div>
                 <div class="chip" onclick="loadTemplate('legs')">Legs</div>
                 <div class="chip" onclick="loadTemplate('full')">Full Body</div>
-                <div class="chip" onclick="loadTemplate('f9')">Torque F9 Only</div>
+                <div class="chip" onclick="loadTemplate('nimble')">🪶 Nimble / Flow</div>
+                <div class="chip" onclick="loadTemplate('f9')">⚙️ Torque F9</div>
             </div>
 
           <button type="button" class="btn btn-main" onclick="generateRandomWorkout()">🎲 Random Workout</button>
@@ -1288,9 +1289,74 @@ function createEx(name, cat, equip, type, prep, exec, tips, benefits, muscles, s
             ["Crunch forward.", "Elbows to chest."],
             ["Standing abs."],
             ["Core."],
-            ["Abs"], {arms: "Narrow", pulleys: "Top"})
-    ];
+            ["Abs"], {arms: "Narrow", pulleys: "Top"}),
+        // ==================== NIMBLE / LONGEVITY / FLOW (NEW 25) ====================
+        
+        // --- ANIMAL FLOW & GROUND ---
+        createEx("Bear Crawl", ["Nimble", "Core"], "Bodyweight", "Mobility", 
+            ["Hands and knees.", "Knees hover 1 inch off floor."], ["Crawl forward opposite hand/foot.", "Keep back flat."], ["Imagine a glass of water on your back."], ["Shoulder stability.", "Core."], ["Core", "Shoulders"]),
+        createEx("Crab Walk", ["Nimble", "Shoulders"], "Bodyweight", "Mobility", 
+            ["Sit on floor.", "Hands behind hips.", "Lift hips."], ["Walk backwards/forwards."], ["Open chest.", "Squeeze glutes."], ["Posterior chain.", "Shoulder mobility."], ["Triceps", "Glutes"]),
+        createEx("Kick Through", ["Nimble", "Core"], "Bodyweight", "Mobility", 
+            ["Bear crawl position."], ["Rotate hips.", "Kick leg through to side.", "Lift opposite hand."], ["Pivot on foot."], ["Rotational agility."], ["Obliques", "Hips"]),
+        createEx("Beast Reach", ["Nimble", "Back"], "Bodyweight", "Mobility", 
+            ["Loaded Beast (Child's pose but knees off floor)."], ["Wave forward into plank.", "Drive one knee to elbow.", "Return."], ["Flow smoothly."], ["Spine wave."], ["Spine", "Core"]),
+        createEx("Duck Walk", ["Nimble", "Legs"], "Bodyweight", "Mobility", 
+            ["Deep squat position."], ["Walk forward staying low."], ["Keep chest up.", "Heels can lift."], ["Ankle mobility.", "Hip strength."], ["Quads", "Ankles"]),
 
+        // --- JOINT BULLETPROOFING ---
+        createEx("Tibialis Raise", ["Nimble", "Legs"], "Bodyweight", "Strength", 
+            ["Lean butt against wall.", "Legs straight out."], ["Lift toes to shins.", "Lower."], ["Feel burn in shins."], ["Bulletproof knees.", "Shin splint help."], ["Tibialis Anterior"]),
+        createEx("ATG Split Squat", ["Nimble", "Legs"], "Bodyweight", "Mobility", 
+            ["Long lunge stance."], ["Push front knee WAY over toe.", "Back leg straight."], ["Cover calf with hamstring."], ["Ankle/Hip mobility."], ["VMO", "Hip Flexors"]),
+        createEx("Lu Raise", ["Nimble", "Shoulders"], "Dumbbell", "Mobility", 
+            ["Light plates/DBs.", "Stand tall."], ["Lateral raise ALL the way overhead.", "Touch plates at top."], ["Control down."], ["Full scapular movement."], ["Side Delts", "Traps"]),
+        createEx("Powell Raise", ["Nimble", "Shoulders"], "Dumbbell", "Strength", 
+            ["Lie on side.", "Top arm holds DB."], ["Raise straight arm to vertical."], ["Control down across chest."], ["Scapular health."], ["Rear Delts", "Rhomboids"]),
+        createEx("Wrist Rocks", ["Nimble", "Arms"], "Bodyweight", "Mobility", 
+            ["Hands and knees.", "Fingers forward/back/side."], ["Rock weight gently over wrists."], ["Elbows locked."], ["Wrist prep for pushups."], ["Forearms"]),
+        createEx("Dead Hang", ["Nimble", "Back"], "Bodyweight", "Strength", 
+            ["Grab pullup bar."], ["Hang completely loose.", "Relax shoulders."], ["Deep breaths."], ["Spine decompression.", "Grip."], ["Lats", "Forearms"]),
+
+        // --- DYNAMIC MOBILITY ---
+        createEx("Cossack Squat", ["Nimble", "Legs"], "Bodyweight", "Mobility", 
+            ["Wide stance.", "Toes out."], ["Squat to ONE side.", "Other leg straight, toe up."], ["Stay low, switch sides."], ["Hip mobility.", "Groin."], ["Adductors", "Quads"]),
+        createEx("Jefferson Curl", ["Nimble", "Back"], "Bodyweight", "Mobility", 
+            ["Stand tall.", "Hold light weight (optional)."], ["Tuck chin.", "Roll down one vertebrae at a time.", "Reach floor."], ["Roll up slow."], ["Spine articulation."], ["Spine", "Hamstrings"]),
+        createEx("Scorpion Stretch", ["Nimble", "Back"], "Bodyweight", "Mobility", 
+            ["Lie on stomach.", "Arms wide."], ["Kick one leg up and over to opposite hand."], ["Touch floor."], ["Dynamic hip/spine twist."], ["Hips", "Spine"]),
+        createEx("Inchworm", ["Nimble", "Core"], "Bodyweight", "Mobility", 
+            ["Stand.", "Hinge to floor."], ["Walk hands out to plank.", "Walk feet to hands."], ["Keep legs straight."], ["Hamstring stretch."], ["Hamstrings", "Shoulders"]),
+        createEx("Thoracic Bridge", ["Nimble", "Back"], "Bodyweight", "Mobility", 
+            ["Sit on floor.", "Hands behind."], ["Drive hips up.", "Reach one arm overhead and across."], ["Look at hand."], ["T-Spine opener."], ["Spine", "Glutes"]),
+
+        // --- AGILITY & PROPRIOCEPTION ---
+        createEx("Single Leg RDL (BW)", ["Nimble", "Legs"], "Bodyweight", "Strength", 
+            ["Stand on one leg."], ["Hinge forward.", "Extend back leg straight."], ["Body creates 'T' shape.", "Return."], ["Balance.", "Hamstring."], ["Hamstrings", "Glutes"]),
+        createEx("Lateral Bounds", ["Nimble", "Cardio"], "Bodyweight", "Plyo", 
+            ["Stand on right leg."], ["Jump laterally to left leg.", "Stick the landing."], ["Pause.", "Jump back."], ["Lateral power.", "Stability."], ["Glutes", "Adductors"]),
+        createEx("Dot Drill", ["Nimble", "Cardio"], "Bodyweight", "Plyo", 
+            ["Imagine 5 dots (dice 5)."], ["Hop feet between dots fast."], ["pattern variations."], ["Fast feet."], ["Calves", "Coordination"]),
+        createEx("Tuck Jumps", ["Nimble", "Cardio"], "Bodyweight", "Plyo", 
+            ["Stand tall."], ["Jump high.", "Tuck knees to chest."], ["Land soft.", "Repeat fast."], ["Explosive power."], ["Quads", "Core"]),
+        createEx("A-Skips", ["Nimble", "Cardio"], "Bodyweight", "Plyo", 
+            ["Skip forward."], ["Drive knee high.", "Drive opposite arm."], ["Rhythm and bounce."], ["Sprinting mechanics."], ["Hip Flexors", "Calves"]),
+
+        // --- ISOMETRIC & TENDON ---
+        createEx("Horse Stance Hold", ["Nimble", "Legs"], "Bodyweight", "Strength", 
+            ["Wide stance.", "Squat until thighs parallel."], ["Back vertical.", "Knees out."], ["Hold for time."], ["Mental toughness.", "Hips."], ["Quads", "Adductors"]),
+        createEx("Reverse Plank", ["Nimble", "Core"], "Bodyweight", "Strength", 
+            ["Sit legs straight.", "Hands behind hips."], ["Drive hips to ceiling.", "Straight line."], ["Squeeze glutes."], ["Posterior chain."], ["Lower Back", "Glutes"]),
+        createEx("Copenhagen Plank", ["Nimble", "Legs"], "Bodyweight", "Strength", 
+            ["Side plank.", "Top leg on bench.", "Bottom leg floating."], ["Hold."], ["Brutal inner thigh work."], ["Groin health."], ["Adductors"]),
+        createEx("L-Sit (Tuck)", ["Nimble", "Core"], "Bodyweight", "Calisthenics", 
+            ["Hands on floor/parallettes."], ["Press down.", "Lift butt and knees off floor."], ["Hold tuck."], ["Core compression."], ["Abs", "Hip Flexors"])
+    ];
+// --- AUTO-TAG EXISTING EXERCISES AS 'NIMBLE' ---
+    ["Burpees", "Mountain Climbers", "Skater Hops", "Box Jump", "Jumping Lunge", "High Knees", "Jump Squat", "Pistol Squat", "Handstand Hold", "Single Leg Glute Bridge", "World's Greatest Stretch", "90/90 Hip Switch", "Deep Squat Hold", "Scapular Push-up", "Cat-Cow", "Bird Dog"].forEach(name => {
+        const ex = allExercises.find(e => e.name === name);
+        if(ex && !ex.cat.includes("Nimble")) ex.cat.push("Nimble");
+    });
 // ─────────────────────────────────────────────────────────────
 // LOAD THE APP (NO CLOUD SYNC ON STARTUP - FAST & NO HANG)
 // ─────────────────────────────────────────────────────────────
@@ -1626,12 +1692,27 @@ function updateTimeLabel(val) {
 
 function loadTemplate(type) {
     let filter = [];
+    
+    // Standard Splits
     if(type==='push') filter = ['Chest','Shoulders','Triceps'];
     if(type==='pull') filter = ['Back','Biceps'];
     if(type==='legs') filter = ['Legs'];
     if(type==='full') filter = ['Chest','Back','Legs'];
+    
+    // Equipment Specific
     if(type==='f9') return generateWorkoutByFilter(e => e.equip === 'Cable');
-    if(type==='core') filter = ['Core','Mobility'];
+    
+    // THE NEW NIMBLE MODE
+    if(type==='nimble') {
+        // Grab anything tagged 'Nimble' OR specific bodyweight/mobility moves
+        return generateWorkoutByFilter(e => 
+            e.cat.includes('Nimble') || 
+            e.cat.includes('Mobility') || 
+            (e.equip === 'Bodyweight' && e.cat.includes('Cardio'))
+        );
+    }
+
+    // Default Filter Logic
     generateWorkoutByFilter(e => e.cat.some(c => filter.includes(c)));
 }
 
