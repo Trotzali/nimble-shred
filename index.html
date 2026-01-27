@@ -114,7 +114,21 @@
     <h3>Syncing with Cloud...</h3>
     <small style="color:#777; margin-top:10px;">Checking History, Foods & GIFs</small>
 </div>
-
+<script>
+    // This runs instantly to ensure you are never stuck
+    window.onload = function() {
+        const loader = document.getElementById('sync-loader');
+        if(loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => loader.style.display = 'none', 500);
+        }
+    };
+    // Backup Timer in case window.onload fails
+    setTimeout(() => {
+        const loader = document.getElementById('sync-loader');
+        if(loader) loader.style.display = 'none';
+    }, 2000);
+</script>
 <div id="timer-badge" class="timer-badge" onclick="openTimerOverlay()"></div>
 
 <div class="container active" id="view-readiness">
