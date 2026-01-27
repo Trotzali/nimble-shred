@@ -1480,6 +1480,8 @@ let pendingFood = null;
 
 // INITIALIZATION
 document.addEventListener('DOMContentLoaded', () => {
+    const loader = document.getElementById('sync-loader');
+    if(loader) loader.style.display = 'none';
     if(document.getElementById('view-plan')) renderPlanner();
     const today = new Date().getDay();
     const plan = userSettings.schedule[today];
