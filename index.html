@@ -339,7 +339,54 @@
         <div id="builder-list-content" style="margin-top:10px;"></div>
     </div>
 </div>
+<div class="container hidden" id="view-plan">
+    <h2>Weekly Structure</h2>
+    
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>📅 Phase: <span id="cycle-phase" style="color:var(--primary)">Week 1</span></h3>
+            <small onclick="nextPhase()" style="color:#777; cursor:pointer; border:1px solid #444; padding:2px 6px; border-radius:4px;">Next >></small>
+        </div>
+        <div class="calendar-grid" id="week-grid"></div>
+        <div id="day-detail" style="margin-top:10px; font-style:italic; color:#aaa; font-size:0.9em; text-align:center;">Tap a day to schedule</div>
+    </div>
+    
+    <div class="card">
+        <h3>⚔️ Active Challenge</h3>
+        <p style="margin-bottom:5px;">30 Days of Nimble Hips</p>
+        <div class="macro-bar-container"><div class="macro-fill" style="width: 45%; background: var(--gold);"></div></div>
+        <small style="color:#aaa;">Day 14/30</small>
+    </div>
 
+    <div class="card" onclick="startBreathWork()">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>🧘 Recovery Breath</h3>
+            <span style="font-size:1.5em;">🫁</span>
+        </div>
+        <p style="color:#aaa; font-size:0.8em;">Box breathing to lower cortisol.</p>
+    </div>
+</div>
+
+<div class="container hidden" id="view-food">
+    <h2>Nutrition Log</h2>
+    <div class="card">
+        <input type="text" id="food-search" placeholder="Search Food (e.g. Chicken)" onchange="searchFood()">
+        <button class="btn btn-action" onclick="searchFood()">Search</button>
+        <div id="search-results" style="margin-top:10px;"></div>
+    </div>
+    <div id="meal-container"></div>
+</div>
+
+<div class="container hidden" id="view-progress">
+    <h2>Command Center</h2>
+    </div>
+
+<div id="breath-modal" class="checklist-modal" onclick="this.style.display='none'">
+    <div class="breath-circle"></div>
+    <h2 style="margin-top:30px; color:#fff;">Breathe In...</h2>
+</div>
+
+<div id="plate-helper" class="plate-popup hidden"></div>
 <div id="timer-overlay" class="fs-overlay flex-center hidden">
     <div id="timer-display" style="font-size:4em; font-weight:bold; color:var(--primary);">00:00</div>
     <div style="margin-top:20px;">
@@ -349,6 +396,25 @@
     </div>
 </div>
 
+    <nav style="position:fixed; bottom:0; width:100%; background:#1e1e1e; border-top:1px solid #333; display:flex; justify-content:space-around; padding:10px 0; z-index:1000;">
+    <div class="nav-item active" style="text-align:center; font-size:0.8em; color:#777; cursor:pointer;" onclick="switchTab('home')">
+        <div style="font-size:1.5em;">🔥</div>
+        <div>Shred</div>
+    </div>
+    <div class="nav-item" style="text-align:center; font-size:0.8em; color:#777; cursor:pointer;" onclick="switchTab('plan')">
+        <div style="font-size:1.5em;">📅</div>
+        <div>Plan</div>
+    </div>
+    <div class="nav-item" style="text-align:center; font-size:0.8em; color:#777; cursor:pointer;" onclick="switchTab('food')">
+        <div style="font-size:1.5em;">🥗</div>
+        <div>Food</div>
+    </div>
+    <div class="nav-item" style="text-align:center; font-size:0.8em; color:#777; cursor:pointer;" onclick="switchTab('progress')">
+        <div style="font-size:1.5em;">📈</div>
+        <div>Stats</div>
+    </div>
+</nav>
+    
 <script>
  
    // ─────────────────────────────────────────────────────────────
