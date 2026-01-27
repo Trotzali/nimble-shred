@@ -1508,13 +1508,42 @@ document.addEventListener('DOMContentLoaded', () => {
     if(!document.getElementById('view-progress').classList.contains('hidden')) renderHeatmap();
 });
 // --- NAVIGATION ---
+// --- NAVIGATION LOGIC (Fixed) ---
 function switchTab(id) {
+    // 1. Hide all main views
     document.querySelectorAll('.container').forEach(d => d.classList.add('hidden'));
-    const target = document.getElementById(`view-${id}`);
-    if(target) target.classList.remove('hidden');
+    
+    // 2. Determine which view to show
+    // Map button IDs to actual View IDs if they differ
+    let targetId = `view-${id}`;
+    
+    // Handle special cases if your HTML IDs are different
+    if (id === 'home') targetId = 'view-home';
+    if (id === 'plan') targetId = 'view-plan'; 
+    if (id === 'food' || id === 'fuel') targetId = 'view-food'; // Handles "Fuel" or "Food"
+    if (id === 'progress' || id === 'stats') targetId = 'view-progress';
+    if (id === 'coach') targetId = 'view-coach'; // Requires a view-coach div to exist
+
+    const target = document.getElementById(targetId);
+    
+    if (target) {
+        target.classList.remove('hidden');
+        
+        // Special render triggers
+        if (id === 'plan') renderPlanner();
+        if (id === 'progress') renderHeatmap();
+    } else {
+        console.warn(`Tab ID "${targetId}" not found in HTML.`);
+        // Optional: Create it dynamically if missing (Safety net)
+        if(id === 'coach') alert("Coach features are inside the Plan tab!");
+    }
+
+    // 3. Update Bottom Navigation Styling
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    if(id === 'plan') renderPlanner();
-    if(id === 'progress') renderHeatmap();
+    // Find the button that was clicked (based on onclick attribute match)
+    // This is a simple visual fix
+    const clickedBtn = Array.from(document.querySelectorAll('.nav-item')).find(el => el.getAttribute('onclick').includes(id));
+    if(clickedBtn) clickedBtn.classList.add('active');
 }
 
 // --- FEATURE 1, 2, 3: PLANNER LOGIC ---
