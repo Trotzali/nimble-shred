@@ -1480,14 +1480,19 @@ let pendingFood = null;
 
 // INITIALIZATION
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. FORCE HIDE THE LOADING SCREEN (This fixes the "Stuck" issue)
     const loader = document.getElementById('sync-loader');
-    if(loader) loader.style.display = 'none';
+    if(loader) {
+        loader.style.opacity = '0';
+        setTimeout(() => loader.style.display = 'none', 500);
+    }
+
+    // 2. Setup Planner
     if(document.getElementById('view-plan')) renderPlanner();
-    const today = new Date().getDay();
-    const plan = userSettings.schedule[today];
+    
+    // 3. Auto-load Heatmap
     if(!document.getElementById('view-progress').classList.contains('hidden')) renderHeatmap();
 });
-
 // --- NAVIGATION ---
 function switchTab(id) {
     document.querySelectorAll('.container').forEach(d => d.classList.add('hidden'));
