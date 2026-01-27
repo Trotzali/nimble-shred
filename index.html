@@ -1507,36 +1507,40 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Auto-load Heatmap
     if(!document.getElementById('view-progress').classList.contains('hidden')) renderHeatmap();
 });
-// --- NAVIGATION ---
-// --- NAVIGATION LOGIC (Fixed) ---
-function switchTab(id) {
-    // 1. Hide all main views
-    document.querySelectorAll('.container').forEach(d => d.classList.add('hidden'));
-    
-    // 2. Determine which view to show
-    // Map button IDs to actual View IDs if they differ
-    let targetId = `view-${id}`;
-    
-    // Handle special cases if your HTML IDs are different
-    if (id === 'home') targetId = 'view-home';
-    if (id === 'plan') targetId = 'view-plan'; 
-    if (id === 'food' || id === 'fuel') targetId = 'view-food'; // Handles "Fuel" or "Food"
-    if (id === 'progress' || id === 'stats') targetId = 'view-progress';
-    if (id === 'coach') targetId = 'view-coach'; // Requires a view-coach div to exist
 
-    const target = document.getElementById(targetId);
+// --- NAVIGATION LOGIC (Corrected) ---
+function switchTab(id) {
+    // 1. Hide all views first
+    document.querySelectorAll('.container').forEach(d => d.classList.add('hidden'));
+
+    // 2. Map the button ID to the actual Screen ID
+    let targetId = '';
     
+    if (id === 'home' || id === 'shred') targetId = 'view-home';
+    if (id === 'plan' || id === 'coach') targetId = 'view-plan';      // "Coach" opens the Plan tab
+    if (id === 'food' || id === 'fuel')  targetId = 'view-food';      // "Fuel" opens the Food tab
+    if (id === 'progress' || id === 'stats') targetId = 'view-progress'; // "Stats" opens Progress tab
+
+    // 3. Show the correct view
+    const target = document.getElementById(targetId);
     if (target) {
         target.classList.remove('hidden');
         
-        // Special render triggers
-        if (id === 'plan') renderPlanner();
-        if (id === 'progress') renderHeatmap();
-    } else {
-        console.warn(`Tab ID "${targetId}" not found in HTML.`);
-        // Optional: Create it dynamically if missing (Safety net)
-        if(id === 'coach') alert("Coach features are inside the Plan tab!");
+        // Trigger special renders if needed
+        if (targetId === 'view-plan') renderPlanner();
+        if (targetId === 'view-progress') renderHeatmap();
     }
+
+    // 4. Update the Bottom Navigation Styling (Visual Feedback)
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    
+    // Find the button you just clicked and make it "Active"
+    // We look for the onclick attribute that contains the ID you passed
+    const activeBtn = Array.from(document.querySelectorAll('.nav-item')).find(btn => 
+        btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(`'${id}'`)
+    );
+    if (activeBtn) activeBtn.classList.add('active');
+}
 
     // 3. Update Bottom Navigation Styling
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
