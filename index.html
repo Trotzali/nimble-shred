@@ -1872,10 +1872,33 @@ function addFoodToMeal(name, cPer100, pPer100, chPer100, fPer100) {
     meals[today].snacks.push(food);
     localStorage.setItem('nimbleMeals', JSON.stringify(meals));
     
-    // Close modal and refresh display
-    document.querySelector('.fs-overlay').remove();
-    renderMacros(); // Assuming you have this function to refresh the macro display
-}
+  // Close modal and refresh display
+document.querySelector('.fs-overlay').remove();
+
+// Update macro displays
+const meals = JSON.parse(localStorage.getItem('nimbleMeals')) || {};
+const today = new Date().toISOString().split('T')[0];
+const todayMeals = meals[today] || { breakfast: [], lunch: [], dinner: [], snacks: [] };
+
+let totalCals = 0, totalPro = 0, totalCarbs = 0, totalFat = 0;
+Object.values(todayMeals).flat().forEach(item => {
+    totalCals += item.calories || 0;
+    totalPro += item.protein || 0;
+    totalCarbs += item.carbs || 0;
+    totalFat += item.fat || 0;
+});
+
+document.getElementById('disp-cals').textContent = totalCals;
+document.getElementById('disp-pro').textContent = totalPro;
+document.getElementById('disp-carb').textContent = totalCarbs;
+document.getElementById('disp-fat').textContent = totalFat;
+
+// Update progress bars (assuming goals exist)
+const goals = { cals: 2500, pro: 180, carbs: 250, fat: 70 }; // You might have these stored somewhere
+document.getElementById('bar-cals').style.width = `${Math.min(100, (totalCals / goals.cals) * 100)}%`;
+document.getElementById('bar-pro').style.width = `${Math.min(100, (totalPro / goals.pro) * 100)}%`;
+document.getElementById('bar-carb').style.width = `${Math.min(100, (totalCarbs / goals.carbs) * 100)}%`;
+document.getElementById('bar-fat').style.width = `${Math.min(100, (totalFat / goals.fat) * 100)}%`;
 // --- UNIFIED FOOD SEARCH ENGINE ---
 async function searchFood() {
     const query = document.getElementById('food-search').value;
