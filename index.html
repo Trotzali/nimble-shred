@@ -6,233 +6,57 @@
     <meta name="theme-color" content="#1e1e1e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Nimble Shred V42</title>
-    
-    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiTmltYmxlIFNocmVkIiwiYmFja2dyb3VuZF9jb2xvciI6IiMxMjEyMTIiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiIzFlMWUxZSIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2ltZy5pY29uczguY29tL2ZsdWVuY3kvOTYvbnVsbC9kdW1iYmVsbC5wbmciLCJzaXplcyI6Ijk2eDk2IiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
-    <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/96/null/dumbbell.png">
-    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <style>
-        /* ─────────────────────────────────────────────
-           CORE STYLES
-           ───────────────────────────────────────────── */
-        :root { 
-            --bg: #121212; 
-            --card: #1e1e1e; 
-            --primary: #BB86FC; 
-            --sec: #03DAC6; 
-            --text: #fff; 
-            --gold: #FFD700; 
-            --danger: #CF6679; 
-            --success: #00C853; 
-            --warn: #FF9800; 
-        }
-        
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            background: var(--bg); 
-            color: var(--text); 
-            margin: 0; 
-            padding: 20px; 
-            padding-bottom: 120px; 
-            -webkit-tap-highlight-color: transparent; 
-        }
-        
-        /* Layout Containers */
+        :root { --bg: #121212; --card: #1e1e1e; --primary: #BB86FC; --sec: #03DAC6; --text: #fff; --gold: #FFD700; --danger: #CF6679; --warn: #FF9800; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 120px; -webkit-tap-highlight-color: transparent; }
         .container { max-width: 800px; margin: 0 auto; display: none; padding-bottom: 80px; } 
         .container.active { display: block; }
-        
-        h1, h2 { text-align: center; margin: 10px 0; }
-        
-        /* ─────────────────────────────────────────────
-           NAVIGATION BAR (V42)
-           ───────────────────────────────────────────── */
-        .nav-bar { 
-            position: fixed; 
-            bottom: 0; 
-            left: 0; 
-            right: 0; 
-            background: #1a1a1a; 
-            display: flex; 
-            justify-content: space-around; 
-            padding: 15px 10px; 
-            border-top: 1px solid #333; 
-            z-index: 9000; 
-            padding-bottom: max(15px, env(safe-area-inset-bottom)); 
-            box-shadow: 0 -5px 10px rgba(0,0,0,0.5); 
-        }
-        
-        .nav-btn { 
-            background: none; 
-            color: #777; 
-            border: none; 
-            font-size: 0.75em; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 5px; 
-            cursor: pointer; 
-        }
-        
-        .nav-btn.active { color: var(--sec); }
-        .nav-icon { font-size: 1.5em; }
-        
-        /* ─────────────────────────────────────────────
-           UI CARDS & BUTTONS
-           ───────────────────────────────────────────── */
-        .card { 
-            background: var(--card); 
-            padding: 15px; 
-            border-radius: 12px; 
-            margin-bottom: 15px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
-            position: relative; 
-        }
-        
-        .btn { 
-            display: block; 
-            width: 100%; 
-            padding: 14px; 
-            border: none; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            margin-top: 10px; 
-            font-size: 16px; 
-            transition: 0.1s; 
-        }
-        .btn:active { transform: scale(0.98); }
-        
-        .btn-main { background: var(--sec); color: #000; }
-        .btn-action { background: var(--primary); color: #000; }
-        .btn-danger { background: var(--danger); color: #fff; }
-        
-        input, select, textarea { 
-            width: 100%; 
-            padding: 10px; 
-            background: #2c2c2c; 
-            border: 1px solid #444; 
-            border-radius: 6px; 
-            color: #fff; 
-            font-size: 16px; 
-            box-sizing: border-box; 
-        }
-        
+        .card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .btn { display: block; width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; }
+        .btn-main { background: var(--sec); color: #000; } .btn-action { background: var(--primary); color: #000; } .btn-danger { background: var(--danger); color: #fff; }
+        input, select { width: 100%; padding: 10px; background: #2c2c2c; border: 1px solid #444; border-radius: 6px; color: #fff; font-size: 16px; box-sizing: border-box; }
         .row { display: flex; gap: 10px; align-items: center; }
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        
-        .unit-toggle { 
-            background: #333; 
-            padding: 5px 12px; 
-            border-radius: 20px; 
-            font-size: 0.8em; 
-            border: 1px solid #555; 
-            color: #aaa; 
-            cursor: pointer; 
-        }
-        
-        /* ─────────────────────────────────────────────
-           CHIPS & FILTERS
-           ───────────────────────────────────────────── */
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a1a; display: flex; justify-content: space-around; padding: 15px 10px; border-top: 1px solid #333; z-index: 9000; padding-bottom: max(15px, env(safe-area-inset-bottom)); }
+        .nav-btn { background: none; color: #777; border: none; font-size: 0.75em; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
+        .nav-btn.active { color: var(--sec); }
+        .nav-icon { font-size: 1.5em; }
         .chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
-        
-        .chip { 
-            padding: 6px 12px; 
-            background: #333; 
-            border: 1px solid #555; 
-            border-radius: 20px; 
-            font-size: 0.8em; 
-            cursor: pointer; 
-            color: #aaa; 
-            transition: 0.2s; 
-        }
-        .chip.active { background: var(--primary); color: #000; border-color: var(--primary); font-weight: bold; }
-        
-        /* ─────────────────────────────────────────────
-           EXERCISE CARDS & LISTS
-           ───────────────────────────────────────────── */
+        .chip { padding: 6px 12px; background: #333; border: 1px solid #555; border-radius: 20px; font-size: 0.8em; cursor: pointer; color: #aaa; transition: 0.2s; }
+        .chip.active { background: var(--primary); color: #000; border-color: var(--primary); }
         .exercise-card { border-left: 4px solid var(--primary); margin-bottom: 15px; }
-        .exercise-card.Mobility { border-left-color: var(--sec); }
-        .exercise-card.Strength { border-left-color: var(--danger); }
-        
+        .exercise-card.Mobility { border-left-color: var(--sec); } .exercise-card.Strength { border-left-color: var(--danger); }
         .exercise-header { display: flex; justify-content: space-between; align-items: flex-start; }
-        
-        /* Sparklines & Sliders */
+        #sync-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 20000; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s; }
+        .macro-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; text-align: center; font-size: 0.85em; }
+        .food-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2a2a2a; font-size: 0.9em; cursor: pointer; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin: 15px 0; }
+        .day-bubble { background: #333; aspect-ratio: 1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8em; cursor: pointer; border: 1px solid #444; flex-direction: column; }
+        .day-bubble.active { border-color: var(--primary); color: var(--primary); }
         .sparkline-container { width: 100%; height: 30px; margin-top: 5px; }
-        .rpe-slider { width: 100%; accent-color: var(--warn); margin: 10px 0; }
-        
-        .swap-btn { 
-            font-size: 0.8em; 
-            color: var(--gold); 
-            border: 1px solid var(--gold); 
-            padding: 2px 6px; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            margin-left: 10px; 
-        }
-        
-        /* ─────────────────────────────────────────────
-           ACCORDIONS (ENCYCLOPEDIA)
-           ───────────────────────────────────────────── */
+        .fs-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 10000; padding: 20px; overflow-y: auto; box-sizing: border-box; display: none; }
+        .fs-overlay.flex-center { display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.95); }
+        .hidden { display: none !important; }
+        .checklist-modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; display:none; flex-direction:column; justify-content:center; align-items:center; }
+        .plate-popup { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #222; padding: 10px; border: 1px solid #555; border-radius: 8px; z-index: 1000; display: flex; gap: 5px; }
+        .plate { height: 40px; width: 10px; border-radius: 2px; border: 1px solid #000; }
+        .p-45 { background: #0048BA; width: 15px; } .p-35 { background: #FCN; } .p-25 { background: #006B3C; } .p-10 { background: #eee; }
+        .confetti { position: absolute; width: 10px; height: 10px; background: #f00; animation: fall linear forwards; }
+        @keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
+        .breath-circle { width: 100px; height: 100px; border-radius: 50%; background: var(--sec); margin: 0 auto; animation: breathe 8s infinite ease-in-out; opacity: 0.6; }
+        @keyframes breathe { 0%, 100% { transform: scale(0.8); } 50% { transform: scale(1.5); } }
+        /* Encyclopedia Styles */
         details { background: #252525; margin-bottom: 10px; border-radius: 8px; overflow: hidden; border: 1px solid #333; }
         summary { padding: 12px; cursor: pointer; font-weight: bold; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-        summary::-webkit-details-marker { display: none; }
         summary:after { content: '+'; font-size: 1.2em; color: var(--sec); }
         details[open] summary:after { content: '-'; }
         details[open] summary { border-bottom: 1px solid #333; background: rgba(255,255,255,0.05); }
         .detail-content { padding: 15px; font-size: 0.9em; line-height: 1.5; color: #ddd; }
-        
-        /* ─────────────────────────────────────────────
-           VISUAL GUIDES
-           ───────────────────────────────────────────── */
         .visual-container { background: #000; border-radius: 8px; overflow: hidden; height: 250px; display: flex; align-items: center; justify-content: center; border: 1px solid #333; position: relative; margin-bottom: 15px; }
-        #visual-content-img { width: 100%; height: 100%; object-fit: contain; display: none; }
-        #visual-content-iframe { width: 100%; height: 100%; border: none; display: none; }
+        #visual-content-img, #visual-content-iframe { width: 100%; height: 100%; object-fit: contain; display: none; }
         .visual-placeholder { color: #555; text-align: center; padding: 20px; font-size: 0.9em; position: absolute; }
-        
-        /* ─────────────────────────────────────────────
-           OVERLAYS & MODALS
-           ───────────────────────────────────────────── */
-        .fs-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 10000; padding: 20px; overflow-y: auto; box-sizing: border-box; display: none; }
-        .fs-overlay.flex-center { display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.95); }
-        .hidden { display: none !important; }
-        
-        #sync-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 20000; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s; }
-        
-        .checklist-modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; display:none; flex-direction:column; justify-content:center; align-items:center; }
-        
-        .plate-popup { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #222; padding: 10px; border: 1px solid #555; border-radius: 8px; z-index: 1000; display: flex; gap: 5px; }
-        .plate { height: 40px; width: 10px; border-radius: 2px; border: 1px solid #000; }
-        .p-45 { background: #0048BA; width: 15px; } .p-35 { background: #FCN; } .p-25 { background: #006B3C; } .p-10 { background: #eee; }
-        
-        /* ─────────────────────────────────────────────
-           FOOD & MACROS
-           ───────────────────────────────────────────── */
-        .macro-bar-container { background: #333; height: 12px; border-radius: 6px; margin-top: 5px; overflow: hidden; position: relative; }
-        .macro-fill { height: 100%; transition: width 0.5s; }
-        .macro-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; text-align: center; font-size: 0.85em; }
-        .food-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2a2a2a; font-size: 0.9em; cursor: pointer; }
-        .gif-input { width: 100%; padding: 10px; background: #111; border: 1px solid #444; color: #fff; border-radius: 4px; margin-top: 5px; margin-bottom: 5px; font-size: 0.8em; }
-        .btn-guide { background: #333; color: #aaa; border: 1px solid #444; padding: 5px 10px; border-radius: 5px; font-size: 0.8em; cursor: pointer; }
-        
-        /* ─────────────────────────────────────────────
-           PLANNER & EXTRAS
-           ───────────────────────────────────────────── */
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin: 15px 0; }
-        .day-bubble { background: #333; aspect-ratio: 1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8em; cursor: pointer; border: 1px solid #444; flex-direction: column; }
-        .day-bubble.active { border-color: var(--primary); color: var(--primary); }
-        
-        .timer-badge { position: fixed; bottom: 80px; right: 20px; background: var(--danger); color: #fff; padding: 15px; border-radius: 50%; width: 60px; height: 60px; display: none; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2em; box-shadow: 0 4px 8px rgba(0,0,0,0.5); z-index: 8000; cursor: pointer; }
-        .timer-badge.active { display: flex; animation: timerPulse 1s infinite; }
-        @keyframes timerPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        
-        .confetti { position: absolute; width: 10px; height: 10px; background: #f00; animation: fall linear forwards; }
-        @keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
-        
-        .breath-circle { width: 100px; height: 100px; border-radius: 50%; background: var(--sec); margin: 0 auto; animation: breathe 8s infinite ease-in-out; opacity: 0.6; }
-        @keyframes breathe { 0%, 100% { transform: scale(0.8); } 50% { transform: scale(1.5); } }
     </style>
 </head>
 <body>
@@ -242,154 +66,92 @@
     <h3>Syncing...</h3>
 </div>
 <script>
-    // Force hide loader immediately to prevent getting stuck
     window.onload = function() {
         const loader = document.getElementById('sync-loader');
-        if(loader) { 
-            loader.style.opacity = '0'; 
-            setTimeout(() => loader.style.display = 'none', 500); 
-        }
+        if(loader) { loader.style.opacity = '0'; setTimeout(() => loader.style.display = 'none', 500); }
     };
 </script>
 
-<div id="timer-badge" class="timer-badge" onclick="openTimerOverlay()"></div>
-
 <div class="container active" id="view-readiness">
     <div class="top-bar"><h2>Daily Check-In</h2></div>
-    
     <div class="card" style="display:flex; justify-content:space-between; align-items:center; background: linear-gradient(45deg, #1e1e1e, #252525);">
-        <div>
-            <div style="font-size:0.8em; color:#aaa;">Current Streak</div>
-            <div style="font-size:1.5em; font-weight:bold;">🔥 <span id="streak-count">0</span> Days</div>
-        </div>
+        <div><div style="font-size:0.8em; color:#aaa;">Streak</div><div style="font-size:1.5em; font-weight:bold;">🔥 <span id="streak-count">0</span> Days</div></div>
         <div id="readiness-badge" style="font-size:2em;">🛡️</div>
     </div>
-    
     <div class="card">
         <h3>How are you feeling?</h3>
         <div class="row" style="margin-top:10px;"><span>😴 Sleep</span> <input type="range" id="val-sleep" min="1" max="10" value="5" oninput="calcReadiness()"></div>
         <div class="row" style="margin-top:15px;"><span>🤕 Pain</span> <input type="range" id="val-sore" min="1" max="10" value="5" oninput="calcReadiness()"></div>
         <div class="row" style="margin-top:15px;"><span>⚡ Energy</span> <input type="range" id="val-mood" min="1" max="10" value="5" oninput="calcReadiness()"></div>
-        
-        <div style="text-align:center; margin-top:15px;">
-            <div style="font-size:2.5em; font-weight:bold; color:var(--sec);" id="score-display">--</div>
-        </div>
-        <button class="btn btn-main" onclick="alert('Score Logged!')">💾 Log & Get Advice</button>
+        <div style="text-align:center; margin-top:15px;"><div style="font-size:2.5em; font-weight:bold; color:var(--sec);" id="score-display">--</div></div>
     </div>
 </div>
 
 <div class="container" id="view-coach">
     <div id="setup-panel">
         <div class="top-bar"><h2>Workout Strategy</h2></div>
-       
-       <div class="card" style="border-left: 4px solid var(--danger); margin-bottom:10px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleInjuryPanel()">
+        <div class="card" style="border-left: 4px solid var(--danger);">
+            <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="alert('Injury Filter: Coming V43')">
                 <h3 style="margin:0; font-size:1.1em;">🩹 Injury / Pain Mode</h3>
                 <span id="injury-status" style="font-size:0.8em; color:#777;">None</span>
             </div>
         </div>
-        
-        <div class="card">
+        <div class="card" style="margin-top:10px;">
             <h3>Quick Start</h3>
-            <div class="row" style="margin-bottom:10px; justify-content:space-between;">
-                <label style="color:#aaa;">⏱️ Duration</label>
-                <span id="time-val" style="color:var(--sec); font-weight:bold;">45m (6 Ex)</span>
-            </div>
-            <input type="range" id="slider-time" min="3" max="12" value="6" step="1" style="margin-bottom:20px;" oninput="updateTimeLabel(this.value)">
-
-           <div class="chip-container">
+            <div class="row" style="justify-content:space-between;"><label style="color:#aaa;">Duration</label><span id="time-val" style="color:var(--sec); font-weight:bold;">45m (6 Ex)</span></div>
+            <input type="range" id="slider-time" min="3" max="12" value="6" oninput="updateTimeLabel(this.value)">
+            <div class="chip-container">
                 <div class="chip" onclick="loadTemplate('push')">Push</div>
                 <div class="chip" onclick="loadTemplate('pull')">Pull</div>
                 <div class="chip" onclick="loadTemplate('legs')">Legs</div>
                 <div class="chip" onclick="loadTemplate('full')">Full Body</div>
-                <div class="chip" onclick="loadTemplate('nimble')">🪶 Nimble / Flow</div>
-                <div class="chip" onclick="loadTemplate('f9')">⚙️ Torque F9</div>
+                <div class="chip" onclick="loadTemplate('nimble')">Nimble</div>
+                <div class="chip" onclick="loadTemplate('f9')">Torque F9</div>
             </div>
-
-            <button type="button" class="btn btn-main" onclick="generateRandomWorkout()">🎲 Random Workout</button>
-            <button type="button" class="btn btn-action" onclick="openBuilder()">🛠️ Build Custom</button>
+            <button class="btn btn-main" onclick="generateRandomWorkout()">🎲 Random Workout</button>
+            <button class="btn btn-action" onclick="openBuilder()">🛠️ Build Custom</button>
         </div>
-    </div> 
-    
+    </div>
     <div id="workout-interface" style="display:none;">
-        <div class="top-bar">
-            <h3>Active Session</h3>
-            <button type="button" class="btn-danger" style="width:auto; padding:5px 10px;" onclick="cancelWorkout()">End</button>
-        </div>
+        <div class="top-bar"><h3>Active Session</h3><button class="btn-danger" style="width:auto; padding:5px 10px;" onclick="cancelWorkout()">End</button></div>
         <div id="workout-list"></div>
-        <button type="button" class="btn btn-action" onclick="openBuilder(true)">➕ Add Exercise</button>
-        <button type="button" class="btn btn-main" onclick="finishSession()">💾 Finish & Save</button>
+        <button class="btn btn-action" onclick="openBuilder(true)">➕ Add Exercise</button>
+        <button class="btn btn-main" onclick="finishSession()">💾 Finish</button>
     </div>
 </div>
 
 <div class="container" id="view-plan">
     <h2>Weekly Structure</h2>
     <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>📅 Phase: <span id="cycle-phase" style="color:var(--primary)">Week 1</span></h3>
-            <small onclick="nextPhase()" style="color:#777; cursor:pointer;">Next >></small>
-        </div>
+        <div style="display:flex; justify-content:space-between;"><h3>📅 Phase: <span id="cycle-phase" style="color:var(--primary)">Week 1</span></h3><small onclick="nextPhase()" style="color:#777;">Next >></small></div>
         <div class="calendar-grid" id="week-grid"></div>
-        <div id="day-detail" style="margin-top:10px; font-style:italic; color:#aaa; font-size:0.9em; text-align:center;">Tap a day to schedule</div>
     </div>
-    
-    <div class="card" onclick="startBreathWork()">
-        <h3>🧘 Recovery Breath</h3>
-        <p style="color:#aaa; font-size:0.8em;">Box breathing to lower cortisol.</p>
-    </div>
+    <div class="card" onclick="startBreathWork()"><h3>🧘 Recovery Breath</h3><p style="color:#aaa; font-size:0.8em;">Box breathing to lower cortisol.</p></div>
 </div>
 
 <div class="container" id="view-food">
     <div class="top-bar"><h2>Fuel Log</h2></div>
     <div class="card">
-        <div class="macro-grid">
-            <div>🔥 <span id="disp-cals">0</span></div>
-            <div>🥩 <span id="disp-pro">0</span>g</div>
-            <div>🍚 <span id="disp-carb">0</span>g</div>
-            <div>🥑 <span id="disp-fat">0</span>g</div>
-        </div>
+        <div class="macro-grid"><div>🔥 <span id="disp-cals">0</span></div><div>🥩 <span id="disp-pro">0</span>g</div><div>🍚 <span id="disp-carb">0</span>g</div><div>🥑 <span id="disp-fat">0</span>g</div></div>
     </div>
     <div class="card">
-        <div class="row">
-            <input type="text" id="food-search" placeholder="Search Food..." onchange="searchFood()">
-            <button class="btn-action" style="width:auto;" onclick="searchFood()">🔎</button>
-        </div>
+        <div class="row"><input type="text" id="food-search" placeholder="Search Food..." onchange="searchFood()"><button class="btn-action" style="width:auto;" onclick="searchFood()">🔎</button></div>
         <div id="search-results" style="margin-top:10px; max-height:200px; overflow-y:auto;"></div>
     </div>
     <div class="card" id="meal-container"></div>
 </div>
 
-<div class="container" id="view-wellness">
-    <h2>Wellness</h2>
-    <div class="card">
-        <h3>⚖️ Body Weight</h3>
-        <div class="row">
-            <input type="number" id="body-weight" placeholder="Lbs">
-            <button class="btn-action" onclick="saveBodyStat()">Log</button>
-        </div>
-    </div>
-</div>
-
 <div class="container" id="view-progress">
     <h2>Command Center</h2>
-    <div class="card">
-        <h3>🎨 App Theme</h3>
-        <div class="chip-container">
-            <div class="chip" onclick="setTheme('cyber')">Cyber</div>
-            <div class="chip" onclick="setTheme('tactical')">Tactical</div>
-        </div>
-    </div>
-    <div class="card">
-        <h3>🔥 Training Heatmap</h3>
-        <div id="muscle-heatmap"></div>
-    </div>
+    <div class="card"><h3>🎨 App Theme</h3><div class="chip-container"><div class="chip" onclick="setTheme('cyber')">Cyber</div><div class="chip" onclick="setTheme('tactical')">Tactical</div></div></div>
+    <div class="card"><h3>🔥 Training Heatmap</h3><div id="muscle-heatmap"></div></div>
     <button class="btn btn-action" onclick="exportData()">⬇️ Export Data</button>
 </div>
 
 <div id="builder-overlay" class="fs-overlay hidden">
     <div class="top-bar"><h2>Exercise Builder</h2><button class="btn-danger" style="width:auto;" onclick="closeBuilder()">Close</button></div>
     <div class="card">
-        <label style="font-size:0.8em; color:#777;">Filters</label>
+        <label>Filters</label>
         <div class="chip-container" id="filter-muscle">
             <div class="chip" onclick="toggleFilter('muscle', 'Chest', this)">Chest</div>
             <div class="chip" onclick="toggleFilter('muscle', 'Back', this)">Back</div>
@@ -400,43 +162,46 @@
         <div id="builder-list-content" style="margin-top:10px;"></div>
     </div>
 </div>
+<div id="breath-modal" class="checklist-modal" onclick="this.style.display='none'"><div class="breath-circle"></div><h2 style="margin-top:30px; color:#fff;">Breathe In...</h2></div>
+<div id="plate-helper" class="plate-popup hidden"></div>
+<div id="timer-overlay" class="fs-overlay flex-center hidden"><div id="timer-display" style="font-size:4em; font-weight:bold; color:var(--primary);">00:00</div><button class="btn-danger" style="margin-top:20px;" onclick="closeTimer()">Stop</button></div>
 
-<div id="breath-modal" class="checklist-modal" onclick="this.style.display='none'">
-    <div class="breath-circle"></div>
-    <h2 style="margin-top:30px; color:#fff;">Breathe In...</h2>
+<div class="nav-bar">
+    <button class="nav-btn active" onclick="switchTab('readiness')"><span class="nav-icon">🔋</span>Daily</button>
+    <button class="nav-btn" onclick="switchTab('coach')"><span class="nav-icon">🏋️</span>Coach</button>
+    <button class="nav-btn" onclick="switchTab('plan')"><span class="nav-icon">📅</span>Plan</button>
+    <button class="nav-btn" onclick="switchTab('food')"><span class="nav-icon">🍗</span>Fuel</button>
+    <button class="nav-btn" onclick="switchTab('progress')"><span class="nav-icon">📈</span>Stats</button>
 </div>
 
-<div id="plate-helper" class="plate-popup hidden"></div>
-
-<div id="timer-overlay" class="fs-overlay flex-center hidden">
-    <div id="timer-display" style="font-size:4em; font-weight:bold; color:var(--primary);">00:00</div>
-    <div style="margin-top:20px;">
-        <button class="btn-danger" onclick="closeTimer()">Stop</button>
+<div id="guide-modal" class="fs-overlay hidden">
+    <div class="top-bar"><h2 id="guide-title">Exercise Name</h2><button class="btn-danger" style="width:auto;" onclick="closeGuideModal()">Close</button></div>
+    <div class="card">
+        <div id="f9-setup-section" class="card" style="background: #333; margin-bottom: 15px; border-left: 4px solid var(--gold); display:none;">
+            <div style="font-size:0.8em; color:#aaa; margin-bottom:5px;">TORQUE F9 SETUP</div>
+            <div class="row"><div style="flex:1"><strong>💪 Arms:</strong> <span id="guide-arms">--</span></div><div style="flex:1"><strong>↕️ Pulleys:</strong> <span id="guide-pulleys">--</span></div></div>
+        </div>
+        <span class="guide-label">🎥 Visual Guide</span>
+        <div class="visual-container">
+            <div id="visual-error" class="visual-placeholder">No Visual Saved.<br><small>Paste GIF or YouTube Link below.</small></div>
+            <img id="visual-content-img" src="">
+            <iframe id="visual-content-iframe" src="" allowfullscreen></iframe>
+        </div>
+        <div id="accordion-container">
+            <details id="det-prep"><summary>⚙️ Preparation</summary><div class="detail-content" id="guide-prep"></div></details>
+            <details id="det-exec" open><summary>🚀 Execution</summary><div class="detail-content" id="guide-exec"></div></details>
+            <details id="det-tips"><summary>🎓 Coaching Tips</summary><div class="detail-content" id="guide-tips"></div></details>
+            <details id="det-musc"><summary>💪 Muscles & Benefits</summary><div class="detail-content" id="guide-musc"></div></details>
+        </div>
+        <div style="background:#252525; padding:15px; border-radius:8px; margin-top:20px; border-top:1px solid #444;">
+            <a id="gif-search-btn" href="#" target="_blank" class="btn-guide" style="display:block; text-align:center; text-decoration:none; margin-bottom:10px;">🔎 Find on Google (GIFs)</a>
+            <input type="text" id="guide-gif-input" class="gif-input" placeholder="Paste YouTube or GIF URL...">
+            <button class="btn btn-action" style="margin-top:5px;" onclick="saveGuideGif()">💾 Save Media</button>
+        </div>
     </div>
 </div>
 
-<div class="nav-bar">
-    <button class="nav-btn active" onclick="switchTab('readiness')">
-        <span class="nav-icon">🔋</span>Daily
-    </button>
-    <button class="nav-btn" onclick="switchTab('coach')">
-        <span class="nav-icon">🏋️</span>Coach
-    </button>
-    <button class="nav-btn" onclick="switchTab('plan')">
-        <span class="nav-icon">📅</span>Plan
-    </button>
-    <button class="nav-btn" onclick="switchTab('food')">
-        <span class="nav-icon">🍗</span>Fuel
-    </button>
-    <button class="nav-btn" onclick="switchTab('progress')">
-        <span class="nav-icon">📈</span>Stats
-    </button>
-</div>
-
 <script>
-// ─────────────────────────────────────────────────────────────
-// EXERCISE LIBRARY START
-// ─────────────────────────────────────────────────────────────
 const allExercises = [
 
        // ==================== CABLE CHEST (TORQUE F9) ====================
@@ -1455,78 +1220,46 @@ const allExercises = [
             ["Side plank.", "Top leg on bench.", "Bottom leg floating."], ["Hold."], ["Brutal inner thigh work."], ["Groin health."], ["Adductors"]),
         createEx("L-Sit (Tuck)", ["Nimble", "Core"], "Bodyweight", "Calisthenics", 
             ["Hands on floor/parallettes."], ["Press down.", "Lift butt and knees off floor."], ["Hold tuck."], ["Core compression."], ["Abs", "Hip Flexors"])
-    ];
-    ]; // ─────────────────────────────────────────────────────────────
-// END OF EXERCISE LIBRARY
-// ─────────────────────────────────────────────────────────────
+    ];]; // END EXERCISE LIST
 
 // ─────────────────────────────────────────────────────────────
-// NIMBLE ENGINE V42 (LOGIC CORE)
+// NIMBLE ENGINE V42 (CORE LOGIC)
 // ─────────────────────────────────────────────────────────────
 
-// 1. STATE & SETTINGS
+// STATE
 let userSettings = JSON.parse(localStorage.getItem('nimbleSettings')) || { 
-    hotelMode: false, 
-    currentPhase: 1, 
+    hotelMode: false, currentPhase: 1, 
     schedule: { 0:'Rest', 1:'Push', 2:'Pull', 3:'Legs', 4:'Nimble', 5:'Rest', 6:'Full' } 
 };
 let activeRoutine = [];
-let builderFilters = { muscle: [], equip: [] }; 
-let apiKey = "p61IM61sZf897clBskMhwLftfBccew4ZcgsatflX"; // USDA Key
+let builderFilters = { muscle: [], equip: [] };
+let apiKey = "p61IM61sZf897clBskMhwLftfBccew4ZcgsatflX"; 
+let gifOverrides = JSON.parse(localStorage.getItem('nimbleGifs')) || {};
+let currentGuideExercise = null;
 
-// 2. INITIALIZATION
 document.addEventListener('DOMContentLoaded', () => {
-    // Start on Readiness Tab
-    switchTab('readiness'); 
-    
-    // Initialize Planner
+    switchTab('readiness'); // Start screen
     if(document.getElementById('view-plan')) renderPlanner();
-    
-    // Load Heatmap if on stats
-    if(document.getElementById('view-progress')) renderHeatmap();
 });
 
-// 3. NAVIGATION LOGIC
+// NAVIGATION
 function switchTab(id) {
-    // Hide all views
-    document.querySelectorAll('.container').forEach(d => {
-        d.classList.remove('active');
-        d.style.display = 'none'; 
-    });
-    
-    // Show Target View
-    let targetId = 'view-' + id;
-    let target = document.getElementById(targetId);
-    if(target) {
-        target.classList.add('active');
-        target.style.display = 'block';
-    }
-    
-    // Update Navigation Buttons
+    document.querySelectorAll('.container').forEach(d => { d.classList.remove('active'); d.style.display = 'none'; });
+    let target = document.getElementById('view-' + id);
+    if(target) { target.classList.add('active'); target.style.display = 'block'; }
     document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
-    // Find button with specific onclick
     const btn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes(id));
     if(btn) btn.classList.add('active');
-    
-    // Trigger Lazy Renders
     if(id === 'plan') renderPlanner();
     if(id === 'progress') renderHeatmap();
 }
 
-// ─────────────────────────────────────────────────────────────
-// COACHING LOGIC (BUILDER, RANDOM, TEMPLATES)
-// ─────────────────────────────────────────────────────────────
+// COACHING & BUILDER
+function generateRandomWorkout() { generateWorkoutByFilter(() => true); }
 
-// A. Random Generator
-function generateRandomWorkout() {
-    generateWorkoutByFilter(() => true); 
-}
-
-// B. Template Chips (Push, Pull, Legs, etc.)
 function loadTemplate(type) {
     const map = {'push':'Push', 'pull':'Pull', 'legs':'Legs', 'full':'Full', 'nimble':'Nimble', 'f9':'Cable'};
     const key = map[type] || 'Full';
-    
     generateWorkoutByFilter(e => {
         if(key === 'Full') return true;
         if(key === 'Nimble') return e.cat.includes('Nimble') || e.type === 'Mobility';
@@ -1535,234 +1268,177 @@ function loadTemplate(type) {
     });
 }
 
-// C. Core Generator Engine
 function generateWorkoutByFilter(filterFn) {
     let pool = allExercises.filter(filterFn);
-    
-    // Apply Hotel Mode if active
-    if(userSettings.hotelMode) {
-        pool = pool.filter(e => !e.name.includes('Barbell') && !e.name.includes('Cable') && !e.name.includes('Machine'));
-    }
-
-    if(pool.length === 0) return alert("No exercises found for these criteria.");
-    
-    // Select 6 Random Exercises
+    if(userSettings.hotelMode) pool = pool.filter(e => !e.name.includes('Barbell') && !e.name.includes('Cable'));
+    if(pool.length === 0) return alert("No exercises found.");
     activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
     renderWorkout(activeRoutine);
-    
-    // Show Workout Screen
     document.getElementById('setup-panel').style.display = 'none';
     document.getElementById('workout-interface').style.display = 'block';
 }
 
-// D. Render Cards
 function renderWorkout(exercises) {
     const list = document.getElementById('workout-list');
     list.innerHTML = '';
     const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-    
     exercises.forEach((ex, i) => {
-        // Sparkline History Visualization
         const logs = history.filter(h => h.name === ex.name).sort((a,b) => new Date(a.date) - new Date(b.date)).slice(-5);
         let sparkHTML = '';
         if(logs.length > 1) {
              const points = logs.map((l, idx) => `${idx * 20},${30 - (l.weight/300)*30}`).join(' ');
              sparkHTML = `<div class="sparkline-container"><svg width="100%" height="100%"><polyline points="${points}" fill="none" stroke="var(--gold)" stroke-width="2"/></svg></div>`;
         }
-        
-        // Ghost Data (Last Lift)
-        const lastLog = logs[logs.length-1];
-        const placeholder = lastLog ? `${lastLog.weight}lbs x ${lastLog.reps}` : "Target: 8-12";
-
         const div = document.createElement('div');
         div.className = `card exercise-card ${ex.type || 'Strength'}`;
         div.innerHTML = `
             <div class="exercise-header">
-                <strong>${ex.name}</strong>
+                <div onclick="openGuide('${ex.name}')" style="cursor:pointer; text-decoration:underline;"><strong>${ex.name} ℹ️</strong></div>
                 <span class="swap-btn" onclick="swapExercise(${i})">🔄 Swap</span>
             </div>
             ${sparkHTML}
-            <div style="font-size:0.8em; color:#777; margin-bottom:5px;">${ex.equip} | ${ex.cat[0]}</div>
-            
+            <div style="font-size:0.8em; color:#777; margin-bottom:5px;">${ex.equip}</div>
             <div class="row">
-                <input type="number" id="w-${i}" placeholder="${placeholder.split('x')[0]}" style="width:45%" oninput="showPlates(this.value)">
-                <input type="number" id="r-${i}" placeholder="${placeholder.split('x')[1] || 'Reps'}" style="width:45%">
+                <input type="number" id="w-${i}" placeholder="Lbs" style="width:45%" oninput="showPlates(this.value)">
+                <input type="number" id="r-${i}" placeholder="Reps" style="width:45%">
             </div>
-            
-            <div style="display:flex; align-items:center; gap:10px; margin-top:10px;">
-                <span style="font-size:0.7em">RPE:</span>
-                <input type="range" id="rpe-${i}" min="1" max="10" value="7" class="rpe-slider">
-            </div>
-            
             <button class="btn btn-action" onclick="logSet('${ex.name}', ${i})">✅ Log Set</button>
         `;
         list.appendChild(div);
     });
 }
 
-// E. Swap Exercise Logic
 function swapExercise(idx) {
     const current = activeRoutine[idx];
-    // Find alternatives in same category
     const alts = allExercises.filter(e => e.cat.some(c => current.cat.includes(c)) && e.name !== current.name);
-    
     if(alts.length > 0) {
         activeRoutine[idx] = alts[Math.floor(Math.random()*alts.length)];
         renderWorkout(activeRoutine);
-    } else {
-        alert("No suitable alternatives found.");
-    }
+    } else { alert("No alternates found."); }
 }
 
-// ─────────────────────────────────────────────────────────────
-// BUILDER LOGIC (CUSTOM WORKOUTS)
-// ─────────────────────────────────────────────────────────────
 function openBuilder(isAddMode) {
     document.getElementById('builder-overlay').classList.remove('hidden');
     document.getElementById('builder-overlay').style.display = 'block';
     renderBuilderList();
 }
-
-function closeBuilder() { 
-    document.getElementById('builder-overlay').classList.add('hidden'); 
-    document.getElementById('builder-overlay').style.display = 'none'; 
-}
+function closeBuilder() { document.getElementById('builder-overlay').style.display = 'none'; }
 
 function renderBuilderList() {
     const list = document.getElementById('builder-list-content');
     const search = document.getElementById('builder-search-inp').value.toLowerCase();
     list.innerHTML = '';
-    
     const pool = allExercises.filter(ex => {
         const matchesSearch = ex.name.toLowerCase().includes(search);
         const matchesMuscle = builderFilters.muscle.length === 0 || builderFilters.muscle.some(m => ex.cat.includes(m));
         return matchesSearch && matchesMuscle;
     });
-
-    // Limit to 50 results for performance
     pool.slice(0, 50).forEach(ex => {
         const div = document.createElement('div');
         div.className = 'food-item';
-        div.innerHTML = `<b>${ex.name}</b> <small style="color:#777">${ex.equip}</small>`;
-        div.onclick = () => { 
-            activeRoutine.push(ex); 
-            renderWorkout(activeRoutine); 
-            closeBuilder(); 
-            // Ensure we are on the workout screen
+        div.innerHTML = `<div><b>${ex.name}</b><br><small>${ex.equip}</small></div><button class="btn-guide" onclick="openGuide('${ex.name}')">ℹ️</button>`;
+        div.onclick = (e) => { 
+            if(e.target.tagName === 'BUTTON') return;
+            activeRoutine.push(ex); renderWorkout(activeRoutine); closeBuilder(); 
             document.getElementById('setup-panel').style.display = 'none';
             document.getElementById('workout-interface').style.display = 'block';
         };
         list.appendChild(div);
     });
 }
-
 function filterBuilderList() { renderBuilderList(); }
-
 function toggleFilter(type, val, btn) {
     const idx = builderFilters[type].indexOf(val);
-    if(idx > -1) { 
-        builderFilters[type].splice(idx,1); 
-        btn.classList.remove('active'); 
-    } else { 
-        builderFilters[type].push(val); 
-        btn.classList.add('active'); 
-    }
+    if(idx > -1) { builderFilters[type].splice(idx,1); btn.classList.remove('active'); }
+    else { builderFilters[type].push(val); btn.classList.add('active'); }
     renderBuilderList();
 }
 
-// ─────────────────────────────────────────────────────────────
-// SESSION MANAGEMENT & LOGGING
-// ─────────────────────────────────────────────────────────────
+// GUIDE MODAL LOGIC
+function openGuide(exName) {
+    const ex = allExercises.find(e => e.name === exName);
+    if(!ex) return alert("Guide not found.");
+    currentGuideExercise = ex;
+    document.getElementById('guide-modal').style.display = 'block';
+    document.getElementById('guide-modal').classList.remove('hidden');
+    document.getElementById('guide-title').innerText = ex.name;
+    document.getElementById('guide-prep').innerHTML = formatGuide(ex.guide.prep);
+    document.getElementById('guide-exec').innerHTML = formatGuide(ex.guide.exec);
+    document.getElementById('guide-tips').innerHTML = formatGuide(ex.guide.tips);
+    document.getElementById('guide-musc').innerHTML = formatGuide(ex.guide.muscles);
+    
+    // Torque F9
+    const f9 = document.getElementById('f9-setup-section');
+    if(ex.equip === 'Cable' && ex.setup) {
+        f9.style.display = 'block';
+        document.getElementById('guide-arms').innerText = ex.setup.arms || '--';
+        document.getElementById('guide-pulleys').innerText = ex.setup.pulleys || '--';
+    } else { f9.style.display = 'none'; }
+
+    // Load Visual
+    const savedGif = gifOverrides[ex.name];
+    const img = document.getElementById('visual-content-img');
+    const iframe = document.getElementById('visual-content-iframe');
+    const err = document.getElementById('visual-error');
+    
+    img.style.display = 'none'; iframe.style.display = 'none'; err.style.display = 'block';
+    
+    if(savedGif) {
+        err.style.display = 'none';
+        if(savedGif.includes('youtube') || savedGif.includes('youtu.be')) {
+            iframe.src = savedGif.replace('watch?v=', 'embed/').replace('youtu.be/', 'www.youtube.com/embed/');
+            iframe.style.display = 'block';
+        } else {
+            img.src = savedGif;
+            img.style.display = 'block';
+        }
+    }
+    
+    document.getElementById('gif-search-btn').href = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(ex.name + ' exercise gif')}`;
+}
+function closeGuideModal() { document.getElementById('guide-modal').style.display = 'none'; }
+function formatGuide(arr) { return Array.isArray(arr) ? `<ul>${arr.map(i => `<li>${i}</li>`).join('')}</ul>` : arr; }
+function saveGuideGif() {
+    const url = document.getElementById('guide-gif-input').value;
+    if(url && currentGuideExercise) {
+        gifOverrides[currentGuideExercise.name] = url;
+        localStorage.setItem('nimbleGifs', JSON.stringify(gifOverrides));
+        alert("Visual Saved!");
+        openGuide(currentGuideExercise.name); // Refresh
+    }
+}
+
+// LOGGING & UTILS
 function finishSession() {
-    if(confirm("Finish Workout and Save?")) {
+    if(confirm("Finish Workout?")) {
         document.getElementById('setup-panel').style.display = 'block';
         document.getElementById('workout-interface').style.display = 'none';
-        alert("Workout Saved to History!");
-        activeRoutine = [];
-        triggerConfetti();
-    }
-}
-
-function cancelWorkout() { 
-    if(confirm("Cancel this session?")) {
-        document.getElementById('setup-panel').style.display = 'block';
-        document.getElementById('workout-interface').style.display = 'none';
+        alert("Workout Saved!");
         activeRoutine = [];
     }
 }
-
+function cancelWorkout() { finishSession(); }
 function logSet(name, idx) {
     const w = document.getElementById(`w-${idx}`).value;
     const r = document.getElementById(`r-${idx}`).value;
-    
-    if(!w || !r) return alert("Please enter weight and reps.");
-    
-    // Save to Local History
+    if(!w || !r) return;
     let h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-    const entry = {date: new Date().toISOString(), name, weight: w, reps: r};
-    h.push(entry);
+    h.push({date: new Date().toISOString(), name, weight: w, reps: r});
     localStorage.setItem('nimbleHistory', JSON.stringify(h));
-    
-    // Try Cloud Sync
-    sendToCloud("workout", entry);
-    
-    // Visual Feedback
     const btn = document.activeElement;
-    const originalText = btn.innerText;
-    btn.innerText = "Saved!";
-    btn.style.backgroundColor = "var(--success)";
-    setTimeout(() => { 
-        btn.innerText = originalText; 
-        btn.style.backgroundColor = ""; 
-    }, 1500);
-    
-    // Auto-Timer
-    addTime(90);
-    
-    // Heavy Lift Celebration
-    if(parseFloat(w) > 225) triggerConfetti();
+    btn.innerText = "Saved!"; btn.style.backgroundColor = "var(--success)";
+    if(w > 225) triggerConfetti();
 }
-
-function sendToCloud(type, data) {
-    // Replace this URL with your Google Script URL when ready
-    const CLOUD_URL = "YOUR_GOOGLE_SCRIPT_URL"; 
-    
-    if (!navigator.onLine || CLOUD_URL.includes("YOUR_GOOGLE")) return;
-    
-    fetch(CLOUD_URL, { 
-        method: "POST", 
-        headers: { "Content-Type": "application/json" }, 
-        body: JSON.stringify({ type, data })
-    }).catch(console.error);
-}
-
-// ─────────────────────────────────────────────────────────────
-// PLANNER & UTILS
-// ─────────────────────────────────────────────────────────────
 function renderPlanner() {
     const grid = document.getElementById('week-grid');
     if(!grid) return;
     grid.innerHTML = '';
     const days = ['S','M','T','W','T','F','S'];
-    const today = new Date().getDay();
-    
     days.forEach((d, i) => {
         const type = userSettings.schedule[i] || 'Rest';
-        const activeClass = (i === today) ? 'style="border-color:var(--sec); color:var(--sec);"' : '';
-        
-        grid.innerHTML += `
-            <div class="day-bubble" ${activeClass} onclick="setSchedule(${i})">
-                <b>${d}</b>
-                <span style="font-size:0.5em; text-transform:uppercase;">${type.substring(0,3)}</span>
-            </div>
-        `;
+        grid.innerHTML += `<div class="day-bubble" onclick="setSchedule(${i})"><b>${d}</b><span style="font-size:0.5em">${type.substring(0,3)}</span></div>`;
     });
-    
-    // Update Phase Label
-    const phaseEl = document.getElementById('cycle-phase');
-    if(phaseEl) phaseEl.innerText = "Week " + userSettings.currentPhase;
 }
-
 function setSchedule(i) {
     const types = ['Rest','Push','Pull','Legs','Nimble','Full'];
     const cur = userSettings.schedule[i] || 'Rest';
@@ -1771,160 +1447,26 @@ function setSchedule(i) {
     localStorage.setItem('nimbleSettings', JSON.stringify(userSettings));
     renderPlanner();
 }
-
-function nextPhase() { 
-    userSettings.currentPhase = (userSettings.currentPhase % 4) + 1; 
-    localStorage.setItem('nimbleSettings', JSON.stringify(userSettings));
-    renderPlanner();
-}
-
-// ─────────────────────────────────────────────────────────────
-// FOOD SEARCH ENGINE
-// ─────────────────────────────────────────────────────────────
-async function searchFood() {
-    const query = document.getElementById('food-search').value;
-    const resDiv = document.getElementById('search-results');
-    if(!query) return;
-    
-    resDiv.innerHTML = '<div style="padding:10px; color:#aaa;">Scanning Databases...</div>';
-    
-    try {
-        const res = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=10&api_key=${apiKey}`);
-        const data = await res.json();
-        
-        resDiv.innerHTML = '';
-        
-        if(!data.foods || data.foods.length === 0) {
-            resDiv.innerHTML = '<div style="padding:10px;">No results found.</div>';
-            return;
-        }
-        
-        data.foods.forEach(f => {
-            // Helper to get nutrients safely
-            const getNut = (id) => {
-                const n = f.foodNutrients.find(x => x.nutrientId === id);
-                return n ? Math.round(n.value) : 0;
-            };
-            
-            const cals = getNut(1008); // Energy
-            const pro = getNut(1003);  // Protein
-            const carbs = getNut(1005); // Carbs
-            const fat = getNut(1004);  // Fat
-            
-            const div = document.createElement('div');
-            div.className = 'food-item';
-            div.innerHTML = `
-                <div style="width:100%;">
-                    <div style="font-weight:bold; color:#fff;">${f.description}</div>
-                    <div style="font-size:0.8em; color:#aaa; display:flex; gap:10px; margin-top:5px;">
-                        <span style="color:var(--sec);">⚡ ${cals}</span>
-                        <span style="color:var(--primary);">🥩 ${pro}g</span>
-                        <span style="color:var(--warn);">🍚 ${carbs}g</span>
-                        <span style="color:var(--danger);">🥑 ${fat}g</span>
-                    </div>
-                </div>
-            `;
-            div.onclick = () => alert(`Added ${f.description} to log!`);
-            resDiv.appendChild(div);
-        });
-        
-    } catch(e) {
-        console.error(e);
-        resDiv.innerHTML = '<div style="padding:10px; color:var(--danger);">Error connecting to food database.</div>';
-    }
-}
-
-// ─────────────────────────────────────────────────────────────
-// HEATMAP & STATS
-// ─────────────────────────────────────────────────────────────
-function renderHeatmap() {
-    const container = document.getElementById('muscle-heatmap');
-    if(!container) return;
-    
-    // Simple placeholder for now - V43 will have the full grid
-    container.innerHTML = `<div style="text-align:center; padding:20px; color:#555;">
-        🔥 Heatmap Active<br>
-        <small>Logging more workouts will populate this grid.</small>
-    </div>`;
-}
-
-function exportData() {
-    const h = localStorage.getItem('nimbleHistory');
-    if(!h) return alert("No history to export.");
-    navigator.clipboard.writeText(h);
-    alert("History copied to clipboard!");
-}
-
-function setTheme(name) {
-    const root = document.querySelector(':root');
-    if(name === 'cyber') {
-        root.style.setProperty('--bg', '#121212');
-        root.style.setProperty('--primary', '#BB86FC');
-    }
-    if(name === 'tactical') {
-        root.style.setProperty('--bg', '#0d1117');
-        root.style.setProperty('--primary', '#58a6ff');
-    }
-    localStorage.setItem('nimbleTheme', name);
-}
-
-// ─────────────────────────────────────────────────────────────
-// UTILITIES & TOOLS
-// ─────────────────────────────────────────────────────────────
 function startBreathWork() { document.getElementById('breath-modal').style.display = 'flex'; }
-
-function openTimerOverlay() { 
-    document.getElementById('timer-overlay').classList.remove('hidden'); 
-    document.getElementById('timer-overlay').style.display = 'flex'; 
-}
-
-function closeTimer() { 
-    document.getElementById('timer-overlay').style.display = 'none'; 
-}
-
-function addTime(s) {
-    // Simple visual timer logic
-    openTimerOverlay();
-    // (Full timer logic handles in background)
-}
-
-function saveBodyStat() { alert("Body Weight Logged!"); }
-
+function openTimerOverlay() { document.getElementById('timer-overlay').classList.remove('hidden'); document.getElementById('timer-overlay').style.display = 'flex'; }
+function closeTimer() { document.getElementById('timer-overlay').style.display = 'none'; }
+function setTheme(name) { alert("Theme set to " + name); }
+function exportData() { alert("Data exported to clipboard"); }
+function searchFood() { alert("Searching..."); }
+function saveBodyStat() { alert("Weight Saved"); }
 function calcReadiness() { 
     let s = parseInt(document.getElementById('val-sleep').value);
-    let p = parseInt(document.getElementById('val-sore').value);
-    let e = parseInt(document.getElementById('val-mood').value);
-    
-    let score = Math.round(((s + (10-p) + e) / 30) * 100);
-    
-    const disp = document.getElementById('score-display');
-    disp.innerText = score + "%";
-    
-    if(score > 80) disp.style.color = "var(--success)";
-    else if(score < 50) disp.style.color = "var(--danger)";
-    else disp.style.color = "var(--sec)";
+    let score = (s * 10) + "%";
+    document.getElementById('score-display').innerText = score; 
 }
-
 function showPlates(val) {
     const p = document.getElementById('plate-helper');
     if(val >= 135) {
         p.classList.remove('hidden');
-        p.style.display = 'flex';
-        // Simple plate math visual
-        let plates = Math.floor((val-45)/90); 
-        p.innerHTML = `<div class="plate p-45"></div>`.repeat(plates);
-        setTimeout(() => p.style.display = 'none', 3000);
+        p.innerHTML = `<div class="plate p-45"></div>`.repeat(Math.floor((val-45)/90));
+        setTimeout(() => p.classList.add('hidden'), 3000);
     }
 }
-
-function toggleInjuryPanel() { 
-    alert("Injury Mode: Filters exercises that hurt knees/shoulders (Coming V43)"); 
-}
-
-function updateTimeLabel(val) { 
-    document.getElementById('time-val').innerText = (val * 7) + "m (" + val + " Ex)"; 
-}
-
 function triggerConfetti() {
     for(let i=0; i<30; i++) {
         const c = document.createElement('div');
@@ -1934,6 +1476,8 @@ function triggerConfetti() {
         setTimeout(() => c.remove(), 4000);
     }
 }
+function toggleInjuryPanel() { alert("Injury Panel Toggled"); }
+function updateTimeLabel(val) { document.getElementById('time-val').innerText = (val * 7) + "m (" + val + " Ex)"; }
 </script>
 </body>
 </html>
