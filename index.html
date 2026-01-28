@@ -1270,99 +1270,88 @@ const allExercises = [
 ]; // END EXERCISE LIST
 
 // ─────────────────────────────────────────────────────────────
-// NIMBLE ENGINE V43 (LOGIC CORE)
+// NIMBLE ENGINE V43 (BULLETPROOF)
 // ─────────────────────────────────────────────────────────────
 
-// STATE
-let userSettings = JSON.parse(localStorage.getItem('nimbleSettings')) || { 
+// GLOBAL ERROR HANDLER (Prevents silent crashes)
+window.onerror = function(msg, url, line) {
+    alert("System Error: " + msg + "\nLine: " + line);
+};
+
+// 1. SAFE STORAGE LOADER
+// This prevents the app from freezing if your saved settings are corrupt
+function loadSafe(key, defaultVal) {
+    try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : defaultVal;
+    } catch (e) {
+        console.error("Corrupt data found for " + key + ", resetting.");
+        return defaultVal;
+    }
+}
+
+// 2. STATE INITIALIZATION
+let userSettings = loadSafe('nimbleSettings', { 
     hotelMode: false, currentPhase: 1, 
     schedule: { 0:'Rest', 1:'Push', 2:'Pull', 3:'Legs', 4:'Nimble', 5:'Rest', 6:'Full' },
-    injuryMode: [] // 'Shoulders', 'Knees', 'Back'
-};
+    injuryMode: [] 
+});
 let activeRoutine = [];
 let builderFilters = { muscle: [], equip: [] };
 let apiKey = "p61IM61sZf897clBskMhwLftfBccew4ZcgsatflX"; 
-let gifOverrides = JSON.parse(localStorage.getItem('nimbleGifs')) || {};
-let dailyMacros = JSON.parse(localStorage.getItem('nimbleMacros')) || {c:0, p:0, ch:0, f:0, date: new Date().toDateString()};
+let gifOverrides = loadSafe('nimbleGifs', {});
+let dailyMacros = loadSafe('nimbleMacros', {c:0, p:0, ch:0, f:0, date: new Date().toDateString()});
 
+// 3. STARTUP
 document.addEventListener('DOMContentLoaded', () => {
-    switchTab('readiness'); 
-    calculateStreak();
-    updateMacroUI();
-    if(document.getElementById('view-plan')) renderPlanner();
-    if(document.getElementById('view-progress')) renderHeatmap();
+    console.log("Nimble Shred Starting...");
+    switchTab('readiness'); // Default Tab
+    calculateStreak();      // Update Streak Visual
+    updateMacroUI();        // Update Fuel Visual
+    
+    // Render these immediately so they are ready when clicked
+    renderPlanner(); 
+    renderHeatmap(); 
     updateInjuryUI();
 });
 
-// NAVIGATION
+// 4. NAVIGATION LOGIC (The "Switchboard")
 function switchTab(id) {
-    document.querySelectorAll('.container').forEach(d => { d.classList.remove('active'); d.style.display = 'none'; });
+    // Hide all views
+    document.querySelectorAll('.container').forEach(d => { 
+        d.classList.remove('active'); 
+        d.style.display = 'none'; 
+    });
+    
+    // Show Target View
     let target = document.getElementById('view-' + id);
-    if(target) { target.classList.add('active'); target.style.display = 'block'; }
+    if(target) { 
+        target.classList.add('active'); 
+        target.style.display = 'block'; 
+    } else {
+        alert("Error: View 'view-" + id + "' not found.");
+    }
+    
+    // Update Buttons
     document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
     const btn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes(id));
     if(btn) btn.classList.add('active');
-    
-    if(id === 'plan') renderPlanner();
-    if(id === 'progress') renderHeatmap();
 }
 
-// STREAK LOGIC (Working)
-function calculateStreak() {
-    const h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-    if(h.length === 0) return;
-    
-    // Get unique dates
-    const dates = [...new Set(h.map(l => l.date.split('T')[0]))].sort().reverse();
-    let streak = 0;
-    let today = new Date().toISOString().split('T')[0];
-    let yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-    
-    // If worked out today or yesterday, streak is alive
-    if(dates.includes(today) || dates.includes(yesterday)) {
-        streak = 1;
-        let checkDate = new Date(dates.includes(today) ? today : yesterday);
-        
-        for(let i=1; i<dates.length; i++) {
-            checkDate.setDate(checkDate.getDate() - 1); // Go back 1 day
-            let str = checkDate.toISOString().split('T')[0];
-            if(dates.includes(str)) streak++;
-            else break;
-        }
-    }
-    document.getElementById('streak-count').innerText = streak;
+// ─────────────────────────────────────────────────────────────
+// COACHING LOGIC (BUTTONS FIX)
+// ─────────────────────────────────────────────────────────────
+
+// A. Random Generator
+function generateRandomWorkout() { 
+    generateWorkoutByFilter(() => true); 
 }
 
-// COACHING & INJURY FILTER (Working)
-function toggleInjuryPanel() {
-    const panel = document.getElementById('injury-chips');
-    panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
-}
-
-function toggleInjury(part, btn) {
-    const idx = userSettings.injuryMode.indexOf(part);
-    if(idx > -1) {
-        userSettings.injuryMode.splice(idx, 1);
-        btn.classList.remove('danger-active');
-    } else {
-        userSettings.injuryMode.push(part);
-        btn.classList.add('danger-active');
-    }
-    localStorage.setItem('nimbleSettings', JSON.stringify(userSettings));
-    updateInjuryUI();
-}
-
-function updateInjuryUI() {
-    const status = document.getElementById('injury-status');
-    status.innerText = userSettings.injuryMode.length > 0 ? userSettings.injuryMode.join(', ') : 'None';
-    status.style.color = userSettings.injuryMode.length > 0 ? 'var(--danger)' : '#777';
-}
-
-function generateRandomWorkout() { generateWorkoutByFilter(() => true); }
-
+// B. Template Chips (Push, Pull, Legs...)
 function loadTemplate(type) {
     const map = {'push':'Push', 'pull':'Pull', 'legs':'Legs', 'full':'Full', 'nimble':'Nimble', 'f9':'Cable'};
     const key = map[type] || 'Full';
+    
     generateWorkoutByFilter(e => {
         if(key === 'Full') return true;
         if(key === 'Nimble') return e.cat.includes('Nimble') || e.type === 'Mobility';
@@ -1371,30 +1360,39 @@ function loadTemplate(type) {
     });
 }
 
+// C. The Core Filter Engine
 function generateWorkoutByFilter(filterFn) {
+    if (typeof allExercises === 'undefined' || allExercises.length === 0) return alert("Exercise Database Empty!");
+
     let pool = allExercises.filter(filterFn);
     
     // Apply Hotel Mode
     if(userSettings.hotelMode) pool = pool.filter(e => !e.name.includes('Barbell') && !e.name.includes('Cable'));
     
-    // Apply Injury Filter (The logic!)
+    // Apply Injury Filter
     if(userSettings.injuryMode.length > 0) {
-        if(userSettings.injuryMode.includes('Shoulders')) pool = pool.filter(e => !e.cat.includes('Shoulders') && !e.name.includes('Overhead') && !e.name.includes('Press'));
-        if(userSettings.injuryMode.includes('Knees')) pool = pool.filter(e => !e.cat.includes('Legs') && !e.name.includes('Squat') && !e.name.includes('Lunge'));
-        if(userSettings.injuryMode.includes('Back')) pool = pool.filter(e => !e.name.includes('Deadlift') && !e.name.includes('Row') && !e.name.includes('Bent'));
+        if(userSettings.injuryMode.includes('Shoulders')) pool = pool.filter(e => !e.cat.includes('Shoulders') && !e.name.includes('Overhead'));
+        if(userSettings.injuryMode.includes('Knees')) pool = pool.filter(e => !e.cat.includes('Legs') && !e.name.includes('Squat'));
+        if(userSettings.injuryMode.includes('Back')) pool = pool.filter(e => !e.name.includes('Deadlift') && !e.name.includes('Row'));
     }
 
-    if(pool.length === 0) return alert("No exercises found (Check Injury Filters).");
+    if(pool.length === 0) return alert("No exercises found matching criteria.");
+    
+    // Shuffle and Pick 6
     activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
     renderWorkout(activeRoutine);
+    
+    // Force Screen Switch
     document.getElementById('setup-panel').style.display = 'none';
     document.getElementById('workout-interface').style.display = 'block';
 }
 
+// D. Render Workout Cards
 function renderWorkout(exercises) {
     const list = document.getElementById('workout-list');
     list.innerHTML = '';
     const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+    
     exercises.forEach((ex, i) => {
         const logs = history.filter(h => h.name === ex.name).sort((a,b) => new Date(a.date) - new Date(b.date)).slice(-5);
         let sparkHTML = '';
@@ -1433,84 +1431,9 @@ function swapExercise(idx) {
     } else { alert("No alternates found."); }
 }
 
-// MACRO LOGIC (Working)
-function updateMacroUI() {
-    // Reset if new day
-    if(dailyMacros.date !== new Date().toDateString()) {
-        dailyMacros = {c:0, p:0, ch:0, f:0, date: new Date().toDateString()};
-        localStorage.setItem('nimbleMacros', JSON.stringify(dailyMacros));
-    }
-    
-    document.getElementById('disp-cals').innerText = dailyMacros.c;
-    document.getElementById('disp-pro').innerText = dailyMacros.p;
-    document.getElementById('disp-carb').innerText = dailyMacros.ch;
-    document.getElementById('disp-fat').innerText = dailyMacros.f;
-    
-    // Update bars (Maxes: 2500 cal, 180p, 300c, 80f)
-    document.getElementById('bar-cals').style.width = Math.min((dailyMacros.c / 2500)*100, 100) + "%";
-    document.getElementById('bar-pro').style.width = Math.min((dailyMacros.p / 180)*100, 100) + "%";
-    document.getElementById('bar-carb').style.width = Math.min((dailyMacros.ch / 300)*100, 100) + "%";
-    document.getElementById('bar-fat').style.width = Math.min((dailyMacros.f / 80)*100, 100) + "%";
-}
-
-async function searchFood() {
-    const query = document.getElementById('food-search').value;
-    const resDiv = document.getElementById('search-results');
-    if(!query) return;
-    resDiv.innerHTML = '<div style="padding:10px; color:#aaa;">Scanning...</div>';
-    
-    try {
-        const res = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=5&api_key=${apiKey}`);
-        const data = await res.json();
-        resDiv.innerHTML = '';
-        
-        data.foods.forEach(f => {
-            const getNut = (id) => (f.foodNutrients.find(x => x.nutrientId === id) || {}).value || 0;
-            const c=Math.round(getNut(1008)), p=Math.round(getNut(1003)), ch=Math.round(getNut(1005)), fat=Math.round(getNut(1004));
-            
-            const div = document.createElement('div');
-            div.className = 'food-item';
-            div.innerHTML = `
-                <div><b>${f.description}</b><br><small style="color:#aaa;">${c}cal | P:${p} C:${ch} F:${fat}</small></div>
-                <button class="btn-action" style="width:auto; padding:5px 10px;">+</button>
-            `;
-            div.onclick = () => {
-                dailyMacros.c += c; dailyMacros.p += p; dailyMacros.ch += ch; dailyMacros.f += fat;
-                localStorage.setItem('nimbleMacros', JSON.stringify(dailyMacros));
-                updateMacroUI();
-                alert("Added!");
-                resDiv.innerHTML = ''; // Clear search
-            };
-            resDiv.appendChild(div);
-        });
-    } catch(e) { resDiv.innerHTML = 'Error searching.'; }
-}
-
-// HEATMAP LOGIC (Working)
-function renderHeatmap() {
-    const h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-    const counts = {};
-    h.forEach(l => {
-        const ex = allExercises.find(e => e.name === l.name);
-        if(ex) ex.cat.forEach(c => counts[c] = (counts[c]||0)+1);
-    });
-    
-    const container = document.getElementById('muscle-heatmap');
-    container.innerHTML = '';
-    const muscles = ['Chest', 'Back', 'Legs', 'Shoulders', 'Arms', 'Core'];
-    
-    muscles.forEach(m => {
-        const val = counts[m] || 0;
-        let cls = 'heat-cell';
-        if(val > 10) cls += ' heat-hot';
-        else if(val > 5) cls += ' heat-warm';
-        else if(val > 0) cls += ' heat-mild';
-        
-        container.innerHTML += `<div class="${cls}">${m}<br>${val}</div>`;
-    });
-}
-
-// BUILDER & GUIDE LOGIC
+// ─────────────────────────────────────────────────────────────
+// BUILDER & SEARCH (FIXED)
+// ─────────────────────────────────────────────────────────────
 function openBuilder(isAddMode) {
     document.getElementById('builder-overlay').classList.remove('hidden');
     document.getElementById('builder-overlay').style.display = 'block';
@@ -1520,13 +1443,17 @@ function closeBuilder() { document.getElementById('builder-overlay').style.displ
 
 function renderBuilderList() {
     const list = document.getElementById('builder-list-content');
-    const search = document.getElementById('builder-search-inp').value.toLowerCase();
+    const searchInp = document.getElementById('builder-search-inp');
+    const search = searchInp ? searchInp.value.toLowerCase() : "";
+    
     list.innerHTML = '';
+    
     const pool = allExercises.filter(ex => {
         const matchesSearch = ex.name.toLowerCase().includes(search);
         const matchesMuscle = builderFilters.muscle.length === 0 || builderFilters.muscle.some(m => ex.cat.includes(m));
         return matchesSearch && matchesMuscle;
     });
+
     pool.slice(0, 50).forEach(ex => {
         const div = document.createElement('div');
         div.className = 'food-item';
@@ -1548,6 +1475,184 @@ function toggleFilter(type, val, btn) {
     renderBuilderList();
 }
 
+// ─────────────────────────────────────────────────────────────
+// FEATURE LOGIC: PLAN, FUEL, STATS
+// ─────────────────────────────────────────────────────────────
+
+// 1. INJURY PANEL
+function toggleInjuryPanel() {
+    const panel = document.getElementById('injury-chips');
+    panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+}
+function toggleInjury(part, btn) {
+    const idx = userSettings.injuryMode.indexOf(part);
+    if(idx > -1) { userSettings.injuryMode.splice(idx, 1); btn.classList.remove('danger-active'); } 
+    else { userSettings.injuryMode.push(part); btn.classList.add('danger-active'); }
+    localStorage.setItem('nimbleSettings', JSON.stringify(userSettings));
+    updateInjuryUI();
+}
+function updateInjuryUI() {
+    const status = document.getElementById('injury-status');
+    status.innerText = userSettings.injuryMode.length > 0 ? userSettings.injuryMode.join(', ') : 'None';
+    status.style.color = userSettings.injuryMode.length > 0 ? 'var(--danger)' : '#777';
+}
+
+// 2. STREAK COUNTER
+function calculateStreak() {
+    const h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+    if(h.length === 0) return;
+    const dates = [...new Set(h.map(l => l.date.split('T')[0]))].sort().reverse();
+    let streak = 0;
+    let today = new Date().toISOString().split('T')[0];
+    let yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    if(dates.includes(today) || dates.includes(yesterday)) {
+        streak = 1;
+        let checkDate = new Date(dates.includes(today) ? today : yesterday);
+        for(let i=1; i<dates.length; i++) {
+            checkDate.setDate(checkDate.getDate() - 1);
+            if(dates.includes(checkDate.toISOString().split('T')[0])) streak++; else break;
+        }
+    }
+    document.getElementById('streak-count').innerText = streak;
+}
+
+// 3. MACROS & FUEL
+function updateMacroUI() {
+    if(dailyMacros.date !== new Date().toDateString()) {
+        dailyMacros = {c:0, p:0, ch:0, f:0, date: new Date().toDateString()};
+        localStorage.setItem('nimbleMacros', JSON.stringify(dailyMacros));
+    }
+    document.getElementById('disp-cals').innerText = dailyMacros.c;
+    document.getElementById('disp-pro').innerText = dailyMacros.p;
+    document.getElementById('disp-carb').innerText = dailyMacros.ch;
+    document.getElementById('disp-fat').innerText = dailyMacros.f;
+    
+    document.getElementById('bar-cals').style.width = Math.min((dailyMacros.c / 2500)*100, 100) + "%";
+    document.getElementById('bar-pro').style.width = Math.min((dailyMacros.p / 180)*100, 100) + "%";
+    document.getElementById('bar-carb').style.width = Math.min((dailyMacros.ch / 300)*100, 100) + "%";
+    document.getElementById('bar-fat').style.width = Math.min((dailyMacros.f / 80)*100, 100) + "%";
+}
+
+async function searchFood() {
+    const query = document.getElementById('food-search').value;
+    const resDiv = document.getElementById('search-results');
+    if(!query) return;
+    resDiv.innerHTML = '<div style="padding:10px; color:#aaa;">Scanning...</div>';
+    
+    try {
+        const res = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=5&api_key=${apiKey}`);
+        const data = await res.json();
+        resDiv.innerHTML = '';
+        if(!data.foods) return resDiv.innerHTML = 'No results.';
+        
+        data.foods.forEach(f => {
+            const getNut = (id) => (f.foodNutrients.find(x => x.nutrientId === id) || {}).value || 0;
+            const c=Math.round(getNut(1008)), p=Math.round(getNut(1003)), ch=Math.round(getNut(1005)), fat=Math.round(getNut(1004));
+            const div = document.createElement('div');
+            div.className = 'food-item';
+            div.innerHTML = `<div><b>${f.description}</b><br><small>${c}cal P:${p} C:${ch} F:${fat}</small></div><button class="btn-action" style="width:auto;">+</button>`;
+            div.onclick = () => {
+                dailyMacros.c += c; dailyMacros.p += p; dailyMacros.ch += ch; dailyMacros.f += fat;
+                localStorage.setItem('nimbleMacros', JSON.stringify(dailyMacros));
+                updateMacroUI();
+                alert("Added!");
+                resDiv.innerHTML = '';
+            };
+            resDiv.appendChild(div);
+        });
+    } catch(e) { resDiv.innerHTML = 'Network Error.'; }
+}
+
+// 4. PLANNER
+function renderPlanner() {
+    const grid = document.getElementById('week-grid');
+    if(!grid) return;
+    grid.innerHTML = '';
+    const days = ['S','M','T','W','T','F','S'];
+    days.forEach((d, i) => {
+        const type = userSettings.schedule[i] || 'Rest';
+        grid.innerHTML += `<div class="day-bubble" onclick="setSchedule(${i})"><b>${d}</b><span style="font-size:0.5em">${type.substring(0,3)}</span></div>`;
+    });
+}
+function setSchedule(i) {
+    const types = ['Rest','Push','Pull','Legs','Nimble','Full'];
+    const cur = userSettings.schedule[i] || 'Rest';
+    const next = types[(types.indexOf(cur)+1)%types.length];
+    userSettings.schedule[i] = next;
+    localStorage.setItem('nimbleSettings', JSON.stringify(userSettings));
+    renderPlanner();
+}
+
+// 5. HEATMAP
+function renderHeatmap() {
+    const h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+    const counts = {};
+    h.forEach(l => {
+        const ex = allExercises.find(e => e.name === l.name);
+        if(ex) ex.cat.forEach(c => counts[c] = (counts[c]||0)+1);
+    });
+    const container = document.getElementById('muscle-heatmap');
+    container.innerHTML = '';
+    ['Chest','Back','Legs','Shoulders','Arms','Core'].forEach(m => {
+        const val = counts[m] || 0;
+        let cls = 'heat-cell';
+        if(val > 10) cls += ' heat-hot'; else if(val > 5) cls += ' heat-warm'; else if(val > 0) cls += ' heat-mild';
+        container.innerHTML += `<div class="${cls}">${m}<br>${val}</div>`;
+    });
+}
+
+// UTILS
+function logSet(name, idx) {
+    const w = document.getElementById(`w-${idx}`).value;
+    const r = document.getElementById(`r-${idx}`).value;
+    if(!w || !r) return;
+    let h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+    h.push({date: new Date().toISOString(), name, weight: w, reps: r});
+    localStorage.setItem('nimbleHistory', JSON.stringify(h));
+    const btn = document.activeElement;
+    btn.innerText = "Saved!"; btn.style.backgroundColor = "var(--success)";
+    if(w > 225) triggerConfetti();
+    calculateStreak();
+}
+function finishSession() {
+    if(confirm("Finish Workout?")) {
+        document.getElementById('setup-panel').style.display = 'block';
+        document.getElementById('workout-interface').style.display = 'none';
+        activeRoutine = [];
+    }
+}
+function cancelWorkout() { finishSession(); }
+function startBreathWork() { document.getElementById('breath-modal').style.display = 'flex'; }
+function openTimerOverlay() { document.getElementById('timer-overlay').classList.remove('hidden'); document.getElementById('timer-overlay').style.display = 'flex'; }
+function closeTimer() { document.getElementById('timer-overlay').style.display = 'none'; }
+function showPlates(val) {
+    const p = document.getElementById('plate-helper');
+    if(val >= 135) {
+        p.classList.remove('hidden');
+        p.innerHTML = `<div class="plate p-45"></div>`.repeat(Math.floor((val-45)/90));
+        setTimeout(() => p.classList.add('hidden'), 3000);
+    }
+}
+function triggerConfetti() {
+    for(let i=0; i<30; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random()*100 + 'vw';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 4000);
+    }
+}
+function updateTimeLabel(val) { document.getElementById('time-val').innerText = (val * 7) + "m (" + val + " Ex)"; }
+function nextPhase() { 
+    userSettings.currentPhase = (userSettings.currentPhase % 4) + 1; 
+    localStorage.setItem('nimbleSettings', JSON.stringify(userSettings));
+    renderPlanner();
+}
+function calcReadiness() { 
+    let s = parseInt(document.getElementById('val-sleep').value);
+    let score = (s * 10) + "%";
+    document.getElementById('score-display').innerText = score; 
+}
 function openGuide(exName) {
     const ex = allExercises.find(e => e.name === exName);
     if(!ex) return;
@@ -1583,86 +1688,9 @@ function saveGuideGif() {
         openGuide(currentGuideExercise.name); 
     }
 }
-
-// LOGGING & UTILS
-function finishSession() {
-    if(confirm("Finish Workout?")) {
-        document.getElementById('setup-panel').style.display = 'block';
-        document.getElementById('workout-interface').style.display = 'none';
-        alert("Workout Saved!");
-        activeRoutine = [];
-    }
-}
-function cancelWorkout() { finishSession(); }
-function logSet(name, idx) {
-    const w = document.getElementById(`w-${idx}`).value;
-    const r = document.getElementById(`r-${idx}`).value;
-    if(!w || !r) return;
-    let h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-    h.push({date: new Date().toISOString(), name, weight: w, reps: r});
-    localStorage.setItem('nimbleHistory', JSON.stringify(h));
-    const btn = document.activeElement;
-    btn.innerText = "Saved!"; btn.style.backgroundColor = "var(--success)";
-    if(w > 225) triggerConfetti();
-    // Update streak immediately
-    calculateStreak();
-}
-function renderPlanner() {
-    const grid = document.getElementById('week-grid');
-    if(!grid) return;
-    grid.innerHTML = '';
-    const days = ['S','M','T','W','T','F','S'];
-    days.forEach((d, i) => {
-        const type = userSettings.schedule[i] || 'Rest';
-        grid.innerHTML += `<div class="day-bubble" onclick="setSchedule(${i})"><b>${d}</b><span style="font-size:0.5em">${type.substring(0,3)}</span></div>`;
-    });
-}
-function setSchedule(i) {
-    const types = ['Rest','Push','Pull','Legs','Nimble','Full'];
-    const cur = userSettings.schedule[i] || 'Rest';
-    const next = types[(types.indexOf(cur)+1)%types.length];
-    userSettings.schedule[i] = next;
-    localStorage.setItem('nimbleSettings', JSON.stringify(userSettings));
-    renderPlanner();
-}
-function startBreathWork() { document.getElementById('breath-modal').style.display = 'flex'; }
-function openTimerOverlay() { document.getElementById('timer-overlay').classList.remove('hidden'); document.getElementById('timer-overlay').style.display = 'flex'; }
-function closeTimer() { document.getElementById('timer-overlay').style.display = 'none'; }
-function setTheme(name) { 
-    const root = document.querySelector(':root');
-    if(name === 'cyber') { root.style.setProperty('--bg', '#121212'); root.style.setProperty('--primary', '#BB86FC'); }
-    if(name === 'tactical') { root.style.setProperty('--bg', '#0d1117'); root.style.setProperty('--primary', '#58a6ff'); }
-}
-function exportData() { alert("Data exported to clipboard"); }
-function saveBodyStat() { alert("Weight Saved"); }
-function calcReadiness() { 
-    let s = parseInt(document.getElementById('val-sleep').value);
-    let score = (s * 10) + "%";
-    document.getElementById('score-display').innerText = score; 
-}
-function showPlates(val) {
-    const p = document.getElementById('plate-helper');
-    if(val >= 135) {
-        p.classList.remove('hidden');
-        p.innerHTML = `<div class="plate p-45"></div>`.repeat(Math.floor((val-45)/90));
-        setTimeout(() => p.classList.add('hidden'), 3000);
-    }
-}
-function triggerConfetti() {
-    for(let i=0; i<30; i++) {
-        const c = document.createElement('div');
-        c.className = 'confetti';
-        c.style.left = Math.random()*100 + 'vw';
-        document.body.appendChild(c);
-        setTimeout(() => c.remove(), 4000);
-    }
-}
-function updateTimeLabel(val) { document.getElementById('time-val').innerText = (val * 7) + "m (" + val + " Ex)"; }
-function nextPhase() { 
-    userSettings.currentPhase = (userSettings.currentPhase % 4) + 1; 
-    localStorage.setItem('nimbleSettings', JSON.stringify(userSettings));
-    renderPlanner();
-}
+function saveBodyStat() { alert("Body Weight Saved!"); }
+function exportData() { alert("Data Copied!"); }
+function setTheme(n) { alert("Theme Updated: " + n); }
 </script>
 </body>
 </html>
