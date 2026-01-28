@@ -419,26 +419,7 @@
         <button class="btn-action" onclick="addTime(30)">+30s</button>
     </div>
 </div>
-
-    <nav style="position:fixed; bottom:0; width:100%; background:#1e1e1e; border-top:1px solid #333; display:flex; justify-content:space-around; padding:10px 0; z-index:1000;">
-    <div class="nav-item active" style="text-align:center; font-size:0.8em; color:#777; cursor:pointer;" onclick="switchTab('home')">
-        <div style="font-size:1.5em;">🔥</div>
-        <div>Shred</div>
-    </div>
-    <div class="nav-item" style="text-align:center; font-size:0.8em; color:#777; cursor:pointer;" onclick="switchTab('plan')">
-        <div style="font-size:1.5em;">📅</div>
-        <div>Plan</div>
-    </div>
-    <div class="nav-item" style="text-align:center; font-size:0.8em; color:#777; cursor:pointer;" onclick="switchTab('food')">
-        <div style="font-size:1.5em;">🥗</div>
-        <div>Food</div>
-    </div>
-    <div class="nav-item" style="text-align:center; font-size:0.8em; color:#777; cursor:pointer;" onclick="switchTab('progress')">
-        <div style="font-size:1.5em;">📈</div>
-        <div>Stats</div>
-    </div>
-</nav>
-    
+ 
 <script>
  
    // ─────────────────────────────────────────────────────────────
@@ -1518,28 +1499,53 @@ document.addEventListener('DOMContentLoaded', () => {
     if(!document.getElementById('view-progress').classList.contains('hidden')) renderHeatmap();
 });
 
-// --- NAVIGATION LOGIC (Corrected) ---
+// --- NAVIGATION LOGIC (Fixed) ---
 function switchTab(id) {
-    // 1. Hide all views first
+    // 1. Hide all views
     document.querySelectorAll('.container').forEach(d => d.classList.add('hidden'));
+    document.querySelectorAll('.container').forEach(d => d.classList.remove('active')); 
 
-    // 2. Map the button ID to the actual Screen ID
-    let targetId = '';
+    // 2. Map buttons to the correct Screen ID
+    let targetId = 'view-' + id;
     
-    if (id === 'home' || id === 'shred') targetId = 'view-home';
-    if (id === 'plan' || id === 'coach') targetId = 'view-plan';      // "Coach" opens the Plan tab
-    if (id === 'food' || id === 'fuel')  targetId = 'view-food';      // "Fuel" opens the Food tab
-    if (id === 'progress' || id === 'stats') targetId = 'view-progress'; // "Stats" opens Progress tab
+    // Special Mappings
+    if (id === 'readiness') targetId = 'view-readiness';
+    if (id === 'coach') targetId = 'view-coach'; 
+    if (id === 'plan') targetId = 'view-plan';   
+    if (id === 'food') targetId = 'view-food';
+    if (id === 'wellness') targetId = 'view-wellness';
+    if (id === 'progress') targetId = 'view-progress';
 
-    // 3. Show the correct view
+    // 3. Show the target view
     const target = document.getElementById(targetId);
     if (target) {
         target.classList.remove('hidden');
+        target.classList.add('active');
         
-        // Trigger special renders if needed
+        // Trigger special renders
         if (targetId === 'view-plan') renderPlanner();
         if (targetId === 'view-progress') renderHeatmap();
+    } else {
+        console.warn("View not found:", targetId);
     }
+
+    // 4. Update Bottom Navigation Styling (Targeting .nav-btn)
+    document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
+    
+    const activeBtn = Array.from(document.querySelectorAll('.nav-btn')).find(btn => 
+        btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(`'${id}'`)
+    );
+    if (activeBtn) activeBtn.classList.add('active');
+}
+
+    // 4. Update Bottom Navigation Styling (Targeting .nav-btn now)
+    document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
+    
+    const activeBtn = Array.from(document.querySelectorAll('.nav-btn')).find(btn => 
+        btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(`'${id}'`)
+    );
+    if (activeBtn) activeBtn.classList.add('active');
+}
 
     // 4. Update the Bottom Navigation Styling (Visual Feedback)
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
