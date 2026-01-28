@@ -197,6 +197,17 @@
 </div>
 
 <script>
+    // ---------------------------------------------------------
+// MISSING TRANSLATION KEY (PASTE THIS TO FIX "NO EXERCISES")
+// ---------------------------------------------------------
+function createEx(name, cat, equip, type, prep, exec, tips, benefits, muscles, setupF9) {
+    return {
+        name: name, cat: cat, equip: equip, type: type,
+        guide: { prep: prep, exec: exec, tips: tips, benefits: benefits, muscles: muscles },
+        setup: setupF9 || { arms: "N/A", pulleys: "N/A" }
+    };
+}
+// ---------------------------------------------------------
 window.allExercises = [
   // ==================== CABLE CHEST (TORQUE F9) ====================
         createEx("Cable Chest Press", ["Chest"], "Cable", "Strength", 
