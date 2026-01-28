@@ -111,8 +111,155 @@
 
 <div id="sync-loader">
     <div style="font-size:3em; margin-bottom:20px;">☁️</div>
-    <h3>Syncing with Cloud...</h3>
-    <small style="color:#777; margin-top:10px;">Checking History, Foods & GIFs</small>
+    <h3>Syncing...</h3>
+</div>
+<script>
+    window.onload = function() {
+        const loader = document.getElementById('sync-loader');
+        if(loader) { loader.style.opacity = '0'; setTimeout(() => loader.style.display = 'none', 500); }
+    };
+</script>
+
+<div id="timer-badge" class="timer-badge" onclick="openTimerOverlay()"></div>
+
+<div class="container active" id="view-readiness">
+    <div class="top-bar"><h2>Daily Check-In</h2></div>
+    <div class="card" style="display:flex; justify-content:space-between; align-items:center; background: linear-gradient(45deg, #1e1e1e, #252525);">
+        <div><div style="font-size:0.8em; color:#aaa;">Current Streak</div><div style="font-size:1.5em; font-weight:bold;">🔥 <span id="streak-count">0</span> Days</div></div>
+        <div id="readiness-badge" style="font-size:2em;">🛡️</div>
+    </div>
+    <div class="card">
+        <h3>How are you feeling?</h3>
+        <div class="row" style="margin-top:10px;"><span>😴 Sleep</span> <input type="range" id="val-sleep" min="1" max="10" value="5" oninput="calcReadiness()"></div>
+        <div class="row" style="margin-top:15px;"><span>🤕 Pain</span> <input type="range" id="val-sore" min="1" max="10" value="5" oninput="calcReadiness()"></div>
+        <div class="row" style="margin-top:15px;"><span>⚡ Energy</span> <input type="range" id="val-mood" min="1" max="10" value="5" oninput="calcReadiness()"></div>
+        <div style="text-align:center; margin-top:15px;"><div style="font-size:2.5em; font-weight:bold; color:var(--sec);" id="score-display">--</div></div>
+    </div>
+</div>
+
+<div class="container" id="view-coach">
+    <div id="setup-panel">
+        <div class="top-bar"><h2>Workout Strategy</h2></div>
+       <div class="card" style="border-left: 4px solid var(--danger); margin-bottom:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleInjuryPanel()">
+                <h3 style="margin:0; font-size:1.1em;">🩹 Injury / Pain Mode</h3>
+                <span id="injury-status" style="font-size:0.8em; color:#777;">None</span>
+            </div>
+        </div>
+        <div class="card">
+            <h3>Quick Start</h3>
+            <div class="row" style="margin-bottom:10px; justify-content:space-between;">
+                <label style="color:#aaa;">⏱️ Duration</label>
+                <span id="time-val" style="color:var(--sec); font-weight:bold;">45m (6 Ex)</span>
+            </div>
+            <input type="range" id="slider-time" min="3" max="12" value="6" step="1" style="margin-bottom:20px;" oninput="updateTimeLabel(this.value)">
+
+           <div class="chip-container">
+                <div class="chip" onclick="loadTemplate('push')">Push</div>
+                <div class="chip" onclick="loadTemplate('pull')">Pull</div>
+                <div class="chip" onclick="loadTemplate('legs')">Legs</div>
+                <div class="chip" onclick="loadTemplate('full')">Full Body</div>
+                <div class="chip" onclick="loadTemplate('nimble')">🪶 Nimble / Flow</div>
+                <div class="chip" onclick="loadTemplate('f9')">⚙️ Torque F9</div>
+            </div>
+
+          <button type="button" class="btn btn-main" onclick="generateRandomWorkout()">🎲 Random Workout</button>
+            <button type="button" class="btn btn-action" onclick="openBuilder()">🛠️ Build Custom</button>
+        </div>
+    </div> 
+    
+    <div id="workout-interface" style="display:none;">
+        <div class="top-bar"><h3>Active Session</h3><button type="button" class="btn-danger" style="width:auto; padding:5px 10px;" onclick="cancelWorkout()">End</button></div>
+        <div id="workout-list"></div>
+        <button type="button" class="btn btn-action" onclick="openBuilder(true)">➕ Add Exercise</button>
+        <button type="button" class="btn btn-main" onclick="finishSession()">💾 Finish & Save</button>
+    </div>
+</div>
+
+<div class="container" id="view-food">
+    <div class="top-bar"><h2>Fuel Log</h2></div>
+    <div class="card">
+        <div class="macro-grid">
+            <div>🔥 <span id="disp-cals">0</span></div>
+            <div>🥩 <span id="disp-pro">0</span>g</div>
+            <div>🍚 <span id="disp-carb">0</span>g</div>
+            <div>🥑 <span id="disp-fat">0</span>g</div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="row"><input type="text" id="food-search" placeholder="Search Food..."><button class="btn-action" style="width:auto;" onclick="searchFood()">🔎</button></div>
+        <div id="search-results" style="margin-top:10px; max-height:200px; overflow-y:auto;"></div>
+    </div>
+    <div class="card" id="meal-container"></div>
+</div>
+
+<div class="container" id="view-wellness">
+    <h2>Wellness</h2>
+    <div class="card"><h3>⚖️ Body Weight</h3><div class="row"><input type="number" id="body-weight" placeholder="Lbs"><button class="btn-action" onclick="saveBodyStat()">Log</button></div></div>
+</div>
+
+<div class="container" id="view-plan">
+    <h2>Weekly Structure</h2>
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>📅 Phase: <span id="cycle-phase" style="color:var(--primary)">Week 1</span></h3>
+            <small onclick="nextPhase()" style="color:#777; cursor:pointer;">Next >></small>
+        </div>
+        <div class="calendar-grid" id="week-grid"></div>
+        <div id="day-detail" style="margin-top:10px; font-style:italic; color:#aaa; font-size:0.9em; text-align:center;">Tap a day to schedule</div>
+    </div>
+    <div class="card" onclick="startBreathWork()">
+        <h3>🧘 Recovery Breath</h3>
+        <p style="color:#aaa; font-size:0.8em;">Box breathing to lower cortisol.</p>
+    </div>
+</div>
+
+<div class="container" id="view-progress">
+    <h2>Command Center</h2>
+    <div class="card">
+        <h3>🎨 App Theme</h3>
+        <div class="chip-container">
+            <div class="chip" onclick="setTheme('cyber')">Cyber</div>
+            <div class="chip" onclick="setTheme('tactical')">Tactical</div>
+        </div>
+    </div>
+    <div class="card"><h3>🔥 Training Heatmap</h3><div id="muscle-heatmap"></div></div>
+    <button class="btn btn-action" onclick="exportData()">⬇️ Export Data</button>
+</div>
+
+<div id="builder-overlay" class="fs-overlay hidden">
+    <div class="top-bar"><h2>Exercise Builder</h2><button class="btn-danger" style="width:auto;" onclick="closeBuilder()">Close</button></div>
+    <div class="card">
+        <label style="font-size:0.8em; color:#777;">Filters</label>
+        <div class="chip-container" id="filter-muscle">
+            <div class="chip" onclick="toggleFilter('muscle', 'Chest', this)">Chest</div>
+            <div class="chip" onclick="toggleFilter('muscle', 'Back', this)">Back</div>
+            <div class="chip" onclick="toggleFilter('muscle', 'Legs', this)">Legs</div>
+            <div class="chip" onclick="toggleFilter('muscle', 'Arms', this)">Arms</div>
+        </div>
+        <input type="text" id="builder-search-inp" placeholder="Search..." onkeyup="filterBuilderList()">
+        <div id="builder-list-content" style="margin-top:10px;"></div>
+    </div>
+</div>
+
+<div id="breath-modal" class="checklist-modal" onclick="this.style.display='none'">
+    <div class="breath-circle"></div>
+    <h2 style="margin-top:30px; color:#fff;">Breathe In...</h2>
+</div>
+<div id="plate-helper" class="plate-popup hidden"></div>
+<div id="timer-overlay" class="fs-overlay flex-center hidden">
+    <div id="timer-display" style="font-size:4em; font-weight:bold; color:var(--primary);">00:00</div>
+    <div style="margin-top:20px;">
+        <button class="btn-danger" onclick="closeTimer()">Stop</button>
+    </div>
+</div>
+
+<div class="nav-bar">
+    <button class="nav-btn active" onclick="switchTab('readiness')"><span class="nav-icon">🔋</span>Daily</button>
+    <button class="nav-btn" onclick="switchTab('coach')"><span class="nav-icon">🏋️</span>Coach</button>
+    <button class="nav-btn" onclick="switchTab('plan')"><span class="nav-icon">📅</span>Plan</button>
+    <button class="nav-btn" onclick="switchTab('food')"><span class="nav-icon">🍗</span>Fuel</button>
+    <button class="nav-btn" onclick="switchTab('progress')"><span class="nav-icon">📈</span>Stats</button>
 </div>
 <script>
     // This runs instantly to ensure you are never stuck
