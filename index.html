@@ -1946,6 +1946,101 @@ async function searchFood() {
         resDiv.appendChild(div);
     });
 }
+    // ─────────────────────────────────────────────────────────────
+// RESTORED COACH LOGIC (Fixes Buttons)
+// ─────────────────────────────────────────────────────────────
+
+// 1. Fix "Random Workout" Button
+function generateRandomWorkout() {
+    generateWorkoutByFilter(() => true); // Generates from all exercises
+}
+
+// 2. Fix Chip Templates (Push, Pull, Legs buttons)
+function loadTemplate(type) {
+    // Map chip names to generator types
+    const map = {
+        'push': 'Push', 'pull': 'Pull', 'legs': 'Legs', 
+        'full': 'Full', 'nimble': 'Nimble', 'f9': 'Cable'
+    };
+    const key = map[type] || 'Full';
+    
+    // Use the existing V42 generator
+    generateWorkoutByFilter(e => {
+        if(key === 'Full') return true;
+        if(key === 'Nimble') return e.cat.includes('Nimble') || e.type === 'Mobility';
+        if(key === 'Cable') return e.equip === 'Cable';
+        return e.cat.includes(key) || e.type === key;
+    });
+}
+
+// 3. Fix "Build Custom" Button
+function openBuilder(isAddMode = false) {
+    const overlay = document.getElementById('builder-overlay');
+    if(overlay) {
+        overlay.classList.remove('hidden');
+        renderBuilderList(); // Show exercises
+    }
+}
+
+function closeBuilder() {
+    document.getElementById('builder-overlay').classList.add('hidden');
+}
+
+// 4. Builder Search & Filter Logic
+let builderFilters = { muscle: [], equip: [] };
+
+function renderBuilderList() {
+    const list = document.getElementById('builder-list-content');
+    const search = document.getElementById('builder-search-inp').value.toLowerCase();
+    
+    list.innerHTML = '';
+    
+    const filtered = allExercises.filter(ex => {
+        const matchesSearch = ex.name.toLowerCase().includes(search);
+        const matchesMuscle = builderFilters.muscle.length === 0 || builderFilters.muscle.some(m => ex.cat.includes(m));
+        const matchesEquip = builderFilters.equip.length === 0 || builderFilters.equip.includes(ex.equip);
+        return matchesSearch && matchesMuscle && matchesEquip;
+    });
+
+    filtered.slice(0, 50).forEach(ex => { // Limit to 50 for performance
+        const div = document.createElement('div');
+        div.className = 'food-item'; // Re-use styling
+        div.innerHTML = `
+            <div style="font-weight:bold;">${ex.name}</div>
+            <div style="font-size:0.8em; color:#aaa;">${ex.equip} | ${ex.cat.join(', ')}</div>
+        `;
+        div.onclick = () => addToWorkout(ex);
+        list.appendChild(div);
+    });
+}
+
+function filterBuilderList() { renderBuilderList(); }
+
+function toggleFilter(type, value, btn) {
+    const arr = builderFilters[type];
+    const idx = arr.indexOf(value);
+    
+    if (idx > -1) {
+        arr.splice(idx, 1);
+        btn.classList.remove('active');
+    } else {
+        arr.push(value);
+        btn.classList.add('active');
+    }
+    renderBuilderList();
+}
+
+function addToWorkout(exercise) {
+    activeRoutine.push(exercise);
+    renderWorkout(activeRoutine);
+    
+    // If we started from an empty screen, switch to workout view
+    document.getElementById('setup-panel').style.display = 'none';
+    document.getElementById('workout-interface').style.display = 'block';
+    
+    // Provide feedback
+    alert(`${exercise.name} added!`);
+}
 </script>
 </body>
 </html>
