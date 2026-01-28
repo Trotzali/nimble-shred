@@ -1343,13 +1343,30 @@ window.allExercises = [
         createEx("L-Sit (Tuck)", ["Nimble", "Core"], "Bodyweight", "Calisthenics", 
             ["Hands on floor/parallettes."], ["Press down.", "Lift butt and knees off floor."], ["Hold tuck."], ["Core compression."], ["Abs", "Hip Flexors"])
 
-]; // END EXERCISE LIST
-
+]; // END EXERCISE LIST</script> 
+<script>
 // ─────────────────────────────────────────────────────────────
-// NIMBLE ENGINE V49 (FINAL INTEGRATION)
+// NIMBLE ENGINE V50 (FINAL WRAPPER FIX)
 // ─────────────────────────────────────────────────────────────
 
-// 1. SAFETY & STATE
+// 0. CRITICAL HELPER: MUST EXIST
+if (typeof createEx !== 'function') {
+    function createEx(name, cat, equip, type, prep, exec, tips, benefits, muscles, setupF9) {
+        return {
+            name: name, cat: cat, equip: equip, type: type,
+            guide: { prep: prep, exec: exec, tips: tips, benefits: benefits, muscles: muscles },
+            setup: setupF9 || { arms: "N/A", pulleys: "N/A" }
+        };
+    }
+}
+
+// 1. DATABASE RECOVERY
+if (typeof window.allExercises === 'undefined') {
+    if (typeof allExercises !== 'undefined') window.allExercises = allExercises;
+    else window.allExercises = [];
+}
+
+// 2. STATE & SETTINGS
 let userSettings = JSON.parse(localStorage.getItem('nimbleSettings')) || { 
     hotelMode: false, currentPhase: 1, 
     schedule: { 0:'Rest', 1:'Push', 2:'Pull', 3:'Legs', 4:'Nimble', 5:'Rest', 6:'Full' },
@@ -1361,12 +1378,7 @@ let dailyMacros = JSON.parse(localStorage.getItem('nimbleMacros')) || {c:0, p:0,
 let apiKey = "p61IM61sZf897clBskMhwLftfBccew4ZcgsatflX"; 
 let gifOverrides = JSON.parse(localStorage.getItem('nimbleGifs')) || {};
 
-// 2. BOOT SEQUENCE (With Safety Check)
 document.addEventListener('DOMContentLoaded', () => {
-    // Ensure data is loaded
-    if (typeof window.allExercises === 'undefined') window.allExercises = [];
-    
-    // Boot features
     switchTab('readiness'); 
     calculateStreak();
     updateMacroUI();
@@ -1393,13 +1405,12 @@ function switchTab(id) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// 4. SMART WORKOUT GENERATOR (The Translator)
+// 4. SMART WORKOUT GENERATOR (With Muscle Map)
 // ─────────────────────────────────────────────────────────────
 
 function generateRandomWorkout() { generateWorkoutByFilter(() => true, "Random"); }
 
 function loadTemplate(type) {
-    // TRANSLATION MAP: Maps Buttons -> Your Data Tags
     const muscleMap = {
         'push': ['Chest', 'Shoulders', 'Triceps', 'Push', 'Delts', 'Pectorals'],
         'pull': ['Back', 'Biceps', 'Traps', 'Pull', 'Lats', 'Rear Delts'],
@@ -1415,9 +1426,7 @@ function loadTemplate(type) {
         if (type === 'full') return true; 
         if (type === 'f9') return e.equip === 'Cable';
 
-        // Check tags (cat) and type
         const exCats = Array.isArray(e.cat) ? e.cat : [e.cat];
-        // Also check name for keywords as backup
         const allTags = exCats.concat(e.name.split(' ')); 
         
         return allTags.some(t => targets.some(target => t.includes(target))) || targets.includes(e.type);
@@ -1425,21 +1434,19 @@ function loadTemplate(type) {
 }
 
 function generateWorkoutByFilter(filterFn, buttonName) {
-    if(window.allExercises.length === 0) return alert("CRITICAL: Database is empty. Check your exercise list for syntax errors.");
+    if(window.allExercises.length === 0) return alert("CRITICAL: Database is empty. Syntax error in list?");
 
     let pool = window.allExercises.filter(filterFn);
     
-    // Hotel Mode
     if(userSettings.hotelMode) pool = pool.filter(e => !e.name.includes('Barbell') && !e.name.includes('Cable') && !e.name.includes('Machine'));
     
-    // Injury Filter
     if(userSettings.injuryMode.length > 0) {
         if(userSettings.injuryMode.includes('Shoulders')) pool = pool.filter(e => !e.cat.includes('Shoulders') && !e.name.includes('Overhead'));
         if(userSettings.injuryMode.includes('Knees')) pool = pool.filter(e => !e.cat.includes('Legs') && !e.name.includes('Squat'));
         if(userSettings.injuryMode.includes('Back')) pool = pool.filter(e => !e.name.includes('Deadlift') && !e.name.includes('Row'));
     }
 
-    if(pool.length === 0) return alert(`No exercises found for '${buttonName}'.\nTry turning off Hotel Mode or Injury Filters.`);
+    if(pool.length === 0) return alert(`No exercises found for '${buttonName}'.\nTry turning off filters.`);
     
     activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
     renderWorkout(activeRoutine);
