@@ -6,7 +6,8 @@
     <meta name="theme-color" content="#1e1e1e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <title>Nimble Shred V43 (Ultimate)</title>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Nimble Shred V43 (Fixed)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --bg: #121212; --card: #1e1e1e; --primary: #BB86FC; --sec: #03DAC6; --text: #fff; --gold: #FFD700; --danger: #CF6679; --warn: #FF9800; --success: #00C853; }
@@ -34,7 +35,8 @@
         input, select { width: 100%; padding: 10px; background: #2c2c2c; border: 1px solid #444; border-radius: 6px; color: #fff; font-size: 16px; box-sizing: border-box; }
         .row { display: flex; gap: 10px; align-items: center; }
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        
+        .unit-toggle { background: #333; padding: 5px 12px; border-radius: 20px; font-size: 0.8em; border: 1px solid #555; color: #aaa; cursor: pointer; }
+
         /* Chips & Injury Toggles */
         .chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
         .chip { padding: 6px 12px; background: #333; border: 1px solid #555; border-radius: 20px; font-size: 0.8em; cursor: pointer; color: #aaa; transition: 0.2s; }
@@ -82,6 +84,16 @@
         .detail-content { padding: 15px; font-size: 0.9em; line-height: 1.5; color: #ddd; }
         .visual-container { background: #000; border-radius: 8px; overflow: hidden; height: 250px; display: flex; align-items: center; justify-content: center; border: 1px solid #333; position: relative; margin-bottom: 15px; }
         #visual-content-img, #visual-content-iframe { width: 100%; height: 100%; object-fit: contain; display: none; }
+        
+        /* Food */
+        .food-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2a2a2a; font-size: 0.9em; cursor: pointer; }
+        .gif-input { width: 100%; padding: 10px; background: #111; border: 1px solid #444; color: #fff; border-radius: 4px; margin-top: 5px; margin-bottom: 5px; font-size: 0.8em; }
+        .btn-guide { background: #333; color: #aaa; border: 1px solid #444; padding: 5px 10px; border-radius: 5px; font-size: 0.8em; cursor: pointer; }
+        .plate-popup { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #222; padding: 10px; border: 1px solid #555; border-radius: 8px; z-index: 1000; display: flex; gap: 5px; }
+        .plate { height: 40px; width: 10px; border-radius: 2px; border: 1px solid #000; }
+        .p-45 { background: #0048BA; width: 15px; } .p-35 { background: #FCN; } .p-25 { background: #006B3C; } .p-10 { background: #eee; }
+        .breath-circle { width: 100px; height: 100px; border-radius: 50%; background: var(--sec); margin: 0 auto; animation: breathe 8s infinite ease-in-out; opacity: 0.6; }
+        @keyframes breathe { 0%, 100% { transform: scale(0.8); } 50% { transform: scale(1.5); } }
     </style>
 </head>
 <body>
@@ -100,7 +112,10 @@
         <div class="row" style="margin-top:10px;"><span>😴 Sleep</span> <input type="range" id="val-sleep" min="1" max="10" value="5" oninput="calcReadiness()"></div>
         <div class="row" style="margin-top:15px;"><span>🤕 Pain</span> <input type="range" id="val-sore" min="1" max="10" value="5" oninput="calcReadiness()"></div>
         <div class="row" style="margin-top:15px;"><span>⚡ Energy</span> <input type="range" id="val-mood" min="1" max="10" value="5" oninput="calcReadiness()"></div>
+        <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
+        <div class="row"><input type="number" id="garmin-score" placeholder="Garmin Body Battery (Optional)" oninput="calcReadiness()"></div>
         <div style="text-align:center; margin-top:15px;"><div style="font-size:2.5em; font-weight:bold; color:var(--sec);" id="score-display">--</div></div>
+        <button class="btn btn-main" onclick="alert('Score Logged!')">💾 Log & Get Advice</button>
     </div>
 </div>
 
@@ -170,6 +185,7 @@
         <div class="row"><input type="text" id="food-search" placeholder="Search Food..." onchange="searchFood()"><button class="btn-action" style="width:auto;" onclick="searchFood()">🔎</button></div>
         <div id="search-results" style="margin-top:10px; max-height:200px; overflow-y:auto;"></div>
     </div>
+    <div class="card" id="meal-container"></div>
 </div>
 
 <div class="container" id="view-progress">
@@ -1251,7 +1267,7 @@ const allExercises = [
             ["Side plank.", "Top leg on bench.", "Bottom leg floating."], ["Hold."], ["Brutal inner thigh work."], ["Groin health."], ["Adductors"]),
         createEx("L-Sit (Tuck)", ["Nimble", "Core"], "Bodyweight", "Calisthenics", 
             ["Hands on floor/parallettes."], ["Press down.", "Lift butt and knees off floor."], ["Hold tuck."], ["Core compression."], ["Abs", "Hip Flexors"])
-  ]; // END EXERCISE LIST
+]; // END EXERCISE LIST
 
 // ─────────────────────────────────────────────────────────────
 // NIMBLE ENGINE V43 (LOGIC CORE)
