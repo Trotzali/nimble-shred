@@ -1346,25 +1346,10 @@ window.allExercises = [
 ]; // END EXERCISE LIST
 
 // ─────────────────────────────────────────────────────────────
-// NIMBLE ENGINE V47 (FINAL STABLE PATCH)
+// NIMBLE ENGINE V49 (FINAL INTEGRATION)
 // ─────────────────────────────────────────────────────────────
 
-// 0. CRITICAL HELPER: DEFINED FIRST TO PREVENT CRASHES
-function createEx(name, cat, equip, type, prep, exec, tips, benefits, muscles, setupF9) {
-    return {
-        name: name, cat: cat, equip: equip, type: type,
-        guide: { prep: prep, exec: exec, tips: tips, benefits: benefits, muscles: muscles },
-        setup: setupF9 || { arms: "N/A", pulleys: "N/A" }
-    };
-}
-
-// 1. DATABASE RECOVERY & SAFETY CHECK
-if (typeof window.allExercises === 'undefined') {
-    if (typeof allExercises !== 'undefined') window.allExercises = allExercises;
-    else window.allExercises = [];
-}
-
-// 2. STATE & SETTINGS
+// 1. SAFETY & STATE
 let userSettings = JSON.parse(localStorage.getItem('nimbleSettings')) || { 
     hotelMode: false, currentPhase: 1, 
     schedule: { 0:'Rest', 1:'Push', 2:'Pull', 3:'Legs', 4:'Nimble', 5:'Rest', 6:'Full' },
@@ -1374,8 +1359,14 @@ let activeRoutine = [];
 let builderFilters = { muscle: [], equip: [] };
 let dailyMacros = JSON.parse(localStorage.getItem('nimbleMacros')) || {c:0, p:0, ch:0, f:0, date: new Date().toDateString()};
 let apiKey = "p61IM61sZf897clBskMhwLftfBccew4ZcgsatflX"; 
+let gifOverrides = JSON.parse(localStorage.getItem('nimbleGifs')) || {};
 
+// 2. BOOT SEQUENCE (With Safety Check)
 document.addEventListener('DOMContentLoaded', () => {
+    // Ensure data is loaded
+    if (typeof window.allExercises === 'undefined') window.allExercises = [];
+    
+    // Boot features
     switchTab('readiness'); 
     calculateStreak();
     updateMacroUI();
@@ -1402,13 +1393,13 @@ function switchTab(id) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// 4. SMART WORKOUT GENERATOR (TRANSLATION FIX)
+// 4. SMART WORKOUT GENERATOR (The Translator)
 // ─────────────────────────────────────────────────────────────
 
 function generateRandomWorkout() { generateWorkoutByFilter(() => true, "Random"); }
 
 function loadTemplate(type) {
-    // TRANSLATION MAP: Matches Buttons to Your Tags
+    // TRANSLATION MAP: Maps Buttons -> Your Data Tags
     const muscleMap = {
         'push': ['Chest', 'Shoulders', 'Triceps', 'Push', 'Delts', 'Pectorals'],
         'pull': ['Back', 'Biceps', 'Traps', 'Pull', 'Lats', 'Rear Delts'],
@@ -1424,9 +1415,9 @@ function loadTemplate(type) {
         if (type === 'full') return true; 
         if (type === 'f9') return e.equip === 'Cable';
 
-        // Check if ANY tag matches
+        // Check tags (cat) and type
         const exCats = Array.isArray(e.cat) ? e.cat : [e.cat];
-        // Also check "muscles" in case data is stored there
+        // Also check name for keywords as backup
         const allTags = exCats.concat(e.name.split(' ')); 
         
         return allTags.some(t => targets.some(target => t.includes(target))) || targets.includes(e.type);
@@ -1434,7 +1425,7 @@ function loadTemplate(type) {
 }
 
 function generateWorkoutByFilter(filterFn, buttonName) {
-    if(window.allExercises.length === 0) return alert("CRITICAL: Database is empty. Syntax error in list?");
+    if(window.allExercises.length === 0) return alert("CRITICAL: Database is empty. Check your exercise list for syntax errors.");
 
     let pool = window.allExercises.filter(filterFn);
     
@@ -1535,6 +1526,12 @@ function renderBuilderList() {
     });
 }
 function filterBuilderList() { renderBuilderList(); }
+function toggleFilter(type, val, btn) {
+    const idx = builderFilters[type].indexOf(val);
+    if(idx > -1) { builderFilters[type].splice(idx,1); btn.classList.remove('active'); }
+    else { builderFilters[type].push(val); btn.classList.add('active'); }
+    renderBuilderList();
+}
 
 function openGuide(exName) {
     const ex = window.allExercises.find(e => e.name === exName);
@@ -1557,10 +1554,8 @@ function openGuide(exName) {
     const savedGif = gifOverrides[ex.name];
     const img = document.getElementById('visual-content-img');
     const iframe = document.getElementById('visual-content-iframe');
-    const err = document.getElementById('visual-error');
-    img.style.display = 'none'; iframe.style.display = 'none'; err.style.display = 'block';
+    img.style.display = 'none'; iframe.style.display = 'none'; 
     if(savedGif) {
-        err.style.display = 'none';
         if(savedGif.includes('youtube')) { iframe.src = savedGif.replace('watch?v=', 'embed/'); iframe.style.display = 'block'; }
         else { img.src = savedGif; img.style.display = 'block'; }
     }
@@ -1574,7 +1569,6 @@ function saveGuideGif() {
         gifOverrides[document.getElementById('guide-title').innerText] = url;
         localStorage.setItem('nimbleGifs', JSON.stringify(gifOverrides));
         alert("Visual Saved!");
-        openGuide(document.getElementById('guide-title').innerText); 
     }
 }
 
@@ -1597,6 +1591,7 @@ function logSet(name, idx) {
     document.activeElement.innerText = "Saved!"; 
     document.activeElement.style.backgroundColor = "var(--success)";
     calculateStreak();
+    if(w > 225) triggerConfetti();
 }
 function calculateStreak() {
     const h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
