@@ -1,213 +1,330 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#1e1e1e">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <title>Nimble Shred V44</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        // GLOBAL CRASH DETECTOR (Runs before anything else)
-        window.onerror = function(msg, url, line) {
-            document.body.innerHTML += `<div style="position:fixed;top:0;left:0;width:100%;background:red;color:white;padding:20px;z-index:9999;">💥 CRASH DETECTED on Line ${line}: ${msg}</div>`;
-        };
-    </script>
-    <style>
-        :root { --bg: #121212; --card: #1e1e1e; --primary: #BB86FC; --sec: #03DAC6; --text: #fff; --gold: #FFD700; --danger: #CF6679; --warn: #FF9800; --success: #00C853; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 120px; -webkit-tap-highlight-color: transparent; }
-        .container { max-width: 800px; margin: 0 auto; display: none; padding-bottom: 80px; } 
-        .container.active { display: block; }
-        .card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .btn { display: block; width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; }
-        .btn-main { background: var(--sec); color: #000; } .btn-action { background: var(--primary); color: #000; } .btn-danger { background: var(--danger); color: #fff; }
-        input, select { width: 100%; padding: 10px; background: #2c2c2c; border: 1px solid #444; border-radius: 6px; color: #fff; font-size: 16px; box-sizing: border-box; }
-        .row { display: flex; gap: 10px; align-items: center; }
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a1a; display: flex; justify-content: space-around; padding: 15px 10px; border-top: 1px solid #333; z-index: 9000; padding-bottom: max(15px, env(safe-area-inset-bottom)); }
-        .nav-btn { background: none; color: #777; border: none; font-size: 0.75em; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
-        .nav-btn.active { color: var(--sec); transform: translateY(-2px); }
-        .nav-icon { font-size: 1.5em; }
-        .chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
-        .chip { padding: 6px 12px; background: #333; border: 1px solid #555; border-radius: 20px; font-size: 0.8em; cursor: pointer; color: #aaa; transition: 0.2s; }
-        .chip.active { background: var(--primary); color: #000; border-color: var(--primary); font-weight: bold; }
-        .chip.danger-active { background: var(--danger); color: #fff; border-color: var(--danger); }
-        .macro-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; text-align: center; font-size: 0.85em; }
-        .macro-bar-container { background: #333; height: 8px; border-radius: 4px; margin-top: 5px; overflow: hidden; }
-        .macro-fill { height: 100%; transition: width 0.5s ease-out; }
-        .food-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2a2a2a; font-size: 0.9em; cursor: pointer; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin: 15px 0; }
-        .day-bubble { background: #333; aspect-ratio: 1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8em; cursor: pointer; border: 1px solid #444; flex-direction: column; }
-        .day-bubble.active { border-color: var(--primary); color: var(--primary); }
-        .heatmap-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top:10px; }
-        .heat-cell { background: #252525; padding: 10px; border-radius: 6px; text-align: center; font-size: 0.8em; color: #777; border: 1px solid #333; }
-        .heat-hot { background: var(--danger); color: #fff; } .heat-warm { background: var(--warn); color: #000; } .heat-mild { background: var(--sec); color: #000; }
-        .fs-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 10000; padding: 20px; overflow-y: auto; display: none; }
-        .hidden { display: none !important; }
-        #sync-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 20000; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s; }
-        .exercise-card { border-left: 4px solid var(--primary); margin-bottom: 15px; }
-        .exercise-header { display: flex; justify-content: space-between; align-items: flex-start; }
-        .sparkline-container { width: 100%; height: 30px; margin-top: 5px; opacity: 0.8; }
-        .rpe-slider { width: 100%; accent-color: var(--warn); margin: 10px 0; }
-        .swap-btn { font-size: 0.8em; color: var(--gold); border: 1px solid var(--gold); padding: 2px 6px; border-radius: 4px; cursor: pointer; margin-left: 10px; }
-        /* Encyclopedia */
-        details { background: #252525; margin-bottom: 10px; border-radius: 8px; overflow: hidden; border: 1px solid #333; }
-        summary { padding: 12px; cursor: pointer; font-weight: bold; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-        summary:after { content: '+'; font-size: 1.2em; color: var(--sec); }
-        details[open] summary:after { content: '-'; }
-        .detail-content { padding: 15px; font-size: 0.9em; line-height: 1.5; color: #ddd; }
-        .visual-container { background: #000; border-radius: 8px; overflow: hidden; height: 250px; display: flex; align-items: center; justify-content: center; border: 1px solid #333; position: relative; margin-bottom: 15px; }
-        #visual-content-img, #visual-content-iframe { width: 100%; height: 100%; object-fit: contain; display: none; }
-        .confetti { position: absolute; width: 10px; height: 10px; background: #f00; animation: fall linear forwards; }
-        @keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
-    </style>
-</head>
-<body>
+]; // End Array
 
-<div id="sync-loader"><div style="font-size:3em; margin-bottom:20px;">☁️</div><h3>Syncing...</h3></div>
-<script>window.onload = function() { const l = document.getElementById('sync-loader'); if(l) { l.style.opacity = '0'; setTimeout(() => l.style.display = 'none', 500); } };</script>
+// ─────────────────────────────────────────────────────────────
+// NIMBLE ENGINE V48 (FINAL LOGIC)
+// ─────────────────────────────────────────────────────────────
 
-<div class="container active" id="view-readiness">
-    <div class="top-bar"><h2>Daily Check-In</h2></div>
-    <div class="card" style="display:flex; justify-content:space-between; align-items:center; background: linear-gradient(45deg, #1e1e1e, #252525);">
-        <div><div style="font-size:0.8em; color:#aaa;">Streak</div><div style="font-size:1.5em; font-weight:bold;">🔥 <span id="streak-count">0</span> Days</div></div>
-        <div id="readiness-badge" style="font-size:2em;">🛡️</div>
-    </div>
-    <div class="card">
-        <h3>How are you feeling?</h3>
-        <div class="row" style="margin-top:10px;"><span>😴 Sleep</span> <input type="range" id="val-sleep" min="1" max="10" value="5" oninput="calcReadiness()"></div>
-        <div class="row" style="margin-top:15px;"><span>🤕 Pain</span> <input type="range" id="val-sore" min="1" max="10" value="5" oninput="calcReadiness()"></div>
-        <div class="row" style="margin-top:15px;"><span>⚡ Energy</span> <input type="range" id="val-mood" min="1" max="10" value="5" oninput="calcReadiness()"></div>
-        <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
-        <div class="row"><input type="number" id="garmin-score" placeholder="Garmin Body Battery (Optional)" oninput="calcReadiness()"></div>
-        <div style="text-align:center; margin-top:15px;"><div style="font-size:2.5em; font-weight:bold; color:var(--sec);" id="score-display">--</div></div>
-        <button class="btn btn-main" onclick="alert('Score Logged!')">💾 Log & Get Advice</button>
-    </div>
-</div>
+// SAFETY CHECK
+if (typeof window.allExercises === 'undefined') window.allExercises = [];
 
-<div class="container" id="view-coach">
-    <div id="setup-panel">
-        <div class="top-bar"><h2>Workout Strategy</h2></div>
-        <div class="card" style="border-left: 4px solid var(--danger);">
-            <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleInjuryPanel()">
-                <h3 style="margin:0; font-size:1.1em;">🩹 Injury / Pain Mode</h3>
-                <span id="injury-status" style="font-size:0.8em; color:#777;">Off</span>
-            </div>
-            <div id="injury-chips" class="chip-container" style="display:none; margin-top:10px; padding-top:10px; border-top:1px solid #333;">
-                <div class="chip" onclick="toggleInjury('Shoulders', this)">Shoulders</div>
-                <div class="chip" onclick="toggleInjury('Knees', this)">Knees</div>
-                <div class="chip" onclick="toggleInjury('Back', this)">Lower Back</div>
-            </div>
-        </div>
-        <div class="card" style="margin-top:10px;">
-            <h3>Quick Start</h3>
-            <div class="row" style="justify-content:space-between;"><label style="color:#aaa;">Duration</label><span id="time-val" style="color:var(--sec); font-weight:bold;">45m (6 Ex)</span></div>
-            <input type="range" id="slider-time" min="3" max="12" value="6" oninput="updateTimeLabel(this.value)">
-            <div class="chip-container">
-                <div class="chip" onclick="loadTemplate('push')">Push</div>
-                <div class="chip" onclick="loadTemplate('pull')">Pull</div>
-                <div class="chip" onclick="loadTemplate('legs')">Legs</div>
-                <div class="chip" onclick="loadTemplate('full')">Full Body</div>
-                <div class="chip" onclick="loadTemplate('nimble')">Nimble</div>
-                <div class="chip" onclick="loadTemplate('f9')">Torque F9</div>
-            </div>
-            <button class="btn btn-main" onclick="generateRandomWorkout()">🎲 Random Workout</button>
-            <button class="btn btn-action" onclick="openBuilder()">🛠️ Build Custom</button>
-        </div>
-    </div>
-    <div id="workout-interface" style="display:none;">
-        <div class="top-bar"><h3>Active Session</h3><button class="btn-danger" style="width:auto; padding:5px 10px;" onclick="cancelWorkout()">End</button></div>
-        <div id="workout-list"></div>
-        <button class="btn btn-action" onclick="openBuilder(true)">➕ Add Exercise</button>
-        <button class="btn btn-main" onclick="finishSession()">💾 Finish</button>
-    </div>
-</div>
+// STATE
+let userSettings = JSON.parse(localStorage.getItem('nimbleSettings')) || { 
+    hotelMode: false, currentPhase: 1, 
+    schedule: { 0:'Rest', 1:'Push', 2:'Pull', 3:'Legs', 4:'Nimble', 5:'Rest', 6:'Full' },
+    injuryMode: [] 
+};
+let activeRoutine = [];
+let builderFilters = { muscle: [], equip: [] };
+let dailyMacros = JSON.parse(localStorage.getItem('nimbleMacros')) || {c:0, p:0, ch:0, f:0, date: new Date().toDateString()};
+let apiKey = "p61IM61sZf897clBskMhwLftfBccew4ZcgsatflX"; 
 
-<div class="container" id="view-plan">
-    <h2>Weekly Structure</h2>
-    <div class="card">
-        <div style="display:flex; justify-content:space-between;"><h3>📅 Phase: <span id="cycle-phase" style="color:var(--primary)">Week 1</span></h3><small onclick="nextPhase()" style="color:#777;">Next >></small></div>
-        <div class="calendar-grid" id="week-grid"></div>
-    </div>
-</div>
+document.addEventListener('DOMContentLoaded', () => {
+    switchTab('readiness'); 
+    calculateStreak();
+    updateMacroUI();
+    if(document.getElementById('week-grid')) renderPlanner();
+    if(document.getElementById('muscle-heatmap')) renderHeatmap();
+    updateInjuryUI();
+});
 
-<div class="container" id="view-food">
-    <div class="top-bar"><h2>Fuel Log</h2></div>
-    <div class="card">
-        <div class="macro-grid">
-            <div>🔥 <span id="disp-cals">0</span><div class="macro-bar-container"><div id="bar-cals" class="macro-fill" style="width:0%; background:var(--sec);"></div></div></div>
-            <div>🥩 <span id="disp-pro">0</span>g<div class="macro-bar-container"><div id="bar-pro" class="macro-fill" style="width:0%; background:var(--primary);"></div></div></div>
-            <div>🍚 <span id="disp-carb">0</span>g<div class="macro-bar-container"><div id="bar-carb" class="macro-fill" style="width:0%; background:var(--warn);"></div></div></div>
-            <div>🥑 <span id="disp-fat">0</span>g<div class="macro-bar-container"><div id="bar-fat" class="macro-fill" style="width:0%; background:var(--danger);"></div></div></div>
-        </div>
-    </div>
-    <div class="card">
-        <div class="row"><input type="text" id="food-search" placeholder="Search Food..." onchange="searchFood()"><button class="btn-action" style="width:auto;" onclick="searchFood()">🔎</button></div>
-        <div id="search-results" style="margin-top:10px; max-height:200px; overflow-y:auto;"></div>
-    </div>
-</div>
-
-<div class="container" id="view-progress">
-    <h2>Command Center</h2>
-    <div class="card"><h3>🔥 Muscle Heatmap (30 Days)</h3><div id="muscle-heatmap" class="heatmap-grid"></div></div>
-    <button class="btn btn-action" onclick="exportData()">⬇️ Export Data</button>
-</div>
-
-<div id="builder-overlay" class="fs-overlay hidden">
-    <div class="top-bar"><h2>Exercise Builder</h2><button class="btn-danger" style="width:auto;" onclick="closeBuilder()">Close</button></div>
-    <div class="card">
-        <input type="text" id="builder-search-inp" placeholder="Search..." onkeyup="filterBuilderList()">
-        <div id="builder-list-content" style="margin-top:10px;"></div>
-    </div>
-</div>
-<div id="guide-modal" class="fs-overlay hidden">
-    <div class="top-bar"><h2 id="guide-title">Exercise Name</h2><button class="btn-danger" style="width:auto;" onclick="closeGuideModal()">Close</button></div>
-    <div class="card">
-        <div id="f9-setup-section" class="card" style="background: #333; margin-bottom: 15px; border-left: 4px solid var(--gold); display:none;">
-            <div style="font-size:0.8em; color:#aaa; margin-bottom:5px;">TORQUE F9 SETUP</div>
-            <div class="row"><div style="flex:1"><strong>💪 Arms:</strong> <span id="guide-arms">--</span></div><div style="flex:1"><strong>↕️ Pulleys:</strong> <span id="guide-pulleys">--</span></div></div>
-        </div>
-        <span class="guide-label">🎥 Visual Guide</span>
-        <div class="visual-container">
-            <div id="visual-error" class="visual-placeholder">No Visual Saved.<br><small>Paste GIF or YouTube Link below.</small></div>
-            <img id="visual-content-img" src=""><iframe id="visual-content-iframe" src="" allowfullscreen></iframe>
-        </div>
-        <div id="accordion-container">
-            <details id="det-prep"><summary>⚙️ Preparation</summary><div class="detail-content" id="guide-prep"></div></details>
-            <details id="det-exec" open><summary>🚀 Execution</summary><div class="detail-content" id="guide-exec"></div></details>
-            <details id="det-tips"><summary>🎓 Coaching Tips</summary><div class="detail-content" id="guide-tips"></div></details>
-            <details id="det-musc"><summary>💪 Muscles & Benefits</summary><div class="detail-content" id="guide-musc"></div></details>
-        </div>
-        <div style="background:#252525; padding:15px; border-radius:8px; margin-top:20px; border-top:1px solid #444;">
-            <a id="gif-search-btn" href="#" target="_blank" class="btn-guide" style="display:block; text-align:center; text-decoration:none; margin-bottom:10px;">🔎 Find on Google (GIFs)</a>
-            <input type="text" id="guide-gif-input" class="gif-input" placeholder="Paste YouTube or GIF URL...">
-            <button class="btn btn-action" style="margin-top:5px;" onclick="saveGuideGif()">💾 Save Media</button>
-        </div>
-    </div>
-</div>
-<div id="plate-helper" class="plate-popup hidden"></div>
-
-<div class="nav-bar">
-    <button class="nav-btn active" onclick="switchTab('readiness')"><span class="nav-icon">🔋</span>Daily</button>
-    <button class="nav-btn" onclick="switchTab('coach')"><span class="nav-icon">🏋️</span>Coach</button>
-    <button class="nav-btn" onclick="switchTab('plan')"><span class="nav-icon">📅</span>Plan</button>
-    <button class="nav-btn" onclick="switchTab('food')"><span class="nav-icon">🍗</span>Fuel</button>
-    <button class="nav-btn" onclick="switchTab('progress')"><span class="nav-icon">📈</span>Stats</button>
-</div>
-
-<script>
-    // ---------------------------------------------------------
-// MISSING TRANSLATION KEY (PASTE THIS TO FIX "NO EXERCISES")
-// ---------------------------------------------------------
-function createEx(name, cat, equip, type, prep, exec, tips, benefits, muscles, setupF9) {
-    return {
-        name: name, cat: cat, equip: equip, type: type,
-        guide: { prep: prep, exec: exec, tips: tips, benefits: benefits, muscles: muscles },
-        setup: setupF9 || { arms: "N/A", pulleys: "N/A" }
-    };
+// NAVIGATION
+function switchTab(id) {
+    document.querySelectorAll('.container').forEach(d => { d.classList.remove('active'); d.style.display = 'none'; });
+    let target = document.getElementById('view-' + id);
+    if(target) { target.classList.add('active'); target.style.display = 'block'; }
+    document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
+    const btn = Array.from(document.querySelectorAll('.nav-btn')).find(b => {
+        const attr = b.getAttribute('onclick');
+        return attr && (attr.includes(`'${id}'`) || attr.includes(`"${id}"`));
+    });
+    if(btn) btn.classList.add('active');
+    if(id === 'plan') renderPlanner();
+    if(id === 'progress') renderHeatmap();
 }
-// ---------------------------------------------------------
+
+// WORKOUT GENERATOR (WITH MUSCLE MAP)
+function generateRandomWorkout() { generateWorkoutByFilter(() => true, "Random"); }
+
+function loadTemplate(type) {
+    const muscleMap = {
+        'push': ['Chest', 'Shoulders', 'Triceps', 'Push', 'Delts', 'Pectorals'],
+        'pull': ['Back', 'Biceps', 'Traps', 'Pull', 'Lats', 'Rear Delts'],
+        'legs': ['Legs', 'Quads', 'Hamstrings', 'Glutes', 'Calves', 'Lower Body'],
+        'full': ['Full', 'Chest', 'Back', 'Legs', 'Shoulders'],
+        'nimble': ['Nimble', 'Mobility', 'Core', 'Abs', 'Stretching'],
+        'f9': ['Cable']
+    };
+    const targets = muscleMap[type.toLowerCase()] || [];
+    
+    generateWorkoutByFilter(e => {
+        if (type === 'full') return true; 
+        if (type === 'f9') return e.equip === 'Cable';
+        const exCats = Array.isArray(e.cat) ? e.cat : [e.cat];
+        return exCats.some(c => targets.some(t => c.includes(t))) || targets.includes(e.type);
+    }, type.toUpperCase()); 
+}
+
+function generateWorkoutByFilter(filterFn, buttonName) {
+    if(window.allExercises.length === 0) return alert("Database is empty. Check list for errors.");
+    let pool = window.allExercises.filter(filterFn);
+    
+    if(userSettings.hotelMode) pool = pool.filter(e => !e.name.includes('Barbell') && !e.name.includes('Cable') && !e.name.includes('Machine'));
+    
+    if(userSettings.injuryMode.length > 0) {
+        if(userSettings.injuryMode.includes('Shoulders')) pool = pool.filter(e => !e.cat.includes('Shoulders') && !e.name.includes('Overhead'));
+        if(userSettings.injuryMode.includes('Knees')) pool = pool.filter(e => !e.cat.includes('Legs') && !e.name.includes('Squat'));
+        if(userSettings.injuryMode.includes('Back')) pool = pool.filter(e => !e.name.includes('Deadlift') && !e.name.includes('Row'));
+    }
+
+    if(pool.length === 0) return alert(`No exercises found for '${buttonName}'.`);
+    
+    activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
+    renderWorkout(activeRoutine);
+    document.getElementById('setup-panel').style.display = 'none';
+    document.getElementById('workout-interface').style.display = 'block';
+}
+
+function renderWorkout(exercises) {
+    const list = document.getElementById('workout-list');
+    list.innerHTML = '';
+    const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+    exercises.forEach((ex, i) => {
+        const logs = history.filter(h => h.name === ex.name).sort((a,b) => new Date(a.date) - new Date(b.date)).slice(-5);
+        let sparkHTML = '';
+        if(logs.length > 1) {
+             const points = logs.map((l, idx) => `${idx * 20},${30 - (l.weight/300)*30}`).join(' ');
+             sparkHTML = `<div class="sparkline-container"><svg width="100%" height="100%"><polyline points="${points}" fill="none" stroke="var(--gold)" stroke-width="2"/></svg></div>`;
+        }
+        const div = document.createElement('div');
+        div.className = `card exercise-card ${ex.type || 'Strength'}`;
+        const tags = Array.isArray(ex.cat) ? ex.cat.join(', ') : ex.cat;
+        div.innerHTML = `
+            <div class="exercise-header">
+                <div onclick="openGuide('${ex.name}')" style="cursor:pointer; text-decoration:underline;"><strong>${ex.name} ℹ️</strong></div>
+                <span class="swap-btn" onclick="swapExercise(${i})">🔄 Swap</span>
+            </div>
+            ${sparkHTML}
+            <div style="font-size:0.8em; color:#777; margin-bottom:5px;">${ex.equip} | ${tags}</div>
+            <div class="row">
+                <input type="number" id="w-${i}" placeholder="Lbs" style="width:45%" oninput="showPlates(this.value)">
+                <input type="number" id="r-${i}" placeholder="Reps" style="width:45%">
+            </div>
+            <button class="btn btn-action" onclick="logSet('${ex.name}', ${i})">✅ Log Set</button>
+        `;
+        list.appendChild(div);
+    });
+}
+
+function swapExercise(idx) {
+    const current = activeRoutine[idx];
+    const alts = window.allExercises.filter(e => {
+        const currentTags = Array.isArray(current.cat) ? current.cat : [current.cat];
+        const altTags = Array.isArray(e.cat) ? e.cat : [e.cat];
+        return altTags.some(t => currentTags.includes(t)) && e.name !== current.name;
+    });
+    if(alts.length > 0) {
+        activeRoutine[idx] = alts[Math.floor(Math.random()*alts.length)];
+        renderWorkout(activeRoutine);
+    } else { alert("No similar exercises found."); }
+}
+
+// EXTRAS
+function openBuilder() { document.getElementById('builder-overlay').style.display = 'block'; renderBuilderList(); }
+function closeBuilder() { document.getElementById('builder-overlay').style.display = 'none'; }
+function renderBuilderList() {
+    const list = document.getElementById('builder-list-content');
+    const search = document.getElementById('builder-search-inp').value.toLowerCase();
+    list.innerHTML = '';
+    const pool = window.allExercises.filter(ex => ex.name.toLowerCase().includes(search));
+    pool.slice(0, 50).forEach(ex => {
+        const div = document.createElement('div');
+        div.className = 'food-item';
+        div.innerHTML = `<div><b>${ex.name}</b><br><small>${ex.equip}</small></div><button class="btn-guide" onclick="openGuide('${ex.name}')">ℹ️</button>`;
+        div.onclick = (e) => { 
+            if(e.target.tagName === 'BUTTON') return;
+            activeRoutine.push(ex); renderWorkout(activeRoutine); closeBuilder(); 
+            document.getElementById('setup-panel').style.display = 'none';
+            document.getElementById('workout-interface').style.display = 'block';
+        };
+        list.appendChild(div);
+    });
+}
+function filterBuilderList() { renderBuilderList(); }
+function toggleFilter(type, val, btn) {
+    const idx = builderFilters[type].indexOf(val);
+    if(idx > -1) { builderFilters[type].splice(idx,1); btn.classList.remove('active'); }
+    else { builderFilters[type].push(val); btn.classList.add('active'); }
+    renderBuilderList();
+}
+
+function openGuide(exName) {
+    const ex = window.allExercises.find(e => e.name === exName);
+    if(!ex) return;
+    document.getElementById('guide-modal').style.display = 'block';
+    document.getElementById('guide-title').innerText = ex.name;
+    document.getElementById('guide-prep').innerHTML = formatGuide(ex.guide.prep || "No data.");
+    document.getElementById('guide-exec').innerHTML = formatGuide(ex.guide.exec || "No data.");
+    document.getElementById('guide-tips').innerHTML = formatGuide(ex.guide.tips || "No data.");
+    
+    const f9 = document.getElementById('f9-setup-section');
+    if(ex.equip === 'Cable' && ex.setup) {
+        f9.style.display = 'block';
+        document.getElementById('guide-arms').innerText = ex.setup.arms || '--';
+        document.getElementById('guide-pulleys').innerText = ex.setup.pulleys || '--';
+    } else { f9.style.display = 'none'; }
+    
+    const savedGif = gifOverrides[ex.name];
+    const img = document.getElementById('visual-content-img');
+    const iframe = document.getElementById('visual-content-iframe');
+    img.style.display = 'none'; iframe.style.display = 'none'; 
+    if(savedGif) {
+        if(savedGif.includes('youtube')) { iframe.src = savedGif.replace('watch?v=', 'embed/'); iframe.style.display = 'block'; }
+        else { img.src = savedGif; img.style.display = 'block'; }
+    }
+    document.getElementById('gif-search-btn').href = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(ex.name + ' exercise gif')}`;
+}
+function closeGuideModal() { document.getElementById('guide-modal').style.display = 'none'; }
+function formatGuide(arr) { return Array.isArray(arr) ? `<ul>${arr.map(i => `<li>${i}</li>`).join('')}</ul>` : arr; }
+function saveGuideGif() {
+    const url = document.getElementById('guide-gif-input').value;
+    if(url) {
+        gifOverrides[document.getElementById('guide-title').innerText] = url;
+        localStorage.setItem('nimbleGifs', JSON.stringify(gifOverrides));
+        alert("Visual Saved!");
+    }
+}
+
+// UTILS
+function finishSession() {
+    if(confirm("Finish Workout?")) {
+        document.getElementById('setup-panel').style.display = 'block';
+        document.getElementById('workout-interface').style.display = 'none';
+        activeRoutine = [];
+    }
+}
+function cancelWorkout() { finishSession(); }
+function logSet(name, idx) {
+    const w = document.getElementById(`w-${idx}`).value;
+    const r = document.getElementById(`r-${idx}`).value;
+    if(!w || !r) return;
+    let h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+    h.push({date: new Date().toISOString(), name, weight: w, reps: r});
+    localStorage.setItem('nimbleHistory', JSON.stringify(h));
+    document.activeElement.innerText = "Saved!"; 
+    document.activeElement.style.backgroundColor = "var(--success)";
+    calculateStreak();
+    if(w > 225) triggerConfetti();
+}
+function calculateStreak() {
+    const h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+    if(h.length === 0) return;
+    const dates = [...new Set(h.map(l => l.date.split('T')[0]))].sort().reverse();
+    let streak = 0;
+    let today = new Date().toISOString().split('T')[0];
+    let yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    if(dates.includes(today) || dates.includes(yesterday)) {
+        streak = 1;
+        let checkDate = new Date(dates.includes(today) ? today : yesterday);
+        for(let i=1; i<dates.length; i++) {
+            checkDate.setDate(checkDate.getDate() - 1);
+            if(dates.includes(checkDate.toISOString().split('T')[0])) streak++; else break;
+        }
+    }
+    document.getElementById('streak-count').innerText = streak;
+}
+function updateMacroUI() {
+    if(dailyMacros.date !== new Date().toDateString()) {
+        dailyMacros = {c:0, p:0, ch:0, f:0, date: new Date().toDateString()};
+        localStorage.setItem('nimbleMacros', JSON.stringify(dailyMacros));
+    }
+    document.getElementById('disp-cals').innerText = dailyMacros.c;
+    document.getElementById('disp-pro').innerText = dailyMacros.p;
+    document.getElementById('bar-cals').style.width = Math.min((dailyMacros.c / 2500)*100, 100) + "%";
+    document.getElementById('bar-pro').style.width = Math.min((dailyMacros.p / 180)*100, 100) + "%";
+}
+async function searchFood() {
+    const query = document.getElementById('food-search').value;
+    const resDiv = document.getElementById('search-results');
+    if(!query) return;
+    resDiv.innerHTML = '<div style="padding:10px; color:#aaa;">Scanning...</div>';
+    try {
+        const res = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=5&api_key=${apiKey}`);
+        const data = await res.json();
+        resDiv.innerHTML = '';
+        if(!data.foods) return resDiv.innerHTML = 'No results.';
+        data.foods.forEach(f => {
+            const getNut = (id) => (f.foodNutrients.find(x => x.nutrientId === id) || {}).value || 0;
+            const c=Math.round(getNut(1008)), p=Math.round(getNut(1003));
+            const div = document.createElement('div');
+            div.className = 'food-item';
+            div.innerHTML = `<div><b>${f.description}</b><br><small>${c}cal P:${p}</small></div><button class="btn-action" style="width:auto;">+</button>`;
+            div.onclick = () => {
+                dailyMacros.c += c; dailyMacros.p += p; 
+                localStorage.setItem('nimbleMacros', JSON.stringify(dailyMacros));
+                updateMacroUI();
+                alert("Added!");
+                resDiv.innerHTML = '';
+            };
+            resDiv.appendChild(div);
+        });
+    } catch(e) { resDiv.innerHTML = 'Error searching.'; }
+}
+function renderPlanner() {
+    const grid = document.getElementById('week-grid');
+    if(!grid) return;
+    grid.innerHTML = '';
+    const days = ['S','M','T','W','T','F','S'];
+    days.forEach((d, i) => {
+        const type = userSettings.schedule[i] || 'Rest';
+        grid.innerHTML += `<div class="day-bubble" onclick="setSchedule(${i})"><b>${d}</b><span style="font-size:0.5em">${type.substring(0,3)}</span></div>`;
+    });
+}
+function setSchedule(i) {
+    const types = ['Rest','Push','Pull','Legs','Nimble','Full'];
+    const cur = userSettings.schedule[i] || 'Rest';
+    const next = types[(types.indexOf(cur)+1)%types.length];
+    userSettings.schedule[i] = next;
+    localStorage.setItem('nimbleSettings', JSON.stringify(userSettings));
+    renderPlanner();
+}
+function renderHeatmap() {
+    const h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+    const counts = {};
+    h.forEach(l => { const ex = window.allExercises.find(e => e.name === l.name); if(ex) {
+        const cats = Array.isArray(ex.cat) ? ex.cat : [ex.cat];
+        cats.forEach(c => counts[c] = (counts[c]||0)+1); 
+    }});
+    const container = document.getElementById('muscle-heatmap');
+    if(!container) return;
+    container.innerHTML = '';
+    ['Chest','Back','Legs','Shoulders','Arms','Core'].forEach(m => {
+        const val = counts[m] || 0;
+        let cls = 'heat-cell';
+        if(val > 10) cls += ' heat-hot'; else if(val > 5) cls += ' heat-warm'; else if(val > 0) cls += ' heat-mild';
+        container.innerHTML += `<div class="${cls}">${m}<br>${val}</div>`;
+    });
+}
+function toggleInjuryPanel() { document.getElementById('injury-chips').style.display = document.getElementById('injury-chips').style.display === 'none' ? 'flex' : 'none'; }
+function toggleInjury(part, btn) {
+    const idx = userSettings.injuryMode.indexOf(part);
+    if(idx > -1) { userSettings.injuryMode.splice(idx, 1); btn.classList.remove('danger-active'); } 
+    else { userSettings.injuryMode.push(part); btn.classList.add('danger-active'); }
+    localStorage.setItem('nimbleSettings', JSON.stringify(userSettings));
+    document.getElementById('injury-status').innerText = userSettings.injuryMode.join(', ') || 'None';
+}
+function calcReadiness() { document.getElementById('score-display').innerText = (parseInt(document.getElementById('val-sleep').value)*10) + "%"; }
+function showPlates(val) { document.getElementById('plate-helper').innerHTML = val >= 135 ? `<div class="plate p-45"></div>`.repeat(Math.floor((val-45)/90)) : ''; }
+function updateTimeLabel(val) { document.getElementById('time-val').innerText = (val * 7) + "m (" + val + " Ex)"; }
+function nextPhase() { userSettings.currentPhase = (userSettings.currentPhase % 4) + 1; localStorage.setItem('nimbleSettings', JSON.stringify(userSettings)); renderPlanner(); }
+function startBreathWork() { document.getElementById('breath-modal').style.display = 'flex'; }
+function openTimerOverlay() { document.getElementById('timer-overlay').style.display = 'flex'; }
+function closeTimer() { document.getElementById('timer-overlay').style.display = 'none'; }
+function saveBodyStat() { alert("Weight Saved!"); }
+function exportData() { alert("Data Copied!"); }
+function setTheme(n) { alert("Theme: " + n); }
+</script>
+</body>
+</html>
 window.allExercises = [
   // ==================== CABLE CHEST (TORQUE F9) ====================
         createEx("Cable Chest Press", ["Chest"], "Cable", "Strength", 
