@@ -1226,15 +1226,23 @@ window.allExercises = [
         createEx("L-Sit (Tuck)", ["Nimble", "Core"], "Bodyweight", "Calisthenics", 
             ["Hands on floor/parallettes."], ["Press down.", "Lift butt and knees off floor."], ["Hold tuck."], ["Core compression."], ["Abs", "Hip Flexors"])
 
-    ]; // END EXERCISE LIST
+]; // END EXERCISE LIST
 
 // ─────────────────────────────────────────────────────────────
-// NIMBLE ENGINE V46 (UNIVERSAL TRANSLATOR)
+// NIMBLE ENGINE V47 (FINAL STABLE PATCH)
 // ─────────────────────────────────────────────────────────────
 
-// 1. DATABASE SAFETY CHECK
+// 0. CRITICAL HELPER: DEFINED FIRST TO PREVENT CRASHES
+function createEx(name, cat, equip, type, prep, exec, tips, benefits, muscles, setupF9) {
+    return {
+        name: name, cat: cat, equip: equip, type: type,
+        guide: { prep: prep, exec: exec, tips: tips, benefits: benefits, muscles: muscles },
+        setup: setupF9 || { arms: "N/A", pulleys: "N/A" }
+    };
+}
+
+// 1. DATABASE RECOVERY & SAFETY CHECK
 if (typeof window.allExercises === 'undefined') {
-    // Try to recover if 'const' was used instead of 'window.'
     if (typeof allExercises !== 'undefined') window.allExercises = allExercises;
     else window.allExercises = [];
 }
@@ -1251,7 +1259,6 @@ let dailyMacros = JSON.parse(localStorage.getItem('nimbleMacros')) || {c:0, p:0,
 let apiKey = "p61IM61sZf897clBskMhwLftfBccew4ZcgsatflX"; 
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Boot up features
     switchTab('readiness'); 
     calculateStreak();
     updateMacroUI();
@@ -1267,7 +1274,6 @@ function switchTab(id) {
     if(target) { target.classList.add('active'); target.style.display = 'block'; }
     
     document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
-    // Smart button matching
     const btn = Array.from(document.querySelectorAll('.nav-btn')).find(b => {
         const attr = b.getAttribute('onclick');
         return attr && (attr.includes(`'${id}'`) || attr.includes(`"${id}"`));
@@ -1279,16 +1285,15 @@ function switchTab(id) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// 4. SMART WORKOUT GENERATOR (The Fix)
+// 4. SMART WORKOUT GENERATOR (TRANSLATION FIX)
 // ─────────────────────────────────────────────────────────────
 
 function generateRandomWorkout() { generateWorkoutByFilter(() => true, "Random"); }
 
 function loadTemplate(type) {
-    // THE TRANSLATION DICTIONARY
-    // This teaches the app that "Push" includes Chest, Shoulders, etc.
+    // TRANSLATION MAP: Matches Buttons to Your Tags
     const muscleMap = {
-        'push': ['Chest', 'Shoulders', 'Triceps', 'Push', 'Delts'],
+        'push': ['Chest', 'Shoulders', 'Triceps', 'Push', 'Delts', 'Pectorals'],
         'pull': ['Back', 'Biceps', 'Traps', 'Pull', 'Lats', 'Rear Delts'],
         'legs': ['Legs', 'Quads', 'Hamstrings', 'Glutes', 'Calves', 'Lower Body'],
         'full': ['Full', 'Chest', 'Back', 'Legs', 'Shoulders'],
@@ -1299,24 +1304,20 @@ function loadTemplate(type) {
     const targets = muscleMap[type.toLowerCase()] || [];
     
     generateWorkoutByFilter(e => {
-        // Full Body: Accept almost anything
         if (type === 'full') return true; 
-        
-        // F9: Strict Cable check
         if (type === 'f9') return e.equip === 'Cable';
 
-        // Standard: Check if exercise tags match ANY target
-        // e.g. Does "Chest" match ["Chest", "Shoulders"]? YES.
+        // Check if ANY tag matches
         const exCats = Array.isArray(e.cat) ? e.cat : [e.cat];
-        return exCats.some(c => targets.includes(c)) || targets.includes(e.type);
-    }, type.toUpperCase()); // Pass name for error message
+        // Also check "muscles" in case data is stored there
+        const allTags = exCats.concat(e.name.split(' ')); 
+        
+        return allTags.some(t => targets.some(target => t.includes(target))) || targets.includes(e.type);
+    }, type.toUpperCase()); 
 }
 
 function generateWorkoutByFilter(filterFn, buttonName) {
-    // Diagnostic 1: Is DB Empty?
-    if(window.allExercises.length === 0) {
-        return alert("CRITICAL: Database is empty. Your list has a syntax error or failed to load.");
-    }
+    if(window.allExercises.length === 0) return alert("CRITICAL: Database is empty. Syntax error in list?");
 
     let pool = window.allExercises.filter(filterFn);
     
@@ -1330,10 +1331,7 @@ function generateWorkoutByFilter(filterFn, buttonName) {
         if(userSettings.injuryMode.includes('Back')) pool = pool.filter(e => !e.name.includes('Deadlift') && !e.name.includes('Row'));
     }
 
-    // Diagnostic 2: Did we filter everything out?
-    if(pool.length === 0) {
-        return alert(`No exercises found for '${buttonName}'.\n\n- Check if 'Hotel Mode' is too strict.\n- Check if 'Injury Mode' is blocking everything.\n- Verify your exercises have tags like 'Chest' or 'Back'.`);
-    }
+    if(pool.length === 0) return alert(`No exercises found for '${buttonName}'.\nTry turning off Hotel Mode or Injury Filters.`);
     
     activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
     renderWorkout(activeRoutine);
@@ -1347,7 +1345,6 @@ function renderWorkout(exercises) {
     const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
     
     exercises.forEach((ex, i) => {
-        // Sparklines
         const logs = history.filter(h => h.name === ex.name).sort((a,b) => new Date(a.date) - new Date(b.date)).slice(-5);
         let sparkHTML = '';
         if(logs.length > 1) {
@@ -1379,7 +1376,6 @@ function renderWorkout(exercises) {
 function swapExercise(idx) {
     const current = activeRoutine[idx];
     const alts = window.allExercises.filter(e => {
-        // Smart Swap: Find something with matching tags
         const currentTags = Array.isArray(current.cat) ? current.cat : [current.cat];
         const altTags = Array.isArray(e.cat) ? e.cat : [e.cat];
         return altTags.some(t => currentTags.includes(t)) && e.name !== current.name;
@@ -1388,7 +1384,7 @@ function swapExercise(idx) {
     if(alts.length > 0) {
         activeRoutine[idx] = alts[Math.floor(Math.random()*alts.length)];
         renderWorkout(activeRoutine);
-    } else { alert("No similar exercises found to swap with."); }
+    } else { alert("No similar exercises found."); }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -1406,8 +1402,6 @@ function renderBuilderList() {
     const list = document.getElementById('builder-list-content');
     const search = document.getElementById('builder-search-inp').value.toLowerCase();
     list.innerHTML = '';
-    
-    // Show first 50 matches
     const pool = window.allExercises.filter(ex => ex.name.toLowerCase().includes(search));
 
     pool.slice(0, 50).forEach(ex => {
@@ -1432,12 +1426,10 @@ function openGuide(exName) {
     document.getElementById('guide-modal').classList.remove('hidden');
     document.getElementById('guide-title').innerText = ex.name;
     
-    // Fill Accordions
     document.getElementById('guide-prep').innerHTML = formatGuide(ex.guide.prep || "No data.");
     document.getElementById('guide-exec').innerHTML = formatGuide(ex.guide.exec || "No data.");
     document.getElementById('guide-tips').innerHTML = formatGuide(ex.guide.tips || "No data.");
     
-    // F9 Setup
     const f9 = document.getElementById('f9-setup-section');
     if(ex.equip === 'Cable' && ex.setup) {
         f9.style.display = 'block';
@@ -1445,13 +1437,31 @@ function openGuide(exName) {
         document.getElementById('guide-pulleys').innerText = ex.setup.pulleys || '--';
     } else { f9.style.display = 'none'; }
     
-    // Setup GIF Search Link
+    const savedGif = gifOverrides[ex.name];
+    const img = document.getElementById('visual-content-img');
+    const iframe = document.getElementById('visual-content-iframe');
+    const err = document.getElementById('visual-error');
+    img.style.display = 'none'; iframe.style.display = 'none'; err.style.display = 'block';
+    if(savedGif) {
+        err.style.display = 'none';
+        if(savedGif.includes('youtube')) { iframe.src = savedGif.replace('watch?v=', 'embed/'); iframe.style.display = 'block'; }
+        else { img.src = savedGif; img.style.display = 'block'; }
+    }
     document.getElementById('gif-search-btn').href = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(ex.name + ' exercise gif')}`;
 }
 function closeGuideModal() { document.getElementById('guide-modal').style.display = 'none'; }
 function formatGuide(arr) { return Array.isArray(arr) ? `<ul>${arr.map(i => `<li>${i}</li>`).join('')}</ul>` : arr; }
+function saveGuideGif() {
+    const url = document.getElementById('guide-gif-input').value;
+    if(url) {
+        gifOverrides[document.getElementById('guide-title').innerText] = url;
+        localStorage.setItem('nimbleGifs', JSON.stringify(gifOverrides));
+        alert("Visual Saved!");
+        openGuide(document.getElementById('guide-title').innerText); 
+    }
+}
 
-// Fuel, Plan, Stats Utils
+// UTILS
 function finishSession() {
     if(confirm("Finish Workout?")) {
         document.getElementById('setup-panel').style.display = 'block';
