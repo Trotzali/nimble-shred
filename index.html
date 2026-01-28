@@ -245,11 +245,21 @@
 </div>
 
 <div class="nav-bar">
-    <button class="nav-btn active" onclick="switchTab('readiness')" id="nav-readiness"><span class="nav-icon">🔋</span>Daily</button>
-    <button class="nav-btn" onclick="switchTab('coach')" id="nav-coach"><span class="nav-icon">🏋️</span>Coach</button>
-    <button class="nav-btn" onclick="switchTab('food')" id="nav-food"><span class="nav-icon">🍗</span>Fuel</button>
-    <button class="nav-btn" onclick="switchTab('wellness')" id="nav-wellness"><span class="nav-icon">🧘</span>Wellness</button>
-    <button class="nav-btn" onclick="switchTab('progress')" id="nav-progress"><span class="nav-icon">📈</span>Stats</button>
+    <button class="nav-btn active" onclick="switchTab('readiness')">
+        <span class="nav-icon">🔋</span>Daily
+    </button>
+    <button class="nav-btn" onclick="switchTab('plan')">
+        <span class="nav-icon">📅</span>Plan
+    </button>
+    <button class="nav-btn" onclick="switchTab('food')">
+        <span class="nav-icon">🍗</span>Fuel
+    </button>
+    <button class="nav-btn" onclick="switchTab('wellness')">
+        <span class="nav-icon">🧘</span>Body
+    </button>
+    <button class="nav-btn" onclick="switchTab('progress')">
+        <span class="nav-icon">📈</span>Stats
+    </button>
 </div>
 
 <div id="readiness-modal" class="fs-overlay flex-center hidden">
@@ -1542,13 +1552,7 @@ function switchTab(id) {
     if (activeBtn) activeBtn.classList.add('active');
 }
 
-    // 3. Update Bottom Navigation Styling
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    // Find the button that was clicked (based on onclick attribute match)
-    // This is a simple visual fix
-    const clickedBtn = Array.from(document.querySelectorAll('.nav-item')).find(el => el.getAttribute('onclick').includes(id));
-    if(clickedBtn) clickedBtn.classList.add('active');
-}
+ 
 
 // --- FEATURE 1, 2, 3: PLANNER LOGIC ---
 function renderPlanner() {
