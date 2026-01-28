@@ -1830,7 +1830,52 @@ function exportData() {
     alert("Data copied to clipboard!");
     navigator.clipboard.writeText(text);
 }
+function openFoodModal(food) {
+    const overlay = document.createElement('div');
+    overlay.className = 'fs-overlay';
+    overlay.style.display = 'block';
+    overlay.innerHTML = `
+        <div class="card">
+            <h2>Add Food</h2>
+            <p><strong>${food.name}</strong></p>
+            <p style="color:#aaa; font-size:0.9em;">${food.desc}</p>
+            <p style="font-size:0.85em;">Per 100g: ${Math.round(food.c)}cal | P:${Math.round(food.p)}g | C:${Math.round(food.ch)}g | F:${Math.round(food.f)}g</p>
+            <label>Portion (grams):</label>
+            <input type="number" id="food-portion" value="100" min="1">
+            <button class="btn btn-main" onclick="addFoodToMeal('${food.name}', ${food.c}, ${food.p}, ${food.ch}, ${food.f})">Add to Current Meal</button>
+            <button class="btn btn-danger" onclick="this.parentElement.parentElement.remove()">Cancel</button>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+}
 
+function addFoodToMeal(name, cPer100, pPer100, chPer100, fPer100) {
+    const portion = parseFloat(document.getElementById('food-portion').value) || 100;
+    const multiplier = portion / 100;
+    
+    const food = {
+        name: name,
+        calories: Math.round(cPer100 * multiplier),
+        protein: Math.round(pPer100 * multiplier),
+        carbs: Math.round(chPer100 * multiplier),
+        fat: Math.round(fPer100 * multiplier),
+        portion: portion
+    };
+    
+    // Add to current meal - you'll need to determine which meal is active
+    // This is a placeholder - adjust based on your meal tracking structure
+    let meals = JSON.parse(localStorage.getItem('nimbleMeals')) || {};
+    const today = new Date().toISOString().split('T')[0];
+    if (!meals[today]) meals[today] = { breakfast: [], lunch: [], dinner: [], snacks: [] };
+    
+    // Add to snacks by default - you might want to track which meal is currently being edited
+    meals[today].snacks.push(food);
+    localStorage.setItem('nimbleMeals', JSON.stringify(meals));
+    
+    // Close modal and refresh display
+    document.querySelector('.fs-overlay').remove();
+    renderMacros(); // Assuming you have this function to refresh the macro display
+}
 // --- UNIFIED FOOD SEARCH ENGINE ---
 async function searchFood() {
     const query = document.getElementById('food-search').value;
