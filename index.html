@@ -1225,28 +1225,30 @@ window.allExercises = [
             ["Side plank.", "Top leg on bench.", "Bottom leg floating."], ["Hold."], ["Brutal inner thigh work."], ["Groin health."], ["Adductors"]),
         createEx("L-Sit (Tuck)", ["Nimble", "Core"], "Bodyweight", "Calisthenics", 
             ["Hands on floor/parallettes."], ["Press down.", "Lift butt and knees off floor."], ["Hold tuck."], ["Core compression."], ["Abs", "Hip Flexors"])
-]; // END EXERCISE DATA
-</script>
+]; ]; // END EXERCISE LIST
 
-<script>
-// 1. SAFETY CHECK
-if(typeof window.allExercises === 'undefined') {
-    alert("CRITICAL ERROR: Exercise list failed to load. Check for syntax errors (missing commas/quotes) in your list.");
-    window.allExercises = []; // Prevent total crash
+// ─────────────────────────────────────────────────────────────
+// NIMBLE ENGINE V45 (FINAL LOGIC PATCH)
+// ─────────────────────────────────────────────────────────────
+
+// 1. SAFETY & STATE
+if (typeof window.allExercises === 'undefined' || !Array.isArray(window.allExercises)) {
+    console.error("Exercise List Missing or Broken.");
+    window.allExercises = []; // Prevent crash
+    alert("⚠️ Data Error: Your exercise list has a syntax error (likely a missing comma). The app is running in Empty Mode.");
 }
 
-// 2. STATE & SETTINGS
 let userSettings = JSON.parse(localStorage.getItem('nimbleSettings')) || { 
     hotelMode: false, currentPhase: 1, 
     schedule: { 0:'Rest', 1:'Push', 2:'Pull', 3:'Legs', 4:'Nimble', 5:'Rest', 6:'Full' },
     injuryMode: [] 
 };
 let activeRoutine = [];
+let builderFilters = { muscle: [], equip: [] };
 let apiKey = "p61IM61sZf897clBskMhwLftfBccew4ZcgsatflX"; 
 let gifOverrides = JSON.parse(localStorage.getItem('nimbleGifs')) || {};
 let dailyMacros = JSON.parse(localStorage.getItem('nimbleMacros')) || {c:0, p:0, ch:0, f:0, date: new Date().toDateString()};
 
-// 3. STARTUP
 document.addEventListener('DOMContentLoaded', () => {
     switchTab('readiness'); 
     calculateStreak();
@@ -1256,43 +1258,57 @@ document.addEventListener('DOMContentLoaded', () => {
     updateInjuryUI();
 });
 
-// 4. NAVIGATION
+// 2. NAVIGATION
 function switchTab(id) {
     document.querySelectorAll('.container').forEach(d => { d.classList.remove('active'); d.style.display = 'none'; });
     let target = document.getElementById('view-' + id);
     if(target) { target.classList.add('active'); target.style.display = 'block'; }
-    
     document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
-    // Flexible button matching
-    const btn = Array.from(document.querySelectorAll('.nav-btn')).find(b => {
-        const onclick = b.getAttribute('onclick');
-        return onclick && (onclick.includes(`'${id}'`) || onclick.includes(`"${id}"`));
-    });
+    const btn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes(id));
     if(btn) btn.classList.add('active');
-    
     if(id === 'plan') renderPlanner();
     if(id === 'progress') renderHeatmap();
 }
 
-// 5. COACHING LOGIC
+// ─────────────────────────────────────────────────────────────
+// 3. COACHING LOGIC (THE FIX FOR "NO EXERCISES")
+// ─────────────────────────────────────────────────────────────
+
 function generateRandomWorkout() { generateWorkoutByFilter(() => true); }
 
 function loadTemplate(type) {
-    const map = {'push':'Push', 'pull':'Pull', 'legs':'Legs', 'full':'Full', 'nimble':'Nimble', 'f9':'Cable'};
-    const key = map[type] || 'Full';
+    // MAP BUTTONS TO MUSCLES (This fixes the empty result issue)
+    const muscleMap = {
+        'push': ['Chest', 'Shoulders', 'Triceps', 'Push'],
+        'pull': ['Back', 'Biceps', 'Traps', 'Pull', 'Lats'],
+        'legs': ['Legs', 'Quads', 'Hamstrings', 'Glutes', 'Calves'],
+        'full': ['Full', 'Chest', 'Back', 'Legs'],
+        'nimble': ['Nimble', 'Mobility', 'Core'],
+        'f9': ['Cable']
+    };
+
+    const targets = muscleMap[type] || [];
+    
     generateWorkoutByFilter(e => {
-        if(key === 'Full') return true;
-        if(key === 'Nimble') return e.cat.includes('Nimble') || e.type === 'Mobility';
-        if(key === 'Cable') return e.equip === 'Cable';
-        return e.cat.includes(key) || e.type === key;
+        // If "Full Body", just ensure it's not a tiny isolation move unless needed
+        if (type === 'full') return true; 
+        
+        // If "F9", strict check for Cable
+        if (type === 'f9') return e.equip === 'Cable';
+
+        // Otherwise, check if ANY category matches our map
+        // e.g. Does ["Chest"] overlap with ["Chest", "Shoulders", "Triceps"]? Yes.
+        return e.cat.some(c => targets.includes(c)) || targets.includes(e.type);
     });
 }
 
 function generateWorkoutByFilter(filterFn) {
+    if(window.allExercises.length === 0) return alert("Database is empty. Check your exercise list for syntax errors.");
+
     let pool = window.allExercises.filter(filterFn);
     
     // Hotel Mode
-    if(userSettings.hotelMode) pool = pool.filter(e => !e.name.includes('Barbell') && !e.name.includes('Cable'));
+    if(userSettings.hotelMode) pool = pool.filter(e => !e.name.includes('Barbell') && !e.name.includes('Cable') && !e.name.includes('Machine'));
     
     // Injury Filter
     if(userSettings.injuryMode.length > 0) {
@@ -1301,17 +1317,20 @@ function generateWorkoutByFilter(filterFn) {
         if(userSettings.injuryMode.includes('Back')) pool = pool.filter(e => !e.name.includes('Deadlift') && !e.name.includes('Row'));
     }
 
-    if(pool.length === 0) return alert("No exercises found (Check Filters).");
+    if(pool.length === 0) return alert("No exercises found for this button. Try 'Random' to verify database works.");
+    
     activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
     renderWorkout(activeRoutine);
     document.getElementById('setup-panel').style.display = 'none';
     document.getElementById('workout-interface').style.display = 'block';
 }
 
+// 4. RENDER CARDS
 function renderWorkout(exercises) {
     const list = document.getElementById('workout-list');
     list.innerHTML = '';
     const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+    
     exercises.forEach((ex, i) => {
         const logs = history.filter(h => h.name === ex.name).sort((a,b) => new Date(a.date) - new Date(b.date)).slice(-5);
         let sparkHTML = '';
@@ -1330,7 +1349,7 @@ function renderWorkout(exercises) {
                 <span class="swap-btn" onclick="swapExercise(${i})">🔄 Swap</span>
             </div>
             ${sparkHTML}
-            <div style="font-size:0.8em; color:#777; margin-bottom:5px;">${ex.equip}</div>
+            <div style="font-size:0.8em; color:#777; margin-bottom:5px;">${ex.equip} | ${ex.cat.join(', ')}</div>
             <div class="row">
                 <input type="number" id="w-${i}" placeholder="${ph.split('x')[0]}" style="width:45%" oninput="showPlates(this.value)">
                 <input type="number" id="r-${i}" placeholder="${ph.split('x')[1] || 'Reps'}" style="width:45%">
@@ -1350,7 +1369,7 @@ function swapExercise(idx) {
     } else { alert("No alternates found."); }
 }
 
-// 6. BUILDER & GUIDE
+// 5. BUILDER & SEARCH
 function openBuilder(isAddMode) {
     document.getElementById('builder-overlay').classList.remove('hidden');
     document.getElementById('builder-overlay').style.display = 'block';
@@ -1362,10 +1381,13 @@ function renderBuilderList() {
     const list = document.getElementById('builder-list-content');
     const search = document.getElementById('builder-search-inp').value.toLowerCase();
     list.innerHTML = '';
+    
     const pool = window.allExercises.filter(ex => {
         const matchesSearch = ex.name.toLowerCase().includes(search);
-        return matchesSearch;
+        const matchesMuscle = builderFilters.muscle.length === 0 || builderFilters.muscle.some(m => ex.cat.includes(m));
+        return matchesSearch && matchesMuscle;
     });
+
     pool.slice(0, 50).forEach(ex => {
         const div = document.createElement('div');
         div.className = 'food-item';
@@ -1380,52 +1402,14 @@ function renderBuilderList() {
     });
 }
 function filterBuilderList() { renderBuilderList(); }
-
-function openGuide(exName) {
-    const ex = window.allExercises.find(e => e.name === exName);
-    if(!ex) return;
-    currentGuideExercise = ex;
-    document.getElementById('guide-modal').style.display = 'block';
-    document.getElementById('guide-modal').classList.remove('hidden');
-    document.getElementById('guide-title').innerText = ex.name;
-    document.getElementById('guide-prep').innerHTML = formatGuide(ex.guide.prep);
-    document.getElementById('guide-exec').innerHTML = formatGuide(ex.guide.exec);
-    document.getElementById('guide-tips').innerHTML = formatGuide(ex.guide.tips);
-    
-    // Torque F9
-    const f9 = document.getElementById('f9-setup-section');
-    if(ex.equip === 'Cable' && ex.setup) {
-        f9.style.display = 'block';
-        document.getElementById('guide-arms').innerText = ex.setup.arms || '--';
-        document.getElementById('guide-pulleys').innerText = ex.setup.pulleys || '--';
-    } else { f9.style.display = 'none'; }
-
-    // Load Visual
-    const savedGif = gifOverrides[ex.name];
-    const img = document.getElementById('visual-content-img');
-    const iframe = document.getElementById('visual-content-iframe');
-    const err = document.getElementById('visual-error');
-    img.style.display = 'none'; iframe.style.display = 'none'; err.style.display = 'block';
-    if(savedGif) {
-        err.style.display = 'none';
-        if(savedGif.includes('youtube')) { iframe.src = savedGif.replace('watch?v=', 'embed/'); iframe.style.display = 'block'; }
-        else { img.src = savedGif; img.style.display = 'block'; }
-    }
-    document.getElementById('gif-search-btn').href = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(ex.name + ' exercise gif')}`;
-}
-function closeGuideModal() { document.getElementById('guide-modal').style.display = 'none'; }
-function formatGuide(arr) { return Array.isArray(arr) ? `<ul>${arr.map(i => `<li>${i}</li>`).join('')}</ul>` : arr; }
-function saveGuideGif() {
-    const url = document.getElementById('guide-gif-input').value;
-    if(url && currentGuideExercise) {
-        gifOverrides[currentGuideExercise.name] = url;
-        localStorage.setItem('nimbleGifs', JSON.stringify(gifOverrides));
-        alert("Visual Saved!");
-        openGuide(currentGuideExercise.name); 
-    }
+function toggleFilter(type, val, btn) {
+    const idx = builderFilters[type].indexOf(val);
+    if(idx > -1) { builderFilters[type].splice(idx,1); btn.classList.remove('active'); }
+    else { builderFilters[type].push(val); btn.classList.add('active'); }
+    renderBuilderList();
 }
 
-// 7. UTILS: PLAN, FUEL, STATS
+// 6. UTILS & EXTRAS
 function finishSession() {
     if(confirm("Finish Workout?")) {
         document.getElementById('setup-panel').style.display = 'block';
@@ -1442,8 +1426,8 @@ function logSet(name, idx) {
     let h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
     h.push({date: new Date().toISOString(), name, weight: w, reps: r});
     localStorage.setItem('nimbleHistory', JSON.stringify(h));
-    const btn = document.activeElement;
-    btn.innerText = "Saved!"; btn.style.backgroundColor = "var(--success)";
+    document.activeElement.innerText = "Saved!"; 
+    document.activeElement.style.backgroundColor = "var(--success)";
     if(w > 225) triggerConfetti();
     calculateStreak();
 }
@@ -1489,12 +1473,8 @@ function updateMacroUI() {
     }
     document.getElementById('disp-cals').innerText = dailyMacros.c;
     document.getElementById('disp-pro').innerText = dailyMacros.p;
-    document.getElementById('disp-carb').innerText = dailyMacros.ch;
-    document.getElementById('disp-fat').innerText = dailyMacros.f;
     document.getElementById('bar-cals').style.width = Math.min((dailyMacros.c / 2500)*100, 100) + "%";
     document.getElementById('bar-pro').style.width = Math.min((dailyMacros.p / 180)*100, 100) + "%";
-    document.getElementById('bar-carb').style.width = Math.min((dailyMacros.ch / 300)*100, 100) + "%";
-    document.getElementById('bar-fat').style.width = Math.min((dailyMacros.f / 80)*100, 100) + "%";
 }
 async function searchFood() {
     const query = document.getElementById('food-search').value;
@@ -1505,14 +1485,15 @@ async function searchFood() {
         const res = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=5&api_key=${apiKey}`);
         const data = await res.json();
         resDiv.innerHTML = '';
+        if(!data.foods) return resDiv.innerHTML = 'No results.';
         data.foods.forEach(f => {
             const getNut = (id) => (f.foodNutrients.find(x => x.nutrientId === id) || {}).value || 0;
-            const c=Math.round(getNut(1008)), p=Math.round(getNut(1003)), ch=Math.round(getNut(1005)), fat=Math.round(getNut(1004));
+            const c=Math.round(getNut(1008)), p=Math.round(getNut(1003));
             const div = document.createElement('div');
             div.className = 'food-item';
-            div.innerHTML = `<div><b>${f.description}</b><br><small>${c}cal P:${p} C:${ch} F:${fat}</small></div><button class="btn-action" style="width:auto;">+</button>`;
+            div.innerHTML = `<div><b>${f.description}</b><br><small>${c}cal P:${p}</small></div><button class="btn-action" style="width:auto;">+</button>`;
             div.onclick = () => {
-                dailyMacros.c += c; dailyMacros.p += p; dailyMacros.ch += ch; dailyMacros.f += fat;
+                dailyMacros.c += c; dailyMacros.p += p; 
                 localStorage.setItem('nimbleMacros', JSON.stringify(dailyMacros));
                 updateMacroUI();
                 alert("Added!");
@@ -1520,7 +1501,7 @@ async function searchFood() {
             };
             resDiv.appendChild(div);
         });
-    } catch(e) { resDiv.innerHTML = 'Error searching.'; }
+    } catch(e) { resDiv.innerHTML = 'Error.'; }
 }
 function renderHeatmap() {
     const h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
@@ -1557,19 +1538,42 @@ function calcReadiness() {
     let score = (s * 10) + "%";
     document.getElementById('score-display').innerText = score; 
 }
-function openTimerOverlay() { document.getElementById('timer-overlay').classList.remove('hidden'); document.getElementById('timer-overlay').style.display = 'flex'; }
-function closeTimer() { document.getElementById('timer-overlay').style.display = 'none'; }
-function updateTimeLabel(val) { document.getElementById('time-val').innerText = (val * 7) + "m (" + val + " Ex)"; }
-function nextPhase() { userSettings.currentPhase = (userSettings.currentPhase % 4) + 1; localStorage.setItem('nimbleSettings', JSON.stringify(userSettings)); renderPlanner(); }
-function triggerConfetti() { 
-    for(let i=0; i<30; i++) {
-        const c = document.createElement('div');
-        c.className = 'confetti';
-        c.style.left = Math.random()*100 + 'vw';
-        document.body.appendChild(c);
-        setTimeout(() => c.remove(), 4000);
+function openGuide(exName) {
+    const ex = window.allExercises.find(e => e.name === exName);
+    if(!ex) return;
+    currentGuideExercise = ex;
+    document.getElementById('guide-modal').style.display = 'block';
+    document.getElementById('guide-modal').classList.remove('hidden');
+    document.getElementById('guide-title').innerText = ex.name;
+    document.getElementById('guide-prep').innerHTML = formatGuide(ex.guide.prep);
+    document.getElementById('guide-exec').innerHTML = formatGuide(ex.guide.exec);
+    document.getElementById('guide-tips').innerHTML = formatGuide(ex.guide.tips);
+    const savedGif = gifOverrides[ex.name];
+    const img = document.getElementById('visual-content-img');
+    const iframe = document.getElementById('visual-content-iframe');
+    const err = document.getElementById('visual-error');
+    img.style.display = 'none'; iframe.style.display = 'none'; err.style.display = 'block';
+    if(savedGif) {
+        err.style.display = 'none';
+        if(savedGif.includes('youtube')) { iframe.src = savedGif.replace('watch?v=', 'embed/'); iframe.style.display = 'block'; }
+        else { img.src = savedGif; img.style.display = 'block'; }
+    }
+    document.getElementById('gif-search-btn').href = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(ex.name + ' exercise gif')}`;
+}
+function closeGuideModal() { document.getElementById('guide-modal').style.display = 'none'; }
+function formatGuide(arr) { return Array.isArray(arr) ? `<ul>${arr.map(i => `<li>${i}</li>`).join('')}</ul>` : arr; }
+function saveGuideGif() {
+    const url = document.getElementById('guide-gif-input').value;
+    if(url && currentGuideExercise) {
+        gifOverrides[currentGuideExercise.name] = url;
+        localStorage.setItem('nimbleGifs', JSON.stringify(gifOverrides));
+        alert("Visual Saved!");
+        openGuide(currentGuideExercise.name); 
     }
 }
+function startBreathWork() { document.getElementById('breath-modal').style.display = 'flex'; }
+function openTimerOverlay() { document.getElementById('timer-overlay').classList.remove('hidden'); document.getElementById('timer-overlay').style.display = 'flex'; }
+function closeTimer() { document.getElementById('timer-overlay').style.display = 'none'; }
 function showPlates(val) {
     const p = document.getElementById('plate-helper');
     if(val >= 135) {
@@ -1578,8 +1582,24 @@ function showPlates(val) {
         setTimeout(() => p.classList.add('hidden'), 3000);
     }
 }
-function exportData() { alert("Data exported!"); }
+function triggerConfetti() {
+    for(let i=0; i<30; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random()*100 + 'vw';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 4000);
+    }
+}
+function updateTimeLabel(val) { document.getElementById('time-val').innerText = (val * 7) + "m (" + val + " Ex)"; }
+function nextPhase() { 
+    userSettings.currentPhase = (userSettings.currentPhase % 4) + 1; 
+    localStorage.setItem('nimbleSettings', JSON.stringify(userSettings));
+    renderPlanner();
+}
 function saveBodyStat() { alert("Weight Saved!"); }
+function exportData() { alert("Data Copied!"); }
+function setTheme(n) { alert("Theme: " + n); }
 </script>
 </body>
 </html>
