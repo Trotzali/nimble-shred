@@ -1918,7 +1918,7 @@ async function searchFood() {
         div.style.flexDirection = "column"; div.style.alignItems = "flex-start";
         if (f.isAverage) { div.style.background = "linear-gradient(45deg, #2c2c2c, #3a3a3a)"; div.style.border = "1px solid var(--gold)"; div.style.marginBottom = "10px"; }
         div.innerHTML = `<div style="font-weight:bold; color:#fff; display:flex; justify-content:space-between; width:100%;"><span>${f.name}</span>${f.isAverage ? '<span style="color:var(--gold); font-size:0.8em;">⭐ QUICK ADD</span>' : `<span style="font-size:0.7em; color:#555; border:1px solid #333; padding:1px 4px; border-radius:4px;">${f.source}</span>`}</div><div style="font-size:0.75em; color:#aaa; margin-bottom:4px;">${f.desc}</div><div style="font-size:0.8em; color:#aaa; display:flex; gap:10px;"><span style="color:var(--sec);">⚡ ${Math.round(f.c)}</span><span style="color:var(--primary);">🥩 ${Math.round(f.p)}g</span><span style="color:var(--warn);">🍚 ${Math.round(f.ch)}g</span><span style="color:var(--danger);">🥑 ${Math.round(f.f)}g</span></div>`;
-        div.onclick = () => alert("Selected: " + f.name); // Replace with your openFoodModal logic
+        div.onclick = () => openFoodModal(f);
         resDiv.appendChild(div);
     });
 }
