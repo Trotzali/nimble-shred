@@ -2188,6 +2188,189 @@ function addToWorkout(exercise) {
     // Provide feedback
     alert(`${exercise.name} added!`);
 }
+    // ─────────────────────────────────────────────────────────────
+// RESTORED COACH LOGIC (Fixes Buttons)
+// ─────────────────────────────────────────────────────────────
+
+// Global Filters (Safety Check)
+if (typeof builderFilters === 'undefined') { var builderFilters = { muscle: [], equip: [] }; }
+
+// 1. Random Workout & Chips
+function generateRandomWorkout() {
+    generateWorkoutByFilter(() => true); 
+}
+
+function loadTemplate(type) {
+    const map = {'push':'Push', 'pull':'Pull', 'legs':'Legs', 'full':'Full', 'nimble':'Nimble', 'f9':'Cable'};
+    const key = map[type] || 'Full';
+    generateWorkoutByFilter(e => {
+        if(key === 'Full') return true;
+        if(key === 'Nimble') return e.cat.includes('Nimble') || e.type === 'Mobility';
+        if(key === 'Cable') return e.equip === 'Cable';
+        return e.cat.includes(key) || e.type === key;
+    });
+}
+
+function generateWorkoutByFilter(filterFn) {
+    let pool = allExercises.filter(filterFn);
+    
+    // Hotel Mode check
+    if(userSettings.hotelMode) {
+        pool = pool.filter(e => !e.name.includes('Barbell') && !e.name.includes('Cable') && !e.name.includes('Machine'));
+    }
+
+    if(pool.length === 0) return alert("No exercises found.");
+    
+    // Pick 6 Random
+    activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
+    renderWorkout(activeRoutine);
+    
+    // Switch Screens
+    document.getElementById('setup-panel').style.display = 'none';
+    document.getElementById('workout-interface').style.display = 'block';
+}
+
+// 2. Render Workout Cards (with Sparklines)
+function renderWorkout(exercises) {
+    const list = document.getElementById('workout-list');
+    list.innerHTML = '';
+    const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+    
+    exercises.forEach((ex, i) => {
+        // Sparkline Logic
+        const logs = history.filter(h => h.name === ex.name).sort((a,b) => new Date(a.date) - new Date(b.date)).slice(-5);
+        let sparkHTML = '';
+        if(logs.length > 1) {
+             const points = logs.map((l, idx) => `${idx * 20},${30 - (l.weight/300)*30}`).join(' ');
+             sparkHTML = `<svg class="sparkline-container"><polyline points="${points}" fill="none" stroke="var(--gold)" stroke-width="2"/></svg>`;
+        }
+
+        const div = document.createElement('div');
+        div.className = `card exercise-card ${ex.type || 'Strength'}`;
+        div.innerHTML = `
+            <div class="exercise-header">
+                <strong>${ex.name}</strong>
+                <span class="swap-btn" onclick="swapExercise(${i})">🔄 Swap</span>
+            </div>
+            ${sparkHTML}
+            <div class="row">
+                <input type="number" id="w-${i}" placeholder="Lbs" style="width:45%" oninput="showPlates(this.value)">
+                <input type="number" id="r-${i}" placeholder="Reps" style="width:45%">
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; margin-top:10px;">
+                <span style="font-size:0.7em">RPE:</span>
+                <input type="range" id="rpe-${i}" min="1" max="10" value="7" class="rpe-slider">
+            </div>
+            <button class="btn btn-action" onclick="logSet('${ex.name}', ${i})">✅ Log Set</button>
+        `;
+        list.appendChild(div);
+    });
+}
+
+function swapExercise(idx) {
+    const current = activeRoutine[idx];
+    const alts = allExercises.filter(e => e.cat.some(c => current.cat.includes(c)) && e.name !== current.name);
+    if(alts.length > 0) {
+        activeRoutine[idx] = alts[Math.floor(Math.random()*alts.length)];
+        renderWorkout(activeRoutine);
+    } else {
+        alert("No alternates found.");
+    }
+}
+
+// 3. Builder Logic
+function openBuilder(isAddMode) {
+    document.getElementById('builder-overlay').classList.remove('hidden');
+    document.getElementById('builder-overlay').style.display = 'block';
+    renderBuilderList();
+}
+function closeBuilder() { 
+    document.getElementById('builder-overlay').classList.add('hidden'); 
+    document.getElementById('builder-overlay').style.display = 'none'; 
+}
+
+function renderBuilderList() {
+    const list = document.getElementById('builder-list-content');
+    const search = document.getElementById('builder-search-inp').value.toLowerCase();
+    list.innerHTML = '';
+    
+    const pool = allExercises.filter(ex => {
+        const matchesSearch = ex.name.toLowerCase().includes(search);
+        const matchesMuscle = builderFilters.muscle.length === 0 || builderFilters.muscle.some(m => ex.cat.includes(m));
+        return matchesSearch && matchesMuscle;
+    });
+
+    pool.slice(0, 50).forEach(ex => {
+        const div = document.createElement('div');
+        div.className = 'food-item';
+        div.innerHTML = `<b>${ex.name}</b> <small style="color:#777">${ex.equip}</small>`;
+        div.onclick = () => { 
+            activeRoutine.push(ex); 
+            renderWorkout(activeRoutine); 
+            closeBuilder(); 
+            document.getElementById('setup-panel').style.display = 'none';
+            document.getElementById('workout-interface').style.display = 'block';
+        };
+        list.appendChild(div);
+    });
+}
+function filterBuilderList() { renderBuilderList(); }
+function toggleFilter(type, val, btn) {
+    const idx = builderFilters[type].indexOf(val);
+    if(idx > -1) { builderFilters[type].splice(idx,1); btn.classList.remove('active'); }
+    else { builderFilters[type].push(val); btn.classList.add('active'); }
+    renderBuilderList();
+}
+
+function finishSession() {
+    if(confirm("Finish Workout?")) {
+        document.getElementById('setup-panel').style.display = 'block';
+        document.getElementById('workout-interface').style.display = 'none';
+        alert("Workout Saved!");
+        activeRoutine = [];
+    }
+}
+function cancelWorkout() { finishSession(); }
+
+// 4. Logging
+function logSet(name, idx) {
+    const w = document.getElementById(`w-${idx}`).value;
+    const r = document.getElementById(`r-${idx}`).value;
+    if(!w || !r) return;
+    
+    let h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
+    h.push({date: new Date().toISOString(), name, weight: w, reps: r});
+    localStorage.setItem('nimbleHistory', JSON.stringify(h));
+    
+    const btn = document.activeElement;
+    btn.innerText = "Saved!";
+    btn.style.backgroundColor = "var(--success)";
+    
+    if(w > 225) triggerConfetti();
+}
+
+// 5. Utils
+function showPlates(val) {
+    const p = document.getElementById('plate-helper');
+    if(val >= 135) {
+        p.classList.remove('hidden');
+        p.innerHTML = `<div class="plate p-45"></div>`.repeat(Math.floor((val-45)/90));
+        setTimeout(() => p.classList.add('hidden'), 3000);
+    }
+}
+function triggerConfetti() {
+    for(let i=0; i<30; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random()*100 + 'vw';
+        c.style.backgroundColor = ['#f00','#0f0','#00f','#ff0'][Math.floor(Math.random()*4)];
+        c.style.animationDuration = (Math.random()*2+2) + 's';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 4000);
+    }
+}
+function toggleInjuryPanel() { alert("Injury Panel Toggled"); }
+function updateTimeLabel(val) { document.getElementById('time-val').innerText = (val * 7) + "m (" + val + " Ex)"; }
 </script>
 </body>
 </html>
