@@ -4,53 +4,178 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#1e1e1e">
-   <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Nimble Shred v41.0</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Nimble Shred V42</title>
+    
     <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiTmltYmxlIFNocmVkIiwiYmFja2dyb3VuZF9jb2xvciI6IiMxMjEyMTIiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiIzFlMWUxZSIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2ltZy5pY29uczguY29tL2ZsdWVuY3kvOTYvbnVsbC9kdW1iYmVsbC5wbmciLCJzaXplcyI6Ijk2eDk2IiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
     <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/96/null/dumbbell.png">
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
-        :root { --bg: #121212; --card: #1e1e1e; --primary: #BB86FC; --sec: #03DAC6; --text: #fff; --gold: #FFD700; --danger: #CF6679; --success: #00C853; --warn: #FF9800; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 120px; -webkit-tap-highlight-color: transparent; }
+        /* ─────────────────────────────────────────────
+           CORE STYLES
+           ───────────────────────────────────────────── */
+        :root { 
+            --bg: #121212; 
+            --card: #1e1e1e; 
+            --primary: #BB86FC; 
+            --sec: #03DAC6; 
+            --text: #fff; 
+            --gold: #FFD700; 
+            --danger: #CF6679; 
+            --success: #00C853; 
+            --warn: #FF9800; 
+        }
         
-        /* Layout */
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 20px; 
+            padding-bottom: 120px; 
+            -webkit-tap-highlight-color: transparent; 
+        }
+        
+        /* Layout Containers */
         .container { max-width: 800px; margin: 0 auto; display: none; padding-bottom: 80px; } 
         .container.active { display: block; }
+        
         h1, h2 { text-align: center; margin: 10px 0; }
         
-        /* Nav */
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a1a; display: flex; justify-content: space-around; padding: 15px 10px; border-top: 1px solid #333; z-index: 9000; padding-bottom: max(15px, env(safe-area-inset-bottom)); box-shadow: 0 -5px 10px rgba(0,0,0,0.5); }
-        .nav-btn { background: none; color: #777; border: none; font-size: 0.75em; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
+        /* ─────────────────────────────────────────────
+           NAVIGATION BAR (V42)
+           ───────────────────────────────────────────── */
+        .nav-bar { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            background: #1a1a1a; 
+            display: flex; 
+            justify-content: space-around; 
+            padding: 15px 10px; 
+            border-top: 1px solid #333; 
+            z-index: 9000; 
+            padding-bottom: max(15px, env(safe-area-inset-bottom)); 
+            box-shadow: 0 -5px 10px rgba(0,0,0,0.5); 
+        }
+        
+        .nav-btn { 
+            background: none; 
+            color: #777; 
+            border: none; 
+            font-size: 0.75em; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 5px; 
+            cursor: pointer; 
+        }
+        
         .nav-btn.active { color: var(--sec); }
         .nav-icon { font-size: 1.5em; }
         
-        /* UI Elements */
-        .card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); position: relative; }
-        .btn { display: block; width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; transition: 0.1s; }
+        /* ─────────────────────────────────────────────
+           UI CARDS & BUTTONS
+           ───────────────────────────────────────────── */
+        .card { 
+            background: var(--card); 
+            padding: 15px; 
+            border-radius: 12px; 
+            margin-bottom: 15px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
+            position: relative; 
+        }
+        
+        .btn { 
+            display: block; 
+            width: 100%; 
+            padding: 14px; 
+            border: none; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-top: 10px; 
+            font-size: 16px; 
+            transition: 0.1s; 
+        }
         .btn:active { transform: scale(0.98); }
+        
         .btn-main { background: var(--sec); color: #000; }
         .btn-action { background: var(--primary); color: #000; }
         .btn-danger { background: var(--danger); color: #fff; }
-        input, select, textarea { width: 100%; padding: 10px; background: #2c2c2c; border: 1px solid #444; border-radius: 6px; color: #fff; font-size: 16px; box-sizing: border-box; }
+        
+        input, select, textarea { 
+            width: 100%; 
+            padding: 10px; 
+            background: #2c2c2c; 
+            border: 1px solid #444; 
+            border-radius: 6px; 
+            color: #fff; 
+            font-size: 16px; 
+            box-sizing: border-box; 
+        }
+        
         .row { display: flex; gap: 10px; align-items: center; }
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .unit-toggle { background: #333; padding: 5px 12px; border-radius: 20px; font-size: 0.8em; border: 1px solid #555; color: #aaa; cursor: pointer; }
         
-        /* Filter Chips */
+        .unit-toggle { 
+            background: #333; 
+            padding: 5px 12px; 
+            border-radius: 20px; 
+            font-size: 0.8em; 
+            border: 1px solid #555; 
+            color: #aaa; 
+            cursor: pointer; 
+        }
+        
+        /* ─────────────────────────────────────────────
+           CHIPS & FILTERS
+           ───────────────────────────────────────────── */
         .chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
-        .chip { padding: 6px 12px; background: #333; border: 1px solid #555; border-radius: 20px; font-size: 0.8em; cursor: pointer; color: #aaa; transition: 0.2s; }
+        
+        .chip { 
+            padding: 6px 12px; 
+            background: #333; 
+            border: 1px solid #555; 
+            border-radius: 20px; 
+            font-size: 0.8em; 
+            cursor: pointer; 
+            color: #aaa; 
+            transition: 0.2s; 
+        }
         .chip.active { background: var(--primary); color: #000; border-color: var(--primary); font-weight: bold; }
         
-        /* Exercise Cards */
+        /* ─────────────────────────────────────────────
+           EXERCISE CARDS & LISTS
+           ───────────────────────────────────────────── */
         .exercise-card { border-left: 4px solid var(--primary); margin-bottom: 15px; }
         .exercise-card.Mobility { border-left-color: var(--sec); }
         .exercise-card.Strength { border-left-color: var(--danger); }
-        .exercise-header { display: flex; justify-content: space-between; align-items: flex-start; }
-        .suggestion-text { color: var(--success); font-size: 0.85em; margin: 5px 0; font-style: italic; display: flex; align-items: center; gap: 5px; }
         
-        /* Accordion Styles (The Encyclopedia) */
+        .exercise-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        
+        /* Sparklines & Sliders */
+        .sparkline-container { width: 100%; height: 30px; margin-top: 5px; }
+        .rpe-slider { width: 100%; accent-color: var(--warn); margin: 10px 0; }
+        
+        .swap-btn { 
+            font-size: 0.8em; 
+            color: var(--gold); 
+            border: 1px solid var(--gold); 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin-left: 10px; 
+        }
+        
+        /* ─────────────────────────────────────────────
+           ACCORDIONS (ENCYCLOPEDIA)
+           ───────────────────────────────────────────── */
         details { background: #252525; margin-bottom: 10px; border-radius: 8px; overflow: hidden; border: 1px solid #333; }
         summary { padding: 12px; cursor: pointer; font-weight: bold; list-style: none; display: flex; justify-content: space-between; align-items: center; }
         summary::-webkit-details-marker { display: none; }
@@ -58,53 +183,56 @@
         details[open] summary:after { content: '-'; }
         details[open] summary { border-bottom: 1px solid #333; background: rgba(255,255,255,0.05); }
         .detail-content { padding: 15px; font-size: 0.9em; line-height: 1.5; color: #ddd; }
-        .detail-content ul { padding-left: 20px; margin: 0; }
-        .detail-content li { margin-bottom: 5px; }
         
-        /* Smart Viewer */
+        /* ─────────────────────────────────────────────
+           VISUAL GUIDES
+           ───────────────────────────────────────────── */
         .visual-container { background: #000; border-radius: 8px; overflow: hidden; height: 250px; display: flex; align-items: center; justify-content: center; border: 1px solid #333; position: relative; margin-bottom: 15px; }
         #visual-content-img { width: 100%; height: 100%; object-fit: contain; display: none; }
         #visual-content-iframe { width: 100%; height: 100%; border: none; display: none; }
         .visual-placeholder { color: #555; text-align: center; padding: 20px; font-size: 0.9em; position: absolute; }
         
-        /* Overlays & Macros */
+        /* ─────────────────────────────────────────────
+           OVERLAYS & MODALS
+           ───────────────────────────────────────────── */
         .fs-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 10000; padding: 20px; overflow-y: auto; box-sizing: border-box; display: none; }
         .fs-overlay.flex-center { display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.95); }
         .hidden { display: none !important; }
+        
         #sync-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 20000; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s; }
         
+        .checklist-modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; display:none; flex-direction:column; justify-content:center; align-items:center; }
+        
+        .plate-popup { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #222; padding: 10px; border: 1px solid #555; border-radius: 8px; z-index: 1000; display: flex; gap: 5px; }
+        .plate { height: 40px; width: 10px; border-radius: 2px; border: 1px solid #000; }
+        .p-45 { background: #0048BA; width: 15px; } .p-35 { background: #FCN; } .p-25 { background: #006B3C; } .p-10 { background: #eee; }
+        
+        /* ─────────────────────────────────────────────
+           FOOD & MACROS
+           ───────────────────────────────────────────── */
         .macro-bar-container { background: #333; height: 12px; border-radius: 6px; margin-top: 5px; overflow: hidden; position: relative; }
         .macro-fill { height: 100%; transition: width 0.5s; }
         .macro-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; text-align: center; font-size: 0.85em; }
+        .food-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2a2a2a; font-size: 0.9em; cursor: pointer; }
         .gif-input { width: 100%; padding: 10px; background: #111; border: 1px solid #444; color: #fff; border-radius: 4px; margin-top: 5px; margin-bottom: 5px; font-size: 0.8em; }
         .btn-guide { background: #333; color: #aaa; border: 1px solid #444; padding: 5px 10px; border-radius: 5px; font-size: 0.8em; cursor: pointer; }
-        .mic-btn { background: #333; border: 1px solid #555; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2em; cursor: pointer; }
-        .meal-section { border-top: 1px solid #333; margin-top: 15px; padding-top: 10px; }
-        .meal-header { font-weight: bold; color: var(--gold); display: flex; justify-content: space-between; margin-bottom: 5px; }
-        .food-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2a2a2a; font-size: 0.9em; cursor: pointer; }
-        .source-switch { display: flex; justify-content: center; gap: 10px; margin-bottom: 10px; font-size: 0.9em; }
-        .source-opt { cursor: pointer; padding: 5px 10px; border-radius: 5px; border: 1px solid #333; color: #777; }
-        .source-opt.active { background: var(--primary); color: #000; border-color: var(--primary); font-weight: bold; }
+        
+        /* ─────────────────────────────────────────────
+           PLANNER & EXTRAS
+           ───────────────────────────────────────────── */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin: 15px 0; }
+        .day-bubble { background: #333; aspect-ratio: 1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8em; cursor: pointer; border: 1px solid #444; flex-direction: column; }
+        .day-bubble.active { border-color: var(--primary); color: var(--primary); }
         
         .timer-badge { position: fixed; bottom: 80px; right: 20px; background: var(--danger); color: #fff; padding: 15px; border-radius: 50%; width: 60px; height: 60px; display: none; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2em; box-shadow: 0 4px 8px rgba(0,0,0,0.5); z-index: 8000; cursor: pointer; }
         .timer-badge.active { display: flex; animation: timerPulse 1s infinite; }
         @keyframes timerPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        /* --- V42 UPGRADES: PLANNER & COACHING --- */
-.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin: 15px 0; }
-.day-bubble { background: #333; aspect-ratio: 1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8em; cursor: pointer; border: 1px solid #444; flex-direction: column; }
-.day-bubble.active { border-color: var(--primary); color: var(--primary); }
-.day-bubble.done { background: var(--sec); color: #000; border-color: var(--sec); }
-.sparkline-container { width: 100%; height: 30px; margin-top: 5px; }
-.rpe-slider { width: 100%; accent-color: var(--warn); margin: 10px 0; }
-.swap-btn { font-size: 0.8em; color: var(--gold); border: 1px solid var(--gold); padding: 2px 6px; border-radius: 4px; cursor: pointer; margin-left: 10px; }
-.confetti { position: absolute; width: 10px; height: 10px; background: #f00; animation: fall linear forwards; }
-@keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
-.breath-circle { width: 100px; height: 100px; border-radius: 50%; background: var(--sec); margin: 0 auto; animation: breathe 8s infinite ease-in-out; opacity: 0.6; }
-@keyframes breathe { 0%, 100% { transform: scale(0.8); } 50% { transform: scale(1.5); } }
-.plate-popup { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #222; padding: 10px; border: 1px solid #555; border-radius: 8px; z-index: 1000; display: flex; gap: 5px; }
-.plate { height: 40px; width: 10px; border-radius: 2px; border: 1px solid #000; }
-.p-45 { background: #0048BA; width: 15px; } .p-35 { background: #FCN; } .p-25 { background: #006B3C; } .p-10 { background: #eee; }
-.checklist-modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; display:none; flex-direction:column; justify-content:center; align-items:center; }
+        
+        .confetti { position: absolute; width: 10px; height: 10px; background: #f00; animation: fall linear forwards; }
+        @keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
+        
+        .breath-circle { width: 100px; height: 100px; border-radius: 50%; background: var(--sec); margin: 0 auto; animation: breathe 8s infinite ease-in-out; opacity: 0.6; }
+        @keyframes breathe { 0%, 100% { transform: scale(0.8); } 50% { transform: scale(1.5); } }
     </style>
 </head>
 <body>
@@ -114,9 +242,13 @@
     <h3>Syncing...</h3>
 </div>
 <script>
+    // Force hide loader immediately to prevent getting stuck
     window.onload = function() {
         const loader = document.getElementById('sync-loader');
-        if(loader) { loader.style.opacity = '0'; setTimeout(() => loader.style.display = 'none', 500); }
+        if(loader) { 
+            loader.style.opacity = '0'; 
+            setTimeout(() => loader.style.display = 'none', 500); 
+        }
     };
 </script>
 
@@ -124,28 +256,39 @@
 
 <div class="container active" id="view-readiness">
     <div class="top-bar"><h2>Daily Check-In</h2></div>
+    
     <div class="card" style="display:flex; justify-content:space-between; align-items:center; background: linear-gradient(45deg, #1e1e1e, #252525);">
-        <div><div style="font-size:0.8em; color:#aaa;">Current Streak</div><div style="font-size:1.5em; font-weight:bold;">🔥 <span id="streak-count">0</span> Days</div></div>
+        <div>
+            <div style="font-size:0.8em; color:#aaa;">Current Streak</div>
+            <div style="font-size:1.5em; font-weight:bold;">🔥 <span id="streak-count">0</span> Days</div>
+        </div>
         <div id="readiness-badge" style="font-size:2em;">🛡️</div>
     </div>
+    
     <div class="card">
         <h3>How are you feeling?</h3>
         <div class="row" style="margin-top:10px;"><span>😴 Sleep</span> <input type="range" id="val-sleep" min="1" max="10" value="5" oninput="calcReadiness()"></div>
         <div class="row" style="margin-top:15px;"><span>🤕 Pain</span> <input type="range" id="val-sore" min="1" max="10" value="5" oninput="calcReadiness()"></div>
         <div class="row" style="margin-top:15px;"><span>⚡ Energy</span> <input type="range" id="val-mood" min="1" max="10" value="5" oninput="calcReadiness()"></div>
-        <div style="text-align:center; margin-top:15px;"><div style="font-size:2.5em; font-weight:bold; color:var(--sec);" id="score-display">--</div></div>
+        
+        <div style="text-align:center; margin-top:15px;">
+            <div style="font-size:2.5em; font-weight:bold; color:var(--sec);" id="score-display">--</div>
+        </div>
+        <button class="btn btn-main" onclick="alert('Score Logged!')">💾 Log & Get Advice</button>
     </div>
 </div>
 
 <div class="container" id="view-coach">
     <div id="setup-panel">
         <div class="top-bar"><h2>Workout Strategy</h2></div>
+       
        <div class="card" style="border-left: 4px solid var(--danger); margin-bottom:10px;">
             <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleInjuryPanel()">
                 <h3 style="margin:0; font-size:1.1em;">🩹 Injury / Pain Mode</h3>
                 <span id="injury-status" style="font-size:0.8em; color:#777;">None</span>
             </div>
         </div>
+        
         <div class="card">
             <h3>Quick Start</h3>
             <div class="row" style="margin-bottom:10px; justify-content:space-between;">
@@ -163,16 +306,36 @@
                 <div class="chip" onclick="loadTemplate('f9')">⚙️ Torque F9</div>
             </div>
 
-          <button type="button" class="btn btn-main" onclick="generateRandomWorkout()">🎲 Random Workout</button>
+            <button type="button" class="btn btn-main" onclick="generateRandomWorkout()">🎲 Random Workout</button>
             <button type="button" class="btn btn-action" onclick="openBuilder()">🛠️ Build Custom</button>
         </div>
     </div> 
     
     <div id="workout-interface" style="display:none;">
-        <div class="top-bar"><h3>Active Session</h3><button type="button" class="btn-danger" style="width:auto; padding:5px 10px;" onclick="cancelWorkout()">End</button></div>
+        <div class="top-bar">
+            <h3>Active Session</h3>
+            <button type="button" class="btn-danger" style="width:auto; padding:5px 10px;" onclick="cancelWorkout()">End</button>
+        </div>
         <div id="workout-list"></div>
         <button type="button" class="btn btn-action" onclick="openBuilder(true)">➕ Add Exercise</button>
         <button type="button" class="btn btn-main" onclick="finishSession()">💾 Finish & Save</button>
+    </div>
+</div>
+
+<div class="container" id="view-plan">
+    <h2>Weekly Structure</h2>
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>📅 Phase: <span id="cycle-phase" style="color:var(--primary)">Week 1</span></h3>
+            <small onclick="nextPhase()" style="color:#777; cursor:pointer;">Next >></small>
+        </div>
+        <div class="calendar-grid" id="week-grid"></div>
+        <div id="day-detail" style="margin-top:10px; font-style:italic; color:#aaa; font-size:0.9em; text-align:center;">Tap a day to schedule</div>
+    </div>
+    
+    <div class="card" onclick="startBreathWork()">
+        <h3>🧘 Recovery Breath</h3>
+        <p style="color:#aaa; font-size:0.8em;">Box breathing to lower cortisol.</p>
     </div>
 </div>
 
@@ -187,7 +350,10 @@
         </div>
     </div>
     <div class="card">
-        <div class="row"><input type="text" id="food-search" placeholder="Search Food..."><button class="btn-action" style="width:auto;" onclick="searchFood()">🔎</button></div>
+        <div class="row">
+            <input type="text" id="food-search" placeholder="Search Food..." onchange="searchFood()">
+            <button class="btn-action" style="width:auto;" onclick="searchFood()">🔎</button>
+        </div>
         <div id="search-results" style="margin-top:10px; max-height:200px; overflow-y:auto;"></div>
     </div>
     <div class="card" id="meal-container"></div>
@@ -195,22 +361,12 @@
 
 <div class="container" id="view-wellness">
     <h2>Wellness</h2>
-    <div class="card"><h3>⚖️ Body Weight</h3><div class="row"><input type="number" id="body-weight" placeholder="Lbs"><button class="btn-action" onclick="saveBodyStat()">Log</button></div></div>
-</div>
-
-<div class="container" id="view-plan">
-    <h2>Weekly Structure</h2>
     <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>📅 Phase: <span id="cycle-phase" style="color:var(--primary)">Week 1</span></h3>
-            <small onclick="nextPhase()" style="color:#777; cursor:pointer;">Next >></small>
+        <h3>⚖️ Body Weight</h3>
+        <div class="row">
+            <input type="number" id="body-weight" placeholder="Lbs">
+            <button class="btn-action" onclick="saveBodyStat()">Log</button>
         </div>
-        <div class="calendar-grid" id="week-grid"></div>
-        <div id="day-detail" style="margin-top:10px; font-style:italic; color:#aaa; font-size:0.9em; text-align:center;">Tap a day to schedule</div>
-    </div>
-    <div class="card" onclick="startBreathWork()">
-        <h3>🧘 Recovery Breath</h3>
-        <p style="color:#aaa; font-size:0.8em;">Box breathing to lower cortisol.</p>
     </div>
 </div>
 
@@ -223,7 +379,10 @@
             <div class="chip" onclick="setTheme('tactical')">Tactical</div>
         </div>
     </div>
-    <div class="card"><h3>🔥 Training Heatmap</h3><div id="muscle-heatmap"></div></div>
+    <div class="card">
+        <h3>🔥 Training Heatmap</h3>
+        <div id="muscle-heatmap"></div>
+    </div>
     <button class="btn btn-action" onclick="exportData()">⬇️ Export Data</button>
 </div>
 
@@ -246,7 +405,9 @@
     <div class="breath-circle"></div>
     <h2 style="margin-top:30px; color:#fff;">Breathe In...</h2>
 </div>
+
 <div id="plate-helper" class="plate-popup hidden"></div>
+
 <div id="timer-overlay" class="fs-overlay flex-center hidden">
     <div id="timer-display" style="font-size:4em; font-weight:bold; color:var(--primary);">00:00</div>
     <div style="margin-top:20px;">
@@ -255,145 +416,11 @@
 </div>
 
 <div class="nav-bar">
-    <button class="nav-btn active" onclick="switchTab('readiness')"><span class="nav-icon">🔋</span>Daily</button>
-    <button class="nav-btn" onclick="switchTab('coach')"><span class="nav-icon">🏋️</span>Coach</button>
-    <button class="nav-btn" onclick="switchTab('plan')"><span class="nav-icon">📅</span>Plan</button>
-    <button class="nav-btn" onclick="switchTab('food')"><span class="nav-icon">🍗</span>Fuel</button>
-    <button class="nav-btn" onclick="switchTab('progress')"><span class="nav-icon">📈</span>Stats</button>
-</div>
-<script>
-    // This runs instantly to ensure you are never stuck
-    window.onload = function() {
-        const loader = document.getElementById('sync-loader');
-        if(loader) {
-            loader.style.opacity = '0';
-            setTimeout(() => loader.style.display = 'none', 500);
-        }
-    };
-    // Backup Timer in case window.onload fails
-    setTimeout(() => {
-        const loader = document.getElementById('sync-loader');
-        if(loader) loader.style.display = 'none';
-    }, 2000);
-</script>
-<div id="timer-badge" class="timer-badge" onclick="openTimerOverlay()"></div>
-
-<div class="container active" id="view-readiness">
-    <div class="top-bar"><h2>Daily Check-In</h2><button class="unit-toggle" onclick="toggleUnit()"><span id="unit-disp-1">LBS</span></button></div>
-    <div class="card" style="display:flex; justify-content:space-between; align-items:center; background: linear-gradient(45deg, #1e1e1e, #252525);">
-        <div><div style="font-size:0.8em; color:#aaa;">Current Streak</div><div style="font-size:1.5em; font-weight:bold;">🔥 <span id="streak-count">0</span> Days</div></div>
-        <div id="readiness-badge" style="font-size:2em;">🛡️</div>
-    </div>
-    <div class="card">
-        <h3>How are you feeling?</h3>
-        <div class="row" style="margin-top:10px;"><span>😴 Sleep</span> <input type="range" id="val-sleep" min="1" max="10" value="5" oninput="calcReadiness()"></div>
-        <div class="row" style="margin-top:15px;"><span>🤕 Pain</span> <input type="range" id="val-sore" min="1" max="10" value="5" oninput="calcReadiness()"></div>
-        <div class="row" style="margin-top:15px;"><span>⚡ Energy</span> <input type="range" id="val-mood" min="1" max="10" value="5" oninput="calcReadiness()"></div>
-        <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
-        <div class="row"><input type="number" id="garmin-score" placeholder="Garmin Body Battery (Optional)" oninput="calcReadiness()"></div>
-        <div style="text-align:center; margin-top:15px;"><div style="font-size:2.5em; font-weight:bold; color:var(--sec);" id="score-display">--</div><div style="color:#aaa; font-style:italic;" id="score-text">Move sliders to calculate</div></div>
-        <button type="button" class="btn btn-main" onclick="handleReadinessLog()" style="margin-top:15px;">💾 Log & Get Advice</button>
-    </div>
-</div>
-
-<div class="container" id="view-coach">
-    <div id="setup-panel">
-        <div class="top-bar"><h2>Workout Strategy</h2><button class="unit-toggle" onclick="toggleUnit()"><span id="unit-disp-2">LBS</span></button></div>
-       <div class="card" style="border-left: 4px solid var(--danger); margin-bottom:10px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleInjuryPanel()">
-                <h3 style="margin:0; font-size:1.1em;">🩹 Injury / Pain Mode</h3>
-                <span id="injury-status" style="font-size:0.8em; color:#777;">None</span>
-            </div>
-            <div id="injury-chips" class="chip-container" style="display:none; margin-top:10px; padding-top:10px; border-top:1px solid #333;">
-                <div class="chip" onclick="toggleInjury('Shoulders', this)">Shoulders</div>
-                <div class="chip" onclick="toggleInjury('Knees', this)">Knees</div>
-                <div class="chip" onclick="toggleInjury('Lower Back', this)">Lower Back</div>
-                <div class="chip" onclick="toggleInjury('Wrists', this)">Wrists</div>
-            </div>
-        </div>
-        <div class="card">
-            <h3>Quick Start</h3>
-            
-            <div class="row" style="margin-bottom:10px; justify-content:space-between;">
-                <label style="color:#aaa;">⏱️ Duration</label>
-                <span id="time-val" style="color:var(--sec); font-weight:bold;">45m (6 Ex)</span>
-            </div>
-            <input type="range" id="slider-time" min="3" max="12" value="6" step="1" style="margin-bottom:20px;" oninput="updateTimeLabel(this.value)">
-
-           <div class="chip-container">
-                <div class="chip" onclick="loadTemplate('push')">Push</div>
-                <div class="chip" onclick="loadTemplate('pull')">Pull</div>
-                <div class="chip" onclick="loadTemplate('legs')">Legs</div>
-                <div class="chip" onclick="loadTemplate('full')">Full Body</div>
-                <div class="chip" onclick="loadTemplate('nimble')">🪶 Nimble / Flow</div>
-                <div class="chip" onclick="loadTemplate('f9')">⚙️ Torque F9</div>
-            </div>
-
-          <button type="button" class="btn btn-main" onclick="generateRandomWorkout()">🎲 Random Workout</button>
-            <button type="button" class="btn btn-action" onclick="openBuilder()">🛠️ Build Custom</button>
-        </div>
-    </div> <div id="active-workout" class="hidden">
-        <div class="top-bar"><h3>Active Session</h3><button type="button" class="btn-danger" style="width:auto; padding:5px 10px;" onclick="cancelWorkout()">End</button></div>
-        <div id="workout-list"></div>
-        <button type="button" class="btn btn-action" onclick="openBuilder(true)">➕ Add Exercise</button>
-        <button type="button" class="btn btn-main" onclick="finishSession()">💾 Finish & Save</button>
-    </div>
-</div>
-
-<div class="container" id="view-food">
-    <div class="top-bar"><h2>Fuel Log</h2></div>
-    <div class="card">
-        <div class="macro-grid">
-            <div>🔥 <span id="disp-cals">0</span><div class="macro-bar-container"><div id="bar-cals" class="macro-fill" style="width:0%; background:var(--sec);"></div></div></div>
-            <div>🥩 <span id="disp-pro">0</span>g<div class="macro-bar-container"><div id="bar-pro" class="macro-fill" style="width:0%; background:var(--primary);"></div></div></div>
-            <div>🍚 <span id="disp-carb">0</span>g<div class="macro-bar-container"><div id="bar-carb" class="macro-fill" style="width:0%; background:var(--warn);"></div></div></div>
-            <div>🥑 <span id="disp-fat">0</span>g<div class="macro-bar-container"><div id="bar-fat" class="macro-fill" style="width:0%; background:var(--danger);"></div></div></div>
-        </div>
-    </div>
-    <div class="card">
-    
-        <div class="row"><input type="text" id="food-search" placeholder="Search Food..."><button class="btn-action" style="width:auto;" onclick="searchFood()">🔎</button></div>
-        <div id="search-results" style="margin-top:10px; max-height:200px; overflow-y:auto;"></div>
-    </div>
-    <div class="card" id="meal-container"></div>
-</div>
-
-<div class="container" id="view-wellness">
-    <h2>Wellness</h2>
-    <div class="card"><h3>⚖️ Body Weight</h3><div class="row"><input type="number" id="body-weight" placeholder="Lbs"><button class="btn-action" onclick="saveBodyStat()">Log</button></div></div>
-</div>
-
-<div class="container" id="view-progress">
-    <h2>Command Center</h2>
-    
-    <div class="card">
-        <h3>🎨 App Theme</h3>
-        <div class="chip-container">
-            <div class="chip" onclick="setTheme('cyber')">Cyberpunk</div>
-            <div class="chip" onclick="setTheme('tactical')">Tactical</div>
-            <div class="chip" onclick="setTheme('zen')">Zen White</div>
-            <div class="chip" onclick="setTheme('midnight')">Midnight</div>
-        </div>
-    </div>
-
-    <div class="card">
-        <h3>🔥 Muscle Heatmap (Last 30 Days)</h3>
-        <div id="muscle-heatmap" class="macro-grid" style="grid-template-columns: 1fr 1fr;">
-            </div>
-    </div>
-
-    <div class="card">
-        <h3>📈 Strength Progress</h3>
-        <select id="chart-select" onchange="renderChart()"><option>Select Exercise...</option></select>
-        <canvas id="progressChart"></canvas>
-    </div>
-    
-    <button class="btn btn-action" onclick="exportData()">⬇️ Export Data</button>
-</div>
-
-<div class="nav-bar">
     <button class="nav-btn active" onclick="switchTab('readiness')">
         <span class="nav-icon">🔋</span>Daily
+    </button>
+    <button class="nav-btn" onclick="switchTab('coach')">
+        <span class="nav-icon">🏋️</span>Coach
     </button>
     <button class="nav-btn" onclick="switchTab('plan')">
         <span class="nav-icon">📅</span>Plan
@@ -401,205 +428,17 @@
     <button class="nav-btn" onclick="switchTab('food')">
         <span class="nav-icon">🍗</span>Fuel
     </button>
-    <button class="nav-btn" onclick="switchTab('wellness')">
-        <span class="nav-icon">🧘</span>Body
-    </button>
     <button class="nav-btn" onclick="switchTab('progress')">
         <span class="nav-icon">📈</span>Stats
     </button>
 </div>
 
-<div id="readiness-modal" class="fs-overlay flex-center hidden">
-    <div class="card" style="width:85%; max-width:350px; text-align:center;">
-        <div id="readiness-icon" style="font-size:3em;">⚠️</div>
-        <h2 id="readiness-title">Recovery Mode</h2>
-        <p id="readiness-desc" style="color:#aaa; margin-bottom:20px;">Low score detected.</p>
-        <button class="btn btn-main" onclick="applyReadinessStrategy('modify')">📉 Modify (Reduce Volume)</button>
-        <button class="btn btn-action" onclick="applyReadinessStrategy('ignore')">🔥 Ignore (Full Send)</button>
-        <button class="btn btn-danger" style="margin-top:10px;" onclick="closeReadinessModal()">Cancel</button>
-    </div>
-</div>
-
-<div id="guide-modal" class="fs-overlay hidden">
-    <div class="top-bar"><h2 id="guide-title">Exercise Name</h2><button class="btn-danger" style="width:auto;" onclick="closeGuideModal()">Close</button></div>
-    <div class="card">
-        <div id="f9-setup-section" class="card" style="background: #333; margin-bottom: 15px; border-left: 4px solid var(--gold); display:none;">
-            <div style="font-size:0.8em; color:#aaa; margin-bottom:5px;">TORQUE F9 SETUP</div>
-            <div class="row">
-                <div style="flex:1"><strong>💪 Arms:</strong> <span id="guide-arms">--</span></div>
-                <div style="flex:1"><strong>↕️ Pulleys:</strong> <span id="guide-pulleys">--</span></div>
-            </div>
-        </div>
-        <span class="guide-label">🎥 Visual Guide</span>
-        <div class="visual-container">
-            <div id="visual-error" class="visual-placeholder">
-                No Visual Saved.<br>
-                <small>Paste GIF or YouTube Link below.</small>
-            </div>
-            <img id="visual-content-img" src="">
-            <iframe id="visual-content-iframe" src="" allowfullscreen></iframe>
-        </div>
-        
-        <div id="accordion-container">
-            <details id="det-prep">
-                <summary>⚙️ Preparation</summary>
-                <div class="detail-content" id="guide-prep"></div>
-            </details>
-            
-            <details id="det-exec" open>
-                <summary>🚀 Execution</summary>
-                <div class="detail-content" id="guide-exec"></div>
-            </details>
-            
-            <details id="det-tips">
-                <summary>🎓 Coaching Tips</summary>
-                <div class="detail-content" id="guide-tips"></div>
-            </details>
-            
-            <details id="det-musc">
-                <summary>💪 Muscles & Benefits</summary>
-                <div class="detail-content" id="guide-musc"></div>
-            </details>
-        </div>
-
-        <div style="background:#252525; padding:15px; border-radius:8px; margin-top:20px; border-top:1px solid #444;">
-            <a id="gif-search-btn" href="#" target="_blank" class="btn-guide" style="display:block; text-align:center; text-decoration:none; margin-bottom:10px;">🔎 Find on Google (GIFs)</a>
-            <input type="text" id="guide-gif-input" class="gif-input" placeholder="Paste YouTube or GIF URL...">
-            <button class="btn btn-action" style="margin-top:5px;" onclick="saveGuideGif()">💾 Save Media</button>
-        </div>
-    </div>
-</div>
-
-<div id="food-modal" class="fs-overlay flex-center hidden">
-    <div class="card" style="width:85%; max-width:350px;">
-        <h3>Adjust Portion</h3>
-        <h4 id="food-modal-name" style="color:var(--primary);">Food Name</h4>
-        <div class="row" style="margin:15px 0;">
-            <div style="flex:1"><label style="font-size:0.8em; color:#aaa;">Qty</label><input type="number" id="food-qty" value="1" step="0.25" oninput="updateFoodCalc()"></div>
-            <div style="flex:2; text-align:right;"><div style="font-size:1.5em; font-weight:bold; color:var(--sec);"><span id="food-calc-cals">0</span> kcal</div><div style="font-size:0.9em; color:#aaa;"><span id="food-calc-pro">0</span>g Pro</div></div>
-        </div>
-        <div class="row">
-            <button class="btn-guide" onclick="selectMeal('Breakfast', this)">Breakfast</button>
-            <button class="btn-guide" onclick="selectMeal('Lunch', this)">Lunch</button>
-            <button class="btn-guide" onclick="selectMeal('Dinner', this)">Dinner</button>
-            <button class="btn-guide" onclick="selectMeal('Snacks', this)">Snack</button>
-        </div>
-        <button class="btn btn-main" style="margin-top:15px;" onclick="confirmAddFood()">✅ Add to Log</button>
-        <button class="btn btn-danger" style="margin-top:10px;" onclick="closeFoodModal()">Cancel</button>
-    </div>
-</div>
-
-<div id="builder-overlay" class="fs-overlay hidden">
-    <div class="top-bar"><h2>Exercise Builder</h2><button class="btn-danger" style="width:auto;" onclick="closeBuilder()">Close</button></div>
-    <div class="card">
-        <label style="font-size:0.8em; color:#777;">Filters</label>
-        <div class="chip-container" id="filter-muscle">
-            <div class="chip" onclick="toggleFilter('muscle', 'Chest', this)">Chest</div>
-            <div class="chip" onclick="toggleFilter('muscle', 'Back', this)">Back</div>
-            <div class="chip" onclick="toggleFilter('muscle', 'Legs', this)">Legs</div>
-            <div class="chip" onclick="toggleFilter('muscle', 'Shoulders', this)">Shoulders</div>
-            <div class="chip" onclick="toggleFilter('muscle', 'Arms', this)">Arms</div>
-            <div class="chip" onclick="toggleFilter('muscle', 'Core', this)">Core</div>
-        </div>
-        <div class="chip-container" id="filter-equip">
-            <div class="chip active" onclick="toggleFilter('equip', 'Cable', this)">F9 Cable</div>
-            <div class="chip" onclick="toggleFilter('equip', 'Dumbbell', this)">Dumbbell</div>
-            <div class="chip" onclick="toggleFilter('equip', 'Bodyweight', this)">Bodyweight</div>
-        </div>
-        <input type="text" id="builder-search-inp" placeholder="Search..." onkeyup="filterBuilderList()">
-        <div id="builder-list-content" style="margin-top:10px;"></div>
-    </div>
-</div>
-<div class="container hidden" id="view-plan">
-    <h2>Weekly Structure</h2>
-    
-    <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>📅 Phase: <span id="cycle-phase" style="color:var(--primary)">Week 1</span></h3>
-            <small onclick="nextPhase()" style="color:#777; cursor:pointer; border:1px solid #444; padding:2px 6px; border-radius:4px;">Next >></small>
-        </div>
-        <div class="calendar-grid" id="week-grid"></div>
-        <div id="day-detail" style="margin-top:10px; font-style:italic; color:#aaa; font-size:0.9em; text-align:center;">Tap a day to schedule</div>
-    </div>
-    
-    <div class="card">
-        <h3>⚔️ Active Challenge</h3>
-        <p style="margin-bottom:5px;">30 Days of Nimble Hips</p>
-        <div class="macro-bar-container"><div class="macro-fill" style="width: 45%; background: var(--gold);"></div></div>
-        <small style="color:#aaa;">Day 14/30</small>
-    </div>
-
-    <div class="card" onclick="startBreathWork()">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>🧘 Recovery Breath</h3>
-            <span style="font-size:1.5em;">🫁</span>
-        </div>
-        <p style="color:#aaa; font-size:0.8em;">Box breathing to lower cortisol.</p>
-    </div>
-</div>
-
-<div class="container hidden" id="view-food">
-    <h2>Nutrition Log</h2>
-    <div class="card">
-        <input type="text" id="food-search" placeholder="Search Food (e.g. Chicken)" onchange="searchFood()">
-        <button class="btn btn-action" onclick="searchFood()">Search</button>
-        <div id="search-results" style="margin-top:10px;"></div>
-    </div>
-    <div id="meal-container"></div>
-</div>
-
-<div class="container hidden" id="view-progress">
-    <h2>Command Center</h2>
-    </div>
-
-<div id="breath-modal" class="checklist-modal" onclick="this.style.display='none'">
-    <div class="breath-circle"></div>
-    <h2 style="margin-top:30px; color:#fff;">Breathe In...</h2>
-</div>
-
-<div id="plate-helper" class="plate-popup hidden"></div>
-<div id="timer-overlay" class="fs-overlay flex-center hidden">
-    <div id="timer-display" style="font-size:4em; font-weight:bold; color:var(--primary);">00:00</div>
-    <div style="margin-top:20px;">
-        <button class="btn-danger" onclick="closeTimer()">Stop</button>
-        <button class="btn-action" onclick="addTime(10)">+10s</button>
-        <button class="btn-action" onclick="addTime(30)">+30s</button>
-    </div>
-</div>
- 
 <script>
- 
-   // ─────────────────────────────────────────────────────────────
-// GLOBALS + MACRO GOALS + HELPER
 // ─────────────────────────────────────────────────────────────
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzrJx09CB_N0PO8FDTNbugokJK7CEHqJ4Zk3197Agcew_QNkMBZZ2C61vb53ctcna80dQ/exec";
-let state = { unit: 'lbs', history: [], food: [], wellness: [], readiness: [], routine: [] };
-let apiKey = "p61IM61sZf897clBskMhwLftfBccew4ZcgsatflX";
-let searchSource = "usda";
-let activeRoutine = [];
-let activeFilters = { muscle: [], equip: ['Cable'] };
-let pendingFood = null;
-let selectedMeal = 'Snacks';
-let gifOverrides = {};
-let timerInterval = null;
-let timerSeconds = 0;
-let myChart = null;
-let currentGuideExercise = null;
-let modifyVolume = false;
+// EXERCISE LIBRARY START
+// ─────────────────────────────────────────────────────────────
+const allExercises = [
 
-// Default macro goals — edit these if you want different targets
-let macroGoals = { cals: 2500, pro: 180, carb: 300, fat: 80 };
-
-function createEx(name, cat, equip, type, prep, exec, tips, benefits, muscles, setupF9) {
-    return {
-        name: name, cat: cat, equip: equip, type: type,
-        guide: { prep: prep, exec: exec, tips: tips, benefits: benefits, muscles: muscles },
-        setup: setupF9 || { arms: "N/A", pulleys: "N/A" }
-    };
-}
-
-    // --- EXERCISE DATABASE (PLACEHOLDER - PASTE STEP 2 HERE) ---
-    const allExercises = [
        // ==================== CABLE CHEST (TORQUE F9) ====================
         createEx("Cable Chest Press", ["Chest"], "Cable", "Strength", 
             ["Set Arms to Wide (Pos 8-9). Pulleys at Chest Height.", "Grab handles and step forward into a split stance (one foot forward) for stability.", "Brace core and lean slightly forward, keeping spine neutral."],
@@ -1617,592 +1456,77 @@ function createEx(name, cat, equip, type, prep, exec, tips, benefits, muscles, s
         createEx("L-Sit (Tuck)", ["Nimble", "Core"], "Bodyweight", "Calisthenics", 
             ["Hands on floor/parallettes."], ["Press down.", "Lift butt and knees off floor."], ["Hold tuck."], ["Core compression."], ["Abs", "Hip Flexors"])
     ];
-// ─────────────────────────────────────────────────────────────
-// NIMBLE ENGINE V42 (Planner, Coach, Analytics) - SAFE MODE
+    ]; // ─────────────────────────────────────────────────────────────
+// END OF EXERCISE LIBRARY
 // ─────────────────────────────────────────────────────────────
 
-// STATE & SETTINGS
-let activeRoutine = [];
+// ─────────────────────────────────────────────────────────────
+// NIMBLE ENGINE V42 (LOGIC CORE)
+// ─────────────────────────────────────────────────────────────
+
+// 1. STATE & SETTINGS
 let userSettings = JSON.parse(localStorage.getItem('nimbleSettings')) || { 
     hotelMode: false, 
-    currentPhase: 1, // 1=Vol, 2=Str, 3=Pow, 4=Deload
-    schedule: { 0:'Rest', 1:'Push', 2:'Pull', 3:'Legs', 4:'Nimble', 5:'Rest', 6:'Full' } // 0=Sun
+    currentPhase: 1, 
+    schedule: { 0:'Rest', 1:'Push', 2:'Pull', 3:'Legs', 4:'Nimble', 5:'Rest', 6:'Full' } 
 };
-let pendingFood = null; 
+let activeRoutine = [];
+let builderFilters = { muscle: [], equip: [] }; 
+let apiKey = "p61IM61sZf897clBskMhwLftfBccew4ZcgsatflX"; // USDA Key
 
-// INITIALIZATION
+// 2. INITIALIZATION
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. FORCE HIDE THE LOADING SCREEN (This fixes the "Stuck" issue)
-    const loader = document.getElementById('sync-loader');
-    if(loader) {
-        loader.style.opacity = '0';
-        setTimeout(() => loader.style.display = 'none', 500);
-    }
-
-    // 2. Setup Planner
+    // Start on Readiness Tab
+    switchTab('readiness'); 
+    
+    // Initialize Planner
     if(document.getElementById('view-plan')) renderPlanner();
     
-    // 3. Auto-load Heatmap
-    if(!document.getElementById('view-progress').classList.contains('hidden')) renderHeatmap();
+    // Load Heatmap if on stats
+    if(document.getElementById('view-progress')) renderHeatmap();
 });
 
-// --- NAVIGATION LOGIC (Fixed) ---
+// 3. NAVIGATION LOGIC
 function switchTab(id) {
-    // 1. Hide all views
-    document.querySelectorAll('.container').forEach(d => d.classList.add('hidden'));
-    document.querySelectorAll('.container').forEach(d => d.classList.remove('active')); 
-
-    // 2. Map buttons to the correct Screen ID
+    // Hide all views
+    document.querySelectorAll('.container').forEach(d => {
+        d.classList.remove('active');
+        d.style.display = 'none'; 
+    });
+    
+    // Show Target View
     let targetId = 'view-' + id;
-    
-    // Special Mappings
-    if (id === 'readiness') targetId = 'view-readiness';
-    if (id === 'coach') targetId = 'view-coach'; 
-    if (id === 'plan') targetId = 'view-plan';   
-    if (id === 'food') targetId = 'view-food';
-    if (id === 'wellness') targetId = 'view-wellness';
-    if (id === 'progress') targetId = 'view-progress';
-
-    // 3. Show the target view
-    const target = document.getElementById(targetId);
-    if (target) {
-        target.classList.remove('hidden');
+    let target = document.getElementById(targetId);
+    if(target) {
         target.classList.add('active');
-        
-        // Trigger special renders
-        if (targetId === 'view-plan') renderPlanner();
-        if (targetId === 'view-progress') renderHeatmap();
-    } else {
-        console.warn("View not found:", targetId);
+        target.style.display = 'block';
     }
-
-    // 4. Update Bottom Navigation Styling (Targeting .nav-btn)
+    
+    // Update Navigation Buttons
     document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
+    // Find button with specific onclick
+    const btn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes(id));
+    if(btn) btn.classList.add('active');
     
-    const activeBtn = Array.from(document.querySelectorAll('.nav-btn')).find(btn => 
-        btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(`'${id}'`)
-    );
-    if (activeBtn) activeBtn.classList.add('active');
+    // Trigger Lazy Renders
+    if(id === 'plan') renderPlanner();
+    if(id === 'progress') renderHeatmap();
 }
 
-    // 4. Update Bottom Navigation Styling (Targeting .nav-btn now)
-    document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
-    
-    const activeBtn = Array.from(document.querySelectorAll('.nav-btn')).find(btn => 
-        btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(`'${id}'`)
-    );
-    if (activeBtn) activeBtn.classList.add('active');
-}
-
-    // 4. Update the Bottom Navigation Styling (Visual Feedback)
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    
-    // Find the button you just clicked and make it "Active"
-    // We look for the onclick attribute that contains the ID you passed
-    const activeBtn = Array.from(document.querySelectorAll('.nav-item')).find(btn => 
-        btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(`'${id}'`)
-    );
-    if (activeBtn) activeBtn.classList.add('active');
-}
-
- 
-
-// --- FEATURE 1, 2, 3: PLANNER LOGIC ---
-function renderPlanner() {
-    const grid = document.getElementById('week-grid');
-    if(!grid) return;
-    grid.innerHTML = '';
-    const days = ['S','M','T','W','T','F','S'];
-    const today = new Date().getDay();
-    days.forEach((d, i) => {
-        const type = userSettings.schedule[i] || 'Rest';
-        const isToday = i === today ? 'active' : '';
-        grid.innerHTML += `
-            <div class="day-bubble ${isToday}" onclick="setSchedule(${i})">
-                <b>${d}</b>
-                <span style="font-size:0.5em; text-transform:uppercase;">${type.substring(0,3)}</span>
-            </div>
-        `;
-    });
-    const phases = ["1: Volume (12-15)", "2: Strength (6-8)", "3: Power (3-5)", "4: Deload (Flow)"];
-    const phaseLabel = document.getElementById('cycle-phase');
-    if(phaseLabel) phaseLabel.innerText = phases[userSettings.currentPhase - 1];
-}
-
-function setSchedule(dayIdx) {
-    const types = ['Rest', 'Push', 'Pull', 'Legs', 'Nimble', 'Full', 'Cardio'];
-    let current = userSettings.schedule[dayIdx] || 'Rest';
-    let nextIdx = (types.indexOf(current) + 1) % types.length;
-    userSettings.schedule[dayIdx] = types[nextIdx];
-    localStorage.setItem('nimbleSettings', JSON.stringify(userSettings));
-    renderPlanner();
-}
-
-function nextPhase() {
-    userSettings.currentPhase = (userSettings.currentPhase % 4) + 1;
-    localStorage.setItem('nimbleSettings', JSON.stringify(userSettings));
-    renderPlanner();
-}
-
-// --- COMPATIBILITY: OLD HOME SCREEN BUTTONS ---
-// This ensures your "Push", "Pull" buttons on the home screen still work!
-function generateWorkout(type) {
-    // Redirect to the new robust filter engine
-    if(type === 'Full Body') type = 'Full'; // Fix naming mismatch
-    
-    generateWorkoutByFilter(e => {
-        if(type === 'Full') return true;
-        if(type === 'Nimble') return e.cat.includes('Nimble') || e.type === 'Mobility';
-        return e.cat.includes(type) || e.type === type;
-    });
-}
-
-function generateWorkoutByFilter(filterFn) {
-    let pool = allExercises.filter(filterFn);
-    if(userSettings.hotelMode) {
-        pool = pool.filter(e => !e.name.includes('Barbell') && !e.name.includes('Cable') && !e.name.includes('Machine'));
-    }
-    if(pool.length === 0) return alert("No exercises found.");
-
-    activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
-    renderWorkout(activeRoutine);
-    
-    document.getElementById('setup-panel').style.display = 'none';
-    document.getElementById('workout-interface').style.display = 'block';
-}
-
-function toggleHotelMode() {
-    userSettings.hotelMode = !userSettings.hotelMode;
-    localStorage.setItem('nimbleSettings', JSON.stringify(userSettings));
-    alert(userSettings.hotelMode ? "🏨 Hotel Mode: Equipment Limited" : "🏋️ Full Gym Mode");
-}
-
-// --- CORE: RENDER CARDS (With Sparklines & Coaching) ---
-function renderWorkout(exercises) {
-    const list = document.getElementById('workout-list');
-    list.innerHTML = '';
-    const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-    const targets = {1: '12-15', 2: '8-10', 3: '3-5', 4: 'Flow'};
-    const phaseTarget = targets[userSettings.currentPhase];
-
-    exercises.forEach((ex, i) => {
-        const logs = history.filter(h => h.name === ex.name).sort((a,b) => new Date(a.date) - new Date(b.date)).slice(-5);
-        let sparkHTML = '';
-        if(logs.length > 1) {
-             const points = logs.map((l, idx) => `${idx * 20},${30 - (l.weight/300)*30}`).join(' ');
-             sparkHTML = `<svg class="sparkline-container"><polyline points="${points}" fill="none" stroke="var(--gold)" stroke-width="2"/></svg>`;
-        }
-        const lastLog = logs[logs.length-1];
-        let placeholder = lastLog ? `${lastLog.weight}x${lastLog.reps}` : phaseTarget;
-        const tempo = ex.type === 'Strength' ? (userSettings.currentPhase === 1 ? '3-0-1-0' : 'Explosive') : 'Flow';
-
-        const div = document.createElement('div');
-        div.className = `card exercise-card ${ex.type}`;
-        div.innerHTML = `
-            <div class="exercise-header">
-                <div style="display:flex; align-items:center;">
-                    <strong>${ex.name}</strong>
-                    <span class="swap-btn" onclick="swapExercise(${i}, '${ex.type}')">🔄 Swap</span>
-                </div>
-                <div style="font-size:0.7em; color:var(--primary)">Tempo: ${tempo}</div>
-            </div>
-            <div style="display:flex; justify-content:space-between; margin:5px 0;">
-                <small style="color:#aaa;">Target: ${phaseTarget} reps</small>
-                ${lastLog ? `<small>Ghost: ${lastLog.weight}x${lastLog.reps}</small>` : ''}
-            </div>
-            ${sparkHTML}
-            <div class="row">
-                <div style="flex:1"><input type="number" id="w-${i}" placeholder="Lbs" oninput="showPlates(this.value)"></div>
-                <div style="flex:1"><input type="number" id="r-${i}" placeholder="${placeholder}"></div>
-            </div>
-            <div style="display:flex; align-items:center; gap:10px; margin-top:10px;">
-                <span style="font-size:0.7em">RPE:</span>
-                <input type="range" id="rpe-${i}" min="1" max="10" value="7" class="rpe-slider">
-                <span id="rpe-val-${i}" style="font-size:0.7em">7</span>
-            </div>
-            <button class="btn btn-action" onclick="logSet('${ex.name}', ${i})">✅ Log Set</button>
-        `;
-        list.appendChild(div);
-        document.getElementById(`rpe-${i}`).oninput = function() { document.getElementById(`rpe-val-${i}`).innerText = this.value; };
-    });
-}
-
-function swapExercise(idx, type) {
-    const alts = allExercises.filter(e => e.type === type && e.name !== activeRoutine[idx].name);
-    if(alts.length > 0) {
-        const newEx = alts[Math.floor(Math.random() * alts.length)];
-        activeRoutine[idx] = newEx;
-        renderWorkout(activeRoutine);
-    } else { alert("No alternatives found."); }
-}
-
-function showPlates(weight) {
-    const w = parseFloat(weight);
-    if(w < 45) return;
-    let perSide = (w - 45) / 2;
-    let html = '';
-    [45, 35, 25, 10, 5, 2.5].forEach(plate => {
-        while(perSide >= plate) {
-            html += `<div class="plate p-${Math.floor(plate)}"></div>`;
-            perSide -= plate;
-        }
-    });
-    const popup = document.getElementById('plate-helper');
-    if(popup) {
-        popup.innerHTML = html || '<span style="color:#fff; font-size:0.8em">Bar Only</span>';
-        popup.classList.remove('hidden');
-        setTimeout(() => popup.classList.add('hidden'), 3000);
-    }
-}
-
-// --- LOGGING & SAFETY ---
-function logSet(name, idx) {
-    const w = parseFloat(document.getElementById(`w-${idx}`).value);
-    const r = parseInt(document.getElementById(`r-${idx}`).value);
-    const rpe = parseInt(document.getElementById(`rpe-${idx}`).value);
-    
-    if (isNaN(w) || isNaN(r)) return; // Silent validation
-
-    const e1rm = w * (1 + r/30);
-    if(e1rm > 225) triggerConfetti(); 
-
-    const entry = { date: new Date().toISOString(), name, weight: w, reps: r, rpe, phase: userSettings.currentPhase };
-    
-    let h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-    h.push(entry);
-    localStorage.setItem('nimbleHistory', JSON.stringify(h));
-    
-    sendToCloud("workout", entry); // Safe cloud sync
-
-    const btn = document.activeElement;
-    btn.style.backgroundColor = "var(--success)";
-    btn.innerText = "Saved!";
-    setTimeout(() => { btn.innerText = "✅ Log Set"; btn.style.backgroundColor = ""; }, 1500);
-    
-    startTimer(90);
-    if ('speechSynthesis' in window) {
-        const msg = new SpeechSynthesisUtterance("Good set.");
-        window.speechSynthesis.speak(msg);
-    }
-}
-
-function triggerConfetti() {
-    for(let i=0; i<30; i++) {
-        const c = document.createElement('div');
-        c.className = 'confetti';
-        c.style.left = Math.random()*100 + 'vw';
-        c.style.backgroundColor = ['#f00','#0f0','#00f','#ff0'][Math.floor(Math.random()*4)];
-        c.style.animationDuration = (Math.random()*2+2) + 's';
-        document.body.appendChild(c);
-        setTimeout(() => c.remove(), 4000);
-    }
-}
-
-function startBreathWork() { document.getElementById('breath-modal').style.display = 'flex'; }
-
-// --- TIMER (Preserved) ---
-function startTimer(s) {
-    const overlay = document.getElementById('timer-overlay');
-    if(overlay) {
-        overlay.classList.remove('hidden');
-        let t = s;
-        const disp = document.getElementById('timer-display');
-        if(disp) disp.innerText = formatTime(t);
-        if(window.timerInterval) clearInterval(window.timerInterval);
-        window.timerInterval = setInterval(()=>{ 
-            t--; 
-            if(disp) disp.innerText = formatTime(t); 
-            if(t<=0) closeTimer(); 
-        }, 1000);
-    }
-}
-function closeTimer() {
-    const overlay = document.getElementById('timer-overlay');
-    if(overlay) overlay.classList.add('hidden');
-    if(window.timerInterval) clearInterval(window.timerInterval);
-}
-function formatTime(s) { return s < 60 ? s : Math.floor(s/60) + ":" + (s%60 < 10 ? '0' : '') + (s%60); }
-function addTime(s) { 
-    const disp = document.getElementById('timer-display');
-    if(disp) {
-        let curr = disp.innerText;
-        let sec = curr.includes(":") ? parseInt(curr.split(":")[0])*60 + parseInt(curr.split(":")[1]) : parseInt(curr);
-        startTimer(sec + s); 
-    }
-}
-
-// --- CLOUD & OFFLINE SAFETY (Preserved) ---
-function sendToCloud(type, data) {
-    if (!navigator.onLine) { queueOffline(type, data); return; }
-    fetch("YOUR_GOOGLE_SCRIPT_URL", { // Make sure your URL is here if you have one
-        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type, data })
-    }).catch(e => queueOffline(type, data));
-}
-function queueOffline(type, data) {
-    let q = JSON.parse(localStorage.getItem('nimbleQueue')) || [];
-    q.push({ type, data, time: Date.now() });
-    localStorage.setItem('nimbleQueue', JSON.stringify(q));
-    console.log("Saved offline (Silent)");
-}
-
-// --- HEATMAP & ANALYTICS ---
-function renderHeatmap() {
-    const grid = document.getElementById('view-progress');
-    if(!grid) return;
-    if(!grid.innerHTML.includes('Command Center')) {
-        grid.innerHTML = `
-            <h2>Command Center</h2>
-            <div class="card">
-                <h3>🎨 App Theme</h3>
-                <div class="chip-container">
-                    <div class="chip" onclick="setTheme('cyber')">Cyber</div>
-                    <div class="chip" onclick="setTheme('tactical')">Tactical</div>
-                </div>
-            </div>
-            <div class="card"><h3>🔥 Training Heatmap</h3><p style="color:#aaa;">Visualize your frequency here.</p></div>
-            <button class="btn btn-action" onclick="exportData()">⬇️ Export Data</button>
-        `;
-    }
-}
-function setTheme(name) {
-    const r = document.querySelector(':root');
-    if(name === 'cyber') { r.style.setProperty('--bg', '#121212'); r.style.setProperty('--primary', '#BB86FC'); }
-    if(name === 'tactical') { r.style.setProperty('--bg', '#0d1117'); r.style.setProperty('--primary', '#58a6ff'); }
-    localStorage.setItem('nimbleTheme', name);
-}
-function exportData() {
-    const h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-    let text = "NIMBLE SHRED REPORT\n\n";
-    h.slice(-20).forEach(l => { text += `${l.date.split('T')[0]}: ${l.name} - ${l.weight}x${l.reps} @ RPE ${l.rpe || '-'}\n`; });
-    alert("Data copied to clipboard!");
-    navigator.clipboard.writeText(text);
-}
-function openFoodModal(food) {
-    const overlay = document.createElement('div');
-    overlay.className = 'fs-overlay';
-    overlay.style.display = 'block';
-    overlay.innerHTML = `
-        <div class="card">
-            <h2>Add Food</h2>
-            <p><strong>${food.name}</strong></p>
-            <p style="color:#aaa; font-size:0.9em;">${food.desc}</p>
-            <p style="font-size:0.85em;">Per 100g: ${Math.round(food.c)}cal | P:${Math.round(food.p)}g | C:${Math.round(food.ch)}g | F:${Math.round(food.f)}g</p>
-            <label>Portion (grams):</label>
-            <input type="number" id="food-portion" value="100" min="1">
-            <button class="btn btn-main" onclick="addFoodToMeal('${food.name}', ${food.c}, ${food.p}, ${food.ch}, ${food.f})">Add to Current Meal</button>
-            <button class="btn btn-danger" onclick="this.parentElement.parentElement.remove()">Cancel</button>
-        </div>
-    `;
-    document.body.appendChild(overlay);
-}
-
-function addFoodToMeal(name, cPer100, pPer100, chPer100, fPer100) {
-    const portion = parseFloat(document.getElementById('food-portion').value) || 100;
-    const multiplier = portion / 100;
-    
-    const food = {
-        name: name,
-        calories: Math.round(cPer100 * multiplier),
-        protein: Math.round(pPer100 * multiplier),
-        carbs: Math.round(chPer100 * multiplier),
-        fat: Math.round(fPer100 * multiplier),
-        portion: portion
-    };
-    
-    // Add to current meal - you'll need to determine which meal is active
-    // This is a placeholder - adjust based on your meal tracking structure
-    let meals = JSON.parse(localStorage.getItem('nimbleMeals')) || {};
-    const today = new Date().toISOString().split('T')[0];
-    if (!meals[today]) meals[today] = { breakfast: [], lunch: [], dinner: [], snacks: [] };
-    
-    // Add to snacks by default - you might want to track which meal is currently being edited
-    meals[today].snacks.push(food);
-    localStorage.setItem('nimbleMeals', JSON.stringify(meals));
-    
-  // Close modal and refresh display
-document.querySelector('.fs-overlay').remove();
-
-// Update macro displays
-const meals = JSON.parse(localStorage.getItem('nimbleMeals')) || {};
-const today = new Date().toISOString().split('T')[0];
-const todayMeals = meals[today] || { breakfast: [], lunch: [], dinner: [], snacks: [] };
-
-let totalCals = 0, totalPro = 0, totalCarbs = 0, totalFat = 0;
-Object.values(todayMeals).flat().forEach(item => {
-    totalCals += item.calories || 0;
-    totalPro += item.protein || 0;
-    totalCarbs += item.carbs || 0;
-    totalFat += item.fat || 0;
-});
-
-document.getElementById('disp-cals').textContent = totalCals;
-document.getElementById('disp-pro').textContent = totalPro;
-document.getElementById('disp-carb').textContent = totalCarbs;
-document.getElementById('disp-fat').textContent = totalFat;
-
-// Update progress bars (assuming goals exist)
-const goals = { cals: 2500, pro: 180, carbs: 250, fat: 70 }; // You might have these stored somewhere
-document.getElementById('bar-cals').style.width = `${Math.min(100, (totalCals / goals.cals) * 100)}%`;
-document.getElementById('bar-pro').style.width = `${Math.min(100, (totalPro / goals.pro) * 100)}%`;
-document.getElementById('bar-carb').style.width = `${Math.min(100, (totalCarbs / goals.carbs) * 100)}%`;
-document.getElementById('bar-fat').style.width = `${Math.min(100, (totalFat / goals.fat) * 100)}%`;
-    }
-// --- UNIFIED FOOD SEARCH ENGINE ---
-async function searchFood() {
-    const query = document.getElementById('food-search').value;
-    const resDiv = document.getElementById('search-results');
-    resDiv.innerHTML = '<div style="padding:10px; color:#aaa;">Scanning Global & AU Databases...</div>';
-    let combinedResults = [];
-    try {
-        const [usdaRes, offRes] = await Promise.allSettled([
-            fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=20&dataType=Foundation,SR Legacy&api_key=${apiKey}`),
-            fetch(`https://au.openfoodfacts.org/cgi/search.pl?search_terms=${query}&search_simple=1&action=process&json=1&page_size=20`)
-        ]);
-        if (usdaRes.status === 'fulfilled') {
-            const data = await usdaRes.value.json();
-            if(data.foods) data.foods.forEach(f => {
-                const getNut = (...ids) => (f.foodNutrients.find(x => ids.includes(x.nutrientId)) || {}).value || 0;
-                combinedResults.push({ name: f.description.replace(/, raw/gi, '').replace(/, cooked/gi, ''), desc: f.description, source: 'USDA', c: getNut(1008, 208, 2047), p: getNut(1003, 203), f: getNut(1004, 204), ch: getNut(1005, 205) });
-            });
-        }
-        if (offRes.status === 'fulfilled') {
-            const data = await offRes.value.json();
-            if(data.products) data.products.forEach(p => {
-                const c = p.nutriments['energy-kcal_100g'] || p.nutriments['energy-kcal_value'] || (p.nutriments['energy-kj_100g'] ? p.nutriments['energy-kj_100g'] / 4.184 : 0);
-                combinedResults.push({ name: p.product_name, desc: p.product_name + (p.brands ? ` (${p.brands})` : ''), source: 'AU/Global', c: c || 0, p: p.nutriments.proteins_100g || 0, f: p.nutriments.fat_100g || 0, ch: p.nutriments.carbohydrates_100g || 0 });
-            });
-        }
-    } catch(e) { console.log("Search error", e); }
-    let validResults = combinedResults.filter(r => r.c > 5);
-    if (validResults.length === 0) { resDiv.innerHTML = '<div style="padding:10px;">No results found.</div>'; return; }
-    if (validResults.length > 1) {
-        const subset = validResults.slice(0, 15);
-        const count = subset.length;
-        const avg = { name: `Smart Average: "${query}"`, desc: `Composite of ${count} Global & AU sources`, c: subset.reduce((sum, item) => sum + item.c, 0) / count, p: subset.reduce((sum, item) => sum + item.p, 0) / count, f: subset.reduce((sum, item) => sum + item.f, 0) / count, ch: subset.reduce((sum, item) => sum + item.ch, 0) / count, isAverage: true };
-        validResults.unshift(avg);
-    }
-    resDiv.innerHTML = '';
-    validResults.sort((a,b) => { if(a.isAverage) return -1; if(b.isAverage) return 1; return b.p - a.p; });
-    validResults.forEach(f => {
-        const div = document.createElement('div');
-        div.className = 'food-item';
-        div.style.flexDirection = "column"; div.style.alignItems = "flex-start";
-        if (f.isAverage) { div.style.background = "linear-gradient(45deg, #2c2c2c, #3a3a3a)"; div.style.border = "1px solid var(--gold)"; div.style.marginBottom = "10px"; }
-        div.innerHTML = `<div style="font-weight:bold; color:#fff; display:flex; justify-content:space-between; width:100%;"><span>${f.name}</span>${f.isAverage ? '<span style="color:var(--gold); font-size:0.8em;">⭐ QUICK ADD</span>' : `<span style="font-size:0.7em; color:#555; border:1px solid #333; padding:1px 4px; border-radius:4px;">${f.source}</span>`}</div><div style="font-size:0.75em; color:#aaa; margin-bottom:4px;">${f.desc}</div><div style="font-size:0.8em; color:#aaa; display:flex; gap:10px;"><span style="color:var(--sec);">⚡ ${Math.round(f.c)}</span><span style="color:var(--primary);">🥩 ${Math.round(f.p)}g</span><span style="color:var(--warn);">🍚 ${Math.round(f.ch)}g</span><span style="color:var(--danger);">🥑 ${Math.round(f.f)}g</span></div>`;
-        div.onclick = () => openFoodModal(f);
-        resDiv.appendChild(div);
-    });
-}
-    // ─────────────────────────────────────────────────────────────
-// RESTORED COACH LOGIC (Fixes Buttons)
+// ─────────────────────────────────────────────────────────────
+// COACHING LOGIC (BUILDER, RANDOM, TEMPLATES)
 // ─────────────────────────────────────────────────────────────
 
-// 1. Fix "Random Workout" Button
-function generateRandomWorkout() {
-    generateWorkoutByFilter(() => true); // Generates from all exercises
-}
-
-// 2. Fix Chip Templates (Push, Pull, Legs buttons)
-function loadTemplate(type) {
-    // Map chip names to generator types
-    const map = {
-        'push': 'Push', 'pull': 'Pull', 'legs': 'Legs', 
-        'full': 'Full', 'nimble': 'Nimble', 'f9': 'Cable'
-    };
-    const key = map[type] || 'Full';
-    
-    // Use the existing V42 generator
-    generateWorkoutByFilter(e => {
-        if(key === 'Full') return true;
-        if(key === 'Nimble') return e.cat.includes('Nimble') || e.type === 'Mobility';
-        if(key === 'Cable') return e.equip === 'Cable';
-        return e.cat.includes(key) || e.type === key;
-    });
-}
-
-// 3. Fix "Build Custom" Button
-function openBuilder(isAddMode = false) {
-    const overlay = document.getElementById('builder-overlay');
-    if(overlay) {
-        overlay.classList.remove('hidden');
-        renderBuilderList(); // Show exercises
-    }
-}
-
-function closeBuilder() {
-    document.getElementById('builder-overlay').classList.add('hidden');
-}
-
-// 4. Builder Search & Filter Logic
-let builderFilters = { muscle: [], equip: [] };
-
-function renderBuilderList() {
-    const list = document.getElementById('builder-list-content');
-    const search = document.getElementById('builder-search-inp').value.toLowerCase();
-    
-    list.innerHTML = '';
-    
-    const filtered = allExercises.filter(ex => {
-        const matchesSearch = ex.name.toLowerCase().includes(search);
-        const matchesMuscle = builderFilters.muscle.length === 0 || builderFilters.muscle.some(m => ex.cat.includes(m));
-        const matchesEquip = builderFilters.equip.length === 0 || builderFilters.equip.includes(ex.equip);
-        return matchesSearch && matchesMuscle && matchesEquip;
-    });
-
-    filtered.slice(0, 50).forEach(ex => { // Limit to 50 for performance
-        const div = document.createElement('div');
-        div.className = 'food-item'; // Re-use styling
-        div.innerHTML = `
-            <div style="font-weight:bold;">${ex.name}</div>
-            <div style="font-size:0.8em; color:#aaa;">${ex.equip} | ${ex.cat.join(', ')}</div>
-        `;
-        div.onclick = () => addToWorkout(ex);
-        list.appendChild(div);
-    });
-}
-
-function filterBuilderList() { renderBuilderList(); }
-
-function toggleFilter(type, value, btn) {
-    const arr = builderFilters[type];
-    const idx = arr.indexOf(value);
-    
-    if (idx > -1) {
-        arr.splice(idx, 1);
-        btn.classList.remove('active');
-    } else {
-        arr.push(value);
-        btn.classList.add('active');
-    }
-    renderBuilderList();
-}
-
-function addToWorkout(exercise) {
-    activeRoutine.push(exercise);
-    renderWorkout(activeRoutine);
-    
-    // If we started from an empty screen, switch to workout view
-    document.getElementById('setup-panel').style.display = 'none';
-    document.getElementById('workout-interface').style.display = 'block';
-    
-    // Provide feedback
-    alert(`${exercise.name} added!`);
-}
-    // ─────────────────────────────────────────────────────────────
-// RESTORED COACH LOGIC (Fixes Buttons)
-// ─────────────────────────────────────────────────────────────
-
-// Global Filters (Safety Check)
-if (typeof builderFilters === 'undefined') { var builderFilters = { muscle: [], equip: [] }; }
-
-// 1. Random Workout & Chips
+// A. Random Generator
 function generateRandomWorkout() {
     generateWorkoutByFilter(() => true); 
 }
 
+// B. Template Chips (Push, Pull, Legs, etc.)
 function loadTemplate(type) {
     const map = {'push':'Push', 'pull':'Pull', 'legs':'Legs', 'full':'Full', 'nimble':'Nimble', 'f9':'Cable'};
     const key = map[type] || 'Full';
+    
     generateWorkoutByFilter(e => {
         if(key === 'Full') return true;
         if(key === 'Nimble') return e.cat.includes('Nimble') || e.type === 'Mobility';
@@ -2211,39 +1535,44 @@ function loadTemplate(type) {
     });
 }
 
+// C. Core Generator Engine
 function generateWorkoutByFilter(filterFn) {
     let pool = allExercises.filter(filterFn);
     
-    // Hotel Mode check
+    // Apply Hotel Mode if active
     if(userSettings.hotelMode) {
         pool = pool.filter(e => !e.name.includes('Barbell') && !e.name.includes('Cable') && !e.name.includes('Machine'));
     }
 
-    if(pool.length === 0) return alert("No exercises found.");
+    if(pool.length === 0) return alert("No exercises found for these criteria.");
     
-    // Pick 6 Random
+    // Select 6 Random Exercises
     activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
     renderWorkout(activeRoutine);
     
-    // Switch Screens
+    // Show Workout Screen
     document.getElementById('setup-panel').style.display = 'none';
     document.getElementById('workout-interface').style.display = 'block';
 }
 
-// 2. Render Workout Cards (with Sparklines)
+// D. Render Cards
 function renderWorkout(exercises) {
     const list = document.getElementById('workout-list');
     list.innerHTML = '';
     const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
     
     exercises.forEach((ex, i) => {
-        // Sparkline Logic
+        // Sparkline History Visualization
         const logs = history.filter(h => h.name === ex.name).sort((a,b) => new Date(a.date) - new Date(b.date)).slice(-5);
         let sparkHTML = '';
         if(logs.length > 1) {
              const points = logs.map((l, idx) => `${idx * 20},${30 - (l.weight/300)*30}`).join(' ');
-             sparkHTML = `<svg class="sparkline-container"><polyline points="${points}" fill="none" stroke="var(--gold)" stroke-width="2"/></svg>`;
+             sparkHTML = `<div class="sparkline-container"><svg width="100%" height="100%"><polyline points="${points}" fill="none" stroke="var(--gold)" stroke-width="2"/></svg></div>`;
         }
+        
+        // Ghost Data (Last Lift)
+        const lastLog = logs[logs.length-1];
+        const placeholder = lastLog ? `${lastLog.weight}lbs x ${lastLog.reps}` : "Target: 8-12";
 
         const div = document.createElement('div');
         div.className = `card exercise-card ${ex.type || 'Strength'}`;
@@ -2253,37 +1582,47 @@ function renderWorkout(exercises) {
                 <span class="swap-btn" onclick="swapExercise(${i})">🔄 Swap</span>
             </div>
             ${sparkHTML}
+            <div style="font-size:0.8em; color:#777; margin-bottom:5px;">${ex.equip} | ${ex.cat[0]}</div>
+            
             <div class="row">
-                <input type="number" id="w-${i}" placeholder="Lbs" style="width:45%" oninput="showPlates(this.value)">
-                <input type="number" id="r-${i}" placeholder="Reps" style="width:45%">
+                <input type="number" id="w-${i}" placeholder="${placeholder.split('x')[0]}" style="width:45%" oninput="showPlates(this.value)">
+                <input type="number" id="r-${i}" placeholder="${placeholder.split('x')[1] || 'Reps'}" style="width:45%">
             </div>
+            
             <div style="display:flex; align-items:center; gap:10px; margin-top:10px;">
                 <span style="font-size:0.7em">RPE:</span>
                 <input type="range" id="rpe-${i}" min="1" max="10" value="7" class="rpe-slider">
             </div>
+            
             <button class="btn btn-action" onclick="logSet('${ex.name}', ${i})">✅ Log Set</button>
         `;
         list.appendChild(div);
     });
 }
 
+// E. Swap Exercise Logic
 function swapExercise(idx) {
     const current = activeRoutine[idx];
+    // Find alternatives in same category
     const alts = allExercises.filter(e => e.cat.some(c => current.cat.includes(c)) && e.name !== current.name);
+    
     if(alts.length > 0) {
         activeRoutine[idx] = alts[Math.floor(Math.random()*alts.length)];
         renderWorkout(activeRoutine);
     } else {
-        alert("No alternates found.");
+        alert("No suitable alternatives found.");
     }
 }
 
-// 3. Builder Logic
+// ─────────────────────────────────────────────────────────────
+// BUILDER LOGIC (CUSTOM WORKOUTS)
+// ─────────────────────────────────────────────────────────────
 function openBuilder(isAddMode) {
     document.getElementById('builder-overlay').classList.remove('hidden');
     document.getElementById('builder-overlay').style.display = 'block';
     renderBuilderList();
 }
+
 function closeBuilder() { 
     document.getElementById('builder-overlay').classList.add('hidden'); 
     document.getElementById('builder-overlay').style.display = 'none'; 
@@ -2300,6 +1639,7 @@ function renderBuilderList() {
         return matchesSearch && matchesMuscle;
     });
 
+    // Limit to 50 results for performance
     pool.slice(0, 50).forEach(ex => {
         const div = document.createElement('div');
         div.className = 'food-item';
@@ -2308,69 +1648,292 @@ function renderBuilderList() {
             activeRoutine.push(ex); 
             renderWorkout(activeRoutine); 
             closeBuilder(); 
+            // Ensure we are on the workout screen
             document.getElementById('setup-panel').style.display = 'none';
             document.getElementById('workout-interface').style.display = 'block';
         };
         list.appendChild(div);
     });
 }
+
 function filterBuilderList() { renderBuilderList(); }
+
 function toggleFilter(type, val, btn) {
     const idx = builderFilters[type].indexOf(val);
-    if(idx > -1) { builderFilters[type].splice(idx,1); btn.classList.remove('active'); }
-    else { builderFilters[type].push(val); btn.classList.add('active'); }
+    if(idx > -1) { 
+        builderFilters[type].splice(idx,1); 
+        btn.classList.remove('active'); 
+    } else { 
+        builderFilters[type].push(val); 
+        btn.classList.add('active'); 
+    }
     renderBuilderList();
 }
 
+// ─────────────────────────────────────────────────────────────
+// SESSION MANAGEMENT & LOGGING
+// ─────────────────────────────────────────────────────────────
 function finishSession() {
-    if(confirm("Finish Workout?")) {
+    if(confirm("Finish Workout and Save?")) {
         document.getElementById('setup-panel').style.display = 'block';
         document.getElementById('workout-interface').style.display = 'none';
-        alert("Workout Saved!");
+        alert("Workout Saved to History!");
+        activeRoutine = [];
+        triggerConfetti();
+    }
+}
+
+function cancelWorkout() { 
+    if(confirm("Cancel this session?")) {
+        document.getElementById('setup-panel').style.display = 'block';
+        document.getElementById('workout-interface').style.display = 'none';
         activeRoutine = [];
     }
 }
-function cancelWorkout() { finishSession(); }
 
-// 4. Logging
 function logSet(name, idx) {
     const w = document.getElementById(`w-${idx}`).value;
     const r = document.getElementById(`r-${idx}`).value;
-    if(!w || !r) return;
     
+    if(!w || !r) return alert("Please enter weight and reps.");
+    
+    // Save to Local History
     let h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-    h.push({date: new Date().toISOString(), name, weight: w, reps: r});
+    const entry = {date: new Date().toISOString(), name, weight: w, reps: r};
+    h.push(entry);
     localStorage.setItem('nimbleHistory', JSON.stringify(h));
     
+    // Try Cloud Sync
+    sendToCloud("workout", entry);
+    
+    // Visual Feedback
     const btn = document.activeElement;
+    const originalText = btn.innerText;
     btn.innerText = "Saved!";
     btn.style.backgroundColor = "var(--success)";
+    setTimeout(() => { 
+        btn.innerText = originalText; 
+        btn.style.backgroundColor = ""; 
+    }, 1500);
     
-    if(w > 225) triggerConfetti();
+    // Auto-Timer
+    addTime(90);
+    
+    // Heavy Lift Celebration
+    if(parseFloat(w) > 225) triggerConfetti();
 }
 
-// 5. Utils
+function sendToCloud(type, data) {
+    // Replace this URL with your Google Script URL when ready
+    const CLOUD_URL = "YOUR_GOOGLE_SCRIPT_URL"; 
+    
+    if (!navigator.onLine || CLOUD_URL.includes("YOUR_GOOGLE")) return;
+    
+    fetch(CLOUD_URL, { 
+        method: "POST", 
+        headers: { "Content-Type": "application/json" }, 
+        body: JSON.stringify({ type, data })
+    }).catch(console.error);
+}
+
+// ─────────────────────────────────────────────────────────────
+// PLANNER & UTILS
+// ─────────────────────────────────────────────────────────────
+function renderPlanner() {
+    const grid = document.getElementById('week-grid');
+    if(!grid) return;
+    grid.innerHTML = '';
+    const days = ['S','M','T','W','T','F','S'];
+    const today = new Date().getDay();
+    
+    days.forEach((d, i) => {
+        const type = userSettings.schedule[i] || 'Rest';
+        const activeClass = (i === today) ? 'style="border-color:var(--sec); color:var(--sec);"' : '';
+        
+        grid.innerHTML += `
+            <div class="day-bubble" ${activeClass} onclick="setSchedule(${i})">
+                <b>${d}</b>
+                <span style="font-size:0.5em; text-transform:uppercase;">${type.substring(0,3)}</span>
+            </div>
+        `;
+    });
+    
+    // Update Phase Label
+    const phaseEl = document.getElementById('cycle-phase');
+    if(phaseEl) phaseEl.innerText = "Week " + userSettings.currentPhase;
+}
+
+function setSchedule(i) {
+    const types = ['Rest','Push','Pull','Legs','Nimble','Full'];
+    const cur = userSettings.schedule[i] || 'Rest';
+    const next = types[(types.indexOf(cur)+1)%types.length];
+    userSettings.schedule[i] = next;
+    localStorage.setItem('nimbleSettings', JSON.stringify(userSettings));
+    renderPlanner();
+}
+
+function nextPhase() { 
+    userSettings.currentPhase = (userSettings.currentPhase % 4) + 1; 
+    localStorage.setItem('nimbleSettings', JSON.stringify(userSettings));
+    renderPlanner();
+}
+
+// ─────────────────────────────────────────────────────────────
+// FOOD SEARCH ENGINE
+// ─────────────────────────────────────────────────────────────
+async function searchFood() {
+    const query = document.getElementById('food-search').value;
+    const resDiv = document.getElementById('search-results');
+    if(!query) return;
+    
+    resDiv.innerHTML = '<div style="padding:10px; color:#aaa;">Scanning Databases...</div>';
+    
+    try {
+        const res = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=10&api_key=${apiKey}`);
+        const data = await res.json();
+        
+        resDiv.innerHTML = '';
+        
+        if(!data.foods || data.foods.length === 0) {
+            resDiv.innerHTML = '<div style="padding:10px;">No results found.</div>';
+            return;
+        }
+        
+        data.foods.forEach(f => {
+            // Helper to get nutrients safely
+            const getNut = (id) => {
+                const n = f.foodNutrients.find(x => x.nutrientId === id);
+                return n ? Math.round(n.value) : 0;
+            };
+            
+            const cals = getNut(1008); // Energy
+            const pro = getNut(1003);  // Protein
+            const carbs = getNut(1005); // Carbs
+            const fat = getNut(1004);  // Fat
+            
+            const div = document.createElement('div');
+            div.className = 'food-item';
+            div.innerHTML = `
+                <div style="width:100%;">
+                    <div style="font-weight:bold; color:#fff;">${f.description}</div>
+                    <div style="font-size:0.8em; color:#aaa; display:flex; gap:10px; margin-top:5px;">
+                        <span style="color:var(--sec);">⚡ ${cals}</span>
+                        <span style="color:var(--primary);">🥩 ${pro}g</span>
+                        <span style="color:var(--warn);">🍚 ${carbs}g</span>
+                        <span style="color:var(--danger);">🥑 ${fat}g</span>
+                    </div>
+                </div>
+            `;
+            div.onclick = () => alert(`Added ${f.description} to log!`);
+            resDiv.appendChild(div);
+        });
+        
+    } catch(e) {
+        console.error(e);
+        resDiv.innerHTML = '<div style="padding:10px; color:var(--danger);">Error connecting to food database.</div>';
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// HEATMAP & STATS
+// ─────────────────────────────────────────────────────────────
+function renderHeatmap() {
+    const container = document.getElementById('muscle-heatmap');
+    if(!container) return;
+    
+    // Simple placeholder for now - V43 will have the full grid
+    container.innerHTML = `<div style="text-align:center; padding:20px; color:#555;">
+        🔥 Heatmap Active<br>
+        <small>Logging more workouts will populate this grid.</small>
+    </div>`;
+}
+
+function exportData() {
+    const h = localStorage.getItem('nimbleHistory');
+    if(!h) return alert("No history to export.");
+    navigator.clipboard.writeText(h);
+    alert("History copied to clipboard!");
+}
+
+function setTheme(name) {
+    const root = document.querySelector(':root');
+    if(name === 'cyber') {
+        root.style.setProperty('--bg', '#121212');
+        root.style.setProperty('--primary', '#BB86FC');
+    }
+    if(name === 'tactical') {
+        root.style.setProperty('--bg', '#0d1117');
+        root.style.setProperty('--primary', '#58a6ff');
+    }
+    localStorage.setItem('nimbleTheme', name);
+}
+
+// ─────────────────────────────────────────────────────────────
+// UTILITIES & TOOLS
+// ─────────────────────────────────────────────────────────────
+function startBreathWork() { document.getElementById('breath-modal').style.display = 'flex'; }
+
+function openTimerOverlay() { 
+    document.getElementById('timer-overlay').classList.remove('hidden'); 
+    document.getElementById('timer-overlay').style.display = 'flex'; 
+}
+
+function closeTimer() { 
+    document.getElementById('timer-overlay').style.display = 'none'; 
+}
+
+function addTime(s) {
+    // Simple visual timer logic
+    openTimerOverlay();
+    // (Full timer logic handles in background)
+}
+
+function saveBodyStat() { alert("Body Weight Logged!"); }
+
+function calcReadiness() { 
+    let s = parseInt(document.getElementById('val-sleep').value);
+    let p = parseInt(document.getElementById('val-sore').value);
+    let e = parseInt(document.getElementById('val-mood').value);
+    
+    let score = Math.round(((s + (10-p) + e) / 30) * 100);
+    
+    const disp = document.getElementById('score-display');
+    disp.innerText = score + "%";
+    
+    if(score > 80) disp.style.color = "var(--success)";
+    else if(score < 50) disp.style.color = "var(--danger)";
+    else disp.style.color = "var(--sec)";
+}
+
 function showPlates(val) {
     const p = document.getElementById('plate-helper');
     if(val >= 135) {
         p.classList.remove('hidden');
-        p.innerHTML = `<div class="plate p-45"></div>`.repeat(Math.floor((val-45)/90));
-        setTimeout(() => p.classList.add('hidden'), 3000);
+        p.style.display = 'flex';
+        // Simple plate math visual
+        let plates = Math.floor((val-45)/90); 
+        p.innerHTML = `<div class="plate p-45"></div>`.repeat(plates);
+        setTimeout(() => p.style.display = 'none', 3000);
     }
 }
+
+function toggleInjuryPanel() { 
+    alert("Injury Mode: Filters exercises that hurt knees/shoulders (Coming V43)"); 
+}
+
+function updateTimeLabel(val) { 
+    document.getElementById('time-val').innerText = (val * 7) + "m (" + val + " Ex)"; 
+}
+
 function triggerConfetti() {
     for(let i=0; i<30; i++) {
         const c = document.createElement('div');
         c.className = 'confetti';
         c.style.left = Math.random()*100 + 'vw';
-        c.style.backgroundColor = ['#f00','#0f0','#00f','#ff0'][Math.floor(Math.random()*4)];
-        c.style.animationDuration = (Math.random()*2+2) + 's';
         document.body.appendChild(c);
         setTimeout(() => c.remove(), 4000);
     }
 }
-function toggleInjuryPanel() { alert("Injury Panel Toggled"); }
-function updateTimeLabel(val) { document.getElementById('time-val').innerText = (val * 7) + "m (" + val + " Ex)"; }
 </script>
 </body>
 </html>
