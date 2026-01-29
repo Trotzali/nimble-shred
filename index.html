@@ -2727,128 +2727,38 @@ function testVoice() {
 // ========================================
 let currentGifExercise = null;
 
-// SETUP INSTRUCTIONS:
-// 1. Get Google API Key: https://console.cloud.google.com/ (Enable "Custom Search API")
-// 2. Create Search Engine: https://programmablesearchengine.google.com/ (Enable "Image search")
-// 3. Replace the values below with your credentials
-const GOOGLE_API_KEY = 'AIzaSyDTMHmq0CTQ99pISqb8s4q_6KFh-LNr2Vk'; 
-const GOOGLE_SEARCH_ENGINE_ID = '662ed314c61674eea';
+// ========================================
+// DIRECT GOOGLE IMAGE SEARCH (No API Required)
+// ========================================
+let currentGifExercise = null;
 
 function openGifSearch(exerciseName) {
     currentGifExercise = exerciseName;
-    document.getElementById('gif-search-query').textContent = `"${exerciseName} muscles worked anatomy"`;
-    document.getElementById('gif-search-modal').classList.add('active');
-    searchExerciseImages(exerciseName);
+    
+    // This query is tuned to find animated males showing correct form and muscles
+    const searchQuery = `male animated ${exerciseName} muscle anatomy form gif`;
+    
+    // This URL forces Google to go to Images (isch) and filters for Animations (itp:animated)
+    const googleImageUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}&tbm=isch&tbs=itp:animated`;
+    
+    // Open in a new tab so your app stays open
+    window.open(googleImageUrl, '_blank');
+    
+    speak(`Opening Google Images for ${exerciseName}`);
+    
+    // Optional: We can close the modal since we've moved to a new tab
+    closeGifSearch();
 }
 
 function closeGifSearch() {
-    document.getElementById('gif-search-modal').classList.remove('active');
+    const modal = document.getElementById('gif-search-modal');
+    if (modal) modal.classList.remove('active');
     currentGifExercise = null;
 }
 
-async function searchExerciseImages(exerciseName) {
-    const loading = document.getElementById('gif-loading');
-    const results = document.getElementById('gif-results');
-    const error = document.getElementById('gif-error');
-    
-    loading.style.display = 'block';
-    results.innerHTML = '';
-    error.style.display = 'none';
-    
-    // Check cache
-    const cacheKey = `image_cache_${exerciseName}`;
-    const cached = localStorage.getItem(cacheKey);
-    if(cached) {
-        loading.style.display = 'none';
-        displayImageResults(JSON.parse(cached));
-        return;
-    }
-    
-    // NEW REFINED QUERY: Explicitly looking for animated male anatomy
-    const searchQuery = `male animated ${exerciseName} muscle anatomy form`;
-    
-    // NEW REFINED PARAMS: Added &fileType=gif and &imgType=animated
-    const url = `https://www.googleapis.com/customsearch/v1?` +
-        `key=${GOOGLE_API_KEY}&` +
-        `cx=${GOOGLE_SEARCH_ENGINE_ID}&` +
-        `q=${encodeURIComponent(searchQuery)}&` +
-        `searchType=image&` +
-        `fileType=gif&` + // Forces GIF format
-        `num=10&` +
-        `safe=active`;
-    
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        loading.style.display = 'none';
-        
-        if(data.items && data.items.length > 0) {
-            localStorage.setItem(cacheKey, JSON.stringify(data.items));
-            displayImageResults(data.items);
-        } else {
-            results.innerHTML = '<p class="text-muted text-center">No GIFs found. Check if Image Search is enabled in your CSE panel.</p>';
-        }
-    } catch(err) {
-        loading.style.display = 'none';
-        error.style.display = 'block';
-        console.error('Google Search API error:', err);
-    }
-}
-    
-    // Optimized search query for anatomy diagrams and muscle activation
-    const searchQuery = `${exerciseName} muscles worked anatomy diagram male`;
-    
-    // Google Custom Search API for images
-    const url = `https://www.googleapis.com/customsearch/v1?` +
-        `key=${GOOGLE_API_KEY}&` +
-        `cx=${GOOGLE_SEARCH_ENGINE_ID}&` +
-        `q=${encodeURIComponent(searchQuery)}&` +
-        `searchType=image&` +
-        `num=10&` +
-        `imgSize=large&` +
-        `safe=active&` +
-        `imgType=photo`; // Use 'photo' for real images or 'lineart' for diagrams
-    
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        loading.style.display = 'none';
-        
-        if(data.items && data.items.length > 0) {
-            // Cache results to avoid repeated API calls
-            localStorage.setItem(cacheKey, JSON.stringify(data.items));
-            displayImageResults(data.items);
-        } else {
-            results.innerHTML = '<p class="text-muted text-center">No images found. Try uploading your own!</p>';
-        }
-    } catch(err) {
-        loading.style.display = 'none';
-        error.style.display = 'block';
-        error.querySelector('p').textContent = '⚠️ Error: Check API key or try again later. You may have reached the daily limit (100 searches/day).';
-        console.error('Google Search API error:', err);
-    }
-}
-
-function displayImageResults(items) {
-    const results = document.getElementById('gif-results');
-    results.innerHTML = items.map(item => `
-        <div class="gif-item" onclick="selectGif('${item.link.replace(/'/g, "\\'")}')">
-            <img src="${item.link}" alt="${item.title}" loading="lazy">
-        </div>
-    `).join('');
-}
-
-function selectGif(gifUrl) {
-    if(currentGifExercise) {
-        localStorage.setItem(`gif_${currentGifExercise}`, gifUrl);
-        speak(`Image saved for ${currentGifExercise}`);
-        closeGifSearch();
-        viewExerciseDetails(currentGifExercise); // Refresh the exercise details
-    }
-}
-
+// Since we aren't using the API to "Select" a GIF anymore, 
+// you can use the built-in "Upload Image" button in your app 
+// to save the one you find, or we can add a "Paste Link" box later.
 function removeExerciseGif(exerciseName) {
     if(confirm(`Remove image for ${exerciseName}?`)) {
         localStorage.removeItem(`gif_${exerciseName}`);
