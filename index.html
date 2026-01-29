@@ -1,330 +1,703 @@
-]; // End Array
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#1e1e1e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Nimble Shred V45 Enhanced - Complete Edition</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { 
+            --bg: #121212; --card: #1e1e1e; --primary: #BB86FC; --sec: #03DAC6; 
+            --text: #fff; --gold: #FFD700; --danger: #CF6679; --warn: #FF9800; 
+            --success: #00C853; --push-color: #FF6B6B; --pull-color: #4ECDC4; 
+            --legs-color: #95E1D3; --cardio-color: #3498db; --nimble-color: #9b59b6; 
+            --rest-color: #555;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background: var(--bg); color: var(--text); padding: 20px; 
+            padding-bottom: 100px; -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* CONTAINERS */
+        .container { max-width: 800px; margin: 0 auto; display: none; }
+        .container.active { display: block; }
+        .card { 
+            background: var(--card); padding: 15px; border-radius: 12px; 
+            margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
+        }
+        
+        /* BUTTONS */
+        .btn { 
+            display: block; width: 100%; padding: 14px; border: none; 
+            border-radius: 8px; font-weight: bold; cursor: pointer; 
+            margin-top: 10px; font-size: 16px; transition: 0.2s; 
+        }
+        .btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .btn-main { background: var(--sec); color: #000; }
+        .btn-action { background: var(--primary); color: #000; }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-success { background: var(--success); color: #fff; }
+        .btn-small { 
+            padding: 8px 12px; font-size: 0.85em; width: auto; 
+            display: inline-block; margin: 5px; 
+        }
+        
+        /* INPUTS */
+        input, select, textarea { 
+            width: 100%; padding: 10px; background: #2c2c2c; 
+            border: 1px solid #444; border-radius: 6px; color: #fff; 
+            font-size: 16px; margin: 5px 0;
+        }
+        input:focus, select:focus, textarea:focus { 
+            border-color: var(--sec); outline: none; 
+        }
+        
+        /* LAYOUT */
+        .row { display: flex; gap: 10px; align-items: center; }
+        .row-wrap { display: flex; gap: 10px; flex-wrap: wrap; }
+        
+        /* NAVIGATION */
+        .nav-bar { 
+            position: fixed; bottom: 0; left: 0; right: 0; 
+            background: #1a1a1a; display: flex; justify-content: space-around; 
+            padding: 12px 8px; border-top: 1px solid #333; z-index: 9000; 
+            padding-bottom: max(12px, env(safe-area-inset-bottom));
+        }
+        .nav-btn { 
+            background: none; color: #777; border: none; font-size: 0.7em; 
+            display: flex; flex-direction: column; align-items: center; 
+            gap: 3px; cursor: pointer; padding: 5px; transition: 0.2s; flex: 1;
+        }
+        .nav-btn.active { color: var(--sec); }
+        .nav-icon { font-size: 1.4em; }
+        
+        /* CHIPS */
+        .chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+        .chip { 
+            padding: 8px 16px; background: #333; border: 2px solid #555; 
+            border-radius: 20px; font-size: 0.85em; cursor: pointer; 
+            color: #aaa; transition: all 0.2s; user-select: none;
+        }
+        .chip:hover { background: #444; border-color: var(--sec); }
+        .chip.active { 
+            background: var(--primary); color: #000; 
+            border-color: var(--primary); font-weight: bold; 
+        }
+        
+        /* PROGRESSIVE SETS */
+        .exercise-card { 
+            border-left: 4px solid var(--primary); 
+            margin-bottom: 15px; position: relative; 
+        }
+        .set-completed { 
+            background: linear-gradient(90deg, #1a4d2e 0%, #2d5f3d 100%); 
+            padding: 10px; border-radius: 6px; margin: 5px 0; 
+            border-left: 3px solid var(--success); 
+            display: flex; justify-content: space-between;
+        }
+        .set-active { 
+            background: #2c2c2c; padding: 12px; border-radius: 6px; 
+            border: 2px solid var(--sec); margin: 8px 0; 
+            box-shadow: 0 0 10px rgba(3,218,198,0.2);
+        }
+        .progression-badge { 
+            background: var(--gold); color: #000; padding: 4px 8px; 
+            border-radius: 12px; font-size: 0.75em; font-weight: bold; 
+        }
+        
+        /* CALENDAR */
+        .calendar-grid { 
+            display: grid; grid-template-columns: repeat(7, 1fr); 
+            gap: 8px; margin: 15px 0; 
+        }
+        .day-bubble { 
+            background: #333; aspect-ratio: 1; border-radius: 12px; 
+            display: flex; flex-direction: column; align-items: center; 
+            justify-content: center; cursor: pointer; border: 2px solid #444; 
+            padding: 8px; position: relative; transition: all 0.3s;
+        }
+        .day-bubble:hover { transform: translateY(-2px); }
+        .day-bubble .day-icon { font-size: 1.8em; margin-bottom: 4px; }
+        .day-bubble .day-letter { font-weight: bold; font-size: 0.75em; }
+        .day-bubble .day-type { font-size: 0.65em; color: #aaa; }
+        .day-bubble .day-check { 
+            position: absolute; top: 4px; right: 4px; font-size: 1em; 
+        }
+        
+        /* Workout type colors */
+        .day-bubble.workout-type-push { 
+            border-color: var(--push-color); 
+            background: rgba(255,107,107,0.1); 
+        }
+        .day-bubble.workout-type-pull { 
+            border-color: var(--pull-color); 
+            background: rgba(78,205,196,0.1); 
+        }
+        .day-bubble.workout-type-legs { 
+            border-color: var(--legs-color); 
+            background: rgba(149,225,211,0.1); 
+        }
+        .day-bubble.workout-type-cardio { 
+            border-color: var(--cardio-color); 
+            background: rgba(52,152,219,0.1); 
+        }
+        .day-bubble.workout-type-nimble { 
+            border-color: var(--nimble-color); 
+            background: rgba(155,89,182,0.1); 
+        }
+        .day-bubble.workout-type-rest { 
+            border-color: var(--rest-color); 
+            background: rgba(85,85,85,0.1); 
+        }
+        
+        /* EXERCISE BUILDER */
+        .exercise-list-item { 
+            padding: 12px; margin: 5px 0; background: #2c2c2c; 
+            border-radius: 6px; cursor: pointer; 
+            border-left: 3px solid #555; transition: all 0.2s;
+        }
+        .exercise-list-item:hover { 
+            background: #333; border-left-color: var(--primary); 
+            transform: translateX(5px);
+        }
+        .exercise-list-item.selected { 
+            background: rgba(187,134,252,0.2); 
+            border-left-color: var(--primary); 
+        }
+        
+        /* ENCYCLOPEDIA */
+        .encyclopedia-section { 
+            margin: 15px 0; padding: 15px; 
+            background: #1a1a1a; border-radius: 8px; 
+        }
+        .encyclopedia-section h4 { 
+            color: var(--sec); margin-bottom: 8px; 
+            font-size: 0.9em; text-transform: uppercase; 
+        }
+        .encyclopedia-section ul { list-style: none; padding: 0; }
+        .encyclopedia-section li { 
+            padding: 5px 0 5px 20px; position: relative; 
+        }
+        .encyclopedia-section li:before { 
+            content: '▸'; position: absolute; left: 0; color: var(--sec); 
+        }
+        .muscle-badge { 
+            display: inline-block; background: var(--primary); 
+            color: #000; padding: 3px 8px; border-radius: 12px; 
+            font-size: 0.75em; margin: 3px; font-weight: bold;
+        }
+        .gif-container { 
+            background: #000; border-radius: 8px; padding: 15px; 
+            margin: 15px 0; text-align: center; min-height: 200px;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid #333;
+        }
+        .gif-container img { 
+            max-width: 100%; max-height: 300px; 
+            border-radius: 6px; 
+        }
+        
+        /* MODALS */
+        .modal-overlay { 
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+            background: rgba(0,0,0,0.95); z-index: 10000; 
+            display: none; align-items: center; justify-content: center; 
+            padding: 20px; overflow-y: auto;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content { 
+            background: var(--card); border-radius: 12px; 
+            padding: 20px; max-width: 600px; width: 100%; 
+            max-height: 90vh; overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        .modal-header { 
+            display: flex; justify-content: space-between; 
+            align-items: center; margin-bottom: 20px; 
+            padding-bottom: 15px; border-bottom: 2px solid #333;
+        }
+        .modal-close { 
+            background: var(--danger); color: white; border: none; 
+            padding: 8px 16px; border-radius: 6px; cursor: pointer; 
+        }
+        
+        /* SLIDER */
+        input[type="range"] { 
+            width: 100%; height: 8px; border-radius: 5px; 
+            background: #333; outline: none; -webkit-appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb { 
+            -webkit-appearance: none; width: 20px; height: 20px; 
+            border-radius: 50%; background: var(--sec); cursor: pointer; 
+        }
+        
+        /* GIF SEARCH */
+        .gif-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
+            gap: 10px; 
+            margin-top: 15px; 
+        }
+        .gif-item { 
+            cursor: pointer; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            border: 2px solid transparent; 
+            transition: all 0.2s; 
+            aspect-ratio: 1;
+        }
+        .gif-item:hover { 
+            border-color: var(--sec); 
+            transform: scale(1.05); 
+        }
+        .gif-item img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+        }
+        .gif-actions { 
+            display: flex; 
+            gap: 10px; 
+            margin-top: 10px; 
+        }
+        
+        /* GPS MAP */
+        .gps-map { 
+            width: 100%; 
+            height: 300px; 
+            background: #2c2c2c; 
+            border-radius: 8px; 
+            margin: 10px 0; 
+            position: relative; 
+            overflow: hidden; 
+        }
+        .gps-stats { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 10px; 
+            margin: 10px 0; 
+        }
+        .gps-stat { 
+            background: #2c2c2c; 
+            padding: 12px; 
+            border-radius: 8px; 
+            text-align: center; 
+        }
+        .gps-stat-value { 
+            font-size: 1.5em; 
+            font-weight: bold; 
+            color: var(--sec); 
+        }
+        .gps-stat-label { 
+            font-size: 0.8em; 
+            color: #aaa; 
+            margin-top: 5px; 
+        }
+        
+        /* WARMUP SEQUENCE */
+        .warmup-exercise { 
+            background: #2c2c2c; 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin: 10px 0; 
+            border-left: 3px solid var(--warn); 
+        }
+        .warmup-timer { 
+            font-size: 2em; 
+            font-weight: bold; 
+            color: var(--sec); 
+            text-align: center; 
+            margin: 10px 0; 
+        }
+        
+        /* AI COACH */
+        .ai-coach-card { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            padding: 15px; 
+            border-radius: 12px; 
+            margin: 15px 0; 
+        }
+        .ai-coach-card.warning { 
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); 
+        }
+        .ai-coach-card.success { 
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); 
+        }
+        
+        /* UTILITIES */
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .text-muted { color: #aaa; font-size: 0.85em; }
+        .mb-10 { margin-bottom: 10px; }
+        .mt-10 { margin-top: 10px; }
+    </style>
+</head>
+<body>
 
-// ─────────────────────────────────────────────────────────────
-// NIMBLE ENGINE V48 (FINAL LOGIC)
-// ─────────────────────────────────────────────────────────────
+<!-- TODAY'S BANNER -->
+<div id="todays-banner" class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: none;">
+    <h3 style="margin-bottom: 10px;">📅 <span id="today-date"></span></h3>
+    <div style="font-size: 1.1em; margin-bottom: 15px;">
+        Planned: <span id="today-workout"></span>
+    </div>
+    <button class="btn btn-main" onclick="startTodaysWorkout()">▶️ Start Workout</button>
+</div>
 
-// SAFETY CHECK
-if (typeof window.allExercises === 'undefined') window.allExercises = [];
+<!-- COACH PAGE -->
+<div class="container active" id="view-coach">
+    <h2>💪 Workout Coach</h2>
+    
+    <div class="card">
+        <h3>Quick Start</h3>
+        <div class="chip-container">
+            <div class="chip" onclick="quickStartWorkout('push')">💪 Push</div>
+            <div class="chip" onclick="quickStartWorkout('pull')">🏋️ Pull</div>
+            <div class="chip" onclick="quickStartWorkout('legs')">🦵 Legs</div>
+            <div class="chip" onclick="quickStartWorkout('full')">🔥 Full</div>
+            <div class="chip" onclick="quickStartWorkout('nimble')">🧘 Nimble</div>
+        </div>
+        <button class="btn btn-main" onclick="openCustomBuilder()">🛠️ Custom Workout Builder</button>
+        <button class="btn btn-action" onclick="generateRandomWorkout()">🎲 Random Workout</button>
+    </div>
+    
+    <div id="workout-interface" style="display:none;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+            <h3>Active Session</h3>
+            <button class="btn btn-danger btn-small" onclick="endWorkout()">End</button>
+        </div>
+        <div id="workout-list"></div>
+    </div>
+</div>
 
-// STATE
-let userSettings = JSON.parse(localStorage.getItem('nimbleSettings')) || { 
-    hotelMode: false, currentPhase: 1, 
-    schedule: { 0:'Rest', 1:'Push', 2:'Pull', 3:'Legs', 4:'Nimble', 5:'Rest', 6:'Full' },
-    injuryMode: [] 
-};
-let activeRoutine = [];
-let builderFilters = { muscle: [], equip: [] };
-let dailyMacros = JSON.parse(localStorage.getItem('nimbleMacros')) || {c:0, p:0, ch:0, f:0, date: new Date().toDateString()};
-let apiKey = "p61IM61sZf897clBskMhwLftfBccew4ZcgsatflX"; 
+<!-- PLAN PAGE -->
+<div class="container" id="view-plan">
+    <h2>📅 Training Plan</h2>
+    
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; margin-bottom: 15px;">
+            <div>
+                <h3 id="phase-display">Week 1 - Foundation</h3>
+                <div class="text-muted">
+                    Adherence: <span id="adherence-display">0/6</span>
+                </div>
+            </div>
+            <button class="btn-small btn-action" onclick="openPlanGenerator()">🔄 New Plan</button>
+        </div>
+        <div class="calendar-grid" id="week-grid"></div>
+    </div>
+    
+    <div id="ai-coach-suggestions"></div>
+</div>
 
-document.addEventListener('DOMContentLoaded', () => {
-    switchTab('readiness'); 
-    calculateStreak();
-    updateMacroUI();
-    if(document.getElementById('week-grid')) renderPlanner();
-    if(document.getElementById('muscle-heatmap')) renderHeatmap();
-    updateInjuryUI();
-});
+<!-- CARDIO PAGE -->
+<div class="container" id="view-cardio">
+    <h2>🚴 Cardio Tracking</h2>
+    
+    <div class="card">
+        <h3>📍 Live GPS Tracking</h3>
+        <p class="text-muted" style="margin-bottom:10px;">Track your run or bike ride with live GPS</p>
+        <select id="gps-activity-type" style="margin-bottom:10px;">
+            <option value="run">🏃 Running</option>
+            <option value="bike">🚴 Cycling</option>
+            <option value="walk">🚶 Walking</option>
+        </select>
+        <button class="btn btn-success" onclick="startGpsTracking()">📍 Start GPS Tracking</button>
+    </div>
+    
+    <div class="card">
+        <h3>Quick Log Cardio</h3>
+        <label>Type:</label>
+        <select id="cardio-type">
+            <option value="run">🏃 Run</option>
+            <option value="bike">🚴 Bike</option>
+            <option value="swim">🏊 Swim</option>
+            <option value="walk">🚶 Walk</option>
+            <option value="row">🚣 Row</option>
+        </select>
+        <label>Duration (minutes):</label>
+        <input type="number" id="cardio-duration" value="30" min="5">
+        <label>Distance (km) - optional:</label>
+        <input type="number" id="cardio-distance" placeholder="e.g. 5.5" step="0.1">
+        <button class="btn btn-main" onclick="logCardioSession()">💾 Log Cardio</button>
+    </div>
+    
+    <div class="card">
+        <h3>Recent Cardio</h3>
+        <div id="cardio-history"></div>
+    </div>
+</div>
 
-// NAVIGATION
-function switchTab(id) {
-    document.querySelectorAll('.container').forEach(d => { d.classList.remove('active'); d.style.display = 'none'; });
-    let target = document.getElementById('view-' + id);
-    if(target) { target.classList.add('active'); target.style.display = 'block'; }
-    document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
-    const btn = Array.from(document.querySelectorAll('.nav-btn')).find(b => {
-        const attr = b.getAttribute('onclick');
-        return attr && (attr.includes(`'${id}'`) || attr.includes(`"${id}"`));
-    });
-    if(btn) btn.classList.add('active');
-    if(id === 'plan') renderPlanner();
-    if(id === 'progress') renderHeatmap();
-}
+<!-- SETTINGS PAGE -->
+<div class="container" id="view-settings">
+    <h2>⚙️ Settings</h2>
+    
+    <div class="card">
+        <h3>🏋️ Equipment Available</h3>
+        <div id="equipment-presets"></div>
+    </div>
+    
+    <div class="card">
+        <h3>🔊 Voice Coach</h3>
+        <label>
+            <input type="checkbox" id="voice-enabled" checked onchange="saveVoiceSettings()"> 
+            Enable Voice
+        </label>
+        <label style="margin-top: 10px; display: block;">Level:</label>
+        <select id="voice-level" onchange="saveVoiceSettings()">
+            <option value="silent">Silent</option>
+            <option value="countdown">Countdown Only</option>
+            <option value="standard" selected>Standard</option>
+            <option value="motivational">Motivational</option>
+        </select>
+        <button class="btn btn-action" onclick="testVoice()">🎵 Test Voice</button>
+    </div>
+    
+    <div class="card">
+        <h3>🔍 Giphy API Setup</h3>
+        <p class="text-muted" style="margin-bottom:10px;">
+            To enable GIF search for exercises, get a free API key from 
+            <a href="https://developers.giphy.com" target="_blank" style="color:var(--sec);">developers.giphy.com</a>
+        </p>
+        <p class="text-muted" style="margin-bottom:10px; font-size:0.75em;">
+            Once you have your API key, replace 'YOUR_GIPHY_API_KEY' in the JavaScript code (line ~2903) with your actual key.
+        </p>
+    </div>
+</div>
 
-// WORKOUT GENERATOR (WITH MUSCLE MAP)
-function generateRandomWorkout() { generateWorkoutByFilter(() => true, "Random"); }
+<!-- ENCYCLOPEDIA PAGE -->
+<div class="container" id="view-encyclopedia">
+    <h2>📚 Exercise Encyclopedia</h2>
+    
+    <div class="card">
+        <input type="text" id="encyclopedia-search" placeholder="Search exercises..." 
+               onkeyup="searchEncyclopedia()" style="margin-bottom: 10px;">
+        
+        <label>Filter by:</label>
+        <div class="chip-container">
+            <div class="chip active" onclick="filterEncyclopedia('all')">All</div>
+            <div class="chip" onclick="filterEncyclopedia('Chest')">Chest</div>
+            <div class="chip" onclick="filterEncyclopedia('Back')">Back</div>
+            <div class="chip" onclick="filterEncyclopedia('Legs')">Legs</div>
+            <div class="chip" onclick="filterEncyclopedia('Shoulders')">Shoulders</div>
+            <div class="chip" onclick="filterEncyclopedia('Cable')">Cables</div>
+            <div class="chip" onclick="filterEncyclopedia('Bodyweight')">Bodyweight</div>
+        </div>
+    </div>
+    
+    <div id="encyclopedia-list"></div>
+</div>
 
-function loadTemplate(type) {
-    const muscleMap = {
-        'push': ['Chest', 'Shoulders', 'Triceps', 'Push', 'Delts', 'Pectorals'],
-        'pull': ['Back', 'Biceps', 'Traps', 'Pull', 'Lats', 'Rear Delts'],
-        'legs': ['Legs', 'Quads', 'Hamstrings', 'Glutes', 'Calves', 'Lower Body'],
-        'full': ['Full', 'Chest', 'Back', 'Legs', 'Shoulders'],
-        'nimble': ['Nimble', 'Mobility', 'Core', 'Abs', 'Stretching'],
-        'f9': ['Cable']
+<!-- NAVIGATION -->
+<div class="nav-bar">
+    <button class="nav-btn active" onclick="switchTab('coach')">
+        <div class="nav-icon">💪</div>Coach
+    </button>
+    <button class="nav-btn" onclick="switchTab('plan')">
+        <div class="nav-icon">📅</div>Plan
+    </button>
+    <button class="nav-btn" onclick="switchTab('cardio')">
+        <div class="nav-icon">🚴</div>Cardio
+    </button>
+    <button class="nav-btn" onclick="switchTab('encyclopedia')">
+        <div class="nav-icon">📚</div>Library
+    </button>
+    <button class="nav-btn" onclick="switchTab('settings')">
+        <div class="nav-icon">⚙️</div>Settings
+    </button>
+</div>
+
+<!-- CUSTOM BUILDER MODAL -->
+<div class="modal-overlay" id="custom-builder-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>🛠️ Custom Workout Builder</h2>
+            <button class="modal-close" onclick="closeCustomBuilder()">✕</button>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label>Number of Exercises: <span id="exercise-count-display">6</span></label>
+            <input type="range" id="exercise-count-slider" min="3" max="10" value="6" 
+                   oninput="updateExerciseCount(this.value)">
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <input type="text" id="builder-search" placeholder="Search exercises..." 
+                   onkeyup="searchBuilderExercises()">
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label>Filter by:</label>
+            <div class="chip-container">
+                <div class="chip active" onclick="filterBuilder('all')">All</div>
+                <div class="chip" onclick="filterBuilder('Chest')">Chest</div>
+                <div class="chip" onclick="filterBuilder('Back')">Back</div>
+                <div class="chip" onclick="filterBuilder('Legs')">Legs</div>
+                <div class="chip" onclick="filterBuilder('Shoulders')">Shoulders</div>
+            </div>
+        </div>
+        
+        <div id="builder-exercise-list" style="max-height: 300px; overflow-y: auto;"></div>
+        
+        <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #333;">
+            <p class="text-muted">Selected: <span id="selected-count">0</span> exercises</p>
+            <button class="btn btn-main" onclick="startCustomWorkout()">
+                ▶️ Start Custom Workout
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- EXERCISE DETAIL MODAL -->
+<div class="modal-overlay" id="exercise-detail-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="exercise-detail-name">Exercise Name</h2>
+            <button class="modal-close" onclick="closeExerciseDetail()">✕</button>
+        </div>
+        <div id="exercise-detail-content"></div>
+    </div>
+</div>
+
+<!-- GIF SEARCH MODAL -->
+<div class="modal-overlay" id="gif-search-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>🔍 Search Exercise GIFs</h2>
+            <button class="modal-close" onclick="closeGifSearch()">✕</button>
+        </div>
+        <div id="gif-search-content">
+            <p class="text-muted" style="margin-bottom:15px;">
+                Searching Giphy for: <strong id="gif-search-query"></strong>
+            </p>
+            <div id="gif-results" class="gif-grid"></div>
+            <div id="gif-loading" style="text-align:center; padding:20px; display:none;">
+                <p>🔄 Loading GIFs...</p>
+            </div>
+            <div id="gif-error" style="display:none; color:var(--danger); text-align:center; padding:20px;">
+                <p>⚠️ Error loading GIFs. Please check your API key or try again.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- GPS TRACKING MODAL -->
+<div class="modal-overlay" id="gps-tracking-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>📍 GPS Tracking</h2>
+            <button class="modal-close" onclick="stopGpsTracking()">✕ Stop</button>
+        </div>
+        <div id="gps-tracking-content">
+            <div class="gps-stats">
+                <div class="gps-stat">
+                    <div class="gps-stat-value" id="gps-distance">0.00</div>
+                    <div class="gps-stat-label">km</div>
+                </div>
+                <div class="gps-stat">
+                    <div class="gps-stat-value" id="gps-pace">0:00</div>
+                    <div class="gps-stat-label">min/km</div>
+                </div>
+                <div class="gps-stat">
+                    <div class="gps-stat-value" id="gps-duration">00:00</div>
+                    <div class="gps-stat-label">duration</div>
+                </div>
+            </div>
+            <div class="gps-map" id="gps-map-container">
+                <canvas id="gps-map-canvas" width="600" height="300"></canvas>
+            </div>
+            <div style="text-align:center; margin-top:15px;">
+                <button class="btn btn-success" onclick="saveGpsRoute()">💾 Save Route</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- WARMUP MODAL -->
+<div class="modal-overlay" id="warmup-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>🔥 Warm-up Sequence</h2>
+            <button class="modal-close" onclick="skipWarmup()">Skip</button>
+        </div>
+        <div id="warmup-content">
+            <div class="warmup-timer" id="warmup-timer">60</div>
+            <div class="warmup-exercise" id="warmup-current-exercise">
+                <h3 id="warmup-exercise-name">Exercise Name</h3>
+                <p class="text-muted" id="warmup-exercise-desc">Instructions</p>
+            </div>
+            <div style="text-align:center; margin-top:20px;">
+                <button class="btn btn-action" id="warmup-next-btn" onclick="nextWarmupExercise()">Next Exercise</button>
+            </div>
+            <div class="text-muted" style="text-align:center; margin-top:10px;">
+                Exercise <span id="warmup-progress">1/6</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PLAN GENERATOR MODAL -->
+<div class="modal-overlay" id="plan-generator-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Generate Training Plan</h2>
+            <button class="modal-close" onclick="closePlanGenerator()">✕</button>
+        </div>
+        
+        <div id="generator-step-1">
+            <h3>Training Frequency</h3>
+            <p class="text-muted">How many days per week?</p>
+            <div class="chip-container">
+                <div class="chip" onclick="selectFrequency(3)">3 Days</div>
+                <div class="chip" onclick="selectFrequency(4)">4 Days</div>
+                <div class="chip" onclick="selectFrequency(5)">5 Days</div>
+                <div class="chip" onclick="selectFrequency(6)">6 Days</div>
+            </div>
+        </div>
+        
+        <div id="generator-step-2" style="display:none;">
+            <h3>Training Focus</h3>
+            <p class="text-muted">Balanced approach for sustainable fitness</p>
+            <div class="chip-container">
+                <div class="chip" onclick="selectGoal('balanced')">⚖️ Balanced Performance</div>
+                <div class="chip" onclick="selectGoal('vitality')">🧘 Health & Vitality</div>
+                <div class="chip" onclick="selectGoal('functional')">🎯 Functional Fitness</div>
+            </div>
+        </div>
+        
+        <div id="generator-step-3" style="display:none;">
+            <h3>✅ Plan Generated!</h3>
+            <div id="plan-preview"></div>
+            <button class="btn btn-main" onclick="acceptPlan()">Accept & Start</button>
+            <button class="btn btn-action" onclick="regeneratePlan()">🔄 Regenerate</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ========================================
+// EXERCISE DATABASE
+// ========================================
+function createEx(name, cat, equip, type, prep, exec, tips, benefits, muscles, setupF9) {
+    return {
+        name: name,
+        cat: cat,
+        equip: equip,
+        type: type,
+        guide: {
+            prep: prep,
+            exec: exec,
+            tips: tips,
+            benefits: benefits,
+            muscles: muscles
+        },
+        setup: setupF9 || { arms: "N/A", pulleys: "N/A" }
     };
-    const targets = muscleMap[type.toLowerCase()] || [];
-    
-    generateWorkoutByFilter(e => {
-        if (type === 'full') return true; 
-        if (type === 'f9') return e.equip === 'Cable';
-        const exCats = Array.isArray(e.cat) ? e.cat : [e.cat];
-        return exCats.some(c => targets.some(t => c.includes(t))) || targets.includes(e.type);
-    }, type.toUpperCase()); 
 }
 
-function generateWorkoutByFilter(filterFn, buttonName) {
-    if(window.allExercises.length === 0) return alert("Database is empty. Check list for errors.");
-    let pool = window.allExercises.filter(filterFn);
-    
-    if(userSettings.hotelMode) pool = pool.filter(e => !e.name.includes('Barbell') && !e.name.includes('Cable') && !e.name.includes('Machine'));
-    
-    if(userSettings.injuryMode.length > 0) {
-        if(userSettings.injuryMode.includes('Shoulders')) pool = pool.filter(e => !e.cat.includes('Shoulders') && !e.name.includes('Overhead'));
-        if(userSettings.injuryMode.includes('Knees')) pool = pool.filter(e => !e.cat.includes('Legs') && !e.name.includes('Squat'));
-        if(userSettings.injuryMode.includes('Back')) pool = pool.filter(e => !e.name.includes('Deadlift') && !e.name.includes('Row'));
-    }
-
-    if(pool.length === 0) return alert(`No exercises found for '${buttonName}'.`);
-    
-    activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
-    renderWorkout(activeRoutine);
-    document.getElementById('setup-panel').style.display = 'none';
-    document.getElementById('workout-interface').style.display = 'block';
-}
-
-function renderWorkout(exercises) {
-    const list = document.getElementById('workout-list');
-    list.innerHTML = '';
-    const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-    exercises.forEach((ex, i) => {
-        const logs = history.filter(h => h.name === ex.name).sort((a,b) => new Date(a.date) - new Date(b.date)).slice(-5);
-        let sparkHTML = '';
-        if(logs.length > 1) {
-             const points = logs.map((l, idx) => `${idx * 20},${30 - (l.weight/300)*30}`).join(' ');
-             sparkHTML = `<div class="sparkline-container"><svg width="100%" height="100%"><polyline points="${points}" fill="none" stroke="var(--gold)" stroke-width="2"/></svg></div>`;
-        }
-        const div = document.createElement('div');
-        div.className = `card exercise-card ${ex.type || 'Strength'}`;
-        const tags = Array.isArray(ex.cat) ? ex.cat.join(', ') : ex.cat;
-        div.innerHTML = `
-            <div class="exercise-header">
-                <div onclick="openGuide('${ex.name}')" style="cursor:pointer; text-decoration:underline;"><strong>${ex.name} ℹ️</strong></div>
-                <span class="swap-btn" onclick="swapExercise(${i})">🔄 Swap</span>
-            </div>
-            ${sparkHTML}
-            <div style="font-size:0.8em; color:#777; margin-bottom:5px;">${ex.equip} | ${tags}</div>
-            <div class="row">
-                <input type="number" id="w-${i}" placeholder="Lbs" style="width:45%" oninput="showPlates(this.value)">
-                <input type="number" id="r-${i}" placeholder="Reps" style="width:45%">
-            </div>
-            <button class="btn btn-action" onclick="logSet('${ex.name}', ${i})">✅ Log Set</button>
-        `;
-        list.appendChild(div);
-    });
-}
-
-function swapExercise(idx) {
-    const current = activeRoutine[idx];
-    const alts = window.allExercises.filter(e => {
-        const currentTags = Array.isArray(current.cat) ? current.cat : [current.cat];
-        const altTags = Array.isArray(e.cat) ? e.cat : [e.cat];
-        return altTags.some(t => currentTags.includes(t)) && e.name !== current.name;
-    });
-    if(alts.length > 0) {
-        activeRoutine[idx] = alts[Math.floor(Math.random()*alts.length)];
-        renderWorkout(activeRoutine);
-    } else { alert("No similar exercises found."); }
-}
-
-// EXTRAS
-function openBuilder() { document.getElementById('builder-overlay').style.display = 'block'; renderBuilderList(); }
-function closeBuilder() { document.getElementById('builder-overlay').style.display = 'none'; }
-function renderBuilderList() {
-    const list = document.getElementById('builder-list-content');
-    const search = document.getElementById('builder-search-inp').value.toLowerCase();
-    list.innerHTML = '';
-    const pool = window.allExercises.filter(ex => ex.name.toLowerCase().includes(search));
-    pool.slice(0, 50).forEach(ex => {
-        const div = document.createElement('div');
-        div.className = 'food-item';
-        div.innerHTML = `<div><b>${ex.name}</b><br><small>${ex.equip}</small></div><button class="btn-guide" onclick="openGuide('${ex.name}')">ℹ️</button>`;
-        div.onclick = (e) => { 
-            if(e.target.tagName === 'BUTTON') return;
-            activeRoutine.push(ex); renderWorkout(activeRoutine); closeBuilder(); 
-            document.getElementById('setup-panel').style.display = 'none';
-            document.getElementById('workout-interface').style.display = 'block';
-        };
-        list.appendChild(div);
-    });
-}
-function filterBuilderList() { renderBuilderList(); }
-function toggleFilter(type, val, btn) {
-    const idx = builderFilters[type].indexOf(val);
-    if(idx > -1) { builderFilters[type].splice(idx,1); btn.classList.remove('active'); }
-    else { builderFilters[type].push(val); btn.classList.add('active'); }
-    renderBuilderList();
-}
-
-function openGuide(exName) {
-    const ex = window.allExercises.find(e => e.name === exName);
-    if(!ex) return;
-    document.getElementById('guide-modal').style.display = 'block';
-    document.getElementById('guide-title').innerText = ex.name;
-    document.getElementById('guide-prep').innerHTML = formatGuide(ex.guide.prep || "No data.");
-    document.getElementById('guide-exec').innerHTML = formatGuide(ex.guide.exec || "No data.");
-    document.getElementById('guide-tips').innerHTML = formatGuide(ex.guide.tips || "No data.");
-    
-    const f9 = document.getElementById('f9-setup-section');
-    if(ex.equip === 'Cable' && ex.setup) {
-        f9.style.display = 'block';
-        document.getElementById('guide-arms').innerText = ex.setup.arms || '--';
-        document.getElementById('guide-pulleys').innerText = ex.setup.pulleys || '--';
-    } else { f9.style.display = 'none'; }
-    
-    const savedGif = gifOverrides[ex.name];
-    const img = document.getElementById('visual-content-img');
-    const iframe = document.getElementById('visual-content-iframe');
-    img.style.display = 'none'; iframe.style.display = 'none'; 
-    if(savedGif) {
-        if(savedGif.includes('youtube')) { iframe.src = savedGif.replace('watch?v=', 'embed/'); iframe.style.display = 'block'; }
-        else { img.src = savedGif; img.style.display = 'block'; }
-    }
-    document.getElementById('gif-search-btn').href = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(ex.name + ' exercise gif')}`;
-}
-function closeGuideModal() { document.getElementById('guide-modal').style.display = 'none'; }
-function formatGuide(arr) { return Array.isArray(arr) ? `<ul>${arr.map(i => `<li>${i}</li>`).join('')}</ul>` : arr; }
-function saveGuideGif() {
-    const url = document.getElementById('guide-gif-input').value;
-    if(url) {
-        gifOverrides[document.getElementById('guide-title').innerText] = url;
-        localStorage.setItem('nimbleGifs', JSON.stringify(gifOverrides));
-        alert("Visual Saved!");
-    }
-}
-
-// UTILS
-function finishSession() {
-    if(confirm("Finish Workout?")) {
-        document.getElementById('setup-panel').style.display = 'block';
-        document.getElementById('workout-interface').style.display = 'none';
-        activeRoutine = [];
-    }
-}
-function cancelWorkout() { finishSession(); }
-function logSet(name, idx) {
-    const w = document.getElementById(`w-${idx}`).value;
-    const r = document.getElementById(`r-${idx}`).value;
-    if(!w || !r) return;
-    let h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-    h.push({date: new Date().toISOString(), name, weight: w, reps: r});
-    localStorage.setItem('nimbleHistory', JSON.stringify(h));
-    document.activeElement.innerText = "Saved!"; 
-    document.activeElement.style.backgroundColor = "var(--success)";
-    calculateStreak();
-    if(w > 225) triggerConfetti();
-}
-function calculateStreak() {
-    const h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-    if(h.length === 0) return;
-    const dates = [...new Set(h.map(l => l.date.split('T')[0]))].sort().reverse();
-    let streak = 0;
-    let today = new Date().toISOString().split('T')[0];
-    let yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-    if(dates.includes(today) || dates.includes(yesterday)) {
-        streak = 1;
-        let checkDate = new Date(dates.includes(today) ? today : yesterday);
-        for(let i=1; i<dates.length; i++) {
-            checkDate.setDate(checkDate.getDate() - 1);
-            if(dates.includes(checkDate.toISOString().split('T')[0])) streak++; else break;
-        }
-    }
-    document.getElementById('streak-count').innerText = streak;
-}
-function updateMacroUI() {
-    if(dailyMacros.date !== new Date().toDateString()) {
-        dailyMacros = {c:0, p:0, ch:0, f:0, date: new Date().toDateString()};
-        localStorage.setItem('nimbleMacros', JSON.stringify(dailyMacros));
-    }
-    document.getElementById('disp-cals').innerText = dailyMacros.c;
-    document.getElementById('disp-pro').innerText = dailyMacros.p;
-    document.getElementById('bar-cals').style.width = Math.min((dailyMacros.c / 2500)*100, 100) + "%";
-    document.getElementById('bar-pro').style.width = Math.min((dailyMacros.p / 180)*100, 100) + "%";
-}
-async function searchFood() {
-    const query = document.getElementById('food-search').value;
-    const resDiv = document.getElementById('search-results');
-    if(!query) return;
-    resDiv.innerHTML = '<div style="padding:10px; color:#aaa;">Scanning...</div>';
-    try {
-        const res = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=5&api_key=${apiKey}`);
-        const data = await res.json();
-        resDiv.innerHTML = '';
-        if(!data.foods) return resDiv.innerHTML = 'No results.';
-        data.foods.forEach(f => {
-            const getNut = (id) => (f.foodNutrients.find(x => x.nutrientId === id) || {}).value || 0;
-            const c=Math.round(getNut(1008)), p=Math.round(getNut(1003));
-            const div = document.createElement('div');
-            div.className = 'food-item';
-            div.innerHTML = `<div><b>${f.description}</b><br><small>${c}cal P:${p}</small></div><button class="btn-action" style="width:auto;">+</button>`;
-            div.onclick = () => {
-                dailyMacros.c += c; dailyMacros.p += p; 
-                localStorage.setItem('nimbleMacros', JSON.stringify(dailyMacros));
-                updateMacroUI();
-                alert("Added!");
-                resDiv.innerHTML = '';
-            };
-            resDiv.appendChild(div);
-        });
-    } catch(e) { resDiv.innerHTML = 'Error searching.'; }
-}
-function renderPlanner() {
-    const grid = document.getElementById('week-grid');
-    if(!grid) return;
-    grid.innerHTML = '';
-    const days = ['S','M','T','W','T','F','S'];
-    days.forEach((d, i) => {
-        const type = userSettings.schedule[i] || 'Rest';
-        grid.innerHTML += `<div class="day-bubble" onclick="setSchedule(${i})"><b>${d}</b><span style="font-size:0.5em">${type.substring(0,3)}</span></div>`;
-    });
-}
-function setSchedule(i) {
-    const types = ['Rest','Push','Pull','Legs','Nimble','Full'];
-    const cur = userSettings.schedule[i] || 'Rest';
-    const next = types[(types.indexOf(cur)+1)%types.length];
-    userSettings.schedule[i] = next;
-    localStorage.setItem('nimbleSettings', JSON.stringify(userSettings));
-    renderPlanner();
-}
-function renderHeatmap() {
-    const h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-    const counts = {};
-    h.forEach(l => { const ex = window.allExercises.find(e => e.name === l.name); if(ex) {
-        const cats = Array.isArray(ex.cat) ? ex.cat : [ex.cat];
-        cats.forEach(c => counts[c] = (counts[c]||0)+1); 
-    }});
-    const container = document.getElementById('muscle-heatmap');
-    if(!container) return;
-    container.innerHTML = '';
-    ['Chest','Back','Legs','Shoulders','Arms','Core'].forEach(m => {
-        const val = counts[m] || 0;
-        let cls = 'heat-cell';
-        if(val > 10) cls += ' heat-hot'; else if(val > 5) cls += ' heat-warm'; else if(val > 0) cls += ' heat-mild';
-        container.innerHTML += `<div class="${cls}">${m}<br>${val}</div>`;
-    });
-}
-function toggleInjuryPanel() { document.getElementById('injury-chips').style.display = document.getElementById('injury-chips').style.display === 'none' ? 'flex' : 'none'; }
-function toggleInjury(part, btn) {
-    const idx = userSettings.injuryMode.indexOf(part);
-    if(idx > -1) { userSettings.injuryMode.splice(idx, 1); btn.classList.remove('danger-active'); } 
-    else { userSettings.injuryMode.push(part); btn.classList.add('danger-active'); }
-    localStorage.setItem('nimbleSettings', JSON.stringify(userSettings));
-    document.getElementById('injury-status').innerText = userSettings.injuryMode.join(', ') || 'None';
-}
-function calcReadiness() { document.getElementById('score-display').innerText = (parseInt(document.getElementById('val-sleep').value)*10) + "%"; }
-function showPlates(val) { document.getElementById('plate-helper').innerHTML = val >= 135 ? `<div class="plate p-45"></div>`.repeat(Math.floor((val-45)/90)) : ''; }
-function updateTimeLabel(val) { document.getElementById('time-val').innerText = (val * 7) + "m (" + val + " Ex)"; }
-function nextPhase() { userSettings.currentPhase = (userSettings.currentPhase % 4) + 1; localStorage.setItem('nimbleSettings', JSON.stringify(userSettings)); renderPlanner(); }
-function startBreathWork() { document.getElementById('breath-modal').style.display = 'flex'; }
-function openTimerOverlay() { document.getElementById('timer-overlay').style.display = 'flex'; }
-function closeTimer() { document.getElementById('timer-overlay').style.display = 'none'; }
-function saveBodyStat() { alert("Weight Saved!"); }
-function exportData() { alert("Data Copied!"); }
-function setTheme(n) { alert("Theme: " + n); }
-</script>
-</body>
-</html>
 window.allExercises = [
   // ==================== CABLE CHEST (TORQUE F9) ====================
         createEx("Cable Chest Press", ["Chest"], "Cable", "Strength", 
@@ -1342,371 +1715,1433 @@ window.allExercises = [
             ["Side plank.", "Top leg on bench.", "Bottom leg floating."], ["Hold."], ["Brutal inner thigh work."], ["Groin health."], ["Adductors"]),
         createEx("L-Sit (Tuck)", ["Nimble", "Core"], "Bodyweight", "Calisthenics", 
             ["Hands on floor/parallettes."], ["Press down.", "Lift butt and knees off floor."], ["Hold tuck."], ["Core compression."], ["Abs", "Hip Flexors"])
+]; // END EXERCISE DATA
+</script>
 
-]; // END EXERCISE LIST</script> 
 <script>
-// ─────────────────────────────────────────────────────────────
-// NIMBLE ENGINE V50 (FINAL WRAPPER FIX)
-// ─────────────────────────────────────────────────────────────
-
-// 0. CRITICAL HELPER: MUST EXIST
-if (typeof createEx !== 'function') {
-    function createEx(name, cat, equip, type, prep, exec, tips, benefits, muscles, setupF9) {
-        return {
-            name: name, cat: cat, equip: equip, type: type,
-            guide: { prep: prep, exec: exec, tips: tips, benefits: benefits, muscles: muscles },
-            setup: setupF9 || { arms: "N/A", pulleys: "N/A" }
-        };
-    }
+// 1. SAFETY CHECK
+if(typeof window.allExercises === 'undefined') {
+    alert("CRITICAL ERROR: Exercise list failed to load. Check for syntax errors (missing commas/quotes) in your list.");
+    window.allExercises = []; // Prevent total crash
 }
 
-// 1. DATABASE RECOVERY
-if (typeof window.allExercises === 'undefined') {
-    if (typeof allExercises !== 'undefined') window.allExercises = allExercises;
-    else window.allExercises = [];
-}
 
-// 2. STATE & SETTINGS
-let userSettings = JSON.parse(localStorage.getItem('nimbleSettings')) || { 
-    hotelMode: false, currentPhase: 1, 
-    schedule: { 0:'Rest', 1:'Push', 2:'Pull', 3:'Legs', 4:'Nimble', 5:'Rest', 6:'Full' },
-    injuryMode: [] 
+// ========================================
+// GLOBAL STATE
+// ========================================
+let appState = {
+    currentWorkout: null,
+    currentSetIndex: {},
+    activePlan: null,
+    equipment: 'home',
+    voiceEnabled: true,
+    voiceLevel: 'standard',
+    selectedExercises: [],
+    exerciseCount: 6,
+    builderFilter: 'all'
 };
-let activeRoutine = [];
-let builderFilters = { muscle: [], equip: [] };
-let dailyMacros = JSON.parse(localStorage.getItem('nimbleMacros')) || {c:0, p:0, ch:0, f:0, date: new Date().toDateString()};
-let apiKey = "p61IM61sZf897clBskMhwLftfBccew4ZcgsatflX"; 
-let gifOverrides = JSON.parse(localStorage.getItem('nimbleGifs')) || {};
 
-document.addEventListener('DOMContentLoaded', () => {
-    switchTab('readiness'); 
-    calculateStreak();
-    updateMacroUI();
-    if(document.getElementById('week-grid')) renderPlanner();
-    if(document.getElementById('muscle-heatmap')) renderHeatmap();
-    updateInjuryUI();
-});
+// ========================================
+// INITIALIZATION
+// ========================================
+window.onload = () => {
+    loadAppState();
+    renderPlanCalendar();
+    renderEquipmentPresets();
+    updateTodaysBanner();
+    renderEncyclopedia();
+    updateSettingsUI();
+};
 
-// 3. NAVIGATION
-function switchTab(id) {
-    document.querySelectorAll('.container').forEach(d => { d.classList.remove('active'); d.style.display = 'none'; });
-    let target = document.getElementById('view-' + id);
-    if(target) { target.classList.add('active'); target.style.display = 'block'; }
-    
-    document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
-    const btn = Array.from(document.querySelectorAll('.nav-btn')).find(b => {
-        const attr = b.getAttribute('onclick');
-        return attr && (attr.includes(`'${id}'`) || attr.includes(`"${id}"`));
-    });
-    if(btn) btn.classList.add('active');
-    
-    if(id === 'plan') renderPlanner();
-    if(id === 'progress') renderHeatmap();
-}
-
-// ─────────────────────────────────────────────────────────────
-// 4. SMART WORKOUT GENERATOR (With Muscle Map)
-// ─────────────────────────────────────────────────────────────
-
-function generateRandomWorkout() { generateWorkoutByFilter(() => true, "Random"); }
-
-function loadTemplate(type) {
-    const muscleMap = {
-        'push': ['Chest', 'Shoulders', 'Triceps', 'Push', 'Delts', 'Pectorals'],
-        'pull': ['Back', 'Biceps', 'Traps', 'Pull', 'Lats', 'Rear Delts'],
-        'legs': ['Legs', 'Quads', 'Hamstrings', 'Glutes', 'Calves', 'Lower Body'],
-        'full': ['Full', 'Chest', 'Back', 'Legs', 'Shoulders'],
-        'nimble': ['Nimble', 'Mobility', 'Core', 'Abs', 'Stretching'],
-        'f9': ['Cable']
-    };
-
-    const targets = muscleMap[type.toLowerCase()] || [];
-    
-    generateWorkoutByFilter(e => {
-        if (type === 'full') return true; 
-        if (type === 'f9') return e.equip === 'Cable';
-
-        const exCats = Array.isArray(e.cat) ? e.cat : [e.cat];
-        const allTags = exCats.concat(e.name.split(' ')); 
-        
-        return allTags.some(t => targets.some(target => t.includes(target))) || targets.includes(e.type);
-    }, type.toUpperCase()); 
-}
-
-function generateWorkoutByFilter(filterFn, buttonName) {
-    if(window.allExercises.length === 0) return alert("CRITICAL: Database is empty. Syntax error in list?");
-
-    let pool = window.allExercises.filter(filterFn);
-    
-    if(userSettings.hotelMode) pool = pool.filter(e => !e.name.includes('Barbell') && !e.name.includes('Cable') && !e.name.includes('Machine'));
-    
-    if(userSettings.injuryMode.length > 0) {
-        if(userSettings.injuryMode.includes('Shoulders')) pool = pool.filter(e => !e.cat.includes('Shoulders') && !e.name.includes('Overhead'));
-        if(userSettings.injuryMode.includes('Knees')) pool = pool.filter(e => !e.cat.includes('Legs') && !e.name.includes('Squat'));
-        if(userSettings.injuryMode.includes('Back')) pool = pool.filter(e => !e.name.includes('Deadlift') && !e.name.includes('Row'));
+function loadAppState() {
+    const saved = localStorage.getItem('nimbleState_v45');
+    if(saved) {
+        try {
+            appState = {...appState, ...JSON.parse(saved)};
+        } catch(e) {}
     }
+    if(!appState.activePlan) {
+        appState.activePlan = createDefaultPlan();
+    }
+}
 
-    if(pool.length === 0) return alert(`No exercises found for '${buttonName}'.\nTry turning off filters.`);
+function saveAppState() {
+    localStorage.setItem('nimbleState_v45', JSON.stringify(appState));
+}
+
+function createDefaultPlan() {
+    return {
+        name: '5-Day Balanced',
+        frequency: 5,
+        schedule: {0:'rest',1:'push',2:'cardio',3:'pull',4:'rest',5:'legs',6:'nimble'},
+        week: 1,
+        phase: 'Foundation'
+    };
+}
+
+// ========================================
+// NAVIGATION
+// ========================================
+function switchTab(tab) {
+    document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     
-    activeRoutine = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
-    renderWorkout(activeRoutine);
-    document.getElementById('setup-panel').style.display = 'none';
+    const container = document.getElementById('view-' + tab);
+    if(container) container.classList.add('active');
+    
+    if(event?.target) {
+        const btn = event.target.closest('.nav-btn');
+        if(btn) btn.classList.add('active');
+    }
+    
+    if(tab === 'plan') renderPlanCalendar();
+    if(tab === 'cardio') loadCardioHistory();
+    if(tab === 'encyclopedia') renderEncyclopedia();
+    if(tab === 'settings') updateSettingsUI();
+}
+
+// ========================================
+// WORKOUT GENERATION
+// ========================================
+function quickStartWorkout(type) {
+    const exercises = generateWorkoutByType(type, appState.exerciseCount);
+    
+    // Store workout type for warmup
+    appState.currentWorkoutType = type;
+    appState.currentWorkout = exercises;
+    appState.currentSetIndex = {};
+    saveAppState();
+    
+    // Start warmup for push/pull/legs workouts
+    if(['push', 'pull', 'legs'].includes(type.toLowerCase())) {
+        startWarmup(type);
+        renderWorkout(exercises);
+    } else {
+        startWorkout(exercises);
+    }
+}
+
+function generateRandomWorkout() {
+    const types = ['push', 'pull', 'legs'];
+    const randomType = types[Math.floor(Math.random() * types.length)];
+    quickStartWorkout(randomType);
+}
+
+function generateWorkoutByType(type, count = 6) {
+    let filtered = window.allExercises.filter(ex => {
+        if(type === 'push') return ex.cat.some(c => ['Chest','Shoulders','Triceps'].includes(c));
+        if(type === 'pull') return ex.cat.some(c => ['Back','Lats','Biceps'].includes(c));
+        if(type === 'legs') return ex.cat.some(c => ['Legs','Quads','Hamstrings','Glutes'].includes(c));
+        if(type === 'nimble') return ex.cat.includes('Nimble') || ex.type === 'Mobility';
+        if(type === 'full') return true;
+        return true;
+    });
+    
+    // Apply equipment filter
+    filtered = filterExercisesByEquipment(filtered);
+    
+    // Shuffle and take count
+    filtered.sort(() => 0.5 - Math.random());
+    return filtered.slice(0, count);
+}
+
+function filterExercisesByEquipment(exercises) {
+    const presets = {
+        home: ['Cable', 'Dumbbell', 'Bodyweight', 'Bench', 'Bands'],
+        hotel: ['Bodyweight', 'Bands'],
+        gym: ['All']
+    };
+    
+    const available = presets[appState.equipment] || presets.gym;
+    if(available.includes('All')) return exercises;
+    
+    return exercises.filter(ex => 
+        available.includes(ex.equip) || ex.equip === 'Bodyweight'
+    );
+}
+
+function startWorkout(exercises) {
+    appState.currentWorkout = exercises;
+    appState.currentSetIndex = {};
+    saveAppState();
+    
+    document.getElementById('workout-interface').style.display = 'block';
+    document.getElementById('workout-interface').scrollIntoView({behavior:'smooth'});
+    
+    renderWorkout(exercises);
+    speak('Workout started! Let\'s get it done!');
+}
+
+// ========================================
+// PROGRESSIVE SET DISPLAY
+// ========================================
+function renderWorkout(exercises) {
+    const container = document.getElementById('workout-list');
+    container.innerHTML = '';
+    
+    exercises.forEach((ex, idx) => {
+        const card = document.createElement('div');
+        card.className = 'card exercise-card';
+        
+        const progression = getProgression(ex.name);
+        const setsCompleted = appState.currentSetIndex[ex.name] || 0;
+        const setData = getTodaysSetData(ex.name);
+        
+        let html = `
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                <div>
+                    <h3 style="margin:0;">${ex.name}</h3>
+                    <div class="text-muted">${ex.cat.join(', ')} • ${ex.equip}</div>
+                </div>
+                <div style="text-align:right;">
+                    ${progression.suggest ? `<div class="progression-badge">${progression.suggest}</div>` : ''}
+                    <button class="btn-small btn-action" onclick="viewExerciseDetails('${ex.name.replace(/'/g,"\\'")}')">
+                        ℹ️
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        if(progression.lastWorkout) {
+            html += `<div style="background:#1a1a1a; padding:8px; border-radius:6px; margin-bottom:10px; font-size:0.85em;">
+                📊 Last: ${progression.lastWorkout.weight} lbs × ${progression.lastWorkout.reps.join(',')} reps
+            </div>`;
+        }
+        
+        // Completed sets
+        for(let i = 0; i < setsCompleted; i++) {
+            const set = setData[i];
+            if(set) {
+                html += `<div class="set-completed">
+                    <span>✅ Set ${i+1}: ${set.weight} lbs × ${set.reps} reps</span>
+                </div>`;
+            }
+        }
+        
+        // Current set
+        if(setsCompleted < 3) {
+            const suggestedWeight = progression.suggestedWeight || 100;
+            html += `
+                <div class="set-active">
+                    <strong>Set ${setsCompleted + 1} of 3</strong>
+                    <div class="row" style="margin-top:10px;">
+                        <div style="flex:1;">
+                            <small class="text-muted">Weight (lbs)</small>
+                            <input type="number" id="weight-${idx}" value="${suggestedWeight}" step="5">
+                        </div>
+                        <div style="flex:1;">
+                            <small class="text-muted">Reps</small>
+                            <input type="number" id="reps-${idx}" value="10" step="1">
+                        </div>
+                    </div>
+                    <button class="btn btn-main" onclick="logSet('${ex.name.replace(/'/g,"\\'")}', ${idx})">
+                        ✓ Log Set
+                    </button>
+                </div>
+            `;
+        } else {
+            html += `<div style="text-align:center; padding:15px; background:#1a4d2e; border-radius:6px;">
+                ✅ Exercise Complete!
+            </div>`;
+        }
+        
+        card.innerHTML = html;
+        container.appendChild(card);
+    });
+    
+    // Check if all complete
+    const allDone = exercises.every(ex => (appState.currentSetIndex[ex.name] || 0) >= 3);
+    if(allDone) {
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-success';
+        btn.textContent = '🎉 Workout Complete!';
+        btn.onclick = finishWorkout;
+        container.appendChild(btn);
+    }
+}
+
+function logSet(exerciseName, idx) {
+    const weight = parseFloat(document.getElementById(`weight-${idx}`).value);
+    const reps = parseInt(document.getElementById(`reps-${idx}`).value);
+    
+    if(!weight || !reps) {
+        alert('Enter weight and reps');
+        return;
+    }
+    
+    // Save to history
+    saveSetToHistory(exerciseName, {weight, reps, date: new Date().toISOString()});
+    
+    // Increment counter
+    if(!appState.currentSetIndex[exerciseName]) appState.currentSetIndex[exerciseName] = 0;
+    appState.currentSetIndex[exerciseName]++;
+    
+    saveAppState();
+    renderWorkout(appState.currentWorkout);
+    speak('Set logged!');
+}
+
+function saveSetToHistory(name, setData) {
+    const today = new Date().toISOString().split('T')[0];
+    let history = JSON.parse(localStorage.getItem('exerciseHistory')) || {};
+    if(!history[name]) history[name] = [];
+    history[name].push({...setData, sessionDate: today});
+    localStorage.setItem('exerciseHistory', JSON.stringify(history));
+}
+
+function getTodaysSetData(name) {
+    const today = new Date().toISOString().split('T')[0];
+    const history = JSON.parse(localStorage.getItem('exerciseHistory')) || {};
+    return (history[name] || []).filter(s => s.sessionDate === today);
+}
+
+function getProgression(name) {
+    const history = JSON.parse(localStorage.getItem('exerciseHistory')) || {};
+    const exerciseHistory = history[name] || [];
+    
+    if(exerciseHistory.length < 3) return {lastWorkout:null, suggest:null, suggestedWeight:100};
+    
+    const today = new Date().toISOString().split('T')[0];
+    const past = exerciseHistory.filter(s => s.sessionDate !== today);
+    
+    if(past.length < 3) return {lastWorkout:null, suggest:null, suggestedWeight:100};
+    
+    // Get last 3 sets
+    const lastSession = past.slice(-3);
+    const avgWeight = lastSession.reduce((sum,s) => sum + s.weight, 0) / 3;
+    const avgReps = lastSession.reduce((sum,s) => sum + s.reps, 0) / 3;
+    
+    let suggested = avgWeight;
+    let hint = null;
+    
+    if(avgReps >= 10) {
+        suggested = avgWeight + 5;
+        hint = '+5 lbs';
+    }
+    
+    return {
+        lastWorkout: {weight: avgWeight, reps: lastSession.map(s => s.reps)},
+        suggest: hint,
+        suggestedWeight: Math.round(suggested)
+    };
+}
+
+function endWorkout() {
+    if(confirm('End workout early?')) {
+        document.getElementById('workout-interface').style.display = 'none';
+        appState.currentWorkout = null;
+        appState.currentSetIndex = {};
+        saveAppState();
+    }
+}
+
+function finishWorkout() {
+    const today = new Date().getDay();
+    markDayCompleted(today);
+    
+    document.getElementById('workout-interface').style.display = 'none';
+    appState.currentWorkout = null;
+    appState.currentSetIndex = {};
+    saveAppState();
+    
+    alert('Workout saved! Great job! 💪');
+    speak('Workout complete! Great work!');
+}
+
+function markDayCompleted(dayIndex) {
+    const date = getDateForDay(dayIndex);
+    let completed = JSON.parse(localStorage.getItem('completedWorkouts')) || {};
+    completed[date] = true;
+    localStorage.setItem('completedWorkouts', JSON.stringify(completed));
+    renderPlanCalendar();
+}
+
+function getDateForDay(dayIndex) {
+    const today = new Date();
+    const diff = dayIndex - today.getDay();
+    const target = new Date(today);
+    target.setDate(today.getDate() + diff);
+    return target.toISOString().split('T')[0];
+}
+
+// ========================================
+// CUSTOM WORKOUT BUILDER
+// ========================================
+function openCustomBuilder() {
+    appState.selectedExercises = [];
+    document.getElementById('custom-builder-modal').classList.add('active');
+    renderBuilderExerciseList();
+    updateSelectedCount();
+}
+
+function closeCustomBuilder() {
+    document.getElementById('custom-builder-modal').classList.remove('active');
+}
+
+function updateExerciseCount(value) {
+    appState.exerciseCount = parseInt(value);
+    document.getElementById('exercise-count-display').textContent = value;
+    saveAppState();
+}
+
+function searchBuilderExercises() {
+    renderBuilderExerciseList();
+}
+
+function filterBuilder(category) {
+    appState.builderFilter = category;
+    
+    document.querySelectorAll('#custom-builder-modal .chip').forEach(c => c.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    renderBuilderExerciseList();
+}
+
+function renderBuilderExerciseList() {
+    const container = document.getElementById('builder-exercise-list');
+    const searchTerm = document.getElementById('builder-search').value.toLowerCase();
+    
+    let exercises = window.allExercises;
+    
+    // Apply filter
+    if(appState.builderFilter !== 'all') {
+        exercises = exercises.filter(ex => 
+            ex.cat.includes(appState.builderFilter) || ex.equip === appState.builderFilter
+        );
+    }
+    
+    // Apply search
+    if(searchTerm) {
+        exercises = exercises.filter(ex => ex.name.toLowerCase().includes(searchTerm));
+    }
+    
+    // Apply equipment
+    exercises = filterExercisesByEquipment(exercises);
+    
+    container.innerHTML = '';
+    exercises.slice(0, 50).forEach(ex => {
+        const div = document.createElement('div');
+        div.className = 'exercise-list-item';
+        if(appState.selectedExercises.some(e => e.name === ex.name)) {
+            div.classList.add('selected');
+        }
+        
+        div.innerHTML = `
+            <div style="display:flex; justify-content:space-between;">
+                <div>
+                    <strong>${ex.name}</strong><br>
+                    <small class="text-muted">${ex.cat.join(', ')} • ${ex.equip}</small>
+                </div>
+                <button class="btn-small btn-action" onclick="event.stopPropagation(); viewExerciseDetails('${ex.name.replace(/'/g,"\\'")}')">
+                    ℹ️
+                </button>
+            </div>
+        `;
+        
+        div.onclick = () => toggleExerciseSelection(ex);
+        container.appendChild(div);
+    });
+}
+
+function toggleExerciseSelection(exercise) {
+    const index = appState.selectedExercises.findIndex(e => e.name === exercise.name);
+    
+    if(index > -1) {
+        appState.selectedExercises.splice(index, 1);
+    } else {
+        if(appState.selectedExercises.length < appState.exerciseCount) {
+            appState.selectedExercises.push(exercise);
+        } else {
+            alert(`Maximum ${appState.exerciseCount} exercises selected`);
+            return;
+        }
+    }
+    
+    renderBuilderExerciseList();
+    updateSelectedCount();
+}
+
+function updateSelectedCount() {
+    const countEl = document.getElementById('selected-count');
+    if(countEl) {
+        countEl.textContent = appState.selectedExercises.length;
+    }
+}
+
+function startCustomWorkout() {
+    if(appState.selectedExercises.length === 0) {
+        alert('Select at least one exercise');
+        return;
+    }
+    
+    closeCustomBuilder();
+    startWorkout(appState.selectedExercises);
+}
+
+// ========================================
+// EXERCISE ENCYCLOPEDIA
+// ========================================
+function renderEncyclopedia() {
+    const container = document.getElementById('encyclopedia-list');
+    if(!container) return;
+    
+    const searchTerm = document.getElementById('encyclopedia-search')?.value.toLowerCase() || '';
+    
+    let exercises = window.allExercises;
+    
+    if(searchTerm) {
+        exercises = exercises.filter(ex => ex.name.toLowerCase().includes(searchTerm));
+    }
+    
+    container.innerHTML = '';
+    exercises.slice(0, 30).forEach(ex => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.cursor = 'pointer';
+        card.onclick = () => viewExerciseDetails(ex.name);
+        
+        card.innerHTML = `
+            <h3 style="margin:0 0 5px 0;">${ex.name}</h3>
+            <div class="text-muted">${ex.cat.join(', ')} • ${ex.equip} • ${ex.type}</div>
+        `;
+        
+        container.appendChild(card);
+    });
+}
+
+function searchEncyclopedia() {
+    renderEncyclopedia();
+}
+
+function filterEncyclopedia(category) {
+    document.querySelectorAll('#view-encyclopedia .chip').forEach(c => c.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    const container = document.getElementById('encyclopedia-list');
+    let exercises = window.allExercises;
+    
+    if(category !== 'all') {
+        exercises = exercises.filter(ex => 
+            ex.cat.includes(category) || ex.equip === category
+        );
+    }
+    
+    container.innerHTML = '';
+    exercises.slice(0, 30).forEach(ex => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.cursor = 'pointer';
+        card.onclick = () => viewExerciseDetails(ex.name);
+        
+        card.innerHTML = `
+            <h3 style="margin:0 0 5px 0;">${ex.name}</h3>
+            <div class="text-muted">${ex.cat.join(', ')} • ${ex.equip} • ${ex.type}</div>
+        `;
+        
+        container.appendChild(card);
+    });
+}
+
+function viewExerciseDetails(exerciseName) {
+    const exercise = window.allExercises.find(ex => ex.name === exerciseName);
+    if(!exercise) return;
+    
+    document.getElementById('exercise-detail-name').textContent = exercise.name;
+    
+    const content = document.getElementById('exercise-detail-content');
+    let html = `
+        <div class="text-muted" style="margin-bottom:15px;">
+            ${exercise.cat.join(', ')} • ${exercise.equip} • ${exercise.type}
+        </div>
+    `;
+    
+    // GIF/Image placeholder
+    const gifUrl = localStorage.getItem(`gif_${exercise.name}`);
+    if(gifUrl) {
+        html += `
+            <div class="gif-container">
+                <img src="${gifUrl}" alt="${exercise.name}">
+            </div>
+            <div class="gif-actions">
+                <button class="btn-small btn-action" onclick="openGifSearch('${exercise.name.replace(/'/g,"\\'")}')">🔍 Replace GIF</button>
+                <button class="btn-small btn-danger" onclick="removeExerciseGif('${exercise.name.replace(/'/g,"\\'")}')">🗑️ Remove</button>
+            </div>
+        `;
+    } else {
+        html += `
+            <div class="gif-container">
+                <div>
+                    <p class="text-muted">No GIF added yet</p>
+                </div>
+            </div>
+            <div class="gif-actions">
+                <button class="btn-small btn-success" onclick="openGifSearch('${exercise.name.replace(/'/g,"\\'")}')">🔍 Search GIF</button>
+                <label class="btn-small btn-action">
+                    📤 Upload GIF
+                    <input type="file" accept="image/*" onchange="uploadExerciseGif('${exercise.name.replace(/'/g,"\\'")}', event)" style="display:none;">
+                </label>
+            </div>
+        `;
+    }
+    
+    // Preparation
+    if(exercise.guide.prep && exercise.guide.prep.length > 0) {
+        html += `
+            <div class="encyclopedia-section">
+                <h4>🎯 PREPARATION</h4>
+                <ul>
+                    ${exercise.guide.prep.map(p => `<li>${p}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+    }
+    
+    // Execution
+    if(exercise.guide.exec && exercise.guide.exec.length > 0) {
+        html += `
+            <div class="encyclopedia-section">
+                <h4>▶️ EXECUTION</h4>
+                <ul>
+                    ${exercise.guide.exec.map(e => `<li>${e}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+    }
+    
+    // Tips
+    if(exercise.guide.tips && exercise.guide.tips.length > 0) {
+        html += `
+            <div class="encyclopedia-section">
+                <h4>💡 TIPS</h4>
+                <ul>
+                    ${exercise.guide.tips.map(t => `<li>${t}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+    }
+    
+    // Benefits
+    if(exercise.guide.benefits && exercise.guide.benefits.length > 0) {
+        html += `
+            <div class="encyclopedia-section">
+                <h4>✨ BENEFITS</h4>
+                <ul>
+                    ${exercise.guide.benefits.map(b => `<li>${b}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+    }
+    
+    // Muscles
+    if(exercise.guide.muscles && exercise.guide.muscles.length > 0) {
+        html += `
+            <div class="encyclopedia-section">
+                <h4>💪 TARGET MUSCLES</h4>
+                <div>
+                    ${exercise.guide.muscles.map(m => `<span class="muscle-badge">${m}</span>`).join('')}
+                </div>
+            </div>
+        `;
+    }
+    
+    // Setup (if Torque F9)
+    if(exercise.setup && (exercise.setup.arms !== 'N/A' || exercise.setup.pulleys !== 'N/A')) {
+        html += `
+            <div class="encyclopedia-section">
+                <h4>🔧 TORQUE F9 SETUP</h4>
+                <p><strong>Arms:</strong> ${exercise.setup.arms}</p>
+                <p><strong>Pulleys:</strong> ${exercise.setup.pulleys}</p>
+            </div>
+        `;
+    }
+    
+    content.innerHTML = html;
+    document.getElementById('exercise-detail-modal').classList.add('active');
+}
+
+function closeExerciseDetail() {
+    document.getElementById('exercise-detail-modal').classList.remove('active');
+}
+
+function uploadExerciseGif(exerciseName, event) {
+    const file = event.target.files[0];
+    if(!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        localStorage.setItem(`gif_${exerciseName}`, e.target.result);
+        viewExerciseDetails(exerciseName); // Refresh
+        speak('GIF uploaded');
+    };
+    reader.readAsDataURL(file);
+}
+
+// ========================================
+// PLAN CALENDAR
+// ========================================
+function renderPlanCalendar() {
+    const grid = document.getElementById('week-grid');
+    if(!grid) return;
+    
+    grid.innerHTML = '';
+    const plan = appState.activePlan;
+    const days = ['S','M','T','W','T','F','S'];
+    
+    days.forEach((letter, idx) => {
+        const type = plan.schedule[idx] || 'rest';
+        const bubble = document.createElement('div');
+        bubble.className = `day-bubble workout-type-${type}`;
+        bubble.onclick = () => editDay(idx);
+        
+        const icon = {push:'💪',pull:'🏋️',legs:'🦵',cardio:'🚴',nimble:'🧘',rest:'😴'}[type] || '🔥';
+        const completed = isDayCompleted(idx);
+        
+        bubble.innerHTML = `
+            <div class="day-icon">${icon}</div>
+            <div class="day-letter">${letter}</div>
+            <div class="day-type">${type.substring(0,4)}</div>
+            ${completed ? '<div class="day-check">✅</div>' : ''}
+        `;
+        
+        grid.appendChild(bubble);
+    });
+    
+    updatePhaseDisplay();
+    updateAiCoach(); // Update AI coach suggestions
+}
+
+function editDay(idx) {
+    const plan = appState.activePlan;
+    const types = ['rest','push','pull','legs','cardio','nimble'];
+    const current = types.indexOf(plan.schedule[idx]);
+    plan.schedule[idx] = types[(current + 1) % types.length];
+    saveAppState();
+    renderPlanCalendar();
+}
+
+function isDayCompleted(idx) {
+    const date = getDateForDay(idx);
+    const completed = JSON.parse(localStorage.getItem('completedWorkouts')) || {};
+    return completed[date] === true;
+}
+
+function updatePhaseDisplay() {
+    const el = document.getElementById('phase-display');
+    if(el) el.textContent = `Week ${appState.activePlan.week} - ${appState.activePlan.phase}`;
+    
+    const plan = appState.activePlan;
+    let done = 0, total = 0;
+    
+    for(let i = 0; i < 7; i++) {
+        if(plan.schedule[i] !== 'rest') {
+            total++;
+            if(isDayCompleted(i)) done++;
+        }
+    }
+    
+    const adherence = document.getElementById('adherence-display');
+    if(adherence) adherence.textContent = `${done}/${total}`;
+}
+
+// ========================================
+// PLAN GENERATOR
+// ========================================
+let planData = {};
+
+function openPlanGenerator() {
+    planData = {};
+    document.getElementById('plan-generator-modal').classList.add('active');
+    showGenStep(1);
+}
+
+function closePlanGenerator() {
+    document.getElementById('plan-generator-modal').classList.remove('active');
+}
+
+function showGenStep(step) {
+    for(let i = 1; i <= 3; i++) {
+        const el = document.getElementById(`generator-step-${i}`);
+        if(el) el.style.display = i === step ? 'block' : 'none';
+    }
+}
+
+function selectFrequency(days) {
+    planData.frequency = days;
+    event.target.classList.add('active');
+    setTimeout(() => showGenStep(2), 300);
+}
+
+function selectGoal(goal) {
+    planData.goal = goal;
+    event.target.classList.add('active');
+    
+    // Generate plan based on holistic focus
+    const schedules = {
+        3: {0:'rest',1:'push',2:'rest',3:'pull',4:'rest',5:'legs',6:'rest'},
+        4: {0:'rest',1:'push',2:'pull',3:'rest',4:'legs',5:'nimble',6:'rest'},
+        5: {0:'rest',1:'push',2:'cardio',3:'pull',4:'rest',5:'legs',6:'nimble'},
+        6: {0:'cardio',1:'push',2:'pull',3:'cardio',4:'legs',5:'nimble',6:'rest'}
+    };
+    
+    // Goal descriptions for 40+ men
+    const goalNames = {
+        balanced: 'Balanced Performance',
+        vitality: 'Health & Vitality',
+        functional: 'Functional Fitness'
+    };
+    
+    appState.activePlan = {
+        name: `${planData.frequency}-Day ${goalNames[planData.goal] || 'Training'}`,
+        frequency: planData.frequency,
+        schedule: schedules[planData.frequency],
+        week: 1,
+        phase: 'Foundation' // Better than 'volume' for 40+
+    };
+    
+    // Show preview
+    const preview = document.getElementById('plan-preview');
+    const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    let html = '<div style="margin:15px 0;">';
+    dayNames.forEach((name, idx) => {
+        const type = appState.activePlan.schedule[idx];
+        const icon = {push:'💪',pull:'🏋️',legs:'🦵',cardio:'🚴',nimble:'🧘',rest:'😴'}[type];
+        html += `<div style="padding:8px; background:#2c2c2c; margin:5px 0; border-radius:6px;">
+            ${icon} <strong>${name}:</strong> ${type}
+        </div>`;
+    });
+    html += '</div>';
+    preview.innerHTML = html;
+    
+    setTimeout(() => showGenStep(3), 300);
+}
+
+function acceptPlan() {
+    saveAppState();
+    closePlanGenerator();
+    renderPlanCalendar();
+    speak('Plan activated!');
+}
+
+function regeneratePlan() {
+    showGenStep(1);
+}
+
+// ========================================
+// TODAY'S BANNER
+// ========================================
+function updateTodaysBanner() {
+    const banner = document.getElementById('todays-banner');
+    if(!banner) return;
+    
+    const plan = appState.activePlan;
+    const today = new Date();
+    const dayIdx = today.getDay();
+    const type = plan.schedule[dayIdx];
+    
+    if(type === 'rest' || isDayCompleted(dayIdx)) {
+        banner.style.display = 'none';
+        return;
+    }
+    
+    document.getElementById('today-date').textContent = 
+        today.toLocaleDateString('en-US', {weekday:'long', month:'short', day:'numeric'});
+    
+    const icon = {push:'💪',pull:'🏋️',legs:'🦵',cardio:'🚴',nimble:'🧘'}[type];
+    document.getElementById('today-workout').textContent = `${icon} ${type.toUpperCase()}`;
+    
+    banner.style.display = 'block';
+}
+
+function startTodaysWorkout() {
+    const dayIdx = new Date().getDay();
+    const type = appState.activePlan.schedule[dayIdx];
+    quickStartWorkout(type);
+}
+
+// ========================================
+// CARDIO TRACKING
+// ========================================
+function logCardioSession() {
+    const type = document.getElementById('cardio-type').value;
+    const duration = parseInt(document.getElementById('cardio-duration').value);
+    const distance = parseFloat(document.getElementById('cardio-distance').value) || null;
+    
+    const session = {
+        type: type,
+        duration: duration,
+        distance: distance,
+        date: new Date().toISOString()
+    };
+    
+    let history = JSON.parse(localStorage.getItem('cardioHistory')) || [];
+    history.push(session);
+    localStorage.setItem('cardioHistory', JSON.stringify(history));
+    
+    // Mark day completed
+    markDayCompleted(new Date().getDay());
+    
+    alert('Cardio logged! 🚴');
+    speak('Cardio session logged');
+    loadCardioHistory();
+}
+
+function loadCardioHistory() {
+    const container = document.getElementById('cardio-history');
+    if(!container) return;
+    
+    const history = JSON.parse(localStorage.getItem('cardioHistory')) || [];
+    
+    if(history.length === 0) {
+        container.innerHTML = '<p class="text-muted">No cardio sessions yet</p>';
+        return;
+    }
+    
+    container.innerHTML = '';
+    history.slice(-10).reverse().forEach(session => {
+        const div = document.createElement('div');
+        div.style.padding = '10px';
+        div.style.borderBottom = '1px solid #333';
+        
+        const date = new Date(session.date).toLocaleDateString();
+        const icon = {run:'🏃',bike:'🚴',swim:'🏊',walk:'🚶',row:'🚣'}[session.type];
+        
+        div.innerHTML = `
+            <strong>${icon} ${session.type}</strong><br>
+            <small class="text-muted">
+                ${date} • ${session.duration} min${session.distance ? ` • ${session.distance} km` : ''}
+            </small>
+        `;
+        
+        container.appendChild(div);
+    });
+}
+
+// ========================================
+// EQUIPMENT SETTINGS
+// ========================================
+function renderEquipmentPresets() {
+    const container = document.getElementById('equipment-presets');
+    if(!container) return;
+    
+    const presets = [
+        {key:'home', name:'🏠 Home Gym', desc:'Cables, Dumbbells, Bench'},
+        {key:'hotel', name:'🏨 Hotel/Travel', desc:'Bodyweight & Bands'},
+        {key:'gym', name:'💪 Full Gym', desc:'All Equipment'}
+    ];
+    
+    container.innerHTML = '';
+    presets.forEach(preset => {
+        const div = document.createElement('div');
+        div.className = 'preset-card';
+        div.setAttribute('data-preset', preset.key);
+        if(appState.equipment === preset.key) div.classList.add('active');
+        
+        div.innerHTML = `
+            <strong>${preset.name}</strong><br>
+            <small class="text-muted">${preset.desc}</small>
+        `;
+        
+        div.onclick = () => activatePreset(preset.key);
+        container.appendChild(div);
+    });
+}
+
+function activatePreset(key) {
+    appState.equipment = key;
+    saveAppState();
+    
+    document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
+    document.querySelector(`[data-preset="${key}"]`).classList.add('active');
+    
+    speak(`Switched to ${key} equipment`);
+}
+
+function updateSettingsUI() {
+    if(document.getElementById('voice-enabled')) {
+        document.getElementById('voice-enabled').checked = appState.voiceEnabled;
+        document.getElementById('voice-level').value = appState.voiceLevel;
+    }
+}
+
+// ========================================
+// VOICE SYSTEM
+// ========================================
+function speak(message) {
+    if(!appState.voiceEnabled || appState.voiceLevel === 'silent') return;
+    if(!window.speechSynthesis) return;
+    
+    const utterance = new SpeechSynthesisUtterance(message);
+    window.speechSynthesis.speak(utterance);
+}
+
+function saveVoiceSettings() {
+    appState.voiceEnabled = document.getElementById('voice-enabled').checked;
+    appState.voiceLevel = document.getElementById('voice-level').value;
+    saveAppState();
+}
+
+function testVoice() {
+    speak('Voice test. Five, four, three, two, one. Well done!');
+}
+
+// ========================================
+// GIF SEARCH FEATURE
+// ========================================
+let currentGifExercise = null;
+const GIPHY_API_KEY = 'YOUR_GIPHY_API_KEY'; // Replace with your API key from developers.giphy.com
+
+function openGifSearch(exerciseName) {
+    currentGifExercise = exerciseName;
+    document.getElementById('gif-search-query').textContent = `"${exerciseName} exercise demonstration"`;
+    document.getElementById('gif-search-modal').classList.add('active');
+    searchGiphy(exerciseName);
+}
+
+function closeGifSearch() {
+    document.getElementById('gif-search-modal').classList.remove('active');
+    currentGifExercise = null;
+}
+
+async function searchGiphy(exerciseName) {
+    const loading = document.getElementById('gif-loading');
+    const results = document.getElementById('gif-results');
+    const error = document.getElementById('gif-error');
+    
+    loading.style.display = 'block';
+    results.innerHTML = '';
+    error.style.display = 'none';
+    
+    const query = `${exerciseName} exercise demonstration`;
+    const url = `https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(query)}&limit=12&rating=g`;
+    
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        loading.style.display = 'none';
+        
+        if(data.data && data.data.length > 0) {
+            results.innerHTML = data.data.map(gif => `
+                <div class="gif-item" onclick="selectGif('${gif.images.fixed_height.url}')">
+                    <img src="${gif.images.fixed_height.url}" alt="Exercise GIF">
+                </div>
+            `).join('');
+        } else {
+            results.innerHTML = '<p class="text-muted text-center">No GIFs found. Try uploading your own!</p>';
+        }
+    } catch(err) {
+        loading.style.display = 'none';
+        error.style.display = 'block';
+        console.error('Giphy API error:', err);
+    }
+}
+
+function selectGif(gifUrl) {
+    if(currentGifExercise) {
+        localStorage.setItem(`gif_${currentGifExercise}`, gifUrl);
+        speak(`GIF saved for ${currentGifExercise}`);
+        closeGifSearch();
+        viewExerciseDetails(currentGifExercise); // Refresh the exercise details
+    }
+}
+
+function removeExerciseGif(exerciseName) {
+    if(confirm(`Remove GIF for ${exerciseName}?`)) {
+        localStorage.removeItem(`gif_${exerciseName}`);
+        speak('GIF removed');
+        viewExerciseDetails(exerciseName);
+    }
+}
+
+// ========================================
+// GPS TRACKING FEATURE
+// ========================================
+let gpsWatchId = null;
+let gpsRoute = [];
+let gpsStartTime = null;
+let gpsInterval = null;
+let gpsTotalDistance = 0;
+
+function startGpsTracking() {
+    if(!navigator.geolocation) {
+        alert('GPS not supported on this device');
+        return;
+    }
+    
+    const activityType = document.getElementById('gps-activity-type').value;
+    
+    gpsRoute = [];
+    gpsTotalDistance = 0;
+    gpsStartTime = Date.now();
+    
+    document.getElementById('gps-tracking-modal').classList.add('active');
+    document.getElementById('gps-distance').textContent = '0.00';
+    document.getElementById('gps-pace').textContent = '0:00';
+    document.getElementById('gps-duration').textContent = '00:00';
+    
+    gpsWatchId = navigator.geolocation.watchPosition(
+        updateGpsPosition,
+        (error) => {
+            console.error('GPS error:', error);
+            alert('Unable to access GPS. Please enable location services.');
+            stopGpsTracking();
+        },
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+    );
+    
+    gpsInterval = setInterval(updateGpsDuration, 1000);
+    speak(`GPS tracking started for ${activityType}`);
+}
+
+function updateGpsPosition(position) {
+    const newPoint = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+        timestamp: Date.now()
+    };
+    
+    if(gpsRoute.length > 0) {
+        const lastPoint = gpsRoute[gpsRoute.length - 1];
+        const distance = calculateDistance(lastPoint.lat, lastPoint.lng, newPoint.lat, newPoint.lng);
+        gpsTotalDistance += distance;
+        
+        document.getElementById('gps-distance').textContent = gpsTotalDistance.toFixed(2);
+        
+        const durationMinutes = (Date.now() - gpsStartTime) / 60000;
+        if(gpsTotalDistance > 0) {
+            const pace = durationMinutes / gpsTotalDistance;
+            const paceMin = Math.floor(pace);
+            const paceSec = Math.floor((pace - paceMin) * 60);
+            document.getElementById('gps-pace').textContent = `${paceMin}:${paceSec.toString().padStart(2, '0')}`;
+        }
+    }
+    
+    gpsRoute.push(newPoint);
+    drawGpsRoute();
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Earth radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
+function updateGpsDuration() {
+    const duration = Date.now() - gpsStartTime;
+    const minutes = Math.floor(duration / 60000);
+    const seconds = Math.floor((duration % 60000) / 1000);
+    document.getElementById('gps-duration').textContent = 
+        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function drawGpsRoute() {
+    const canvas = document.getElementById('gps-map-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    if(gpsRoute.length < 2) return;
+    
+    // Clear canvas
+    ctx.fillStyle = '#2c2c2c';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Find bounds
+    const lats = gpsRoute.map(p => p.lat);
+    const lngs = gpsRoute.map(p => p.lng);
+    const minLat = Math.min(...lats);
+    const maxLat = Math.max(...lats);
+    const minLng = Math.min(...lngs);
+    const maxLng = Math.max(...lngs);
+    
+    const latRange = maxLat - minLat || 0.001;
+    const lngRange = maxLng - minLng || 0.001;
+    
+    // Draw route
+    ctx.strokeStyle = '#03DAC6';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    
+    gpsRoute.forEach((point, i) => {
+        const x = ((point.lng - minLng) / lngRange) * (canvas.width - 40) + 20;
+        const y = canvas.height - (((point.lat - minLat) / latRange) * (canvas.height - 40) + 20);
+        
+        if(i === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+    });
+    
+    ctx.stroke();
+    
+    // Draw start point
+    const startX = ((gpsRoute[0].lng - minLng) / lngRange) * (canvas.width - 40) + 20;
+    const startY = canvas.height - (((gpsRoute[0].lat - minLat) / latRange) * (canvas.height - 40) + 20);
+    ctx.fillStyle = '#00C853';
+    ctx.beginPath();
+    ctx.arc(startX, startY, 6, 0, 2 * Math.PI);
+    ctx.fill();
+    
+    // Draw end point
+    const lastPoint = gpsRoute[gpsRoute.length - 1];
+    const endX = ((lastPoint.lng - minLng) / lngRange) * (canvas.width - 40) + 20;
+    const endY = canvas.height - (((lastPoint.lat - minLat) / latRange) * (canvas.height - 40) + 20);
+    ctx.fillStyle = '#CF6679';
+    ctx.beginPath();
+    ctx.arc(endX, endY, 6, 0, 2 * Math.PI);
+    ctx.fill();
+}
+
+function stopGpsTracking() {
+    if(gpsWatchId) {
+        navigator.geolocation.clearWatch(gpsWatchId);
+        gpsWatchId = null;
+    }
+    if(gpsInterval) {
+        clearInterval(gpsInterval);
+        gpsInterval = null;
+    }
+    document.getElementById('gps-tracking-modal').classList.remove('active');
+}
+
+function saveGpsRoute() {
+    if(gpsRoute.length < 2) {
+        alert('Not enough GPS data to save');
+        return;
+    }
+    
+    const activityType = document.getElementById('gps-activity-type').value;
+    const duration = (Date.now() - gpsStartTime) / 60000;
+    
+    const routeData = {
+        type: activityType,
+        date: new Date().toISOString(),
+        distance: parseFloat(gpsTotalDistance.toFixed(2)),
+        duration: Math.floor(duration),
+        route: gpsRoute,
+        pace: duration / gpsTotalDistance
+    };
+    
+    // Save to cardio history
+    let cardioHistory = JSON.parse(localStorage.getItem('cardioHistory') || '[]');
+    cardioHistory.unshift(routeData);
+    localStorage.setItem('cardioHistory', JSON.stringify(cardioHistory));
+    
+    speak(`${activityType} saved: ${gpsTotalDistance.toFixed(2)} kilometers`);
+    stopGpsTracking();
+    renderCardioHistory();
+}
+
+// ========================================
+// WARMUP SEQUENCES FEATURE
+// ========================================
+const warmupSequences = {
+    push: [
+        { name: 'Arm Circles', duration: 60, desc: 'Large circles forward and backward' },
+        { name: 'Shoulder CARs', duration: 60, desc: 'Controlled articular rotations' },
+        { name: 'Band Pull-Aparts', duration: 45, desc: 'Light resistance band' },
+        { name: 'Push-up Plus', duration: 45, desc: 'Scapular protraction focus' },
+        { name: 'Chest Openers', duration: 45, desc: 'Dynamic stretching' },
+        { name: 'Wrist Rolls', duration: 30, desc: 'Both directions' }
+    ],
+    pull: [
+        { name: 'Dead Hangs', duration: 45, desc: 'Active shoulder engagement' },
+        { name: 'Scapular Shrugs', duration: 60, desc: 'On bar or rings' },
+        { name: 'Band Face Pulls', duration: 45, desc: 'Light resistance' },
+        { name: 'Cat-Cow Stretch', duration: 60, desc: 'Spine mobility' },
+        { name: 'Thoracic Rotations', duration: 45, desc: 'Both sides' },
+        { name: 'Wrist Flexion/Extension', duration: 30, desc: 'Gentle stretches' }
+    ],
+    legs: [
+        { name: 'Leg Swings', duration: 60, desc: 'Front to back, side to side' },
+        { name: 'Hip CARs', duration: 60, desc: 'Controlled hip circles' },
+        { name: 'Bodyweight Squats', duration: 45, desc: 'Full range of motion' },
+        { name: 'Walking Lunges', duration: 45, desc: 'Dynamic stretching' },
+        { name: 'Ankle Rolls', duration: 30, desc: 'Both directions' },
+        { name: 'Glute Bridges', duration: 45, desc: 'Activation focus' }
+    ]
+};
+
+let warmupTimer = null;
+let warmupCurrentIndex = 0;
+let warmupTimeLeft = 0;
+let warmupWorkoutType = '';
+
+function startWarmup(workoutType) {
+    const type = workoutType.toLowerCase();
+    if(!warmupSequences[type]) {
+        // Skip warmup for workout types without sequences
+        continueToWorkout();
+        return;
+    }
+    
+    warmupWorkoutType = type;
+    warmupCurrentIndex = 0;
+    document.getElementById('warmup-modal').classList.add('active');
+    showWarmupExercise(0);
+}
+
+function showWarmupExercise(index) {
+    const sequence = warmupSequences[warmupWorkoutType];
+    if(index >= sequence.length) {
+        completeWarmup();
+        return;
+    }
+    
+    const exercise = sequence[index];
+    warmupCurrentIndex = index;
+    warmupTimeLeft = exercise.duration;
+    
+    document.getElementById('warmup-exercise-name').textContent = exercise.name;
+    document.getElementById('warmup-exercise-desc').textContent = exercise.desc;
+    document.getElementById('warmup-timer').textContent = warmupTimeLeft;
+    document.getElementById('warmup-progress').textContent = `${index + 1}/${sequence.length}`;
+    
+    speak(`${exercise.name}. ${exercise.duration} seconds`);
+    
+    if(warmupTimer) clearInterval(warmupTimer);
+    warmupTimer = setInterval(() => {
+        warmupTimeLeft--;
+        document.getElementById('warmup-timer').textContent = warmupTimeLeft;
+        
+        if(warmupTimeLeft <= 3 && warmupTimeLeft > 0) {
+            speak(warmupTimeLeft.toString());
+        }
+        
+        if(warmupTimeLeft <= 0) {
+            clearInterval(warmupTimer);
+            nextWarmupExercise();
+        }
+    }, 1000);
+}
+
+function nextWarmupExercise() {
+    if(warmupTimer) clearInterval(warmupTimer);
+    showWarmupExercise(warmupCurrentIndex + 1);
+}
+
+function skipWarmup() {
+    if(warmupTimer) clearInterval(warmupTimer);
+    document.getElementById('warmup-modal').classList.remove('active');
+    continueToWorkout();
+}
+
+function completeWarmup() {
+    if(warmupTimer) clearInterval(warmupTimer);
+    document.getElementById('warmup-modal').classList.remove('active');
+    speak('Warmup complete! Ready to train');
+    continueToWorkout();
+}
+
+function continueToWorkout() {
+    // The workout is already loaded, just make sure it's visible
     document.getElementById('workout-interface').style.display = 'block';
 }
 
-function renderWorkout(exercises) {
-    const list = document.getElementById('workout-list');
-    list.innerHTML = '';
-    const history = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-    
-    exercises.forEach((ex, i) => {
-        const logs = history.filter(h => h.name === ex.name).sort((a,b) => new Date(a.date) - new Date(b.date)).slice(-5);
-        let sparkHTML = '';
-        if(logs.length > 1) {
-             const points = logs.map((l, idx) => `${idx * 20},${30 - (l.weight/300)*30}`).join(' ');
-             sparkHTML = `<div class="sparkline-container"><svg width="100%" height="100%"><polyline points="${points}" fill="none" stroke="var(--gold)" stroke-width="2"/></svg></div>`;
-        }
-        
-        const div = document.createElement('div');
-        div.className = `card exercise-card ${ex.type || 'Strength'}`;
-        const tags = Array.isArray(ex.cat) ? ex.cat.join(', ') : ex.cat;
-        
-        div.innerHTML = `
-            <div class="exercise-header">
-                <div onclick="openGuide('${ex.name}')" style="cursor:pointer; text-decoration:underline;"><strong>${ex.name} ℹ️</strong></div>
-                <span class="swap-btn" onclick="swapExercise(${i})">🔄 Swap</span>
-            </div>
-            ${sparkHTML}
-            <div style="font-size:0.8em; color:#777; margin-bottom:5px;">${ex.equip} | ${tags}</div>
-            <div class="row">
-                <input type="number" id="w-${i}" placeholder="Lbs" style="width:45%" oninput="showPlates(this.value)">
-                <input type="number" id="r-${i}" placeholder="Reps" style="width:45%">
-            </div>
-            <button class="btn btn-action" onclick="logSet('${ex.name}', ${i})">✅ Log Set</button>
-        `;
-        list.appendChild(div);
-    });
-}
-
-function swapExercise(idx) {
-    const current = activeRoutine[idx];
-    const alts = window.allExercises.filter(e => {
-        const currentTags = Array.isArray(current.cat) ? current.cat : [current.cat];
-        const altTags = Array.isArray(e.cat) ? e.cat : [e.cat];
-        return altTags.some(t => currentTags.includes(t)) && e.name !== current.name;
-    });
-
-    if(alts.length > 0) {
-        activeRoutine[idx] = alts[Math.floor(Math.random()*alts.length)];
-        renderWorkout(activeRoutine);
-    } else { alert("No similar exercises found."); }
-}
-
-// ─────────────────────────────────────────────────────────────
-// 5. EXTRAS (Builder, Plan, Fuel)
-// ─────────────────────────────────────────────────────────────
-
-function openBuilder(isAddMode) {
-    document.getElementById('builder-overlay').classList.remove('hidden');
-    document.getElementById('builder-overlay').style.display = 'block';
-    renderBuilderList();
-}
-function closeBuilder() { document.getElementById('builder-overlay').style.display = 'none'; }
-
-function renderBuilderList() {
-    const list = document.getElementById('builder-list-content');
-    const search = document.getElementById('builder-search-inp').value.toLowerCase();
-    list.innerHTML = '';
-    const pool = window.allExercises.filter(ex => ex.name.toLowerCase().includes(search));
-
-    pool.slice(0, 50).forEach(ex => {
-        const div = document.createElement('div');
-        div.className = 'food-item';
-        div.innerHTML = `<div><b>${ex.name}</b><br><small>${ex.equip}</small></div><button class="btn-guide" onclick="openGuide('${ex.name}')">ℹ️</button>`;
-        div.onclick = (e) => { 
-            if(e.target.tagName === 'BUTTON') return;
-            activeRoutine.push(ex); renderWorkout(activeRoutine); closeBuilder(); 
-            document.getElementById('setup-panel').style.display = 'none';
-            document.getElementById('workout-interface').style.display = 'block';
-        };
-        list.appendChild(div);
-    });
-}
-function filterBuilderList() { renderBuilderList(); }
-function toggleFilter(type, val, btn) {
-    const idx = builderFilters[type].indexOf(val);
-    if(idx > -1) { builderFilters[type].splice(idx,1); btn.classList.remove('active'); }
-    else { builderFilters[type].push(val); btn.classList.add('active'); }
-    renderBuilderList();
-}
-
-function openGuide(exName) {
-    const ex = window.allExercises.find(e => e.name === exName);
-    if(!ex) return;
-    document.getElementById('guide-modal').style.display = 'block';
-    document.getElementById('guide-modal').classList.remove('hidden');
-    document.getElementById('guide-title').innerText = ex.name;
-    
-    document.getElementById('guide-prep').innerHTML = formatGuide(ex.guide.prep || "No data.");
-    document.getElementById('guide-exec').innerHTML = formatGuide(ex.guide.exec || "No data.");
-    document.getElementById('guide-tips').innerHTML = formatGuide(ex.guide.tips || "No data.");
-    
-    const f9 = document.getElementById('f9-setup-section');
-    if(ex.equip === 'Cable' && ex.setup) {
-        f9.style.display = 'block';
-        document.getElementById('guide-arms').innerText = ex.setup.arms || '--';
-        document.getElementById('guide-pulleys').innerText = ex.setup.pulleys || '--';
-    } else { f9.style.display = 'none'; }
-    
-    const savedGif = gifOverrides[ex.name];
-    const img = document.getElementById('visual-content-img');
-    const iframe = document.getElementById('visual-content-iframe');
-    img.style.display = 'none'; iframe.style.display = 'none'; 
-    if(savedGif) {
-        if(savedGif.includes('youtube')) { iframe.src = savedGif.replace('watch?v=', 'embed/'); iframe.style.display = 'block'; }
-        else { img.src = savedGif; img.style.display = 'block'; }
-    }
-    document.getElementById('gif-search-btn').href = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(ex.name + ' exercise gif')}`;
-}
-function closeGuideModal() { document.getElementById('guide-modal').style.display = 'none'; }
-function formatGuide(arr) { return Array.isArray(arr) ? `<ul>${arr.map(i => `<li>${i}</li>`).join('')}</ul>` : arr; }
-function saveGuideGif() {
-    const url = document.getElementById('guide-gif-input').value;
-    if(url) {
-        gifOverrides[document.getElementById('guide-title').innerText] = url;
-        localStorage.setItem('nimbleGifs', JSON.stringify(gifOverrides));
-        alert("Visual Saved!");
-    }
-}
-
-// UTILS
-function finishSession() {
-    if(confirm("Finish Workout?")) {
-        document.getElementById('setup-panel').style.display = 'block';
-        document.getElementById('workout-interface').style.display = 'none';
-        activeRoutine = [];
-    }
-}
-function cancelWorkout() { finishSession(); }
-function logSet(name, idx) {
-    const w = document.getElementById(`w-${idx}`).value;
-    const r = document.getElementById(`r-${idx}`).value;
-    if(!w || !r) return;
-    let h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-    h.push({date: new Date().toISOString(), name, weight: w, reps: r});
-    localStorage.setItem('nimbleHistory', JSON.stringify(h));
-    document.activeElement.innerText = "Saved!"; 
-    document.activeElement.style.backgroundColor = "var(--success)";
-    calculateStreak();
-    if(w > 225) triggerConfetti();
-}
-function calculateStreak() {
-    const h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-    if(h.length === 0) return;
-    const dates = [...new Set(h.map(l => l.date.split('T')[0]))].sort().reverse();
-    let streak = 0;
-    let today = new Date().toISOString().split('T')[0];
-    let yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-    if(dates.includes(today) || dates.includes(yesterday)) {
-        streak = 1;
-        let checkDate = new Date(dates.includes(today) ? today : yesterday);
-        for(let i=1; i<dates.length; i++) {
-            checkDate.setDate(checkDate.getDate() - 1);
-            if(dates.includes(checkDate.toISOString().split('T')[0])) streak++; else break;
-        }
-    }
-    document.getElementById('streak-count').innerText = streak;
-}
-function updateMacroUI() {
-    if(dailyMacros.date !== new Date().toDateString()) {
-        dailyMacros = {c:0, p:0, ch:0, f:0, date: new Date().toDateString()};
-        localStorage.setItem('nimbleMacros', JSON.stringify(dailyMacros));
-    }
-    document.getElementById('disp-cals').innerText = dailyMacros.c;
-    document.getElementById('disp-pro').innerText = dailyMacros.p;
-    document.getElementById('bar-cals').style.width = Math.min((dailyMacros.c / 2500)*100, 100) + "%";
-    document.getElementById('bar-pro').style.width = Math.min((dailyMacros.p / 180)*100, 100) + "%";
-}
-async function searchFood() {
-    const query = document.getElementById('food-search').value;
-    const resDiv = document.getElementById('search-results');
-    if(!query) return;
-    resDiv.innerHTML = '<div style="padding:10px; color:#aaa;">Scanning...</div>';
-    try {
-        const res = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&pageSize=5&api_key=${apiKey}`);
-        const data = await res.json();
-        resDiv.innerHTML = '';
-        if(!data.foods) return resDiv.innerHTML = 'No results.';
-        data.foods.forEach(f => {
-            const getNut = (id) => (f.foodNutrients.find(x => x.nutrientId === id) || {}).value || 0;
-            const c=Math.round(getNut(1008)), p=Math.round(getNut(1003));
-            const div = document.createElement('div');
-            div.className = 'food-item';
-            div.innerHTML = `<div><b>${f.description}</b><br><small>${c}cal P:${p}</small></div><button class="btn-action" style="width:auto;">+</button>`;
-            div.onclick = () => {
-                dailyMacros.c += c; dailyMacros.p += p; 
-                localStorage.setItem('nimbleMacros', JSON.stringify(dailyMacros));
-                updateMacroUI();
-                alert("Added!");
-                resDiv.innerHTML = '';
-            };
-            resDiv.appendChild(div);
-        });
-    } catch(e) { resDiv.innerHTML = 'Error searching.'; }
-}
-function renderPlanner() {
-    const grid = document.getElementById('week-grid');
-    if(!grid) return;
-    grid.innerHTML = '';
-    const days = ['S','M','T','W','T','F','S'];
-    days.forEach((d, i) => {
-        const type = userSettings.schedule[i] || 'Rest';
-        grid.innerHTML += `<div class="day-bubble" onclick="setSchedule(${i})"><b>${d}</b><span style="font-size:0.5em">${type.substring(0,3)}</span></div>`;
-    });
-}
-function setSchedule(i) {
-    const types = ['Rest','Push','Pull','Legs','Nimble','Full'];
-    const cur = userSettings.schedule[i] || 'Rest';
-    const next = types[(types.indexOf(cur)+1)%types.length];
-    userSettings.schedule[i] = next;
-    localStorage.setItem('nimbleSettings', JSON.stringify(userSettings));
-    renderPlanner();
-}
-function renderHeatmap() {
-    const h = JSON.parse(localStorage.getItem('nimbleHistory')) || [];
-    const counts = {};
-    h.forEach(l => { const ex = window.allExercises.find(e => e.name === l.name); if(ex) {
-        const cats = Array.isArray(ex.cat) ? ex.cat : [ex.cat];
-        cats.forEach(c => counts[c] = (counts[c]||0)+1); 
-    }});
-    const container = document.getElementById('muscle-heatmap');
+// ========================================
+// AI COACH ANALYTICS
+// ========================================
+function updateAiCoach() {
+    const container = document.getElementById('ai-coach-suggestions');
     if(!container) return;
-    container.innerHTML = '';
-    ['Chest','Back','Legs','Shoulders','Arms','Core'].forEach(m => {
-        const val = counts[m] || 0;
-        let cls = 'heat-cell';
-        if(val > 10) cls += ' heat-hot'; else if(val > 5) cls += ' heat-warm'; else if(val > 0) cls += ' heat-mild';
-        container.innerHTML += `<div class="${cls}">${m}<br>${val}</div>`;
-    });
+    
+    const completedWorkouts = JSON.parse(localStorage.getItem('completedWorkouts') || '{}');
+    const plan = JSON.parse(localStorage.getItem('currentPlan') || '[]');
+    
+    // Calculate this week's data
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+    
+    let workoutsThisWeek = 0;
+    let plannedThisWeek = 0;
+    let consecutiveDays = 0;
+    let lastWorkoutDate = null;
+    
+    for(let i = 0; i < 7; i++) {
+        const date = new Date(startOfWeek);
+        date.setDate(startOfWeek.getDate() + i);
+        const dateStr = date.toISOString().split('T')[0];
+        
+        if(completedWorkouts[dateStr]) {
+            workoutsThisWeek++;
+            if(!lastWorkoutDate || (date - lastWorkoutDate) / (1000*60*60*24) === 1) {
+                consecutiveDays++;
+            }
+            lastWorkoutDate = date;
+        }
+        
+        if(plan[i] && plan[i] !== 'rest') {
+            plannedThisWeek++;
+        }
+    }
+    
+    const adherenceRate = plannedThisWeek > 0 ? (workoutsThisWeek / plannedThisWeek) * 100 : 0;
+    
+    let html = '';
+    
+    // Generate AI coach message
+    if(adherenceRate >= 80) {
+        html += `
+            <div class="ai-coach-card success">
+                <h3>🎯 Excellent Progress!</h3>
+                <p>Adherence: <strong>${adherenceRate.toFixed(0)}%</strong> (${workoutsThisWeek}/${plannedThisWeek} workouts)</p>
+                <p style="margin-top:10px;">You're crushing it! Your consistency is outstanding. Keep up this momentum!</p>
+            </div>
+        `;
+    } else if(adherenceRate >= 50) {
+        html += `
+            <div class="ai-coach-card">
+                <h3>💪 Good Work!</h3>
+                <p>Adherence: <strong>${adherenceRate.toFixed(0)}%</strong> (${workoutsThisWeek}/${plannedThisWeek} workouts)</p>
+                <p style="margin-top:10px;">You're making solid progress. Try to hit all planned workouts for maximum results!</p>
+            </div>
+        `;
+    } else if(plannedThisWeek > 0) {
+        html += `
+            <div class="ai-coach-card warning">
+                <h3>⚠️ Need More Consistency</h3>
+                <p>Adherence: <strong>${adherenceRate.toFixed(0)}%</strong> (${workoutsThisWeek}/${plannedThisWeek} workouts)</p>
+                <p style="margin-top:10px;">You've missed several workouts this week. Remember: consistency beats intensity!</p>
+            </div>
+        `;
+    }
+    
+    // Overtraining detection
+    if(workoutsThisWeek >= 6 && consecutiveDays >= 6) {
+        html += `
+            <div class="ai-coach-card warning">
+                <h3>🛑 Recovery Check</h3>
+                <p>You've trained ${consecutiveDays} days in a row.</p>
+                <p style="margin-top:10px;">Consider taking a rest day soon to prevent overtraining and optimize recovery.</p>
+            </div>
+        `;
+    }
+    
+    // Streak tracking
+    if(consecutiveDays >= 3) {
+        html += `
+            <div class="ai-coach-card success">
+                <h3>🔥 ${consecutiveDays} Day Streak!</h3>
+                <p>Amazing consistency! Remember to balance intensity with recovery.</p>
+            </div>
+        `;
+    }
+    
+    container.innerHTML = html;
 }
-function toggleInjuryPanel() { document.getElementById('injury-chips').style.display = document.getElementById('injury-chips').style.display === 'none' ? 'flex' : 'none'; }
-function toggleInjury(part, btn) {
-    const idx = userSettings.injuryMode.indexOf(part);
-    if(idx > -1) { userSettings.injuryMode.splice(idx, 1); btn.classList.remove('danger-active'); } 
-    else { userSettings.injuryMode.push(part); btn.classList.add('danger-active'); }
-    localStorage.setItem('nimbleSettings', JSON.stringify(userSettings));
-    document.getElementById('injury-status').innerText = userSettings.injuryMode.join(', ') || 'None';
+
+// ========================================
+// UTILITY FUNCTIONS
+// ========================================
+function capitalizeFirst(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
 }
-function calcReadiness() { document.getElementById('score-display').innerText = (parseInt(document.getElementById('val-sleep').value)*10) + "%"; }
-function showPlates(val) { document.getElementById('plate-helper').innerHTML = val >= 135 ? `<div class="plate p-45"></div>`.repeat(Math.floor((val-45)/90)) : ''; }
-function updateTimeLabel(val) { document.getElementById('time-val').innerText = (val * 7) + "m (" + val + " Ex)"; }
-function nextPhase() { userSettings.currentPhase = (userSettings.currentPhase % 4) + 1; localStorage.setItem('nimbleSettings', JSON.stringify(userSettings)); renderPlanner(); }
-function startBreathWork() { document.getElementById('breath-modal').style.display = 'flex'; }
-function openTimerOverlay() { document.getElementById('timer-overlay').style.display = 'flex'; }
-function closeTimer() { document.getElementById('timer-overlay').style.display = 'none'; }
-function saveBodyStat() { alert("Weight Saved!"); }
-function exportData() { alert("Data Copied!"); }
-function setTheme(n) { alert("Theme: " + n); }
+
 </script>
 </body>
 </html>
