@@ -265,6 +265,122 @@
             margin-top: 10px; 
         }
         
+        /* GARMIN RECOVERY STYLES */
+        .drop-zone {
+            border: 3px dashed #007CC3;
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            background: rgba(0,124,195,0.05);
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 20px 0;
+        }
+        .drop-zone:hover {
+            border-color: #00ff9d;
+            background: rgba(0,255,157,0.05);
+            transform: scale(1.02);
+        }
+        .drop-zone.dragover {
+            border-color: #00C853;
+            background: rgba(0,255,157,0.1);
+            transform: scale(1.05);
+        }
+        .recovery-score {
+            font-size: 72px;
+            font-weight: 700;
+            font-family: monospace;
+            text-align: center;
+            margin: 30px 0;
+            background: linear-gradient(135deg, #00ff9d, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .recovery-meter {
+            height: 20px;
+            background: #222;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .recovery-meter-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 1s ease-out;
+            background: linear-gradient(90deg, #CF6679, #FF9800, #00C853);
+        }
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .metric-card {
+            background: rgba(255,255,255,0.03);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .metric-label {
+            font-size: 0.75em;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            font-family: monospace;
+            color: #00ff9d;
+        }
+        .ai-recommendation {
+            background: linear-gradient(135deg, rgba(0,255,157,0.1), rgba(0,212,255,0.1));
+            padding: 25px;
+            border-radius: 16px;
+            border-left: 4px solid #00ff9d;
+            margin: 20px 0;
+        }
+        .ai-recommendation h3 {
+            color: #00ff9d;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        .workout-adjustment {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 3px solid #00d4ff;
+        }
+        .file-list { margin: 15px 0; }
+        .file-item {
+            background: rgba(255,255,255,0.05);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        .file-item .file-name { color: #00ff9d; }
+        .file-item .file-size { color: #888; }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0,255,157,0.3);
+            border-radius: 50%;
+            border-top-color: #00ff9d;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
         /* GPS MAP */
         .gps-map { 
             width: 100%; 
@@ -476,6 +592,19 @@
         </select>
         <button class="btn btn-action" onclick="testVoice()">🎵 Test Voice</button>
     </div>
+    
+    <div class="card">
+        <h3>💾 Backup Exercise Images</h3>
+        <p class="text-muted" style="margin-bottom:10px;">
+            Export your saved images to a file, so you can restore them if you clear browser data.
+        </p>
+        <button class="btn btn-success" onclick="exportImages()">📥 Export Images</button>
+        <button class="btn btn-action" onclick="document.getElementById('import-file').click()">📤 Import Images</button>
+        <input type="file" id="import-file" accept=".json" onchange="importImages(event)" style="display:none;">
+        <p class="text-muted" style="margin-top:10px; font-size:0.75em;">
+            <strong>Tip:</strong> Store the exported file in your GitHub repo so you never lose your images!
+        </p>
+    </div>
 
 </div>
 
@@ -494,12 +623,106 @@
             <div class="chip" onclick="filterEncyclopedia('Back')">Back</div>
             <div class="chip" onclick="filterEncyclopedia('Legs')">Legs</div>
             <div class="chip" onclick="filterEncyclopedia('Shoulders')">Shoulders</div>
+            <div class="chip" onclick="filterEncyclopedia('Arms')">Arms</div>
+        </div>
+        
+        <label style="margin-top: 10px; display: block;">Equipment & Style:</label>
+        <div class="chip-container">
             <div class="chip" onclick="filterEncyclopedia('Cable')">Cables</div>
+            <div class="chip" onclick="filterEncyclopedia('Dumbbell')">Dumbbells</div>
+            <div class="chip" onclick="filterEncyclopedia('Barbell')">Barbells</div>
             <div class="chip" onclick="filterEncyclopedia('Bodyweight')">Bodyweight</div>
+        </div>
+        
+        <label style="margin-top: 10px; display: block; color: #9b59b6; font-weight: bold;">💜 40+ Friendly:</label>
+        <div class="chip-container">
+            <div class="chip" onclick="filterEncyclopedia('Mobility')" style="border-color: #9b59b6;">🧘 Mobility (36)</div>
+            <div class="chip" onclick="filterEncyclopedia('Nimble')" style="border-color: #9b59b6;">🤸 Nimble (25)</div>
+            <div class="chip" onclick="filterEncyclopedia('Calisthenics')" style="border-color: #9b59b6;">💪 Calisthenics (41)</div>
+            <div class="chip" onclick="filterEncyclopedia('Plyo')" style="border-color: #FF9800;">⚡ Plyometric</div>
         </div>
     </div>
     
     <div id="encyclopedia-list"></div>
+</div>
+
+<!-- GARMIN RECOVERY CONTAINER -->
+<div class="container" id="view-garmin">
+    <div class="card" style="background: linear-gradient(135deg, rgba(0,124,195,0.1), rgba(0,212,255,0.1)); border: 2px solid #007CC3;">
+        <h2 style="font-size: 2em; margin-bottom: 10px; background: linear-gradient(135deg, #00ff9d, #00d4ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            🏃 Garmin AI Recovery Coach
+        </h2>
+        <p style="color: #888; margin-bottom: 30px;">Upload your Garmin data for AI-powered recovery analysis</p>
+        
+        <!-- UPLOAD ZONE -->
+        <div class="drop-zone" id="dropZone">
+            <div style="font-size: 3em; margin-bottom: 10px;">📊</div>
+            <h3>Drop Garmin CSV Files Here</h3>
+            <p style="color: #888; margin-top: 10px;">or click to browse</p>
+            <input type="file" id="fileInput" multiple accept=".csv" style="display: none;">
+        </div>
+        
+        <div id="fileList" class="file-list"></div>
+        
+        <button class="btn btn-main" id="analyzeBtn" style="display: none;">
+            🤖 Analyze with AI Coach
+        </button>
+        
+        <!-- HOW TO GET DATA -->
+        <div style="margin-top: 30px; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 12px;">
+            <h3 style="color: #00d4ff; margin-bottom: 15px;">📥 How to Export from Garmin Connect</h3>
+            <ol style="line-height: 2; padding-left: 20px;">
+                <li>Go to <a href="https://connect.garmin.com" target="_blank" style="color: #00ff9d;">connect.garmin.com</a></li>
+                <li>Sign in to your account</li>
+                <li>Click your profile icon → Settings</li>
+                <li>Look for "Data Management" or "Export Data"</li>
+                <li>Select last 7-30 days</li>
+                <li>Download CSVs for: Activities, Sleep, Daily Summary</li>
+                <li>Upload them here!</li>
+            </ol>
+        </div>
+    </div>
+    
+    <!-- RECOVERY ANALYSIS RESULTS -->
+    <div id="recoveryResults" style="display: none;">
+        <div class="card">
+            <h2 style="text-align: center; margin-bottom: 20px; color: #00ff9d;">Recovery Status</h2>
+            
+            <div class="recovery-score" id="recoveryScore">--</div>
+            
+            <div class="recovery-meter">
+                <div class="recovery-meter-fill" id="recoveryMeterFill" style="width: 0%"></div>
+            </div>
+            
+            <p style="text-align: center; color: #888; margin-top: 10px;" id="recoveryStatus">Analyzing...</p>
+        </div>
+        
+        <!-- METRICS -->
+        <div class="card">
+            <h3 style="margin-bottom: 20px;">📊 Key Metrics</h3>
+            <div class="metric-grid" id="metricsGrid"></div>
+        </div>
+        
+        <!-- AI RECOMMENDATIONS -->
+        <div class="card">
+            <h3 style="margin-bottom: 20px;">🤖 AI Coach Recommendations</h3>
+            <div id="aiRecommendations"></div>
+        </div>
+        
+        <!-- RAW DATA -->
+        <div class="card">
+            <details>
+                <summary style="cursor: pointer; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                    🔍 View Raw Garmin Data
+                </summary>
+                <div id="rawData" style="margin-top: 15px; font-family: monospace; font-size: 0.85em; background: #000; padding: 15px; border-radius: 8px; overflow-x: auto; max-height: 400px; overflow-y: auto;"></div>
+            </details>
+        </div>
+        
+        <button class="btn btn-action" onclick="resetGarminUpload()">
+            🔄 Upload New Data
+        </button>
+    </div>
 </div>
 
 <!-- NAVIGATION -->
@@ -507,11 +730,11 @@
     <button class="nav-btn active" onclick="switchTab('coach')">
         <div class="nav-icon">💪</div>Coach
     </button>
+    <button class="nav-btn" onclick="switchTab('garmin')">
+        <div class="nav-icon">🏃</div>Recovery
+    </button>
     <button class="nav-btn" onclick="switchTab('plan')">
         <div class="nav-icon">📅</div>Plan
-    </button>
-    <button class="nav-btn" onclick="switchTab('cardio')">
-        <div class="nav-icon">🚴</div>Cardio
     </button>
     <button class="nav-btn" onclick="switchTab('encyclopedia')">
         <div class="nav-icon">📚</div>Library
@@ -541,13 +764,30 @@
         </div>
         
         <div style="margin-bottom: 15px;">
-            <label>Filter by:</label>
+            <label>Filter by Muscle Group:</label>
             <div class="chip-container">
                 <div class="chip active" onclick="filterBuilder('all')">All</div>
                 <div class="chip" onclick="filterBuilder('Chest')">Chest</div>
                 <div class="chip" onclick="filterBuilder('Back')">Back</div>
                 <div class="chip" onclick="filterBuilder('Legs')">Legs</div>
                 <div class="chip" onclick="filterBuilder('Shoulders')">Shoulders</div>
+                <div class="chip" onclick="filterBuilder('Arms')">Arms</div>
+            </div>
+            
+            <label style="margin-top: 10px; display: block;">Equipment:</label>
+            <div class="chip-container">
+                <div class="chip" onclick="filterBuilder('Cable')">Cables</div>
+                <div class="chip" onclick="filterBuilder('Dumbbell')">Dumbbells</div>
+                <div class="chip" onclick="filterBuilder('Barbell')">Barbells</div>
+                <div class="chip" onclick="filterBuilder('Bodyweight')">Bodyweight</div>
+            </div>
+            
+            <label style="margin-top: 10px; display: block; color: #9b59b6; font-weight: bold;">💜 40+ Friendly:</label>
+            <div class="chip-container">
+                <div class="chip" onclick="filterBuilder('Mobility')" style="border-color: #9b59b6;">🧘 Mobility (36)</div>
+                <div class="chip" onclick="filterBuilder('Nimble')" style="border-color: #9b59b6;">🤸 Nimble (25)</div>
+                <div class="chip" onclick="filterBuilder('Calisthenics')" style="border-color: #9b59b6;">💪 Calisthenics (41)</div>
+                <div class="chip" onclick="filterBuilder('Plyo')" style="border-color: #FF9800;">⚡ Plyometric</div>
             </div>
         </div>
         
@@ -1733,8 +1973,77 @@ let appState = {
 // ========================================
 // INITIALIZATION
 // ========================================
+// ========================================
+// PRE-LOADED EXERCISE IMAGES (50 exercises)
+// Generated: 2026-01-29
+// ========================================
+
+const preloadedImages = {
+    'gif_Arnold Press': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Arnold-Press.gif',
+    'gif_Barbell Curl': 'https://cdn.shopify.com/s/files/1/0618/9462/3460/files/cable-curls.gif?v=1741771141',
+    'gif_Barbell Row': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Bent-Over-Row.gif',
+    'gif_Bench Press': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Bench-Press.gif',
+    'gif_Bodyweight Squat': 'https://www.inspireusafoundation.org/file/2023/08/bodyweight-squat-example.png',
+    'gif_Bulgarian Split Squat': 'https://www.inspireusafoundation.org/file/2022/03/bulgarian-split-spuat.gif',
+    'gif_Cable Bicep Curl': 'https://cdn.shopify.com/s/files/1/0618/9462/3460/files/cable-curls.gif?v=1741771141',
+    'gif_Cable Chest Fly (High)': 'https://www.inspireusafoundation.org/wp-content/uploads/2023/08/high-cable-fly.gif',
+    'gif_Cable Chest Fly (Low)': 'https://cdn.shopify.com/s/files/1/0618/9462/3460/files/4324d0a44439cc85146e9db778f65f2a_cable_low_fly_gif___Google_Search.gif?v=1742448445',
+    'gif_Cable Chest Press': 'https://fitliferegime.com/wp-content/uploads/2023/07/Standing-Cable-Chest-Press.gif',
+    'gif_Cable Lateral Raise': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Lateral-Raise.gif',
+    'gif_Cable Overhead Press': 'https://www.inspireusafoundation.org/file/2022/04/military-press.gif',
+    'gif_Cable Pull-Through': 'https://www.inspireusafoundation.org/file/2023/07/cable-pull-through.gif',
+    'gif_Cable Rows': 'https://www.inspireusafoundation.org/file/2023/07/cable-wide-grip-row.gif',
+    'gif_Cable Squat': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/BARBELL-SQUAT.gif',
+    'gif_Chin-ups': 'https://www.inspireusafoundation.org/file/2022/09/chin-ups.gif',
+    'gif_Deadlift': 'https://www.inspireusafoundation.org/file/2022/02/barbell-deadlift-movement.gif',
+    'gif_Dips': 'https://fitnessprogramer.com/wp-content/uploads/2021/04/CHAIR-DIPS.gif',
+    'gif_Dumbbell Bench Press': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Press.gif',
+    'gif_Dumbbell Curl': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Curl.gif',
+    'gif_Dumbbell Fly': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Incline-dumbbell-Fly.gif',
+    'gif_Dumbbell Incline Press': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Incline-Dumbbell-Press.gif',
+    'gif_Dumbbell Lunge': 'https://fitnessprogramer.com/wp-content/uploads/2023/09/dumbbell-lunges.gif',
+    'gif_Dumbbell Press': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Press.gif',
+    'gif_Dumbbell Row': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Row.gif',
+    'gif_Dumbbell Shoulder Press': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Shoulder-Press.gif',
+    'gif_Face Pulls': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Face-Pull.gif',
+    'gif_Front Raise': 'https://www.inspireusafoundation.org/file/2022/01/cable-front-raise-movement.gif',
+    'gif_Glute Bridge': 'https://www.inspireusafoundation.org/file/2022/12/glute-bridge.gif',
+    'gif_Goblet Squat': 'https://fitnessprogramer.com/wp-content/uploads/2021/05/Cable-Squat.gif',
+    'gif_Hammer Curl': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Hammer-Curl.gif',
+    'gif_Incline Press': 'https://liftmanual.com/wp-content/uploads/2023/04/cable-incline-bench-press.webp',
+    'gif_Lat Pulldown (Standing)': 'https://ccuuubmtdurkmbeufybi.supabase.co/storage/v1/object/public/animations/0238.gif',
+    'gif_Lateral Raise': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Lateral-Raise.gif',
+    'gif_Leg Curl': 'https://liftmanual.com/wp-content/uploads/2023/04/cable-standing-leg-curl.gif',
+    'gif_Leg Extension': 'https://www.inspireusafoundation.org/file/2021/06/leg-extension-machine.gif',
+    'gif_Leg Press': 'https://fitnessprogramer.com/wp-content/uploads/2021/05/Cable-Squat.gif',
+    'gif_Lunges': 'https://fitnessprogramer.com/wp-content/uploads/2025/09/pendulum-lunge.gif',
+    'gif_Mountain Climbers': 'https://homeworkouts.org/wp-content/uploads/anim-mountain-climbers.gif',
+    'gif_Overhead Press': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Shoulder-Press.gif',
+    'gif_Planks': 'https://www.inspireusafoundation.org/file/2022/01/plank.gif',
+    'gif_Pull-ups': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Pull-up.gif',
+    'gif_Push-ups': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Push-Up.gif',
+    'gif_Romanian Deadlift': 'https://www.inspireusafoundation.org/file/2021/11/dumbbell-romanian-deadlift.gif',
+    'gif_Romanian Deadlift (DB)': 'https://www.inspireusafoundation.org/file/2021/11/dumbbell-romanian-deadlift.gif',
+    'gif_Seated Cable Row': 'https://www.inspireusafoundation.org/file/2022/08/cable-seated-row.gif',
+    'gif_Squat': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/BARBELL-SQUAT.gif',
+    'gif_Straight Arm Pulldown': 'https://ccuuubmtdurkmbeufybi.supabase.co/storage/v1/object/public/animations/0238.gif',
+    'gif_Tricep Extension': 'https://fitnessvolt.com/wp-content/uploads/2023/09/v-bar-tricep-pushdown.gif',
+    'gif_Tricep Pushdown (Rope)': 'https://fitnessprogramer.com/wp-content/uploads/2021/06/Rope-Pushdown.gif'
+};
+
+function loadPreloadedImages() {
+    Object.keys(preloadedImages).forEach(key => {
+        if(!localStorage.getItem(key)) {
+            localStorage.setItem(key, preloadedImages[key]);
+            console.log('✅ Loaded: ' + key);
+        }
+    });
+    console.log('✅ Pre-loaded 50 exercise images');
+}
+
 window.onload = () => {
     loadAppState();
+    loadPreloadedImages(); // ← Load exercise GIFs
     renderPlanCalendar();
     renderEquipmentPresets();
     updateTodaysBanner();
@@ -2101,7 +2410,9 @@ function renderBuilderExerciseList() {
     // Apply filter
     if(appState.builderFilter !== 'all') {
         exercises = exercises.filter(ex => 
-            ex.cat.includes(appState.builderFilter) || ex.equip === appState.builderFilter
+            ex.cat.includes(appState.builderFilter) || 
+            ex.equip === appState.builderFilter ||
+            ex.type === appState.builderFilter
         );
     }
     
@@ -2114,7 +2425,14 @@ function renderBuilderExerciseList() {
     exercises = filterExercisesByEquipment(exercises);
     
     container.innerHTML = '';
-    exercises.slice(0, 50).forEach(ex => {
+    
+    // Show total count
+    const totalEl = document.createElement('div');
+    totalEl.style.cssText = 'padding: 10px; background: rgba(3,218,198,0.1); border-radius: 8px; margin-bottom: 10px; text-align: center; color: #03DAC6;';
+    totalEl.textContent = `${exercises.length} exercises available`;
+    container.appendChild(totalEl);
+    
+    exercises.forEach(ex => {
         const div = document.createElement('div');
         div.className = 'exercise-list-item';
         if(appState.selectedExercises.some(e => e.name === ex.name)) {
@@ -2189,7 +2507,14 @@ function renderEncyclopedia() {
     }
     
     container.innerHTML = '';
-    exercises.slice(0, 30).forEach(ex => {
+    
+    // Show total count
+    const totalEl = document.createElement('div');
+    totalEl.style.cssText = 'padding: 10px; background: rgba(187,134,252,0.1); border-radius: 8px; margin-bottom: 15px; text-align: center; color: #BB86FC; font-weight: bold;';
+    totalEl.textContent = `📚 ${exercises.length} exercises in library`;
+    container.appendChild(totalEl);
+    
+    exercises.forEach(ex => {
         const card = document.createElement('div');
         card.className = 'card';
         card.style.cursor = 'pointer';
@@ -2217,12 +2542,21 @@ function filterEncyclopedia(category) {
     
     if(category !== 'all') {
         exercises = exercises.filter(ex => 
-            ex.cat.includes(category) || ex.equip === category
+            ex.cat.includes(category) || 
+            ex.equip === category ||
+            ex.type === category
         );
     }
     
     container.innerHTML = '';
-    exercises.slice(0, 30).forEach(ex => {
+    
+    // Show total count
+    const totalEl = document.createElement('div');
+    totalEl.style.cssText = 'padding: 10px; background: rgba(187,134,252,0.1); border-radius: 8px; margin-bottom: 15px; text-align: center; color: #BB86FC; font-weight: bold;';
+    totalEl.textContent = `📚 ${exercises.length} exercises ${category !== 'all' ? 'in ' + category : 'total'}`;
+    container.appendChild(totalEl);
+    
+    exercises.forEach(ex => {
         const card = document.createElement('div');
         card.className = 'card';
         card.style.cursor = 'pointer';
@@ -2261,6 +2595,15 @@ function viewExerciseDetails(exerciseName) {
                 <button class="btn-small btn-action" onclick="openGifSearch('${exercise.name.replace(/'/g,"\\'")}')">🔍 Find Different GIF</button>
                 <button class="btn-small btn-danger" onclick="removeExerciseGif('${exercise.name.replace(/'/g,"\\'")}')">🗑️ Remove</button>
             </div>
+            <div style="margin-top: 10px;">
+                <input 
+                    type="text" 
+                    id="paste-url-${exercise.name.replace(/[^a-zA-Z0-9]/g, '_')}"
+                    placeholder="Or paste new image URL here..."
+                    style="margin-bottom: 5px;"
+                >
+                <button class="btn-small btn-success" onclick="pasteImageUrl('${exercise.name.replace(/'/g,"\\'")}')">💾 Save URL</button>
+            </div>
         `;
     } else {
         html += `
@@ -2275,6 +2618,15 @@ function viewExerciseDetails(exerciseName) {
                     📤 Upload Image
                     <input type="file" accept="image/*" onchange="uploadExerciseGif('${exercise.name.replace(/'/g,"\\'")}', event)" style="display:none;">
                 </label>
+            </div>
+            <div style="margin-top: 10px;">
+                <input 
+                    type="text" 
+                    id="paste-url-${exercise.name.replace(/[^a-zA-Z0-9]/g, '_')}"
+                    placeholder="Paste image URL here..."
+                    style="margin-bottom: 5px;"
+                >
+                <button class="btn-small btn-success" onclick="pasteImageUrl('${exercise.name.replace(/'/g,"\\'")}')">💾 Save URL</button>
             </div>
         `;
     }
@@ -2687,6 +3039,79 @@ function testVoice() {
 }
 
 // ========================================
+// IMAGE BACKUP & RESTORE
+// ========================================
+function exportImages() {
+    // Collect all exercise images from localStorage
+    const images = {};
+    let count = 0;
+    
+    Object.keys(localStorage).forEach(key => {
+        if(key.startsWith('gif_')) {
+            images[key] = localStorage.getItem(key);
+            count++;
+        }
+    });
+    
+    if(count === 0) {
+        alert('No images to export. Add some exercise images first!');
+        return;
+    }
+    
+    // Create JSON file
+    const dataStr = JSON.stringify(images, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    
+    // Create download link
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `nimble-exercise-images-${new Date().toISOString().split('T')[0]}.json`;
+    
+    // Trigger download
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    speak(`Exported ${count} exercise images`);
+    alert(`✅ Exported ${count} exercise images!\n\nSave this file in your GitHub repo or safe location.`);
+}
+
+function importImages(event) {
+    const file = event.target.files[0];
+    if(!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const images = JSON.parse(e.target.result);
+            let count = 0;
+            
+            // Import all images
+            Object.keys(images).forEach(key => {
+                if(key.startsWith('gif_')) {
+                    localStorage.setItem(key, images[key]);
+                    count++;
+                }
+            });
+            
+            speak(`Imported ${count} exercise images`);
+            alert(`✅ Imported ${count} exercise images!\n\nYour images have been restored.`);
+            
+            // Clear file input
+            event.target.value = '';
+            
+        } catch(err) {
+            alert('❌ Error importing file. Make sure it\'s a valid backup file.');
+            console.error('Import error:', err);
+        }
+    };
+    
+    reader.readAsText(file);
+}
+
+// ========================================
 // SIMPLE GOOGLE IMAGE SEARCH
 // ========================================
 function openGifSearch(exerciseName) {
@@ -2707,6 +3132,39 @@ function removeExerciseGif(exerciseName) {
         speak('Image removed');
         viewExerciseDetails(exerciseName);
     }
+}
+
+function pasteImageUrl(exerciseName) {
+    // Get the input field ID (sanitized exercise name)
+    const inputId = `paste-url-${exerciseName.replace(/[^a-zA-Z0-9]/g, '_')}`;
+    const input = document.getElementById(inputId);
+    
+    if(!input) {
+        alert('Error: Could not find input field');
+        return;
+    }
+    
+    const imageUrl = input.value.trim();
+    
+    // Validate URL
+    if(!imageUrl) {
+        alert('Please paste an image URL first');
+        return;
+    }
+    
+    // Basic URL validation
+    if(!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+        alert('Please enter a valid URL starting with http:// or https://');
+        return;
+    }
+    
+    // Save to localStorage
+    localStorage.setItem(`gif_${exerciseName}`, imageUrl);
+    
+    // Clear input and refresh view
+    input.value = '';
+    speak(`Image URL saved for ${exerciseName}`);
+    viewExerciseDetails(exerciseName);
 }
 
 // ========================================
@@ -3097,6 +3555,329 @@ function updateAiCoach() {
 function capitalizeFirst(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+// ========================================
+// GARMIN CSV UPLOAD & AI ANALYSIS
+// ========================================
+let uploadedGarminFiles = [];
+let garminData = {};
+
+// Initialize Garmin upload handlers
+function initGarminUpload() {
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    
+    if (!dropZone || !fileInput) return;
+    
+    dropZone.addEventListener('click', () => fileInput.click());
+    
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+    
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
+    
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        handleGarminFiles(e.dataTransfer.files);
+    });
+    
+    fileInput.addEventListener('change', (e) => {
+        handleGarminFiles(e.target.files);
+    });
+    
+    if (analyzeBtn) {
+        analyzeBtn.addEventListener('click', analyzeGarminData);
+    }
+}
+
+function handleGarminFiles(files) {
+    uploadedGarminFiles = Array.from(files).filter(f => f.name.endsWith('.csv'));
+    
+    if (uploadedGarminFiles.length === 0) {
+        alert('Please upload CSV files only');
+        return;
+    }
+    
+    displayGarminFileList();
+    document.getElementById('analyzeBtn').style.display = 'block';
+}
+
+function displayGarminFileList() {
+    const fileList = document.getElementById('fileList');
+    fileList.innerHTML = '<h4 style="margin-bottom: 10px; color: #00ff9d;">Files Ready:</h4>';
+    
+    uploadedGarminFiles.forEach(file => {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'file-item';
+        fileItem.innerHTML = `
+            <span class="file-name">📄 ${file.name}</span>
+            <span class="file-size">${(file.size / 1024).toFixed(1)} KB</span>
+        `;
+        fileList.appendChild(fileItem);
+    });
+}
+
+async function analyzeGarminData() {
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    analyzeBtn.innerHTML = '<span class="loading"></span> Analyzing with Claude AI...';
+    analyzeBtn.disabled = true;
+    
+    try {
+        // Read all CSV files
+        const fileContents = await Promise.all(
+            uploadedGarminFiles.map(file => readFileAsText(file))
+        );
+        
+        // Prepare data
+        let dataText = '';
+        uploadedGarminFiles.forEach((file, i) => {
+            dataText += `\n\n=== ${file.name} ===\n${fileContents[i]}`;
+        });
+        
+        // Send to Claude for analysis
+        const response = await fetch("https://api.anthropic.com/v1/messages", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                model: "claude-sonnet-4-20250514",
+                max_tokens: 3000,
+                messages: [{
+                    role: "user",
+                    content: `You are an elite AI fitness coach analyzing Garmin health data. Be specific, actionable, and direct.
+
+MY GARMIN DATA:
+${dataText}
+
+ANALYSIS REQUIRED:
+
+1. RECOVERY SCORE (0-100)
+Calculate an overall recovery score based on:
+- Sleep quality and duration
+- Heart rate variability (if available)
+- Resting heart rate trends
+- Recent activity load
+- Any stress indicators
+
+2. KEY METRICS
+Extract and analyze:
+- Average sleep duration (last 7 days)
+- Sleep quality trend
+- Resting heart rate (current and trend)
+- HRV status (if available)
+- Recent training load
+- Rest days taken
+
+3. TODAY'S WORKOUT RECOMMENDATION
+Based on recovery, should I:
+- Train hard (green light)
+- Train with modifications (yellow light)  
+- Rest or very light activity (red light)
+
+Provide SPECIFIC modifications if needed (e.g., "reduce weight by 15%", "cut volume by 30%", "focus on mobility work")
+
+4. INSIGHTS & PATTERNS
+- Any concerning trends?
+- Overtraining signals?
+- Recovery optimization tips?
+- Sleep recommendations?
+
+FORMAT YOUR RESPONSE AS JSON:
+{
+  "recoveryScore": 75,
+  "recoveryStatus": "Good - Ready to Train",
+  "metrics": {
+    "avgSleep": "7.2 hours",
+    "sleepTrend": "improving",
+    "restingHR": "58 bpm",
+    "hrTrend": "stable",
+    "hrv": "45ms",
+    "hrvStatus": "balanced",
+    "trainingLoad": "moderate",
+    "restDays": 1
+  },
+  "recommendation": {
+    "status": "green",
+    "title": "Full Training Recommended",
+    "details": "Your recovery metrics look excellent. You can train at full intensity today.",
+    "modifications": null
+  },
+  "insights": [
+    "Sleep quality has improved 15% this week",
+    "Resting HR is stable - good sign of adaptation"
+  ],
+  "warnings": []
+}
+
+IMPORTANT: Return ONLY valid JSON, no markdown formatting or explanation text.`
+                }]
+            })
+        });
+        
+        const result = await response.json();
+        const aiResponse = result.content[0].text;
+        
+        // Parse JSON response
+        let analysis;
+        try {
+            const cleanJson = aiResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+            analysis = JSON.parse(cleanJson);
+        } catch (e) {
+            console.error('Failed to parse AI response:', aiResponse);
+            throw new Error('AI response was not valid JSON');
+        }
+        
+        displayGarminResults(analysis);
+        
+    } catch (error) {
+        console.error('Analysis failed:', error);
+        alert('Failed to analyze data. Check console for details.');
+        analyzeBtn.innerHTML = '🤖 Analyze with AI Coach';
+        analyzeBtn.disabled = false;
+    }
+}
+
+function readFileAsText(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = reject;
+        reader.readAsText(file);
+    });
+}
+
+function displayGarminResults(analysis) {
+    // Hide upload section
+    const uploadCard = document.querySelector('#view-garmin .card:first-child');
+    if (uploadCard) uploadCard.style.display = 'none';
+    
+    // Show results
+    document.getElementById('recoveryResults').style.display = 'block';
+    
+    // Recovery Score
+    const score = analysis.recoveryScore || 0;
+    document.getElementById('recoveryScore').textContent = score;
+    document.getElementById('recoveryStatus').textContent = analysis.recoveryStatus || 'Unknown';
+    
+    // Animate meter
+    setTimeout(() => {
+        document.getElementById('recoveryMeterFill').style.width = score + '%';
+    }, 100);
+    
+    // Metrics Grid
+    const metricsGrid = document.getElementById('metricsGrid');
+    metricsGrid.innerHTML = '';
+    
+    if (analysis.metrics) {
+        Object.entries(analysis.metrics).forEach(([key, value]) => {
+            const metricCard = document.createElement('div');
+            metricCard.className = 'metric-card';
+            metricCard.innerHTML = `
+                <div class="metric-label">${formatMetricLabel(key)}</div>
+                <div class="metric-value">${value}</div>
+            `;
+            metricsGrid.appendChild(metricCard);
+        });
+    }
+    
+    // AI Recommendations
+    const recDiv = document.getElementById('aiRecommendations');
+    recDiv.innerHTML = '';
+    
+    if (analysis.recommendation) {
+        const rec = analysis.recommendation;
+        const statusColor = rec.status === 'green' ? '#00C853' : 
+                          rec.status === 'yellow' ? '#FF9800' : '#CF6679';
+        
+        recDiv.innerHTML = `
+            <div class="ai-recommendation">
+                <h3 style="color: ${statusColor};">${rec.title}</h3>
+                <p>${rec.details}</p>
+                ${rec.modifications ? `
+                    <div class="workout-adjustment">
+                        <strong>Workout Adjustments:</strong><br>
+                        ${rec.modifications}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }
+    
+    // Insights
+    if (analysis.insights && analysis.insights.length > 0) {
+        recDiv.innerHTML += `
+            <div style="margin-top: 20px;">
+                <h4 style="color: #00d4ff; margin-bottom: 10px;">💡 Key Insights</h4>
+                ${analysis.insights.map(insight => `
+                    <p style="padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; margin: 5px 0;">
+                        → ${insight}
+                    </p>
+                `).join('')}
+            </div>
+        `;
+    }
+    
+    // Warnings
+    if (analysis.warnings && analysis.warnings.length > 0) {
+        recDiv.innerHTML += `
+            <div style="margin-top: 20px;">
+                <h4 style="color: #CF6679; margin-bottom: 10px;">⚠️ Warnings</h4>
+                ${analysis.warnings.map(warning => `
+                    <p style="padding: 10px; background: rgba(207,102,121,0.1); border-radius: 8px; margin: 5px 0; border-left: 3px solid #CF6679;">
+                        ${warning}
+                    </p>
+                `).join('')}
+            </div>
+        `;
+    }
+    
+    // Raw Data
+    document.getElementById('rawData').innerHTML = `<pre>${JSON.stringify(analysis, null, 2)}</pre>`;
+    
+    // Scroll to results
+    document.getElementById('recoveryResults').scrollIntoView({ behavior: 'smooth' });
+    
+    speak('Recovery analysis complete');
+}
+
+function formatMetricLabel(key) {
+    const labels = {
+        'avgSleep': 'Avg Sleep',
+        'sleepTrend': 'Sleep Trend',
+        'restingHR': 'Resting HR',
+        'hrTrend': 'HR Trend',
+        'hrv': 'HRV',
+        'hrvStatus': 'HRV Status',
+        'trainingLoad': 'Training Load',
+        'restDays': 'Rest Days'
+    };
+    return labels[key] || key;
+}
+
+function resetGarminUpload() {
+    const uploadCard = document.querySelector('#view-garmin .card:first-child');
+    if (uploadCard) uploadCard.style.display = 'block';
+    
+    document.getElementById('recoveryResults').style.display = 'none';
+    document.getElementById('fileList').innerHTML = '';
+    document.getElementById('analyzeBtn').style.display = 'none';
+    document.getElementById('fileInput').value = '';
+    uploadedGarminFiles = [];
+    
+    document.querySelector('#view-garmin').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Initialize Garmin on page load
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(initGarminUpload, 500);
+});
 
 </script>
 </body>
