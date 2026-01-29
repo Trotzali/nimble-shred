@@ -2721,12 +2721,6 @@ function saveVoiceSettings() {
 function testVoice() {
     speak('Voice test. Five, four, three, two, one. Well done!');
 }
-
-// ========================================
-// IMAGE SEARCH FEATURE - Google Custom Search
-// ========================================
-let currentGifExercise = null;
-
 // ========================================
 // DIRECT GOOGLE IMAGE SEARCH (No API Required)
 // ========================================
@@ -2735,18 +2729,17 @@ let currentGifExercise = null;
 function openGifSearch(exerciseName) {
     currentGifExercise = exerciseName;
     
-    // This query is tuned to find animated males showing correct form and muscles
+    // Optimized query for male animations and anatomy
     const searchQuery = `male animated ${exerciseName} muscle anatomy form gif`;
     
-    // This URL forces Google to go to Images (isch) and filters for Animations (itp:animated)
+    // Forces Google to show Animated Image results
     const googleImageUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}&tbm=isch&tbs=itp:animated`;
     
-    // Open in a new tab so your app stays open
+    // Opens search in a new tab
     window.open(googleImageUrl, '_blank');
     
     speak(`Opening Google Images for ${exerciseName}`);
     
-    // Optional: We can close the modal since we've moved to a new tab
     closeGifSearch();
 }
 
@@ -2756,9 +2749,6 @@ function closeGifSearch() {
     currentGifExercise = null;
 }
 
-// Since we aren't using the API to "Select" a GIF anymore, 
-// you can use the built-in "Upload Image" button in your app 
-// to save the one you find, or we can add a "Paste Link" box later.
 function removeExerciseGif(exerciseName) {
     if(confirm(`Remove image for ${exerciseName}?`)) {
         localStorage.removeItem(`gif_${exerciseName}`);
