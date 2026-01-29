@@ -353,6 +353,27 @@
     
     <div class="card">
         <h3>Quick Start</h3>
+        
+        <div style="margin-bottom: 20px;">
+            <label style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span>Exercises per workout:</span>
+                <span style="color: var(--sec); font-weight: bold; font-size: 1.2em;" id="exercise-count-display">6</span>
+            </label>
+            <input 
+                type="range" 
+                id="exercise-count-slider" 
+                min="4" 
+                max="10" 
+                value="6" 
+                oninput="updateExerciseCount(this.value)"
+                style="width: 100%;"
+            >
+            <div style="display: flex; justify-content: space-between; font-size: 0.75em; color: #888; margin-top: 4px;">
+                <span>4 (Quick)</span>
+                <span>10 (Full)</span>
+            </div>
+        </div>
+        
         <div class="chip-container">
             <div class="chip" onclick="quickStartWorkout('push')">💪 Push</div>
             <div class="chip" onclick="quickStartWorkout('pull')">🏋️ Pull</div>
@@ -457,13 +478,17 @@
     </div>
     
     <div class="card">
-        <h3>🔍 Giphy API Setup</h3>
+        <h3>🔍 Google Image Search Setup</h3>
         <p class="text-muted" style="margin-bottom:10px;">
-            To enable GIF search for exercises, get a free API key from 
-            <a href="https://developers.giphy.com" target="_blank" style="color:var(--sec);">developers.giphy.com</a>
+            To enable image search for exercise anatomy diagrams:
         </p>
-        <p class="text-muted" style="margin-bottom:10px; font-size:0.75em;">
-            Once you have your API key, replace 'YOUR_GIPHY_API_KEY' in the JavaScript code (line ~2903) with your actual key.
+        <ol style="margin-left: 20px; color: #aaa; font-size: 0.85em; line-height: 1.6;">
+            <li>Get Google API Key from <a href="https://console.cloud.google.com/" target="_blank" style="color:var(--sec);">Google Cloud Console</a> (Enable "Custom Search API")</li>
+            <li>Create Search Engine at <a href="https://programmablesearchengine.google.com/" target="_blank" style="color:var(--sec);">Programmable Search Engine</a> (Enable "Image search")</li>
+            <li>Replace credentials in the code (search for "YOUR_GOOGLE_API_KEY" and "YOUR_SEARCH_ENGINE_ID")</li>
+        </ol>
+        <p class="text-muted" style="margin-top:10px; font-size:0.75em;">
+            <strong>Free Tier:</strong> 100 searches/day. Searches are cached to minimize API usage.
         </p>
     </div>
 </div>
@@ -566,19 +591,19 @@
 <div class="modal-overlay" id="gif-search-modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>🔍 Search Exercise GIFs</h2>
+            <h2>🔍 Search Exercise Images</h2>
             <button class="modal-close" onclick="closeGifSearch()">✕</button>
         </div>
         <div id="gif-search-content">
             <p class="text-muted" style="margin-bottom:15px;">
-                Searching Giphy for: <strong id="gif-search-query"></strong>
+                Searching for: <strong id="gif-search-query"></strong>
             </p>
             <div id="gif-results" class="gif-grid"></div>
             <div id="gif-loading" style="text-align:center; padding:20px; display:none;">
-                <p>🔄 Loading GIFs...</p>
+                <p>🔄 Loading images...</p>
             </div>
             <div id="gif-error" style="display:none; color:var(--danger); text-align:center; padding:20px;">
-                <p>⚠️ Error loading GIFs. Please check your API key or try again.</p>
+                <p>⚠️ Error loading images. Please check your API key or try again.</p>
             </div>
         </div>
     </div>
@@ -1821,6 +1846,12 @@ function quickStartWorkout(type) {
     }
 }
 
+function updateExerciseCount(value) {
+    appState.exerciseCount = parseInt(value);
+    document.getElementById('exercise-count-display').textContent = value;
+    saveAppState();
+}
+
 function generateRandomWorkout() {
     const types = ['push', 'pull', 'legs'];
     const randomType = types[Math.floor(Math.random() * types.length)];
@@ -2263,7 +2294,7 @@ function viewExerciseDetails(exerciseName) {
                 <img src="${gifUrl}" alt="${exercise.name}">
             </div>
             <div class="gif-actions">
-                <button class="btn-small btn-action" onclick="openGifSearch('${exercise.name.replace(/'/g,"\\'")}')">🔍 Replace GIF</button>
+                <button class="btn-small btn-action" onclick="openGifSearch('${exercise.name.replace(/'/g,"\\'")}')">🔍 Replace Image</button>
                 <button class="btn-small btn-danger" onclick="removeExerciseGif('${exercise.name.replace(/'/g,"\\'")}')">🗑️ Remove</button>
             </div>
         `;
@@ -2271,13 +2302,13 @@ function viewExerciseDetails(exerciseName) {
         html += `
             <div class="gif-container">
                 <div>
-                    <p class="text-muted">No GIF added yet</p>
+                    <p class="text-muted">No image added yet</p>
                 </div>
             </div>
             <div class="gif-actions">
-                <button class="btn-small btn-success" onclick="openGifSearch('${exercise.name.replace(/'/g,"\\'")}')">🔍 Search GIF</button>
+                <button class="btn-small btn-success" onclick="openGifSearch('${exercise.name.replace(/'/g,"\\'")}')">🔍 Search Images</button>
                 <label class="btn-small btn-action">
-                    📤 Upload GIF
+                    📤 Upload Image
                     <input type="file" accept="image/*" onchange="uploadExerciseGif('${exercise.name.replace(/'/g,"\\'")}', event)" style="display:none;">
                 </label>
             </div>
@@ -2661,6 +2692,13 @@ function updateSettingsUI() {
         document.getElementById('voice-enabled').checked = appState.voiceEnabled;
         document.getElementById('voice-level').value = appState.voiceLevel;
     }
+    
+    // Update exercise count slider
+    if(document.getElementById('exercise-count-slider')) {
+        const count = appState.exerciseCount || 6;
+        document.getElementById('exercise-count-slider').value = count;
+        document.getElementById('exercise-count-display').textContent = count;
+    }
 }
 
 // ========================================
@@ -2685,16 +2723,22 @@ function testVoice() {
 }
 
 // ========================================
-// GIF SEARCH FEATURE
+// IMAGE SEARCH FEATURE - Google Custom Search
 // ========================================
 let currentGifExercise = null;
-const GIPHY_API_KEY = 'YOUR_GIPHY_API_KEY'; // Replace with your API key from developers.giphy.com
+
+// SETUP INSTRUCTIONS:
+// 1. Get Google API Key: https://console.cloud.google.com/ (Enable "Custom Search API")
+// 2. Create Search Engine: https://programmablesearchengine.google.com/ (Enable "Image search")
+// 3. Replace the values below with your credentials
+const GOOGLE_API_KEY = 'YOUR_GOOGLE_API_KEY'; // From Google Cloud Console
+const GOOGLE_SEARCH_ENGINE_ID = 'YOUR_SEARCH_ENGINE_ID'; // From Programmable Search Engine
 
 function openGifSearch(exerciseName) {
     currentGifExercise = exerciseName;
-    document.getElementById('gif-search-query').textContent = `"${exerciseName} exercise demonstration"`;
+    document.getElementById('gif-search-query').textContent = `"${exerciseName} muscles worked anatomy"`;
     document.getElementById('gif-search-modal').classList.add('active');
-    searchGiphy(exerciseName);
+    searchExerciseImages(exerciseName);
 }
 
 function closeGifSearch() {
@@ -2702,7 +2746,7 @@ function closeGifSearch() {
     currentGifExercise = null;
 }
 
-async function searchGiphy(exerciseName) {
+async function searchExerciseImages(exerciseName) {
     const loading = document.getElementById('gif-loading');
     const results = document.getElementById('gif-results');
     const error = document.getElementById('gif-error');
@@ -2711,8 +2755,28 @@ async function searchGiphy(exerciseName) {
     results.innerHTML = '';
     error.style.display = 'none';
     
-    const query = `${exerciseName} exercise demonstration`;
-    const url = `https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(query)}&limit=12&rating=g`;
+    // Check cache first to save API calls
+    const cacheKey = `image_cache_${exerciseName}`;
+    const cached = localStorage.getItem(cacheKey);
+    if(cached) {
+        loading.style.display = 'none';
+        displayImageResults(JSON.parse(cached));
+        return;
+    }
+    
+    // Optimized search query for anatomy diagrams and muscle activation
+    const searchQuery = `${exerciseName} muscles worked anatomy diagram male`;
+    
+    // Google Custom Search API for images
+    const url = `https://www.googleapis.com/customsearch/v1?` +
+        `key=${GOOGLE_API_KEY}&` +
+        `cx=${GOOGLE_SEARCH_ENGINE_ID}&` +
+        `q=${encodeURIComponent(searchQuery)}&` +
+        `searchType=image&` +
+        `num=10&` +
+        `imgSize=large&` +
+        `safe=active&` +
+        `imgType=photo`; // Use 'photo' for real images or 'lineart' for diagrams
     
     try {
         const response = await fetch(url);
@@ -2720,35 +2784,43 @@ async function searchGiphy(exerciseName) {
         
         loading.style.display = 'none';
         
-        if(data.data && data.data.length > 0) {
-            results.innerHTML = data.data.map(gif => `
-                <div class="gif-item" onclick="selectGif('${gif.images.fixed_height.url}')">
-                    <img src="${gif.images.fixed_height.url}" alt="Exercise GIF">
-                </div>
-            `).join('');
+        if(data.items && data.items.length > 0) {
+            // Cache results to avoid repeated API calls
+            localStorage.setItem(cacheKey, JSON.stringify(data.items));
+            displayImageResults(data.items);
         } else {
-            results.innerHTML = '<p class="text-muted text-center">No GIFs found. Try uploading your own!</p>';
+            results.innerHTML = '<p class="text-muted text-center">No images found. Try uploading your own!</p>';
         }
     } catch(err) {
         loading.style.display = 'none';
         error.style.display = 'block';
-        console.error('Giphy API error:', err);
+        error.querySelector('p').textContent = '⚠️ Error: Check API key or try again later. You may have reached the daily limit (100 searches/day).';
+        console.error('Google Search API error:', err);
     }
+}
+
+function displayImageResults(items) {
+    const results = document.getElementById('gif-results');
+    results.innerHTML = items.map(item => `
+        <div class="gif-item" onclick="selectGif('${item.link.replace(/'/g, "\\'")}')">
+            <img src="${item.link}" alt="${item.title}" loading="lazy">
+        </div>
+    `).join('');
 }
 
 function selectGif(gifUrl) {
     if(currentGifExercise) {
         localStorage.setItem(`gif_${currentGifExercise}`, gifUrl);
-        speak(`GIF saved for ${currentGifExercise}`);
+        speak(`Image saved for ${currentGifExercise}`);
         closeGifSearch();
         viewExerciseDetails(currentGifExercise); // Refresh the exercise details
     }
 }
 
 function removeExerciseGif(exerciseName) {
-    if(confirm(`Remove GIF for ${exerciseName}?`)) {
+    if(confirm(`Remove image for ${exerciseName}?`)) {
         localStorage.removeItem(`gif_${exerciseName}`);
-        speak('GIF removed');
+        speak('Image removed');
         viewExerciseDetails(exerciseName);
     }
 }
