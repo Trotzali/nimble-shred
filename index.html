@@ -477,7 +477,20 @@
         <button class="btn btn-action" onclick="testVoice()">🎵 Test Voice</button>
     </div>
     
-
+    <div class="card">
+        <h3>🔍 Google Image Search Setup</h3>
+        <p class="text-muted" style="margin-bottom:10px;">
+            To enable image search for exercise anatomy diagrams:
+        </p>
+        <ol style="margin-left: 20px; color: #aaa; font-size: 0.85em; line-height: 1.6;">
+            <li>Get Google API Key from <a href="https://console.cloud.google.com/" target="_blank" style="color:var(--sec);">Google Cloud Console</a> (Enable "Custom Search API")</li>
+            <li>Create Search Engine at <a href="https://programmablesearchengine.google.com/" target="_blank" style="color:var(--sec);">Programmable Search Engine</a> (Enable "Image search")</li>
+            <li>Replace credentials in the code (search for "YOUR_GOOGLE_API_KEY" and "YOUR_SEARCH_ENGINE_ID")</li>
+        </ol>
+        <p class="text-muted" style="margin-top:10px; font-size:0.75em;">
+            <strong>Free Tier:</strong> 100 searches/day. Searches are cached to minimize API usage.
+        </p>
+    </div>
 </div>
 
 <!-- ENCYCLOPEDIA PAGE -->
@@ -2285,7 +2298,7 @@ function viewExerciseDetails(exerciseName) {
                 <button class="btn-small btn-danger" onclick="removeExerciseGif('${exercise.name.replace(/'/g,"\\'")}')">🗑️ Remove</button>
             </div>
         `;
-} else {
+    } else {
         html += `
             <div class="gif-container">
                 <div>
@@ -2293,18 +2306,11 @@ function viewExerciseDetails(exerciseName) {
                 </div>
             </div>
             <div class="gif-actions">
-                <button class="btn-small btn-success" onclick="openGifSearch('${exerciseName.replace(/'/g,"\\'")}')">🔍 Search Google</button>
+                <button class="btn-small btn-success" onclick="openGifSearch('${exercise.name.replace(/'/g,"\\'")}')">🔍 Search Images</button>
                 <label class="btn-small btn-action">
-                    📤 Upload File
-                    <input type="file" accept="image/*" onchange="uploadExerciseGif('${exerciseName.replace(/'/g,"\\'")}', event)" style="display:none;">
+                    📤 Upload Image
+                    <input type="file" accept="image/*" onchange="uploadExerciseGif('${exercise.name.replace(/'/g,"\\'")}', event)" style="display:none;">
                 </label>
-            </div>
-            <div style="margin-top:15px; padding:10px; background:rgba(255,255,255,0.05); border-radius:8px;">
-                <p class="text-muted" style="font-size:0.8em; margin-bottom:5px;">Or paste image address (URL) from Google:</p>
-                <div style="display:flex; gap:5px;">
-                    <input type="text" id="image-address-input" placeholder="https://..." style="flex:1; font-size:14px;">
-                    <button class="btn-small btn-main" style="width:auto; margin:0;" onclick="saveImageAddress('${exerciseName.replace(/'/g,"\\'")}')">💾 Save</button>
-                </div>
             </div>
         `;
     }
@@ -2399,30 +2405,6 @@ function uploadExerciseGif(exerciseName, event) {
         speak('GIF uploaded');
     };
     reader.readAsDataURL(file);
-}
- function saveImageAddress(exerciseName) {
-    const urlInput = document.getElementById('image-address-input');
-    const url = urlInput.value.trim();
-    
-    if (!url) {
-        alert("Please paste a valid image address first.");
-        return;
-    }
-
-    // Save the URL link to local storage
-    localStorage.setItem(`gif_${exerciseName}`, url);
-    speak(`Link saved for ${exerciseName}`);
-    
-    // Refresh the modal to display the image immediately
-    viewExerciseDetails(exerciseName);
-}
-
-    // Save the URL to local storage just like a file upload
-    localStorage.setItem(`gif_${exerciseName}`, url);
-    speak(`Image address saved for ${exerciseName}`);
-    
-    // Refresh the view to show the new image
-    viewExerciseDetails(exerciseName);
 }
 
 // ========================================
@@ -2739,32 +2721,100 @@ function saveVoiceSettings() {
 function testVoice() {
     speak('Voice test. Five, four, three, two, one. Well done!');
 }
+
 // ========================================
-// DIRECT GOOGLE IMAGE SEARCH (No API Required)
+// IMAGE SEARCH FEATURE - Google Custom Search
 // ========================================
 let currentGifExercise = null;
 
+// SETUP INSTRUCTIONS:
+// 1. Get Google API Key: https://console.cloud.google.com/ (Enable "Custom Search API")
+// 2. Create Search Engine: https://programmablesearchengine.google.com/ (Enable "Image search")
+// 3. Replace the values below with your credentials
+const GOOGLE_API_KEY = 'YOUR_GOOGLE_API_KEY'; // From Google Cloud Console
+const GOOGLE_SEARCH_ENGINE_ID = 'YOUR_SEARCH_ENGINE_ID'; // From Programmable Search Engine
+
 function openGifSearch(exerciseName) {
     currentGifExercise = exerciseName;
-    
-    // Optimized query for male animations and anatomy
-    const searchQuery = `male animated ${exerciseName} muscle anatomy form gif`;
-    
-    // Forces Google to show Animated Image results
-    const googleImageUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}&tbm=isch&tbs=itp:animated`;
-    
-    // Opens search in a new tab
-    window.open(googleImageUrl, '_blank');
-    
-    speak(`Opening Google Images for ${exerciseName}`);
-    
-    closeGifSearch();
+    document.getElementById('gif-search-query').textContent = `"${exerciseName} muscles worked anatomy"`;
+    document.getElementById('gif-search-modal').classList.add('active');
+    searchExerciseImages(exerciseName);
 }
 
 function closeGifSearch() {
-    const modal = document.getElementById('gif-search-modal');
-    if (modal) modal.classList.remove('active');
+    document.getElementById('gif-search-modal').classList.remove('active');
     currentGifExercise = null;
+}
+
+async function searchExerciseImages(exerciseName) {
+    const loading = document.getElementById('gif-loading');
+    const results = document.getElementById('gif-results');
+    const error = document.getElementById('gif-error');
+    
+    loading.style.display = 'block';
+    results.innerHTML = '';
+    error.style.display = 'none';
+    
+    // Check cache first to save API calls
+    const cacheKey = `image_cache_${exerciseName}`;
+    const cached = localStorage.getItem(cacheKey);
+    if(cached) {
+        loading.style.display = 'none';
+        displayImageResults(JSON.parse(cached));
+        return;
+    }
+    
+    // Optimized search query for anatomy diagrams and muscle activation
+    const searchQuery = `${exerciseName} muscles worked anatomy diagram male`;
+    
+    // Google Custom Search API for images
+    const url = `https://www.googleapis.com/customsearch/v1?` +
+        `key=${GOOGLE_API_KEY}&` +
+        `cx=${GOOGLE_SEARCH_ENGINE_ID}&` +
+        `q=${encodeURIComponent(searchQuery)}&` +
+        `searchType=image&` +
+        `num=10&` +
+        `imgSize=large&` +
+        `safe=active&` +
+        `imgType=photo`; // Use 'photo' for real images or 'lineart' for diagrams
+    
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        loading.style.display = 'none';
+        
+        if(data.items && data.items.length > 0) {
+            // Cache results to avoid repeated API calls
+            localStorage.setItem(cacheKey, JSON.stringify(data.items));
+            displayImageResults(data.items);
+        } else {
+            results.innerHTML = '<p class="text-muted text-center">No images found. Try uploading your own!</p>';
+        }
+    } catch(err) {
+        loading.style.display = 'none';
+        error.style.display = 'block';
+        error.querySelector('p').textContent = '⚠️ Error: Check API key or try again later. You may have reached the daily limit (100 searches/day).';
+        console.error('Google Search API error:', err);
+    }
+}
+
+function displayImageResults(items) {
+    const results = document.getElementById('gif-results');
+    results.innerHTML = items.map(item => `
+        <div class="gif-item" onclick="selectGif('${item.link.replace(/'/g, "\\'")}')">
+            <img src="${item.link}" alt="${item.title}" loading="lazy">
+        </div>
+    `).join('');
+}
+
+function selectGif(gifUrl) {
+    if(currentGifExercise) {
+        localStorage.setItem(`gif_${currentGifExercise}`, gifUrl);
+        speak(`Image saved for ${currentGifExercise}`);
+        closeGifSearch();
+        viewExerciseDetails(currentGifExercise); // Refresh the exercise details
+    }
 }
 
 function removeExerciseGif(exerciseName) {
