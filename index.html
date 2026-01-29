@@ -2285,7 +2285,7 @@ function viewExerciseDetails(exerciseName) {
                 <button class="btn-small btn-danger" onclick="removeExerciseGif('${exercise.name.replace(/'/g,"\\'")}')">🗑️ Remove</button>
             </div>
         `;
-    } else {
+  } else {
         html += `
             <div class="gif-container">
                 <div>
@@ -2293,11 +2293,15 @@ function viewExerciseDetails(exerciseName) {
                 </div>
             </div>
             <div class="gif-actions">
-                <button class="btn-small btn-success" onclick="openGifSearch('${exercise.name.replace(/'/g,"\\'")}')">🔍 Search Images</button>
+                <button class="btn-small btn-success" onclick="openGifSearch('${exerciseName.replace(/'/g,"\\'")}')">🔍 Search Google</button>
                 <label class="btn-small btn-action">
-                    📤 Upload Image
-                    <input type="file" accept="image/*" onchange="uploadExerciseGif('${exercise.name.replace(/'/g,"\\'")}', event)" style="display:none;">
+                    📤 Upload File
+                    <input type="file" accept="image/*" onchange="uploadExerciseGif('${exerciseName.replace(/'/g,"\\'")}', event)" style="display:none;">
                 </label>
+            </div>
+            <div style="margin-top:10px;">
+                <input type="text" id="image-address-input" placeholder="Paste image address (URL) here...">
+                <button class="btn btn-small btn-main" onclick="saveImageAddress('${exerciseName.replace(/'/g,"\\'")}')">💾 Save Link</button>
             </div>
         `;
     }
@@ -2392,6 +2396,22 @@ function uploadExerciseGif(exerciseName, event) {
         speak('GIF uploaded');
     };
     reader.readAsDataURL(file);
+}
+    function saveImageAddress(exerciseName) {
+    const urlInput = document.getElementById('image-address-input');
+    const url = urlInput.value.trim();
+    
+    if (!url) {
+        alert("Please paste a valid image address first.");
+        return;
+    }
+
+    // Save the URL to local storage just like a file upload
+    localStorage.setItem(`gif_${exerciseName}`, url);
+    speak(`Image address saved for ${exerciseName}`);
+    
+    // Refresh the view to show the new image
+    viewExerciseDetails(exerciseName);
 }
 
 // ========================================
