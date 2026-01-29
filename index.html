@@ -2755,7 +2755,7 @@ async function searchExerciseImages(exerciseName) {
     results.innerHTML = '';
     error.style.display = 'none';
     
-    // Check cache first to save API calls
+    // Check cache
     const cacheKey = `image_cache_${exerciseName}`;
     const cached = localStorage.getItem(cacheKey);
     if(cached) {
@@ -2763,6 +2763,38 @@ async function searchExerciseImages(exerciseName) {
         displayImageResults(JSON.parse(cached));
         return;
     }
+    
+    // NEW REFINED QUERY: Explicitly looking for animated male anatomy
+    const searchQuery = `male animated ${exerciseName} muscle anatomy form`;
+    
+    // NEW REFINED PARAMS: Added &fileType=gif and &imgType=animated
+    const url = `https://www.googleapis.com/customsearch/v1?` +
+        `key=${GOOGLE_API_KEY}&` +
+        `cx=${GOOGLE_SEARCH_ENGINE_ID}&` +
+        `q=${encodeURIComponent(searchQuery)}&` +
+        `searchType=image&` +
+        `fileType=gif&` + // Forces GIF format
+        `num=10&` +
+        `safe=active`;
+    
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        loading.style.display = 'none';
+        
+        if(data.items && data.items.length > 0) {
+            localStorage.setItem(cacheKey, JSON.stringify(data.items));
+            displayImageResults(data.items);
+        } else {
+            results.innerHTML = '<p class="text-muted text-center">No GIFs found. Check if Image Search is enabled in your CSE panel.</p>';
+        }
+    } catch(err) {
+        loading.style.display = 'none';
+        error.style.display = 'block';
+        console.error('Google Search API error:', err);
+    }
+}
     
     // Optimized search query for anatomy diagrams and muscle activation
     const searchQuery = `${exerciseName} muscles worked anatomy diagram male`;
