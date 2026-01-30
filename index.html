@@ -5339,6 +5339,16 @@ async function sendChatMessage(message = null) {
         }
         
         const data = await response.json();
+        
+        // Debug: log the response structure
+        console.log('Backend response:', data);
+        
+        // Check if response has the expected structure
+        if (!data || !data.content || !data.content[0] || !data.content[0].text) {
+            console.error('Unexpected response structure:', data);
+            throw new Error('Invalid response format from backend');
+        }
+        
         const assistantMessage = {
             role: 'assistant',
             content: data.content[0].text,
