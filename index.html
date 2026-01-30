@@ -4131,15 +4131,16 @@ async function analyzeGarminData() {
             dataText += `\n\n=== ${file.name} ===\n${fileContents[i]}`;
         });
         
-        // Send to Claude for analysis
-        const response = await fetch("https://api.anthropic.com/v1/messages", {
+        // Send to Claude for analysis via backend proxy
+        const response = await fetch(`${BACKEND_URL}/api/drive`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                model: "claude-sonnet-4-20250514",
-                max_tokens: 3000,
+                action: 'anthropic',
+                anthropicKey: ANTHROPIC_API_KEY,
+                system: 'You are an elite AI fitness coach analyzing Garmin health data.',
                 messages: [{
                     role: "user",
                     content: `You are an elite AI fitness coach analyzing Garmin health data for a 40+ year old male athlete. Be specific, actionable, and direct.
@@ -4822,12 +4823,13 @@ Return JSON:
   "guidance": "Brief explanation of the plan"
 }`;
 
-        const response = await fetch("https://api.anthropic.com/v1/messages", {
+        const response = await fetch(`${BACKEND_URL}/api/drive`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                model: "claude-sonnet-4-20250514",
-                max_tokens: 2000,
+                action: 'anthropic',
+                anthropicKey: ANTHROPIC_API_KEY,
+                system: 'You are a professional fitness trainer creating personalized training plans.',
                 messages: [{ role: "user", content: prompt }]
             })
         });
@@ -4915,12 +4917,13 @@ async function performDailyUpdate() {
 
 async function getAIDailyRecommendation(garminData) {
     try {
-        const response = await fetch("https://api.anthropic.com/v1/messages", {
+        const response = await fetch(`${BACKEND_URL}/api/drive`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                model: "claude-sonnet-4-20250514",
-                max_tokens: 1000,
+                action: 'anthropic',
+                anthropicKey: ANTHROPIC_API_KEY,
+                system: 'You are an AI fitness coach providing daily workout recommendations based on recovery data.',
                 messages: [{
                     role: "user",
                     content: `Based on this Garmin recovery data, should we adjust today's workout?
