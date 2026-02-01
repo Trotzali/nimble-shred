@@ -8,7 +8,9 @@
     <title>Nimble Shred AI Edition - Cloud Sync</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Load Supabase from backend proxy to bypass CDN blocks -->
-    <script src="https://nimble-shred-backend.vercel.app/api/supabase-lib"></script>
+    <script src="https://nimble-shred-backend.vercel.app/api/supabase-lib" 
+            onload="console.log('✅ Supabase script loaded', typeof window.supabase)"
+            onerror="console.error('❌ Failed to load Supabase script')"></script>
     <script>
     // ==========================================
     // SUPABASE CLOUD SYNC CONFIGURATION
@@ -852,7 +854,7 @@
 <div class="container active" id="view-coach">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
         <h2>💪 Workout Coach</h2>
-        <span style="font-size: 0.75em; color: #666; font-family: monospace;">v48</span>
+        <span style="font-size: 0.75em; color: #666; font-family: monospace;">v49</span>
     </div>
     
     <div class="card">
@@ -4432,17 +4434,23 @@ document.addEventListener('DOMContentLoaded', () => {
 async function initSupabase() {
     try {
         console.log('🔄 Initializing Supabase v48 (Backend Proxy)...');
+        console.log('window.supabase at start:', typeof window.supabase);
+        console.log('window object keys:', Object.keys(window).filter(k => k.toLowerCase().includes('supa')));
         
         // Wait for Supabase library to load from backend
         let attempts = 0;
         while (!window.supabase && attempts < 100) {
             await new Promise(resolve => setTimeout(resolve, 100));
             attempts++;
+            if (attempts % 10 === 0) {
+                console.log(`⏳ Still waiting for Supabase... attempt ${attempts}/100`);
+            }
         }
         
         // Check if Supabase library loaded
         if (!window.supabase) {
-            throw new Error('Supabase library not loaded from backend proxy. Check backend logs.');
+            console.error('window object after timeout:', Object.keys(window).slice(0, 50));
+            throw new Error('Supabase library not loaded from backend proxy after 10 seconds');
         }
         
         console.log('✅ Supabase library detected');
