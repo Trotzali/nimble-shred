@@ -4623,29 +4623,26 @@ async function initSupabase() {
     try {
         console.log('🔄 Initializing Supabase v51 (Backend Proxy)...');
         
-        // Wait for Supabase library to load from backend proxy
+        // 1. Wait for Supabase library to load from backend proxy
         let attempts = 0;
         while (typeof window.supabase?.createClient !== 'function' && attempts < 100) {
             await new Promise(resolve => setTimeout(resolve, 100));
             attempts++;
-            if (attempts % 10 === 0) {
-                console.log(`⏳ Still waiting for Supabase... attempt ${attempts}/100`);
-            }
         }
         
         if (typeof window.supabase?.createClient !== 'function') {
             throw new Error('Supabase library not loaded from backend proxy after 10 seconds');
         }
         
-        // Initialize Supabase client
+        // 2. Initialize Supabase client
         supabaseClient = window.supabase.createClient(
             SUPABASE_CONFIG.url,
             SUPABASE_CONFIG.anonKey
         );
         
         console.log('✅ Supabase client created');
-
-        // Get or create device-specific user ID
+        
+        // 3. Get or create device-specific user ID
         USER_ID = localStorage.getItem('nimble_user_id');
         if (!USER_ID) {
             USER_ID = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -4655,16 +4652,16 @@ async function initSupabase() {
             console.log('🆔 Existing User ID:', USER_ID);
         }
         
+        // 4. Update UI and load cloud data
         CLOUD_SYNC_ENABLED = true;
         updateCloudSyncUI();
         
         console.log('📥 Loading data from cloud...');
         await loadFromCloud();
         
-        // 🏃 Garmin Integration - Check files and connection status
-        // These MUST run after USER_ID is defined
+        // 5. 🏃 Garmin Integration - MUST run after USER_ID is set
         checkGarminFiles();
-        checkGarminConnection(); 
+        checkGarminConnection(); // This now has the USER_ID it needs
         
         console.log('✅ Supabase initialized successfully! v51');
     } catch (error) {
@@ -4674,7 +4671,6 @@ async function initSupabase() {
         if (typeof updateCloudSyncUI === 'function') updateCloudSyncUI();
     }
 }
-
 function updateCloudSyncUI() {
     const statusText = document.getElementById('cloud-status-text');
     const deviceIdText = document.getElementById('device-id-text');
