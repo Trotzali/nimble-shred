@@ -4644,13 +4644,13 @@ async function initSupabase() {
         console.log('🆔 User ID:', USER_ID);
 
         CLOUD_SYNC_ENABLED = true;
-        updateCloudSyncUI();
+        if (typeof updateCloudSyncUI === 'function') updateCloudSyncUI();
         
         await loadFromCloud();
         
         // Final Garmin Checks
-        checkGarminFiles();
-        checkGarminConnection(); 
+        if (typeof checkGarminFiles === 'function') checkGarminFiles();
+        if (typeof checkGarminConnection === 'function') checkGarminConnection(); 
         
         console.log('✅ Supabase initialized successfully! v51');
     } catch (error) {
