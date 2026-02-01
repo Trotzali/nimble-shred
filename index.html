@@ -4621,71 +4621,57 @@ setInterval(() => {
 
 async function initSupabase() {
     try {
-        console.log('🔄 Initializing Supabase v50 (Backend Proxy)...');
-        console.log('window.supabase at start:', typeof window.supabase);
-        console.log('window object keys:', Object.keys(window).filter(k => k.toLowerCase().includes('supa')));
+        console.log('🔄 Initializing Supabase v51 (Backend Proxy)...');
         
-        // Wait for Supabase library to load from backend
-        // The script creates window.supabase object with createClient method
+        // Wait for Supabase library to load from backend proxy
         let attempts = 0;
         while (typeof window.supabase?.createClient !== 'function' && attempts < 100) {
             await new Promise(resolve => setTimeout(resolve, 100));
             attempts++;
             if (attempts % 10 === 0) {
                 console.log(`⏳ Still waiting for Supabase... attempt ${attempts}/100`);
-                console.log('   typeof window.supabase:', typeof window.supabase);
-                console.log('   typeof window.supabase?.createClient:', typeof window.supabase?.createClient);
             }
         }
         
-        // Check if Supabase library loaded
         if (typeof window.supabase?.createClient !== 'function') {
-            console.error('window object after timeout:', Object.keys(window).slice(0, 50));
-            console.error('window.supabase:', window.supabase);
             throw new Error('Supabase library not loaded from backend proxy after 10 seconds');
         }
-        
-        console.log('✅ Supabase library detected');
-        console.log('📍 URL:', SUPABASE_CONFIG.url);
-        console.log('🔑 Anon key present:', !!SUPABASE_CONFIG.anonKey);
         
         // Initialize Supabase client
         supabaseClient = window.supabase.createClient(
             SUPABASE_CONFIG.url,
             SUPABASE_CONFIG.anonKey
         );
-        checkGarminConnection();
         
-        console.log('✅ Supabase initialized successfully! v51'); // Updated version
         console.log('✅ Supabase client created');
-        
+
         // Get or create device-specific user ID
         USER_ID = localStorage.getItem('nimble_user_id');
         if (!USER_ID) {
             USER_ID = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             localStorage.setItem('nimble_user_id', USER_ID);
             console.log('🆔 Created new User ID:', USER_ID);
-      
+        } else {
+            console.log('🆔 Existing User ID:', USER_ID);
+        }
+        
         CLOUD_SYNC_ENABLED = true;
         updateCloudSyncUI();
         
         console.log('📥 Loading data from cloud...');
-          } else {
-            console.log('🆔 Existing User ID:', USER_ID);
-        }
-        
-        // Load data from cloud on init
         await loadFromCloud();
         
-        // Check for new Garmin files
+        // 🏃 Garmin Integration - Check files and connection status
+        // These MUST run after USER_ID is defined
         checkGarminFiles();
+        checkGarminConnection(); 
         
-        console.log('✅ Supabase initialized successfully! v50');
+        console.log('✅ Supabase initialized successfully! v51');
     } catch (error) {
         console.error('❌ Supabase init error:', error);
         console.error('Error details:', error.message);
         CLOUD_SYNC_ENABLED = false;
-        updateCloudSyncUI();
+        if (typeof updateCloudSyncUI === 'function') updateCloudSyncUI();
     }
 }
 
