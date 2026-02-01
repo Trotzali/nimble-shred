@@ -7,7 +7,15 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Nimble Shred AI Edition - Cloud Sync</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+    // Force global scope for Supabase check
+    window.SUPABASE_LOADED = false;
+    if (typeof window.supabase !== 'undefined') {
+        window.SUPABASE_LOADED = true;
+        console.log('✅ Supabase library loaded from CDN');
+    }
+    </script>
     <script>
     // ==========================================
     // SUPABASE CLOUD SYNC CONFIGURATION
@@ -850,7 +858,10 @@
 
 <!-- COACH PAGE -->
 <div class="container active" id="view-coach">
-    <h2>💪 Workout Coach</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h2>💪 Workout Coach</h2>
+        <span style="font-size: 0.75em; color: #666; font-family: monospace;">v44</span>
+    </div>
     
     <div class="card">
         <h3>Quick Start</h3>
@@ -4428,14 +4439,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function initSupabase() {
     try {
-        console.log('🔄 Initializing Supabase...');
-        console.log('URL:', SUPABASE_CONFIG.url);
-        console.log('Anon key present:', !!SUPABASE_CONFIG.anonKey);
+        console.log('🔄 Initializing Supabase v44...');
+        
+        // Wait for Supabase library to load (max 5 seconds)
+        let attempts = 0;
+        while (!window.supabase && attempts < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
         
         // Check if Supabase library loaded
         if (!window.supabase) {
-            throw new Error('Supabase library not loaded. Check CDN connection.');
+            throw new Error('Supabase library failed to load after 5 seconds. CDN may be blocked or slow.');
         }
+        
+        console.log('✅ Supabase library detected');
+        console.log('📍 URL:', SUPABASE_CONFIG.url);
+        console.log('🔑 Anon key present:', !!SUPABASE_CONFIG.anonKey);
         
         // Initialize Supabase client
         supabase = window.supabase.createClient(
@@ -4466,11 +4486,10 @@ async function initSupabase() {
         // Check for new Garmin files
         checkGarminFiles();
         
-        console.log('✅ Supabase initialized successfully!');
+        console.log('✅ Supabase initialized successfully! v44');
     } catch (error) {
         console.error('❌ Supabase init error:', error);
         console.error('Error details:', error.message);
-        console.error('Error stack:', error.stack);
         CLOUD_SYNC_ENABLED = false;
         updateCloudSyncUI();
     }
