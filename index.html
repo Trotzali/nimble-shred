@@ -9,7 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Load Supabase from backend proxy to bypass CDN blocks -->
     <script src="https://nimble-shred-backend.vercel.app/api/supabase-lib"></script>
- 
+    <script>
     // ==========================================
     // SUPABASE CLOUD SYNC CONFIGURATION
     // ==========================================
@@ -852,7 +852,7 @@
 <div class="container active" id="view-coach">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
         <h2>💪 Workout Coach</h2>
-        <span style="font-size: 0.75em; color: #666; font-family: monospace;">v47</span>
+        <span style="font-size: 0.75em; color: #666; font-family: monospace;">v48</span>
     </div>
     
     <div class="card">
@@ -4431,7 +4431,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function initSupabase() {
     try {
-        console.log('🔄 Initializing Supabase v47 (Backend Proxy)...');
+        console.log('🔄 Initializing Supabase v48 (Backend Proxy)...');
         
         // Wait for Supabase library to load from backend
         let attempts = 0;
@@ -4478,7 +4478,7 @@ async function initSupabase() {
         // Check for new Garmin files
         checkGarminFiles();
         
-        console.log('✅ Supabase initialized successfully! v46');
+        console.log('✅ Supabase initialized successfully! v48');
     } catch (error) {
         console.error('❌ Supabase init error:', error);
         console.error('Error details:', error.message);
