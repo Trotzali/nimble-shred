@@ -4479,146 +4479,84 @@ document.addEventListener('DOMContentLoaded', () => {
     initSupabase(); // This was missing and caused the syntax error
     checkDailyUpdates();
 });
-// ==========================================
-// GARMIN AUTO-SYNC INTEGRATION
-// ==========================================
+// 1. Define UI Functions FIRST
+function updateCloudSyncUI() {
+    const statusText = document.getElementById('cloud-status-text');
+    const deviceIdText = document.getElementById('device-id-text');
+    const lastSyncText = document.getElementById('last-sync-time');
+    
+    if (statusText) {
+        statusText.textContent = CLOUD_SYNC_ENABLED ? '✅ Connected' : '❌ Offline';
+        statusText.style.color = CLOUD_SYNC_ENABLED ? 'var(--success)' : 'var(--danger)';
+    }
+    if (deviceIdText) deviceIdText.textContent = USER_ID ? USER_ID.substr(0, 20) + '...' : 'Not set';
+    if (lastSyncText && LAST_SYNC_TIME) lastSyncText.textContent = new Date(LAST_SYNC_TIME).toLocaleString();
+}
 
-// Check Garmin connection status on page load
+function updateGarminConnectionUI(connected, lastSync = null) {
+    const statusEl = document.getElementById('garmin-connection-status');
+    const connectBtn = document.getElementById('garmin-connect-btn');
+    const disconnectBtn = document.getElementById('garmin-disconnect-btn');
+    const lastSyncEl = document.getElementById('garmin-last-sync');
+    
+    if (statusEl) {
+        statusEl.innerHTML = connected ? '✅ Connected' : '❌ Not Connected';
+        statusEl.style.color = connected ? 'var(--success)' : 'var(--danger)';
+    }
+    if (connectBtn) connectBtn.style.display = connected ? 'none' : 'inline-block';
+    if (disconnectBtn) disconnectBtn.style.display = connected ? 'inline-block' : 'none';
+    if (lastSyncEl && lastSync) {
+        lastSyncEl.textContent = `Last sync: ${new Date(lastSync).toLocaleString()}`;
+        lastSyncEl.style.display = 'block';
+    }
+}
+
+// 2. Main Logic Functions
 async function checkGarminConnection() {
     if (!CLOUD_SYNC_ENABLED || !USER_ID) return;
-    
     try {
         const response = await fetch(`${BACKEND_URL}/api/garmin/status?user_id=${USER_ID}`);
         const data = await response.json();
-        
-        if (data.connected) {
-            updateGarminConnectionUI(true, data.lastSync);
-        } else {
-            updateGarminConnectionUI(false);
-        }
+        updateGarminConnectionUI(data.connected, data.lastSync);
     } catch (error) {
         console.error('Error checking Garmin connection:', error);
         updateGarminConnectionUI(false);
     }
 }
 
-// Update UI to show Garmin connection status
-function updateGarminConnectionUI(connected, lastSync = null) {
-    const statusEl = document.getElementById('garmin-connection-status');
-    const connectBtn = document.getElementById('garmin-connect-btn');
-    const disconnectBtn = document.getElementById('garmin-disconnect-btn');
-    const syncBtn = document.getElementById('garmin-sync-btn');
-    const lastSyncEl = document.getElementById('garmin-last-sync');
-    
-    if (statusEl) {
-        if (connected) {
-            statusEl.innerHTML = '✅ Connected';
-            statusEl.style.color = 'var(--success)';
-        } else {
-            statusEl.innerHTML = '❌ Not Connected';
-            statusEl.style.color = 'var(--danger)';
+async function initSupabase() {
+    try {
+        console.log('🔄 Initializing Supabase v51 (Backend Proxy)...');
+        let attempts = 0;
+        while (typeof window.supabase?.createClient !== 'function' && attempts < 100) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
         }
-    }
-    
-    if (connectBtn) connectBtn.style.display = connected ? 'none' : 'inline-block';
-    if (disconnectBtn) disconnectBtn.style.display = connected ? 'inline-block' : 'none';
-    if (syncBtn) syncBtn.style.display = connected ? 'inline-block' : 'none';
-    
-    if (lastSyncEl && lastSync) {
-        const date = new Date(lastSync);
-        lastSyncEl.textContent = `Last sync: ${date.toLocaleString()}`;
-        lastSyncEl.style.display = 'block';
-    } else if (lastSyncEl) {
-        lastSyncEl.style.display = 'none';
-    }
-}
+        if (typeof window.supabase?.createClient !== 'function') throw new Error('Supabase library not loaded');
 
-// Connect Garmin account
-async function connectGarmin() {
-    if (!CLOUD_SYNC_ENABLED || !USER_ID) {
-        showNotification('❌ Cloud sync must be enabled first', 'error');
-        return;
-    }
-    
-    try {
-        showNotification('🔄 Connecting to Garmin...', 'info');
+        supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+        USER_ID = localStorage.getItem('nimble_user_id') || ('user_' + Date.now());
+        localStorage.setItem('nimble_user_id', USER_ID);
+
+        CLOUD_SYNC_ENABLED = true;
+        updateCloudSyncUI(); // No longer throws ReferenceError!
         
-        // Get OAuth URL from backend
-        const response = await fetch(`${BACKEND_URL}/api/garmin/auth?user_id=${USER_ID}`);
-        const data = await response.json();
-        
-        if (data.error) throw new Error(data.error);
-        
-        // Open Garmin OAuth page in popup
-        const width = 600, height = 700;
-        const left = (screen.width - width) / 2, top = (screen.height - height) / 2;
-        
-        window.open(data.authUrl, 'garmin-oauth', `width=${width},height=${height},left=${left},top=${top}`);
-        
-        // Listen for OAuth callback
-        window.addEventListener('message', function onMessage(event) {
-            if (event.data.type === 'garmin_connected') {
-                window.removeEventListener('message', onMessage);
-                showNotification('✅ Garmin connected successfully!', 'success');
-                checkGarminConnection();
-                syncGarminNow();
-            }
-        });
+        await loadFromCloud();
+        checkGarminConnection(); 
+        console.log('✅ Supabase initialized successfully! v51');
     } catch (error) {
-        console.error('Garmin connect error:', error);
-        showNotification(`❌ ${error.message}`, 'error');
+        console.error('❌ Supabase init error:', error);
+        CLOUD_SYNC_ENABLED = false;
+        updateCloudSyncUI();
     }
 }
 
-// Disconnect Garmin account
-async function disconnectGarmin() {
-    if (!confirm('Disconnect Garmin? You can reconnect anytime.')) return;
-    
-    try {
-        showNotification('🔄 Disconnecting...', 'info');
-        const response = await fetch(`${BACKEND_URL}/api/garmin/disconnect?user_id=${USER_ID}`);
-        const data = await response.json();
-        
-        if (data.success) {
-            showNotification('✅ Garmin disconnected', 'success');
-            updateGarminConnectionUI(false);
-        } else {
-            throw new Error('Failed to disconnect');
-        }
-    } catch (error) {
-        console.error('Disconnect error:', error);
-        showNotification('❌ Failed to disconnect', 'error');
-    }
-}
-
-// Sync Garmin activities now
-async function syncGarminNow() {
-    if (!CLOUD_SYNC_ENABLED || !USER_ID) return;
-    
-    try {
-        showNotification('🔄 Syncing Garmin activities...', 'info');
-        const response = await fetch(`${BACKEND_URL}/api/garmin/sync?user_id=${USER_ID}`);
-        const data = await response.json();
-        
-        if (data.error) throw new Error(data.error);
-        
-        showNotification(`✅ Synced ${data.activitiesCount} activities`, 'success');
-        updateGarminConnectionUI(true, new Date().toISOString());
-        checkGarminFiles(); // Reload Garmin data in UI
-    } catch (error) {
-        console.error('Sync error:', error);
-        showNotification(`❌ ${error.message}`, 'error');
-    }
-}
-
-// Check connection status periodically (Every 5 minutes)
-setInterval(() => {
-    if (CLOUD_SYNC_ENABLED && USER_ID) checkGarminConnection();
-}, 300000);
-// ========================================
-// SUPABASE CLOUD SYNC SYSTEM
-// ========================================
-
+// 3. Execution Block
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(initGarminUpload, 500);
+    initSupabase(); 
+    checkDailyUpdates();
+});
 async function initSupabase() {
     try {
         console.log('🔄 Initializing Supabase v51 (Backend Proxy)...');
