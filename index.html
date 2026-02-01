@@ -4473,13 +4473,9 @@ function resetGarminUpload() {
     document.querySelector('#view-garmin').scrollIntoView({ behavior: 'smooth' });
 }
 
-// Initialize Garmin on page load
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(initGarminUpload, 500);
-    initSupabase(); // This was missing and caused the syntax error
-    checkDailyUpdates();
-});
-// 1. Define UI Functions FIRST
+// ==========================================
+// 1. UI UPDATE FUNCTIONS (Defined first)
+// ==========================================
 function updateCloudSyncUI() {
     const statusText = document.getElementById('cloud-status-text');
     const deviceIdText = document.getElementById('device-id-text');
@@ -4497,6 +4493,7 @@ function updateGarminConnectionUI(connected, lastSync = null) {
     const statusEl = document.getElementById('garmin-connection-status');
     const connectBtn = document.getElementById('garmin-connect-btn');
     const disconnectBtn = document.getElementById('garmin-disconnect-btn');
+    const syncBtn = document.getElementById('garmin-sync-btn');
     const lastSyncEl = document.getElementById('garmin-last-sync');
     
     if (statusEl) {
@@ -4505,17 +4502,20 @@ function updateGarminConnectionUI(connected, lastSync = null) {
     }
     if (connectBtn) connectBtn.style.display = connected ? 'none' : 'inline-block';
     if (disconnectBtn) disconnectBtn.style.display = connected ? 'inline-block' : 'none';
+    if (syncBtn) syncBtn.style.display = connected ? 'inline-block' : 'none';
     if (lastSyncEl && lastSync) {
         lastSyncEl.textContent = `Last sync: ${new Date(lastSync).toLocaleString()}`;
         lastSyncEl.style.display = 'block';
     }
 }
 
-// 2. Main Logic Functions
+// ==========================================
+// 2. GARMIN & SUPABASE CORE LOGIC
+// ==========================================
 async function checkGarminConnection() {
     if (!CLOUD_SYNC_ENABLED || !USER_ID) return;
     try {
-        const response = await fetch(`${BACKEND_URL}/api/garmin/status?user_id=${USER_ID}`);
+        const response = await fetch(`${BACKEND_URL}/api/garmin-status?user_id=${USER_ID}`);
         const data = await response.json();
         updateGarminConnectionUI(data.connected, data.lastSync);
     } catch (error) {
@@ -4524,22 +4524,77 @@ async function checkGarminConnection() {
     }
 }
 
+async function connectGarmin() {
+    if (!CLOUD_SYNC_ENABLED || !USER_ID) {
+        showNotification('❌ Cloud sync must be enabled first', 'error');
+        return;
+    }
+    try {
+        showNotification('🔄 Connecting to Garmin...', 'info');
+        const response = await fetch(`${BACKEND_URL}/api/garmin-auth?user_id=${USER_ID}`);
+        const data = await response.json();
+        if (data.error) throw new Error(data.error);
+        
+        const width = 600, height = 700;
+        const left = (screen.width - width) / 2, top = (screen.height - height) / 2;
+        window.open(data.authUrl, 'garmin-oauth', `width=${width},height=${height},left=${left},top=${top}`);
+        
+        window.addEventListener('message', function onMessage(event) {
+            if (event.data.type === 'garmin_connected') {
+                window.removeEventListener('message', onMessage);
+                showNotification('✅ Garmin connected!', 'success');
+                checkGarminConnection();
+            }
+        });
+    } catch (error) {
+        showNotification(`❌ ${error.message}`, 'error');
+    }
+}
+
+async function syncGarminNow() {
+    if (!CLOUD_SYNC_ENABLED || !USER_ID) return;
+    try {
+        showNotification('🔄 Syncing Garmin...', 'info');
+        const response = await fetch(`${BACKEND_URL}/api/garmin-sync?user_id=${USER_ID}`);
+        const data = await response.json();
+        showNotification(`✅ Synced ${data.activitiesCount} activities`, 'success');
+        checkGarminConnection();
+    } catch (error) {
+        showNotification('❌ Sync failed', 'error');
+    }
+}
+
+async function disconnectGarmin() {
+    if (!confirm('Disconnect Garmin?')) return;
+    try {
+        await fetch(`${BACKEND_URL}/api/garmin-disconnect?user_id=${USER_ID}`);
+        updateGarminConnectionUI(false);
+        showNotification('✅ Disconnected', 'success');
+    } catch (error) {
+        showNotification('❌ Disconnect failed', 'error');
+    }
+}
+
+// ==========================================
+// 3. SUPABASE INITIALIZATION
+// ==========================================
 async function initSupabase() {
     try {
         console.log('🔄 Initializing Supabase v51 (Backend Proxy)...');
         let attempts = 0;
         while (typeof window.supabase?.createClient !== 'function' && attempts < 100) {
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise(res => setTimeout(res, 100));
             attempts++;
         }
-        if (typeof window.supabase?.createClient !== 'function') throw new Error('Supabase library not loaded');
+        if (typeof window.supabase?.createClient !== 'function') throw new Error('Supabase failed to load');
 
         supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
-        USER_ID = localStorage.getItem('nimble_user_id') || ('user_' + Date.now());
+        
+        USER_ID = localStorage.getItem('nimble_user_id') || ('user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5));
         localStorage.setItem('nimble_user_id', USER_ID);
 
         CLOUD_SYNC_ENABLED = true;
-        updateCloudSyncUI(); // No longer throws ReferenceError!
+        updateCloudSyncUI(); // This works now because it's defined above!
         
         await loadFromCloud();
         checkGarminConnection(); 
@@ -4551,207 +4606,35 @@ async function initSupabase() {
     }
 }
 
-// 3. Execution Block
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(initGarminUpload, 500);
-    initSupabase(); 
-    checkDailyUpdates();
-});
-async function initSupabase() {
-    try {
-        console.log('🔄 Initializing Supabase v51 (Backend Proxy)...');
-        
-        let attempts = 0;
-        while (typeof window.supabase?.createClient !== 'function' && attempts < 100) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-            attempts++;
-        }
-        
-        if (typeof window.supabase?.createClient !== 'function') {
-            throw new Error('Supabase library not loaded from backend proxy');
-        }
-        
-        supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
-        console.log('✅ Supabase client created');
-
-        USER_ID = localStorage.getItem('nimble_user_id');
-        if (!USER_ID) {
-            USER_ID = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('nimble_user_id', USER_ID);
-        }
-        console.log('🆔 User ID:', USER_ID);
-
-        CLOUD_SYNC_ENABLED = true;
-        if (typeof updateCloudSyncUI === 'function') updateCloudSyncUI();
-        
-        await loadFromCloud();
-        
-        if (typeof checkGarminFiles === 'function') checkGarminFiles();
-        if (typeof checkGarminConnection === 'function') checkGarminConnection(); 
-        
-        console.log('✅ Supabase initialized successfully! v51');
-    } catch (error) {
-        console.error('❌ Supabase init error:', error);
-        CLOUD_SYNC_ENABLED = false;
-    }
-}
-// Save workout to cloud
+// ==========================================
+// 4. DATA SYNC WRAPPERS
+// ==========================================
 async function saveWorkoutToCloud(workout) {
-    if (!CLOUD_SYNC_ENABLED || !supabaseClient) return false;
-    
+    if (!CLOUD_SYNC_ENABLED || !supabaseClient) return;
     try {
-        const { data, error } = await supabaseClient
-            .from('workouts')
-            .insert({
-                user_id: USER_ID,
-                date: workout.date,
-                type: workout.type,
-                exercises: workout.exercises,
-                duration: workout.duration || 0,
-                notes: workout.notes || '',
-                created_at: new Date().toISOString()
-            });
-        
-        if (error) throw error;
-        
+        await supabaseClient.from('workouts').insert([{ user_id: USER_ID, ...workout }]);
         LAST_SYNC_TIME = new Date().toISOString();
-        function updateCloudSyncUI() {
-    const statusText = document.getElementById('cloud-status-text');
-    const deviceIdText = document.getElementById('device-id-text');
-    const lastSyncText = document.getElementById('last-sync-time');
-    
-    if (statusText) {
-        statusText.textContent = CLOUD_SYNC_ENABLED ? '✅ Connected' : '❌ Offline';
-        statusText.style.color = CLOUD_SYNC_ENABLED ? 'var(--success)' : 'var(--danger)';
-    }
-    if (deviceIdText) {
-        deviceIdText.textContent = USER_ID ? USER_ID.substr(0, 20) + '...' : 'Not set';
-    }
-    if (lastSyncText && LAST_SYNC_TIME) {
-        lastSyncText.textContent = new Date(LAST_SYNC_TIME).toLocaleString();
-    }
-}
         updateCloudSyncUI();
-        console.log('✅ Workout saved to cloud');
-        return true;
-    } catch (error) {
-        console.error('Error saving workout to cloud:', error);
-        return false;
-    }
+    } catch (e) { console.error('Cloud save error', e); }
 }
 
-// Load workouts from cloud
-async function loadWorkoutsFromCloud() {
-    if (!CLOUD_SYNC_ENABLED || !supabaseClient) return [];
-    
+async function loadFromCloud() {
+    if (!CLOUD_SYNC_ENABLED) return;
+    console.log('📥 Loading from cloud...');
     try {
         const { data, error } = await supabaseClient
             .from('workouts')
             .select('*')
             .eq('user_id', USER_ID)
             .order('date', { ascending: false });
-        
         if (error) throw error;
-        
-        console.log(`📥 Loaded ${data.length} workouts from cloud`);
-        return data || [];
-    } catch (error) {
-        console.error('Error loading workouts from cloud:', error);
-        return [];
-    }
+        console.log(`📥 Loaded ${data.length} workouts`);
+    } catch (e) { console.error('Cloud load error', e); }
 }
 
-// Save training plan to cloud
-async function savePlanToCloud(plan) {
-    if (!CLOUD_SYNC_ENABLED || !supabaseClient) return false;
-    
-    try {
-        // Delete any existing active plan
-        await supabaseClient
-            .from('training_plans')
-            .delete()
-            .eq('user_id', USER_ID)
-            .eq('active', true);
-        
-        // Insert new plan
-        const { data, error } = await supabaseClient
-            .from('training_plans')
-            .insert({
-                user_id: USER_ID,
-                name: plan.name || 'My Training Plan',
-                plan_data: plan,
-                active: true,
-                created_at: new Date().toISOString()
-            });
-        
-        if (error) throw error;
-        
-        LAST_SYNC_TIME = new Date().toISOString();
-        updateCloudSyncUI();
-        console.log('✅ Training plan saved to cloud');
-        return true;
-    } catch (error) {
-        console.error('Error saving plan to cloud:', error);
-        return false;
-    }
-}
-
-// Load active training plan from cloud
-async function loadPlanFromCloud() {
-    if (!CLOUD_SYNC_ENABLED || !supabaseClient) return null;
-    
-    try {
-        const { data, error } = await supabaseClient
-            .from('training_plans')
-            .select('*')
-            .eq('user_id', USER_ID)
-            .eq('active', true)
-            .single();
-        
-        if (error) {
-            if (error.code === 'PGRST116') return null; // No rows found
-            throw error;
-        }
-        
-        console.log('📥 Loaded training plan from cloud');
-        return data?.plan_data || null;
-    } catch (error) {
-        console.error('Error loading plan from cloud:', error);
-        return null;
-    }
-}
-
-// Save Garmin file to cloud
-async function saveGarminToCloud(filename, fileData, analysis) {
-    if (!CLOUD_SYNC_ENABLED || !supabaseClient) return false;
-    
-    try {
-        const { data, error } = await supabaseClient
-            .from('garmin_files')
-            .insert({
-                user_id: USER_ID,
-                filename: filename,
-                file_data: fileData,
-                analysis: analysis || null,
-                uploaded_at: new Date().toISOString()
-            });
-        
-        if (error) throw error;
-        
-        LAST_SYNC_TIME = new Date().toISOString();
-        updateCloudSyncUI();
-        console.log('✅ Garmin file saved to cloud');
-        return true;
-    } catch (error) {
-        console.error('Error saving Garmin file to cloud:', error);
-        return false;
-    }
-}
-
-// Load Garmin files from cloud
-async function loadGarminFromCloud() {
-    if (!CLOUD_SYNC_ENABLED || !supabaseClient) return [];
-    
+// Check for new Garmin files in cloud
+async function checkGarminFiles() {
+    if (!CLOUD_SYNC_ENABLED) return;
     try {
         const { data, error } = await supabaseClient
             .from('garmin_files')
@@ -4759,144 +4642,17 @@ async function loadGarminFromCloud() {
             .eq('user_id', USER_ID)
             .order('uploaded_at', { ascending: false })
             .limit(10);
-        
         if (error) throw error;
-        
-        console.log(`📥 Loaded ${data.length} Garmin files from cloud`);
-        return data || [];
-    } catch (error) {
-        console.error('Error loading Garmin files from cloud:', error);
-        return [];
-    }
+        if (data.length > 0) showNotification(`📊 ${data.length} Garmin file(s) available`, 'info');
+    } catch (error) { console.error('Garmin check error:', error); }
 }
 
-// Load all data from cloud
-async function loadFromCloud() {
-    if (!CLOUD_SYNC_ENABLED) return;
-    
-    try {
-        console.log('📥 Loading workouts from cloud...');
-        
-        // Load workouts with timeout
-        const workoutsPromise = loadWorkoutsFromCloud();
-        const workoutsTimeout = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Workout load timeout')), 5000)
-        );
-        const cloudWorkouts = await Promise.race([workoutsPromise, workoutsTimeout]).catch(err => {
-            console.warn('⚠️ Workout load failed:', err.message);
-            return [];
-        });
-        
-        const localWorkouts = JSON.parse(localStorage.getItem('workouts') || '[]');
-        
-        // Merge cloud and local (cloud takes priority for same dates)
-        const workoutMap = new Map();
-        localWorkouts.forEach(w => workoutMap.set(w.date, w));
-        cloudWorkouts.forEach(w => workoutMap.set(w.date, w));
-        
-        const mergedWorkouts = Array.from(workoutMap.values());
-        localStorage.setItem('workouts', JSON.stringify(mergedWorkouts));
-        
-        console.log(`✅ Merged ${cloudWorkouts.length} cloud + ${localWorkouts.length} local workouts`);
-        
-        // Load training plan with timeout
-        console.log('📥 Loading training plan from cloud...');
-        const planPromise = loadPlanFromCloud();
-        const planTimeout = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Plan load timeout')), 5000)
-        );
-        const cloudPlan = await Promise.race([planPromise, planTimeout]).catch(err => {
-            console.warn('⚠️ Plan load failed:', err.message);
-            return null;
-        });
-        
-        if (cloudPlan) {
-            localStorage.setItem('training_plan', JSON.stringify(cloudPlan));
-            console.log('✅ Training plan loaded from cloud');
-        }
-        
-        LAST_SYNC_TIME = new Date().toISOString();
-        updateCloudSyncUI();
-        
-        console.log('✅ Cloud data loaded successfully');
-    } catch (error) {
-        console.error('Error loading from cloud:', error);
-    }
-}
-
-// Manual sync function
-async function syncNow() {
-    if (!CLOUD_SYNC_ENABLED) {
-        showNotification('❌ Cloud sync not available', 'error');
-        return;
-    }
-    
-    showNotification('🔄 Syncing...', 'info');
-    
-    try {
-        // Upload all local workouts
-        const workouts = JSON.parse(localStorage.getItem('workouts') || '[]');
-        for (const workout of workouts) {
-            await saveWorkoutToCloud(workout);
-        }
-        
-        // Upload training plan
-        const plan = JSON.parse(localStorage.getItem('training_plan') || 'null');
-        if (plan) {
-            await savePlanToCloud(plan);
-        }
-        
-        // Load from cloud (in case there's newer data)
-        await loadFromCloud();
-        
-        showNotification('✅ Sync complete!', 'success');
-    } catch (error) {
-        console.error('Sync error:', error);
-        showNotification('❌ Sync failed', 'error');
-    }
-}
-
-// Show sync log
-function showSyncLog() {
-    const log = `
-Last Sync: ${LAST_SYNC_TIME ? new Date(LAST_SYNC_TIME).toLocaleString() : 'Never'}
-User ID: ${USER_ID}
-Status: ${CLOUD_SYNC_ENABLED ? 'Connected' : 'Offline'}
-Auto-sync: ${CLOUD_SYNC_ENABLED ? 'Enabled' : 'Disabled'}
-
-All workouts and training plans are automatically backed up to the cloud after each save.
-Garmin files are uploaded when you analyze them.
-    `.trim();
-    
-    alert(log);
-}
-
-// Check for new Garmin files in cloud
-async function checkGarminFiles() {
-    if (!CLOUD_SYNC_ENABLED) return;
-    
-    try {
-        const garminFiles = await loadGarminFromCloud();
-        const lastCheck = localStorage.getItem('last_garmin_check');
-        
-        if (!lastCheck && garminFiles.length > 0) {
-            showNotification(`📊 ${garminFiles.length} Garmin file(s) available in cloud`, 'info');
-            localStorage.setItem('last_garmin_check', new Date().toISOString());
-        } else if (lastCheck) {
-            const newFiles = garminFiles.filter(f => 
-                new Date(f.uploaded_at) > new Date(lastCheck)
-            );
-            
-            if (newFiles.length > 0) {
-                showNotification(`🏃 ${newFiles.length} new Garmin file(s) detected!`, 'info');
-                localStorage.setItem('last_garmin_check', new Date().toISOString());
-            }
-        }
-    } catch (error) {
-        console.error('Garmin check error:', error);
-    }
-}
-
+// 5. DOM Initialization
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(initGarminUpload, 500);
+    initSupabase(); 
+    checkDailyUpdates();
+});
 // ========================================
 // AI PLAN GENERATOR
 // ========================================
