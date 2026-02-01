@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:; 
 script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; 
-connect-src 'self' https://api.anthropic.com https://nimble-shred-backend.vercel.app https://q-9immdpqq9k5dhluNXfUQ.supabase.co https://cdn.jsdelivr.net;">    <meta name="theme-color" content="#1e1e1e">
+connect-src 'self' https://api.anthropic.com https://nimble-shred-backend.vercel.app https://wytyvtvmupsmtgjbcybc.supabase.co https://cdn.jsdelivr.net;">    <meta name="theme-color" content="#1e1e1e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Nimble Shred AI Edition - Cloud Sync</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -17,22 +17,20 @@ connect-src 'self' https://api.anthropic.com https://nimble-shred-backend.vercel
     // ✅ Supabase project configured
     // ✅ Database tables created (workouts, training_plans, garmin_files, user_settings)
     // ✅ Anthropic API Key stored securely in backend
-    const SUPABASE_CONFIG = {
-        url: 'https://q-9immdpqq9k5dhluNXfUQ.supabase.co',
-        // IMPORTANT: Get the actual anon key from Supabase Dashboard > Settings > API
-        // This is a JWT token that starts with "eyJ..."
-        // Using publishable key format as placeholder - REPLACE WITH REAL ANON KEY
-        anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InEtOWltbWRwcXE5azVkaGx1bnhmdXEiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTczODQxMzYwMCwiZXhwIjoyMDUzOTg5NjAwfQ.REPLACE_WITH_ACTUAL_JWT_SIGNATURE'
+    var SUPABASE_CONFIG = {
+        url: 'https://wytyvtvmupsmtgjbcybc.supabase.co',
+        // Supabase anon key from dashboard - secure for client-side use
+        anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5dHl2dHZtdXBzbXRnamJjeWJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MzA1MDAsImV4cCI6MjA4NTUwNjUwMH0.Qr1YFdN0QyZ-bLlKB5-LORpFBA2EhlHb-JcRKTYqnP0'
     };
     
     // Backend proxy URL - Vercel deployment
-    const BACKEND_URL = 'https://nimble-shred-backend.vercel.app';
+    var BACKEND_URL = 'https://nimble-shred-backend.vercel.app';
     
     // Supabase client and sync state
-    let supabase = null;
-    let CLOUD_SYNC_ENABLED = false;
-    let USER_ID = null;
-    let LAST_SYNC_TIME = null;
+    var supabase = null;
+    var CLOUD_SYNC_ENABLED = false;
+    var USER_ID = null;
+    var LAST_SYNC_TIME = null;
     </script>
     <style>
         :root { 
@@ -4432,21 +4430,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function initSupabase() {
     try {
+        console.log('🔄 Initializing Supabase...');
+        console.log('URL:', SUPABASE_CONFIG.url);
+        console.log('Anon key present:', !!SUPABASE_CONFIG.anonKey);
+        
+        // Check if Supabase library loaded
+        if (!window.supabase) {
+            throw new Error('Supabase library not loaded. Check CDN connection.');
+        }
+        
         // Initialize Supabase client
         supabase = window.supabase.createClient(
             SUPABASE_CONFIG.url,
             SUPABASE_CONFIG.anonKey
         );
         
+        console.log('✅ Supabase client created');
+        
         // Get or create device-specific user ID
         USER_ID = localStorage.getItem('nimble_user_id');
         if (!USER_ID) {
             USER_ID = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             localStorage.setItem('nimble_user_id', USER_ID);
+            console.log('🆔 Created new User ID:', USER_ID);
+        } else {
+            console.log('🆔 Existing User ID:', USER_ID);
         }
         
         CLOUD_SYNC_ENABLED = true;
         updateCloudSyncUI();
+        
+        console.log('📥 Loading data from cloud...');
         
         // Load data from cloud on init
         await loadFromCloud();
@@ -4454,9 +4468,11 @@ async function initSupabase() {
         // Check for new Garmin files
         checkGarminFiles();
         
-        console.log('✅ Supabase initialized, User ID:', USER_ID);
+        console.log('✅ Supabase initialized successfully!');
     } catch (error) {
-        console.error('Supabase init error:', error);
+        console.error('❌ Supabase init error:', error);
+        console.error('Error details:', error.message);
+        console.error('Error stack:', error.stack);
         CLOUD_SYNC_ENABLED = false;
         updateCloudSyncUI();
     }
