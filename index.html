@@ -8,9 +8,9 @@
     <title>Nimble Shred AI Edition - Cloud Sync</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Load Supabase from backend proxy to bypass CDN blocks -->
-    <script src="https://nimble-shred-backend.vercel.app/api/supabase-lib" 
-            onload="console.log('✅ Supabase script loaded', typeof window.supabase)"
-            onerror="console.error('❌ Failed to load Supabase script')"></script>
+ <script src="https://nimble-shred-backend.vercel.app/api/supabase-lib.js" 
+        onload="console.log('✅ Supabase script loaded', typeof window.supabase)"
+        onerror="console.error('❌ Failed to load Supabase script')"></script>
     <script>
     // ==========================================
     // SUPABASE CLOUD SYNC CONFIGURATION
@@ -4476,7 +4476,7 @@ function resetGarminUpload() {
 // Initialize Garmin on page load
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(initGarminUpload, 500);
-initSupabase();
+    initSupabase(); // This was missing and caused the syntax error
     checkDailyUpdates();
 });
 // ==========================================
@@ -4623,7 +4623,6 @@ async function initSupabase() {
     try {
         console.log('🔄 Initializing Supabase v51 (Backend Proxy)...');
         
-        // 1. Wait for Supabase library to load from backend proxy
         let attempts = 0;
         while (typeof window.supabase?.createClient !== 'function' && attempts < 100) {
             await new Promise(resolve => setTimeout(resolve, 100));
@@ -4634,28 +4633,21 @@ async function initSupabase() {
             throw new Error('Supabase library not loaded from backend proxy');
         }
         
-        // 2. Initialize Supabase client
         supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
         console.log('✅ Supabase client created');
 
-        // 3. Get or create device-specific user ID
         USER_ID = localStorage.getItem('nimble_user_id');
         if (!USER_ID) {
             USER_ID = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             localStorage.setItem('nimble_user_id', USER_ID);
-            console.log('🆔 Created new User ID:', USER_ID);
-        } else {
-            console.log('🆔 Existing User ID:', USER_ID);
         }
+        console.log('🆔 User ID:', USER_ID);
 
-        // 4. Enable cloud state and load data
         CLOUD_SYNC_ENABLED = true;
         if (typeof updateCloudSyncUI === 'function') updateCloudSyncUI();
         
         await loadFromCloud();
         
-        // 5. 🏃 Garmin Integration - Check files and connection status
-        // These MUST run at the very end after USER_ID is established
         if (typeof checkGarminFiles === 'function') checkGarminFiles();
         if (typeof checkGarminConnection === 'function') checkGarminConnection(); 
         
@@ -4663,10 +4655,8 @@ async function initSupabase() {
     } catch (error) {
         console.error('❌ Supabase init error:', error);
         CLOUD_SYNC_ENABLED = false;
-        if (typeof updateCloudSyncUI === 'function') updateCloudSyncUI();
     }
 }
-
 // Save workout to cloud
 async function saveWorkoutToCloud(workout) {
     if (!CLOUD_SYNC_ENABLED || !supabaseClient) return false;
