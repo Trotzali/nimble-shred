@@ -7,25 +7,17 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Nimble Shred AI Edition - Cloud Sync</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script>
-    // Force global scope for Supabase check
-    window.SUPABASE_LOADED = false;
-    if (typeof window.supabase !== 'undefined') {
-        window.SUPABASE_LOADED = true;
-        console.log('✅ Supabase library loaded from CDN');
-    }
-    </script>
+    <!-- Load Supabase from backend proxy to bypass CDN blocks -->
+    <script src="https://nimble-shred-backend.vercel.app/api/supabase-lib"></script>
     <script>
     // ==========================================
     // SUPABASE CLOUD SYNC CONFIGURATION
     // ==========================================
-    // ✅ Supabase project configured
+    // ✅ Supabase library loaded via backend proxy (bypasses CDN blocks)
     // ✅ Database tables created (workouts, training_plans, garmin_files, user_settings)
     // ✅ Anthropic API Key stored securely in backend
     var SUPABASE_CONFIG = {
         url: 'https://wytyvtvmupsmtgjbcybc.supabase.co',
-        // Supabase anon key from dashboard - secure for client-side use
         anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5dHl2dHZtdXBzbXRnamJjeWJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MzA1MDAsImV4cCI6MjA4NTUwNjUwMH0.Qr1YFdN0QyZ-bLlKB5-LORpFBA2EhlHb-JcRKTYqnP0'
     };
     
@@ -860,7 +852,7 @@
 <div class="container active" id="view-coach">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
         <h2>💪 Workout Coach</h2>
-        <span style="font-size: 0.75em; color: #666; font-family: monospace;">v45</span>
+        <span style="font-size: 0.75em; color: #666; font-family: monospace;">v47</span>
     </div>
     
     <div class="card">
@@ -4439,18 +4431,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function initSupabase() {
     try {
-        console.log('🔄 Initializing Supabase v44...');
+        console.log('🔄 Initializing Supabase v47 (Backend Proxy)...');
         
-        // Wait for Supabase library to load (max 5 seconds)
+        // Wait for Supabase library to load from backend
         let attempts = 0;
-        while (!window.supabase && attempts < 50) {
+        while (!window.supabase && attempts < 100) {
             await new Promise(resolve => setTimeout(resolve, 100));
             attempts++;
         }
         
         // Check if Supabase library loaded
         if (!window.supabase) {
-            throw new Error('Supabase library failed to load after 5 seconds. CDN may be blocked or slow.');
+            throw new Error('Supabase library not loaded from backend proxy. Check backend logs.');
         }
         
         console.log('✅ Supabase library detected');
@@ -4486,7 +4478,7 @@ async function initSupabase() {
         // Check for new Garmin files
         checkGarminFiles();
         
-        console.log('✅ Supabase initialized successfully! v44');
+        console.log('✅ Supabase initialized successfully! v46');
     } catch (error) {
         console.error('❌ Supabase init error:', error);
         console.error('Error details:', error.message);
