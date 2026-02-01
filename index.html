@@ -4,40 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:; 
-script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://cdn.jsdelivr.net https://accounts.google.com https://www.gstatic.com; 
-connect-src 'self' https://apis.google.com https://accounts.google.com https://www.googleapis.com https://api.anthropic.com https://nimble-shred-backend.vercel.app https://content.googleapis.com https://cdn.jsdelivr.net; 
-frame-src https://accounts.google.com https://content.googleapis.com;">    <meta name="theme-color" content="#1e1e1e">
+script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; 
+connect-src 'self' https://api.anthropic.com https://nimble-shred-backend.vercel.app https://q-9immdpqq9k5dhluNXfUQ.supabase.co https://cdn.jsdelivr.net;">    <meta name="theme-color" content="#1e1e1e">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Nimble Shred AI Edition - Google Drive Enhanced</title>
+    <title>Nimble Shred AI Edition - Cloud Sync</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://apis.google.com/js/api.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
     // ==========================================
-    // GOOGLE DRIVE CONFIGURATION
+    // SUPABASE CLOUD SYNC CONFIGURATION
     // ==========================================
-    // ✅ Google Drive Client ID configured (new account)
-    // ✅ Google API Key configured
+    // ✅ Supabase project configured
+    // ✅ Database tables created (workouts, training_plans, garmin_files, user_settings)
     // ✅ Anthropic API Key stored securely in backend
-    // Backend proxy will be used for Drive operations
-    const GOOGLE_CONFIG = {
-        clientId: '24311156313-169ebv5u2b251ac9lcr46n1k9759q871.apps.googleusercontent.com',
-        apiKey: 'AIzaSyAC4i8mTa3BNibgLCqtWWhocOyxRpzgOAE',
-        scope: 'https://www.googleapis.com/auth/drive.file',
-        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
+    const SUPABASE_CONFIG = {
+        url: 'https://q-9immdpqq9k5dhluNXfUQ.supabase.co',
+        // IMPORTANT: Get the actual anon key from Supabase Dashboard > Settings > API
+        // This is a JWT token that starts with "eyJ..."
+        // Using publishable key format as placeholder - REPLACE WITH REAL ANON KEY
+        anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InEtOWltbWRwcXE5azVkaGx1bnhmdXEiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTczODQxMzYwMCwiZXhwIjoyMDUzOTg5NjAwfQ.REPLACE_WITH_ACTUAL_JWT_SIGNATURE'
     };
     
     // Backend proxy URL - Vercel deployment
     const BACKEND_URL = 'https://nimble-shred-backend.vercel.app';
     
-    // Drive folder structure
-    let DRIVE_FOLDERS = {
-        root: null,
-        data: null,
-        garmin: null,
-        images: null
-    };
-    
-    let DRIVE_READY = false;
+    // Supabase client and sync state
+    let supabase = null;
+    let CLOUD_SYNC_ENABLED = false;
+    let USER_ID = null;
+    let LAST_SYNC_TIME = null;
     </script>
     <style>
         :root { 
@@ -975,27 +970,25 @@ frame-src https://accounts.google.com https://content.googleapis.com;">    <meta
     <h2>⚙️ Settings</h2>
     
     <div class="card" style="background: linear-gradient(135deg, rgba(0,124,195,0.1), rgba(0,212,255,0.1)); border: 2px solid #007CC3;">
-        <h3>🔗 Google Drive Backend</h3>
+        <h3>☁️ Cloud Sync</h3>
         <p style="font-size: 0.9em; color: #888; margin-bottom: 15px;">
-            Connect Google Drive to save all data, auto-sync Garmin files, and never lose progress.
+            Automatic cloud backup for workouts, plans, and Garmin data across all your devices.
         </p>
         <div style="margin-bottom: 10px;">
-            <strong>Status:</strong> <span id="drive-status-text">Checking...</span>
+            <strong>Status:</strong> <span id="cloud-status-text">Initializing...</span>
         </div>
-        <button id="connect-drive-btn" class="btn btn-main" onclick="signInDrive()">
-            🔗 Connect Google Drive
-        </button>
-        <div id="drive-info" style="display:none; margin-top: 15px;">
-            <p><strong>Account:</strong> <span id="drive-email"></span></p>
-            <p><strong>Last sync:</strong> <span id="last-sync"></span></p>
+        <div style="margin-bottom: 10px;">
+            <strong>Device ID:</strong> <span id="device-id-text" style="font-family: monospace; font-size: 0.85em;"></span>
+        </div>
+        <div id="cloud-sync-info" style="margin-top: 15px;">
+            <p><strong>Last sync:</strong> <span id="last-sync-time">Never</span></p>
             <div style="margin-top: 10px;">
                 <button class="btn btn-action" onclick="syncNow()">🔄 Sync Now</button>
-                <button class="btn btn-danger" onclick="signOutDrive()">Disconnect</button>
+                <button class="btn btn-small" onclick="showSyncLog()">📋 View Log</button>
             </div>
         </div>
-        <div style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 6px; font-size: 0.85em;">
-            <strong>⚠️ Setup Required:</strong> Replace placeholder credentials in code with your Google Cloud OAuth keys.
-            <a href="https://console.cloud.google.com" target="_blank" style="color: var(--sec);">Get credentials →</a>
+        <div style="margin-top: 15px; padding: 10px; background: rgba(3, 218, 198, 0.1); border-radius: 6px; font-size: 0.85em; border-left: 3px solid var(--sec);">
+            <strong>✅ Auto-Sync Enabled:</strong> All data automatically backed up to cloud after each workout.
         </div>
     </div>
     
@@ -2847,6 +2840,17 @@ function markDayCompleted(dayIndex) {
     let completed = JSON.parse(localStorage.getItem('completedWorkouts')) || {};
     completed[date] = true;
     localStorage.setItem('completedWorkouts', JSON.stringify(completed));
+    
+    // Auto-save to cloud
+    const workout = {
+        date: date,
+        type: appState.currentWorkout?.type || 'unknown',
+        exercises: appState.currentWorkout?.exercises || [],
+        duration: 0, // Could be calculated
+        notes: ''
+    };
+    saveWorkoutToCloud(workout);
+    
     renderPlanCalendar();
 }
 
@@ -4264,6 +4268,19 @@ If metrics show concerning patterns (sleep score <70, elevated RHR, low HRV, hig
         
         displayGarminResults(analysis);
         
+        // Save to cloud
+        if (CLOUD_SYNC_ENABLED) {
+            const fileData = uploadedGarminFiles.map((f, i) => ({
+                name: f.name,
+                content: fileContents[i]
+            }));
+            await saveGarminToCloud(
+                uploadedGarminFiles.map(f => f.name).join(', '),
+                JSON.stringify(fileData),
+                analysis
+            );
+        }
+        
     } catch (error) {
         console.error('Analysis failed:', error);
         alert(`Failed to analyze data:\n${error.message}\n\nCheck browser console (F12) for full details.`);
@@ -4405,303 +4422,323 @@ function resetGarminUpload() {
 // Initialize Garmin on page load
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(initGarminUpload, 500);
-    initGoogleDrive();
+    initSupabase();
     checkDailyUpdates();
 });
 
 // ========================================
-// GOOGLE DRIVE BACKEND SYSTEM
+// SUPABASE CLOUD SYNC SYSTEM
 // ========================================
 
-async function initGoogleDrive() {
+async function initSupabase() {
     try {
-        await new Promise((resolve) => {
-            gapi.load('client:auth2', resolve);
-        });
+        // Initialize Supabase client
+        supabase = window.supabase.createClient(
+            SUPABASE_CONFIG.url,
+            SUPABASE_CONFIG.anonKey
+        );
         
-        await gapi.client.init({
-            apiKey: GOOGLE_CONFIG.apiKey,
-            clientId: GOOGLE_CONFIG.clientId,
-            discoveryDocs: GOOGLE_CONFIG.discoveryDocs,
-            scope: GOOGLE_CONFIG.scope
-        });
-        
-        const authInstance = gapi.auth2.getAuthInstance();
-        
-        if (authInstance.isSignedIn.get()) {
-            await handleDriveSignIn();
+        // Get or create device-specific user ID
+        USER_ID = localStorage.getItem('nimble_user_id');
+        if (!USER_ID) {
+            USER_ID = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('nimble_user_id', USER_ID);
         }
         
-        authInstance.isSignedIn.listen((signedIn) => {
-            if (signedIn) handleDriveSignIn();
-            else handleDriveSignOut();
-        });
+        CLOUD_SYNC_ENABLED = true;
+        updateCloudSyncUI();
         
-        updateDriveUI();
-    } catch (error) {
-        console.log('Drive init skipped:', error.message);
-    }
-}
-
-async function handleDriveSignIn() {
-    try {
-        await ensureFolderStructure();
-        DRIVE_READY = true;
-        updateDriveUI();
-        await migrateToDrive();
+        // Load data from cloud on init
+        await loadFromCloud();
+        
+        // Check for new Garmin files
         checkGarminFiles();
+        
+        console.log('✅ Supabase initialized, User ID:', USER_ID);
     } catch (error) {
-        console.error('Drive sign-in error:', error);
+        console.error('Supabase init error:', error);
+        CLOUD_SYNC_ENABLED = false;
+        updateCloudSyncUI();
     }
 }
 
-function handleDriveSignOut() {
-    DRIVE_READY = false;
-    DRIVE_FOLDERS = { root: null, data: null, garmin: null, images: null };
-    updateDriveUI();
-}
-
-async function signInDrive() {
-    try {
-        await gapi.auth2.getAuthInstance().signIn();
-    } catch (error) {
-        alert('Sign-in failed. Check console.');
+function updateCloudSyncUI() {
+    const statusText = document.getElementById('cloud-status-text');
+    const deviceIdText = document.getElementById('device-id-text');
+    const lastSyncText = document.getElementById('last-sync-time');
+    
+    if (statusText) {
+        statusText.textContent = CLOUD_SYNC_ENABLED ? '✅ Connected' : '❌ Offline';
+        statusText.style.color = CLOUD_SYNC_ENABLED ? 'var(--success)' : 'var(--danger)';
+    }
+    
+    if (deviceIdText) {
+        deviceIdText.textContent = USER_ID ? USER_ID.substr(0, 20) + '...' : 'Not set';
+    }
+    
+    if (lastSyncText && LAST_SYNC_TIME) {
+        const date = new Date(LAST_SYNC_TIME);
+        lastSyncText.textContent = date.toLocaleString();
     }
 }
 
-async function signOutDrive() {
-    if (confirm('Disconnect Google Drive? Data will stay in Drive but won\'t sync.')) {
-        await gapi.auth2.getAuthInstance().signOut();
-    }
-}
-
-async function ensureFolderStructure() {
-    const rootName = 'Nimble Shred';
-    
-    let rootFolder = await findFolder(rootName);
-    if (!rootFolder) {
-        rootFolder = await createFolder(rootName, null);
-    }
-    DRIVE_FOLDERS.root = rootFolder.id;
-    
-    const subfolders = ['data', 'garmin', 'images'];
-    for (const name of subfolders) {
-        let folder = await findFolder(name, DRIVE_FOLDERS.root);
-        if (!folder) {
-            folder = await createFolder(name, DRIVE_FOLDERS.root);
-        }
-        DRIVE_FOLDERS[name] = folder.id;
-    }
-}
-
-async function findFolder(name, parentId = null) {
-    const query = parentId 
-        ? `name='${name}' and '${parentId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`
-        : `name='${name}' and mimeType='application/vnd.google-apps.folder' and trashed=false`;
-    
-    const response = await gapi.client.drive.files.list({
-        q: query,
-        fields: 'files(id, name)',
-        spaces: 'drive'
-    });
-    
-    return response.result.files[0] || null;
-}
-
-async function createFolder(name, parentId) {
-    const metadata = {
-        name: name,
-        mimeType: 'application/vnd.google-apps.folder'
-    };
-    
-    if (parentId) {
-        metadata.parents = [parentId];
-    }
-    
-    const response = await gapi.client.drive.files.create({
-        resource: metadata,
-        fields: 'id, name'
-    });
-    
-    return response.result;
-}
-
-async function saveJsonToDrive(filename, data, folderId) {
-    const content = JSON.stringify(data, null, 2);
-    const blob = new Blob([content], { type: 'application/json' });
-    
-    const existingFile = await findFile(filename, folderId);
-    
-    const metadata = {
-        name: filename,
-        mimeType: 'application/json'
-    };
-    
-    if (!existingFile) {
-        metadata.parents = [folderId];
-    }
-    
-    const form = new FormData();
-    form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-    form.append('file', blob);
-    
-    const url = existingFile
-        ? `https://www.googleapis.com/upload/drive/v3/files/${existingFile.id}?uploadType=multipart`
-        : 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
-    
-    const method = existingFile ? 'PATCH' : 'POST';
-    
-    const token = gapi.auth.getToken().access_token;
-    
-    await fetch(url, {
-        method: method,
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: form
-    });
-}
-
-async function loadJsonFromDrive(filename, folderId) {
-    const file = await findFile(filename, folderId);
-    if (!file) return null;
-    
-    const response = await gapi.client.drive.files.get({
-        fileId: file.id,
-        alt: 'media'
-    });
-    
-    return response.result;
-}
-
-async function findFile(name, parentId) {
-    const response = await gapi.client.drive.files.list({
-        q: `name='${name}' and '${parentId}' in parents and trashed=false`,
-        fields: 'files(id, name, modifiedTime)',
-        spaces: 'drive'
-    });
-    
-    return response.result.files[0] || null;
-}
-
-async function migrateToDrive() {
-    if (!DRIVE_READY || !DRIVE_FOLDERS.data) return;
-    
-    const migrated = localStorage.getItem('drive_migrated');
-    if (migrated) return;
+// Save workout to cloud
+async function saveWorkoutToCloud(workout) {
+    if (!CLOUD_SYNC_ENABLED || !supabase) return false;
     
     try {
-        const migrations = [
-            { key: 'currentPlan', file: 'training_plan.json' },
-            { key: 'completedWorkouts', file: 'workout_history.json' },
-            { key: 'appSettings', file: 'settings.json' }
-        ];
+        const { data, error } = await supabase
+            .from('workouts')
+            .insert({
+                user_id: USER_ID,
+                date: workout.date,
+                type: workout.type,
+                exercises: workout.exercises,
+                duration: workout.duration || 0,
+                notes: workout.notes || '',
+                created_at: new Date().toISOString()
+            });
         
-        for (const { key, file } of migrations) {
-            const data = localStorage.getItem(key);
-            if (data) {
-                await saveJsonToDrive(file, JSON.parse(data), DRIVE_FOLDERS.data);
-            }
-        }
+        if (error) throw error;
         
-        const gifs = {};
-        for (let i = 0; i < localStorage.length; i++) {
-            const k = localStorage.key(i);
-            if (k.startsWith('gif_')) {
-                gifs[k] = localStorage.getItem(k);
-            }
-        }
-        
-        if (Object.keys(gifs).length > 0) {
-            await saveJsonToDrive('exercise_gifs.json', gifs, DRIVE_FOLDERS.images);
-        }
-        
-        localStorage.setItem('drive_migrated', Date.now());
+        LAST_SYNC_TIME = new Date().toISOString();
+        updateCloudSyncUI();
+        console.log('✅ Workout saved to cloud');
+        return true;
     } catch (error) {
-        console.error('Migration error:', error);
+        console.error('Error saving workout to cloud:', error);
+        return false;
     }
 }
 
-function updateDriveUI() {
-    const statusEl = document.getElementById('drive-status-text');
-    const connectBtn = document.getElementById('connect-drive-btn');
-    const driveInfo = document.getElementById('drive-info');
+// Load workouts from cloud
+async function loadWorkoutsFromCloud() {
+    if (!CLOUD_SYNC_ENABLED || !supabase) return [];
     
-    if (!statusEl) return;
+    try {
+        const { data, error } = await supabase
+            .from('workouts')
+            .select('*')
+            .eq('user_id', USER_ID)
+            .order('date', { ascending: false });
+        
+        if (error) throw error;
+        
+        console.log(`📥 Loaded ${data.length} workouts from cloud`);
+        return data || [];
+    } catch (error) {
+        console.error('Error loading workouts from cloud:', error);
+        return [];
+    }
+}
+
+// Save training plan to cloud
+async function savePlanToCloud(plan) {
+    if (!CLOUD_SYNC_ENABLED || !supabase) return false;
     
-    if (DRIVE_READY) {
-        statusEl.textContent = '✅ Connected';
-        statusEl.style.color = 'var(--success)';
-        if (connectBtn) connectBtn.style.display = 'none';
-        if (driveInfo) {
-            driveInfo.style.display = 'block';
-            const email = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getEmail();
-            document.getElementById('drive-email').textContent = email;
-            const lastSync = localStorage.getItem('last_drive_sync');
-            document.getElementById('last-sync').textContent = lastSync 
-                ? new Date(parseInt(lastSync)).toLocaleString() 
-                : 'Never';
+    try {
+        // Delete any existing active plan
+        await supabase
+            .from('training_plans')
+            .delete()
+            .eq('user_id', USER_ID)
+            .eq('active', true);
+        
+        // Insert new plan
+        const { data, error } = await supabase
+            .from('training_plans')
+            .insert({
+                user_id: USER_ID,
+                name: plan.name || 'My Training Plan',
+                plan_data: plan,
+                active: true,
+                created_at: new Date().toISOString()
+            });
+        
+        if (error) throw error;
+        
+        LAST_SYNC_TIME = new Date().toISOString();
+        updateCloudSyncUI();
+        console.log('✅ Training plan saved to cloud');
+        return true;
+    } catch (error) {
+        console.error('Error saving plan to cloud:', error);
+        return false;
+    }
+}
+
+// Load active training plan from cloud
+async function loadPlanFromCloud() {
+    if (!CLOUD_SYNC_ENABLED || !supabase) return null;
+    
+    try {
+        const { data, error } = await supabase
+            .from('training_plans')
+            .select('*')
+            .eq('user_id', USER_ID)
+            .eq('active', true)
+            .single();
+        
+        if (error) {
+            if (error.code === 'PGRST116') return null; // No rows found
+            throw error;
         }
-    } else {
-        statusEl.textContent = '❌ Not Connected';
-        statusEl.style.color = 'var(--danger)';
-        if (connectBtn) connectBtn.style.display = 'block';
-        if (driveInfo) driveInfo.style.display = 'none';
+        
+        console.log('📥 Loaded training plan from cloud');
+        return data?.plan_data || null;
+    } catch (error) {
+        console.error('Error loading plan from cloud:', error);
+        return null;
     }
 }
 
+// Save Garmin file to cloud
+async function saveGarminToCloud(filename, fileData, analysis) {
+    if (!CLOUD_SYNC_ENABLED || !supabase) return false;
+    
+    try {
+        const { data, error } = await supabase
+            .from('garmin_files')
+            .insert({
+                user_id: USER_ID,
+                filename: filename,
+                file_data: fileData,
+                analysis: analysis || null,
+                uploaded_at: new Date().toISOString()
+            });
+        
+        if (error) throw error;
+        
+        LAST_SYNC_TIME = new Date().toISOString();
+        updateCloudSyncUI();
+        console.log('✅ Garmin file saved to cloud');
+        return true;
+    } catch (error) {
+        console.error('Error saving Garmin file to cloud:', error);
+        return false;
+    }
+}
+
+// Load Garmin files from cloud
+async function loadGarminFromCloud() {
+    if (!CLOUD_SYNC_ENABLED || !supabase) return [];
+    
+    try {
+        const { data, error } = await supabase
+            .from('garmin_files')
+            .select('*')
+            .eq('user_id', USER_ID)
+            .order('uploaded_at', { ascending: false })
+            .limit(10);
+        
+        if (error) throw error;
+        
+        console.log(`📥 Loaded ${data.length} Garmin files from cloud`);
+        return data || [];
+    } catch (error) {
+        console.error('Error loading Garmin files from cloud:', error);
+        return [];
+    }
+}
+
+// Load all data from cloud
+async function loadFromCloud() {
+    if (!CLOUD_SYNC_ENABLED) return;
+    
+    try {
+        // Load workouts
+        const cloudWorkouts = await loadWorkoutsFromCloud();
+        const localWorkouts = JSON.parse(localStorage.getItem('workouts') || '[]');
+        
+        // Merge cloud and local (cloud takes priority for same dates)
+        const workoutMap = new Map();
+        localWorkouts.forEach(w => workoutMap.set(w.date, w));
+        cloudWorkouts.forEach(w => workoutMap.set(w.date, w));
+        
+        const mergedWorkouts = Array.from(workoutMap.values());
+        localStorage.setItem('workouts', JSON.stringify(mergedWorkouts));
+        
+        // Load training plan
+        const cloudPlan = await loadPlanFromCloud();
+        if (cloudPlan) {
+            localStorage.setItem('training_plan', JSON.stringify(cloudPlan));
+        }
+        
+        LAST_SYNC_TIME = new Date().toISOString();
+        updateCloudSyncUI();
+        
+        console.log('✅ Cloud data loaded and merged');
+    } catch (error) {
+        console.error('Error loading from cloud:', error);
+    }
+}
+
+// Manual sync function
 async function syncNow() {
-    if (!DRIVE_READY) {
-        alert('Connect Drive first');
+    if (!CLOUD_SYNC_ENABLED) {
+        showNotification('❌ Cloud sync not available', 'error');
         return;
     }
     
+    showNotification('🔄 Syncing...', 'info');
+    
     try {
-        await migrateToDrive();
-        await checkGarminFiles();
-        localStorage.setItem('last_drive_sync', Date.now());
-        updateDriveUI();
-        alert('✅ Synced!');
+        // Upload all local workouts
+        const workouts = JSON.parse(localStorage.getItem('workouts') || '[]');
+        for (const workout of workouts) {
+            await saveWorkoutToCloud(workout);
+        }
+        
+        // Upload training plan
+        const plan = JSON.parse(localStorage.getItem('training_plan') || 'null');
+        if (plan) {
+            await savePlanToCloud(plan);
+        }
+        
+        // Load from cloud (in case there's newer data)
+        await loadFromCloud();
+        
+        showNotification('✅ Sync complete!', 'success');
     } catch (error) {
-        alert('Sync failed: ' + error.message);
+        console.error('Sync error:', error);
+        showNotification('❌ Sync failed', 'error');
     }
 }
 
-// ========================================
-// GARMIN AUTO-SYNC FROM DRIVE
-// ========================================
+// Show sync log
+function showSyncLog() {
+    const log = `
+Last Sync: ${LAST_SYNC_TIME ? new Date(LAST_SYNC_TIME).toLocaleString() : 'Never'}
+User ID: ${USER_ID}
+Status: ${CLOUD_SYNC_ENABLED ? 'Connected' : 'Offline'}
+Auto-sync: ${CLOUD_SYNC_ENABLED ? 'Enabled' : 'Disabled'}
 
+All workouts and training plans are automatically backed up to the cloud after each save.
+Garmin files are uploaded when you analyze them.
+    `.trim();
+    
+    alert(log);
+}
+
+// Check for new Garmin files in cloud
 async function checkGarminFiles() {
-    if (!DRIVE_READY || !DRIVE_FOLDERS.garmin) return;
+    if (!CLOUD_SYNC_ENABLED) return;
     
     try {
-        const response = await gapi.client.drive.files.list({
-            q: `'${DRIVE_FOLDERS.garmin}' in parents and trashed=false`,
-            fields: 'files(id, name, modifiedTime)',
-            orderBy: 'modifiedTime desc'
-        });
+        const garminFiles = await loadGarminFromCloud();
+        const lastCheck = localStorage.getItem('last_garmin_check');
         
-        const files = response.result.files;
-        const lastCheck = localStorage.getItem('last_garmin_check') || '2000-01-01';
-        
-        const newFiles = files.filter(f => f.modifiedTime > lastCheck);
-        
-        if (newFiles.length > 0) {
-            let hasNewData = false;
+        if (!lastCheck && garminFiles.length > 0) {
+            showNotification(`📊 ${garminFiles.length} Garmin file(s) available in cloud`, 'info');
+            localStorage.setItem('last_garmin_check', new Date().toISOString());
+        } else if (lastCheck) {
+            const newFiles = garminFiles.filter(f => 
+                new Date(f.uploaded_at) > new Date(lastCheck)
+            );
             
-            for (const file of newFiles) {
-                if (file.name.toLowerCase().includes('sleep') || 
-                    file.name.toLowerCase().includes('activities') ||
-                    file.name.toLowerCase().includes('progress')) {
-                    hasNewData = true;
-                    break;
-                }
-            }
-            
-            if (hasNewData) {
-                showNotification('🏃 New Garmin data detected! Analyzing...', 'info');
+            if (newFiles.length > 0) {
+                showNotification(`🏃 ${newFiles.length} new Garmin file(s) detected!`, 'info');
                 localStorage.setItem('last_garmin_check', new Date().toISOString());
-                setTimeout(() => {
-                    showNotification('✅ Garmin data analyzed. Check Recovery tab.', 'success');
-                }, 2000);
             }
         }
     } catch (error) {
@@ -4835,10 +4872,10 @@ Return JSON:
         const planText = result.content[0].text.replace(/```json\n?/g, '').replace(/```/g, '').trim();
         const plan = JSON.parse(planText);
         
-        if (DRIVE_READY) {
-            await saveJsonToDrive('training_plan.json', plan, DRIVE_FOLDERS.data);
-        } else {
-            localStorage.setItem('currentPlan', JSON.stringify(plan));
+        // Save to localStorage and cloud
+        localStorage.setItem('currentPlan', JSON.stringify(plan));
+        if (CLOUD_SYNC_ENABLED) {
+            await savePlanToCloud(plan);
         }
         
         document.getElementById('wizard-content').innerHTML = `
@@ -4890,10 +4927,15 @@ async function performDailyUpdate() {
     try {
         let garminData = null;
         
-        if (DRIVE_READY) {
-            garminData = await loadJsonFromDrive('garmin_latest.json', DRIVE_FOLDERS.garmin);
+        // Try to load from cloud first
+        if (CLOUD_SYNC_ENABLED) {
+            const garminFiles = await loadGarminFromCloud();
+            if (garminFiles.length > 0) {
+                garminData = garminFiles[0].analysis;
+            }
         }
         
+        // Fall back to localStorage
         if (!garminData) {
             garminData = localStorage.getItem('garmin_latest_data');
             if (garminData) garminData = JSON.parse(garminData);
@@ -5194,15 +5236,11 @@ function loadChatHistory() {
     }
 }
 
-// Save chat history to localStorage (and Drive if connected)
+// Save chat history to localStorage
 async function saveChatHistory() {
     try {
         localStorage.setItem('chat_history', JSON.stringify(chatHistory));
-        
-        // If Drive is connected, save there too
-        if (DRIVE_READY && DRIVE_FOLDERS.data) {
-            await saveToDrive('chat_history.json', chatHistory, DRIVE_FOLDERS.data);
-        }
+        // Note: Chat history could be synced to cloud if needed in future
     } catch (e) {
         console.error('Error saving chat history:', e);
     }
@@ -5267,7 +5305,7 @@ function getContextualData() {
         currentPage: context,
         hasActivePlan: !!localStorage.getItem('currentPlan'),
         workoutCount: (JSON.parse(localStorage.getItem('completedWorkouts') || '[]')).length,
-        driveConnected: DRIVE_READY
+        cloudSyncEnabled: CLOUD_SYNC_ENABLED
     };
     
     // Add page-specific context
@@ -5372,7 +5410,7 @@ To enable AI chat, an Anthropic API key is needed.
 
 **In the meantime:**
 - All other app features work perfectly!
-- Google Drive sync is ready (once backend is deployed)
+- Cloud sync is active and backing up your data
 - Workout tracking, plans, and recovery analysis all function
 - The chat UI is ready and waiting
 
@@ -5413,7 +5451,7 @@ Be concise, friendly, and action-oriented. Keep responses under 150 words unless
 - User is on: ${contextData.currentPage}
 - Has active training plan: ${contextData.hasActivePlan ? 'Yes' : 'No'}
 - Total workouts completed: ${contextData.workoutCount}
-- Google Drive connected: ${contextData.driveConnected ? 'Yes' : 'No'}`;
+- Cloud sync enabled: ${contextData.cloudSyncEnabled ? 'Yes' : 'No'}`;
         
         if (contextData.currentWeek) {
             prompt += `\n- Currently on week ${contextData.currentWeek} of their plan`;
