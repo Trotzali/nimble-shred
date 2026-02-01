@@ -27,7 +27,7 @@
     var BACKEND_URL = 'https://nimble-shred-backend.vercel.app';
     
     // Supabase client and sync state
-    var supabase = null;
+    var supabaseClient = null;
     var CLOUD_SYNC_ENABLED = false;
     var USER_ID = null;
     var LAST_SYNC_TIME = null;
@@ -854,7 +854,7 @@
 <div class="container active" id="view-coach">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
         <h2>💪 Workout Coach</h2>
-        <span style="font-size: 0.75em; color: #666; font-family: monospace;">v49</span>
+        <span style="font-size: 0.75em; color: #666; font-family: monospace;">v50</span>
     </div>
     
     <div class="card">
@@ -4433,23 +4433,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function initSupabase() {
     try {
-        console.log('🔄 Initializing Supabase v48 (Backend Proxy)...');
+        console.log('🔄 Initializing Supabase v50 (Backend Proxy)...');
         console.log('window.supabase at start:', typeof window.supabase);
         console.log('window object keys:', Object.keys(window).filter(k => k.toLowerCase().includes('supa')));
         
         // Wait for Supabase library to load from backend
+        // The script creates window.supabase object with createClient method
         let attempts = 0;
-        while (!window.supabase && attempts < 100) {
+        while (typeof window.supabase?.createClient !== 'function' && attempts < 100) {
             await new Promise(resolve => setTimeout(resolve, 100));
             attempts++;
             if (attempts % 10 === 0) {
                 console.log(`⏳ Still waiting for Supabase... attempt ${attempts}/100`);
+                console.log('   typeof window.supabase:', typeof window.supabase);
+                console.log('   typeof window.supabase?.createClient:', typeof window.supabase?.createClient);
             }
         }
         
         // Check if Supabase library loaded
-        if (!window.supabase) {
+        if (typeof window.supabase?.createClient !== 'function') {
             console.error('window object after timeout:', Object.keys(window).slice(0, 50));
+            console.error('window.supabase:', window.supabase);
             throw new Error('Supabase library not loaded from backend proxy after 10 seconds');
         }
         
@@ -4458,7 +4462,7 @@ async function initSupabase() {
         console.log('🔑 Anon key present:', !!SUPABASE_CONFIG.anonKey);
         
         // Initialize Supabase client
-        supabase = window.supabase.createClient(
+        supabaseClient = window.supabase.createClient(
             SUPABASE_CONFIG.url,
             SUPABASE_CONFIG.anonKey
         );
@@ -4486,7 +4490,7 @@ async function initSupabase() {
         // Check for new Garmin files
         checkGarminFiles();
         
-        console.log('✅ Supabase initialized successfully! v48');
+        console.log('✅ Supabase initialized successfully! v50');
     } catch (error) {
         console.error('❌ Supabase init error:', error);
         console.error('Error details:', error.message);
@@ -4517,10 +4521,10 @@ function updateCloudSyncUI() {
 
 // Save workout to cloud
 async function saveWorkoutToCloud(workout) {
-    if (!CLOUD_SYNC_ENABLED || !supabase) return false;
+    if (!CLOUD_SYNC_ENABLED || !supabaseClient) return false;
     
     try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('workouts')
             .insert({
                 user_id: USER_ID,
@@ -4546,10 +4550,10 @@ async function saveWorkoutToCloud(workout) {
 
 // Load workouts from cloud
 async function loadWorkoutsFromCloud() {
-    if (!CLOUD_SYNC_ENABLED || !supabase) return [];
+    if (!CLOUD_SYNC_ENABLED || !supabaseClient) return [];
     
     try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('workouts')
             .select('*')
             .eq('user_id', USER_ID)
@@ -4567,18 +4571,18 @@ async function loadWorkoutsFromCloud() {
 
 // Save training plan to cloud
 async function savePlanToCloud(plan) {
-    if (!CLOUD_SYNC_ENABLED || !supabase) return false;
+    if (!CLOUD_SYNC_ENABLED || !supabaseClient) return false;
     
     try {
         // Delete any existing active plan
-        await supabase
+        await supabaseClient
             .from('training_plans')
             .delete()
             .eq('user_id', USER_ID)
             .eq('active', true);
         
         // Insert new plan
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('training_plans')
             .insert({
                 user_id: USER_ID,
@@ -4602,10 +4606,10 @@ async function savePlanToCloud(plan) {
 
 // Load active training plan from cloud
 async function loadPlanFromCloud() {
-    if (!CLOUD_SYNC_ENABLED || !supabase) return null;
+    if (!CLOUD_SYNC_ENABLED || !supabaseClient) return null;
     
     try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('training_plans')
             .select('*')
             .eq('user_id', USER_ID)
@@ -4627,10 +4631,10 @@ async function loadPlanFromCloud() {
 
 // Save Garmin file to cloud
 async function saveGarminToCloud(filename, fileData, analysis) {
-    if (!CLOUD_SYNC_ENABLED || !supabase) return false;
+    if (!CLOUD_SYNC_ENABLED || !supabaseClient) return false;
     
     try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('garmin_files')
             .insert({
                 user_id: USER_ID,
@@ -4654,10 +4658,10 @@ async function saveGarminToCloud(filename, fileData, analysis) {
 
 // Load Garmin files from cloud
 async function loadGarminFromCloud() {
-    if (!CLOUD_SYNC_ENABLED || !supabase) return [];
+    if (!CLOUD_SYNC_ENABLED || !supabaseClient) return [];
     
     try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('garmin_files')
             .select('*')
             .eq('user_id', USER_ID)
