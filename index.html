@@ -4677,6 +4677,22 @@ async function saveWorkoutToCloud(workout) {
         if (error) throw error;
         
         LAST_SYNC_TIME = new Date().toISOString();
+        function updateCloudSyncUI() {
+    const statusText = document.getElementById('cloud-status-text');
+    const deviceIdText = document.getElementById('device-id-text');
+    const lastSyncText = document.getElementById('last-sync-time');
+    
+    if (statusText) {
+        statusText.textContent = CLOUD_SYNC_ENABLED ? '✅ Connected' : '❌ Offline';
+        statusText.style.color = CLOUD_SYNC_ENABLED ? 'var(--success)' : 'var(--danger)';
+    }
+    if (deviceIdText) {
+        deviceIdText.textContent = USER_ID ? USER_ID.substr(0, 20) + '...' : 'Not set';
+    }
+    if (lastSyncText && LAST_SYNC_TIME) {
+        lastSyncText.textContent = new Date(LAST_SYNC_TIME).toLocaleString();
+    }
+}
         updateCloudSyncUI();
         console.log('✅ Workout saved to cloud');
         return true;
