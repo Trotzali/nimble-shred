@@ -854,7 +854,7 @@
 <div class="container active" id="view-coach">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
         <h2>💪 Workout Coach</h2>
-        <span style="font-size: 0.75em; color: #666; font-family: monospace;">v50</span>
+        <span style="font-size: 0.75em; color: #666; font-family: monospace;">v51</span>
     </div>
     
     <div class="card">
@@ -981,11 +981,64 @@
         <div style="margin-bottom: 10px;">
             <strong>Device ID:</strong> <span id="device-id-text" style="font-family: monospace; font-size: 0.85em;"></span>
         </div>
-        <div id="cloud-sync-info" style="margin-top: 15px;">
+      <div id="cloud-sync-info" style="margin-top: 15px;">
             <p><strong>Last sync:</strong> <span id="last-sync-time">Never</span></p>
             <div style="margin-top: 10px;">
                 <button class="btn btn-action" onclick="syncNow()">🔄 Sync Now</button>
                 <button class="btn btn-small" onclick="showSyncLog()">📋 View Log</button>
+            </div>
+            
+            <div style="margin-top: 30px; padding-top: 30px; border-top: 1px solid #333;">
+                <h3 style="color: var(--sec); margin-bottom: 15px;">
+                    🏃 Garmin Auto-Sync
+                </h3>
+                <p style="color: #888; font-size: 14px; margin-bottom: 20px;">
+                    Automatically sync your Garmin activities, heart rate, and training data
+                </p>
+                
+                <div style="background: rgba(187, 134, 252, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-weight: bold;">Status:</span>
+                        <span id="garmin-connection-status" style="font-weight: bold;">❌ Not Connected</span>
+                    </div>
+                    <div id="garmin-last-sync" style="font-size: 12px; color: #888; display: none;"></div>
+                </div>
+                
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button 
+                        id="garmin-connect-btn" 
+                        class="btn btn-action" 
+                        onclick="connectGarmin()"
+                        style="flex: 1; min-width: 150px;">
+                        🔗 Connect Garmin
+                    </button>
+                    
+                    <button 
+                        id="garmin-sync-btn" 
+                        class="btn btn-action" 
+                        onclick="syncNow()"
+                        style="flex: 1; min-width: 150px; display: none;">
+                        🔄 Sync Now
+                    </button>
+                    
+                    <button 
+                        id="garmin-disconnect-btn" 
+                        class="btn" 
+                        onclick="disconnectGarmin()"
+                        style="flex: 1; min-width: 150px; display: none; background: var(--danger);">
+                        ❌ Disconnect
+                    </button>
+                </div>
+                
+                <div style="margin-top: 15px; padding: 12px; background: rgba(3, 218, 198, 0.1); border-radius: 6px; font-size: 13px; color: #888;">
+                    <strong style="color: var(--sec);">💡 How it works:</strong>
+                    <ul style="margin: 8px 0 0 20px; padding: 0;">
+                        <li>Click "Connect Garmin" to authorize access</li>
+                        <li>Activities sync automatically every hour</li>
+                        <li>Click "Sync Now" for immediate sync</li>
+                        <li>Your data stays private in your cloud database</li>
+                    </ul>
+                </div>
             </div>
         </div>
         <div style="margin-top: 15px; padding: 10px; background: rgba(3, 218, 198, 0.1); border-radius: 6px; font-size: 0.85em; border-left: 3px solid var(--sec);">
@@ -4426,7 +4479,142 @@ document.addEventListener('DOMContentLoaded', () => {
     initSupabase();
     checkDailyUpdates();
 });
+// ==========================================
+// GARMIN AUTO-SYNC INTEGRATION
+// ==========================================
 
+// Check Garmin connection status on page load
+async function checkGarminConnection() {
+    if (!CLOUD_SYNC_ENABLED || !USER_ID) return;
+    
+    try {
+        const response = await fetch(`${BACKEND_URL}/api/garmin/status?user_id=${USER_ID}`);
+        const data = await response.json();
+        
+        if (data.connected) {
+            updateGarminConnectionUI(true, data.lastSync);
+        } else {
+            updateGarminConnectionUI(false);
+        }
+    } catch (error) {
+        console.error('Error checking Garmin connection:', error);
+        updateGarminConnectionUI(false);
+    }
+}
+
+// Update UI to show Garmin connection status
+function updateGarminConnectionUI(connected, lastSync = null) {
+    const statusEl = document.getElementById('garmin-connection-status');
+    const connectBtn = document.getElementById('garmin-connect-btn');
+    const disconnectBtn = document.getElementById('garmin-disconnect-btn');
+    const syncBtn = document.getElementById('garmin-sync-btn');
+    const lastSyncEl = document.getElementById('garmin-last-sync');
+    
+    if (statusEl) {
+        if (connected) {
+            statusEl.innerHTML = '✅ Connected';
+            statusEl.style.color = 'var(--success)';
+        } else {
+            statusEl.innerHTML = '❌ Not Connected';
+            statusEl.style.color = 'var(--danger)';
+        }
+    }
+    
+    if (connectBtn) connectBtn.style.display = connected ? 'none' : 'inline-block';
+    if (disconnectBtn) disconnectBtn.style.display = connected ? 'inline-block' : 'none';
+    if (syncBtn) syncBtn.style.display = connected ? 'inline-block' : 'none';
+    
+    if (lastSyncEl && lastSync) {
+        const date = new Date(lastSync);
+        lastSyncEl.textContent = `Last sync: ${date.toLocaleString()}`;
+        lastSyncEl.style.display = 'block';
+    } else if (lastSyncEl) {
+        lastSyncEl.style.display = 'none';
+    }
+}
+
+// Connect Garmin account
+async function connectGarmin() {
+    if (!CLOUD_SYNC_ENABLED || !USER_ID) {
+        showNotification('❌ Cloud sync must be enabled first', 'error');
+        return;
+    }
+    
+    try {
+        showNotification('🔄 Connecting to Garmin...', 'info');
+        
+        // Get OAuth URL from backend
+        const response = await fetch(`${BACKEND_URL}/api/garmin/auth?user_id=${USER_ID}`);
+        const data = await response.json();
+        
+        if (data.error) throw new Error(data.error);
+        
+        // Open Garmin OAuth page in popup
+        const width = 600, height = 700;
+        const left = (screen.width - width) / 2, top = (screen.height - height) / 2;
+        
+        window.open(data.authUrl, 'garmin-oauth', `width=${width},height=${height},left=${left},top=${top}`);
+        
+        // Listen for OAuth callback
+        window.addEventListener('message', function onMessage(event) {
+            if (event.data.type === 'garmin_connected') {
+                window.removeEventListener('message', onMessage);
+                showNotification('✅ Garmin connected successfully!', 'success');
+                checkGarminConnection();
+                syncGarminNow();
+            }
+        });
+    } catch (error) {
+        console.error('Garmin connect error:', error);
+        showNotification(`❌ ${error.message}`, 'error');
+    }
+}
+
+// Disconnect Garmin account
+async function disconnectGarmin() {
+    if (!confirm('Disconnect Garmin? You can reconnect anytime.')) return;
+    
+    try {
+        showNotification('🔄 Disconnecting...', 'info');
+        const response = await fetch(`${BACKEND_URL}/api/garmin/disconnect?user_id=${USER_ID}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('✅ Garmin disconnected', 'success');
+            updateGarminConnectionUI(false);
+        } else {
+            throw new Error('Failed to disconnect');
+        }
+    } catch (error) {
+        console.error('Disconnect error:', error);
+        showNotification('❌ Failed to disconnect', 'error');
+    }
+}
+
+// Sync Garmin activities now
+async function syncGarminNow() {
+    if (!CLOUD_SYNC_ENABLED || !USER_ID) return;
+    
+    try {
+        showNotification('🔄 Syncing Garmin activities...', 'info');
+        const response = await fetch(`${BACKEND_URL}/api/garmin/sync?user_id=${USER_ID}`);
+        const data = await response.json();
+        
+        if (data.error) throw new Error(data.error);
+        
+        showNotification(`✅ Synced ${data.activitiesCount} activities`, 'success');
+        updateGarminConnectionUI(true, new Date().toISOString());
+        checkGarminFiles(); // Reload Garmin data in UI
+    } catch (error) {
+        console.error('Sync error:', error);
+        showNotification(`❌ ${error.message}`, 'error');
+    }
+}
+
+// Check connection status periodically (Every 5 minutes)
+setInterval(() => {
+    if (CLOUD_SYNC_ENABLED && USER_ID) checkGarminConnection();
+}, 300000);
 // ========================================
 // SUPABASE CLOUD SYNC SYSTEM
 // ========================================
@@ -4466,7 +4654,9 @@ async function initSupabase() {
             SUPABASE_CONFIG.url,
             SUPABASE_CONFIG.anonKey
         );
+        checkGarminConnection();
         
+        console.log('✅ Supabase initialized successfully! v51'); // Updated version
         console.log('✅ Supabase client created');
         
         // Get or create device-specific user ID
@@ -4475,14 +4665,14 @@ async function initSupabase() {
             USER_ID = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             localStorage.setItem('nimble_user_id', USER_ID);
             console.log('🆔 Created new User ID:', USER_ID);
-        } else {
-            console.log('🆔 Existing User ID:', USER_ID);
-        }
-        
+      
         CLOUD_SYNC_ENABLED = true;
         updateCloudSyncUI();
         
         console.log('📥 Loading data from cloud...');
+          } else {
+            console.log('🆔 Existing User ID:', USER_ID);
+        }
         
         // Load data from cloud on init
         await loadFromCloud();
