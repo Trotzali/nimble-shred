@@ -860,7 +860,7 @@
 <div class="container active" id="view-coach">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
         <h2>💪 Workout Coach</h2>
-        <span style="font-size: 0.75em; color: #666; font-family: monospace;">v44</span>
+        <span style="font-size: 0.75em; color: #666; font-family: monospace;">v45</span>
     </div>
     
     <div class="card">
@@ -4679,8 +4679,18 @@ async function loadFromCloud() {
     if (!CLOUD_SYNC_ENABLED) return;
     
     try {
-        // Load workouts
-        const cloudWorkouts = await loadWorkoutsFromCloud();
+        console.log('📥 Loading workouts from cloud...');
+        
+        // Load workouts with timeout
+        const workoutsPromise = loadWorkoutsFromCloud();
+        const workoutsTimeout = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Workout load timeout')), 5000)
+        );
+        const cloudWorkouts = await Promise.race([workoutsPromise, workoutsTimeout]).catch(err => {
+            console.warn('⚠️ Workout load failed:', err.message);
+            return [];
+        });
+        
         const localWorkouts = JSON.parse(localStorage.getItem('workouts') || '[]');
         
         // Merge cloud and local (cloud takes priority for same dates)
@@ -4691,16 +4701,28 @@ async function loadFromCloud() {
         const mergedWorkouts = Array.from(workoutMap.values());
         localStorage.setItem('workouts', JSON.stringify(mergedWorkouts));
         
-        // Load training plan
-        const cloudPlan = await loadPlanFromCloud();
+        console.log(`✅ Merged ${cloudWorkouts.length} cloud + ${localWorkouts.length} local workouts`);
+        
+        // Load training plan with timeout
+        console.log('📥 Loading training plan from cloud...');
+        const planPromise = loadPlanFromCloud();
+        const planTimeout = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Plan load timeout')), 5000)
+        );
+        const cloudPlan = await Promise.race([planPromise, planTimeout]).catch(err => {
+            console.warn('⚠️ Plan load failed:', err.message);
+            return null;
+        });
+        
         if (cloudPlan) {
             localStorage.setItem('training_plan', JSON.stringify(cloudPlan));
+            console.log('✅ Training plan loaded from cloud');
         }
         
         LAST_SYNC_TIME = new Date().toISOString();
         updateCloudSyncUI();
         
-        console.log('✅ Cloud data loaded and merged');
+        console.log('✅ Cloud data loaded successfully');
     } catch (error) {
         console.error('Error loading from cloud:', error);
     }
