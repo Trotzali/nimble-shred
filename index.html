@@ -4623,7 +4623,6 @@ async function initSupabase() {
     try {
         console.log('🔄 Initializing Supabase v51 (Backend Proxy)...');
         
-        // 1. Wait for Supabase library to load from backend proxy
         let attempts = 0;
         while (typeof window.supabase?.createClient !== 'function' && attempts < 100) {
             await new Promise(resolve => setTimeout(resolve, 100));
@@ -4631,44 +4630,32 @@ async function initSupabase() {
         }
         
         if (typeof window.supabase?.createClient !== 'function') {
-            throw new Error('Supabase library not loaded from backend proxy after 10 seconds');
+            throw new Error('Supabase library not loaded from backend proxy');
         }
         
-        // 2. Initialize Supabase client
-        supabaseClient = window.supabase.createClient(
-            SUPABASE_CONFIG.url,
-            SUPABASE_CONFIG.anonKey
-        );
-        
+        supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
         console.log('✅ Supabase client created');
-        
-        // 3. Get or create device-specific user ID
+
         USER_ID = localStorage.getItem('nimble_user_id');
         if (!USER_ID) {
             USER_ID = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             localStorage.setItem('nimble_user_id', USER_ID);
-            console.log('🆔 Created new User ID:', USER_ID);
-        } else {
-            console.log('🆔 Existing User ID:', USER_ID);
         }
-        
-        // 4. Update UI and load cloud data
+        console.log('🆔 User ID:', USER_ID);
+
         CLOUD_SYNC_ENABLED = true;
         updateCloudSyncUI();
         
-        console.log('📥 Loading data from cloud...');
         await loadFromCloud();
         
-        // 5. 🏃 Garmin Integration - MUST run after USER_ID is set
+        // Final Garmin Checks
         checkGarminFiles();
-        checkGarminConnection(); // This now has the USER_ID it needs
+        checkGarminConnection(); 
         
         console.log('✅ Supabase initialized successfully! v51');
     } catch (error) {
         console.error('❌ Supabase init error:', error);
-        console.error('Error details:', error.message);
         CLOUD_SYNC_ENABLED = false;
-        if (typeof updateCloudSyncUI === 'function') updateCloudSyncUI();
     }
 }
 function updateCloudSyncUI() {
