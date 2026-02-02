@@ -8,7 +8,7 @@
     <title>Nimble Shred AI Edition - Cloud Sync</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Load Supabase from backend proxy to bypass CDN blocks -->
- <script src="https://nimble-shred-backend.vercel.app/api/supabase-lib" 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
         onload="console.log('✅ Supabase script loaded', typeof window.supabase)"
         onerror="console.error('❌ Failed to load Supabase script')"></script>
     <script>
@@ -5164,8 +5164,9 @@ async function sendChatMessage(message = null) {
             })
         });
         
-        if (!response.ok) {
-            throw new Error(`API Error: ${response.status}`);
+      if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `API Error: ${response.status}`);
         }
         
         const data = await response.json();
