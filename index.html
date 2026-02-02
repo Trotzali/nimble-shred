@@ -4685,7 +4685,7 @@ async function savePlanToCloud(plan) {
 async function loadPlanFromCloud() {
     if (!CLOUD_SYNC_ENABLED || !supabaseClient) return null;
     try {
-        const { data, error } = await supabaseClient.from('training_plans').select('*').eq('user_id', USER_ID).eq('active', true).single();
+    const { data, error } = await supabaseClient.from('training_plans').select('*').eq('user_id', USER_ID).eq('active', true).maybeSingle();
         if (error && error.code !== 'PGRST116') throw error;
         console.log('📥 Loaded training plan from cloud');
         return data?.plan_data || null;
