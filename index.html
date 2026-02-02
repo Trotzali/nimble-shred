@@ -17,7 +17,7 @@
     // ==========================================
     // ✅ Supabase library loaded via backend proxy (bypasses CDN blocks)
     // ✅ Database tables created (workouts, training_plans, garmin_files, user_settings)
-    // ✅ Anthropic API Key stored securely in backend
+    // ✅ gemini API Key stored securely in backend
     var SUPABASE_CONFIG = {
         url: 'https://wytyvtvmupsmtgjbcybc.supabase.co',
         anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5dHl2dHZtdXBzbXRnamJjeWJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MzA1MDAsImV4cCI6MjA4NTUwNjUwMH0.Qr1YFdN0QyZ-bLlKB5-LORpFBA2EhlHb-JcRKTYqnP0'
@@ -4195,7 +4195,7 @@ async function analyzeGarminData() {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                action: 'anthropic',
+                action: 'gemini',
                 system: 'You are an elite AI fitness coach analyzing Garmin health data.',
                 messages: [{
                     role: "user",
@@ -4808,7 +4808,7 @@ async function generateAIPlan() {
         const prompt = `Generate a ${userProfile.daysPerWeek}-day/week training plan for a 40+ male athlete. Goal: ${userProfile.goal}. Injuries: ${userProfile.injuries || 'None'}. Equipment: Torque F9, dumbbells, barbells. Return ONLY valid JSON with name, duration, phases, weekSchedule, and guidance.`;
         const response = await fetch(`${BACKEND_URL}/api/drive`, {
             method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action: 'anthropic', system: 'Professional fitness trainer.', messages: [{ role: "user", content: prompt }] })
+            body: JSON.stringify({ action: 'gemini', system: 'Professional fitness trainer.', messages: [{ role: "user", content: prompt }] })
         });
         const result = await response.json();
         const plan = JSON.parse(result.content[0].text.replace(/```json\n?/g, '').replace(/```/g, '').trim());
@@ -4847,7 +4847,7 @@ async function getAIDailyRecommendation(garminData) {
     try {
         const response = await fetch(`${BACKEND_URL}/api/drive`, {
             method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action: 'anthropic', system: 'AI fitness coach.', messages: [{ role: "user", content: `Analyze recovery: ${JSON.stringify(garminData)}. Return JSON with recoveryScore, adjustments (array), and reasoning.` }] })
+            body: JSON.stringify({ action: 'gemini', system: 'AI fitness coach.', messages: [{ role: "user", content: `Analyze recovery: ${JSON.stringify(garminData)}. Return JSON with recoveryScore, adjustments (array), and reasoning.` }] })
         });
         const result = await response.json();
         const text = result.content[0].text.replace(/```json\n?/g, '').replace(/```/g, '').trim();
@@ -5158,7 +5158,7 @@ async function sendChatMessage(message = null) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                action: 'anthropic',
+                action: 'gemini',
                 system: systemPrompt,
                 messages: formatChatHistory()
             })
