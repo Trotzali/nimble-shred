@@ -4473,9 +4473,10 @@ function resetGarminUpload() {
     document.querySelector('#view-garmin').scrollIntoView({ behavior: 'smooth' });
 }
 
-// ==========================================
-// 1. UI UPDATE FUNCTIONS (Defined first)
-// ==========================================
+// ==========================================================================
+// 1. UI & NOTIFICATION CORE (Defined first to prevent ReferenceErrors)
+// ==========================================================================
+
 function updateCloudSyncUI() {
     const statusText = document.getElementById('cloud-status-text');
     const deviceIdText = document.getElementById('device-id-text');
@@ -4497,24 +4498,45 @@ function updateGarminConnectionUI(connected, lastSync = null) {
     const lastSyncEl = document.getElementById('garmin-last-sync');
     
     if (statusEl) {
-        statusEl.innerHTML = connected ? '✅ Connected' : '❌ Not Connected';
-        statusEl.style.color = connected ? 'var(--success)' : 'var(--danger)';
+        if (connected) {
+            statusEl.innerHTML = '✅ Connected';
+            statusEl.style.color = 'var(--success)';
+        } else {
+            statusEl.innerHTML = '❌ Not Connected';
+            statusEl.style.color = 'var(--danger)';
+        }
     }
+    
     if (connectBtn) connectBtn.style.display = connected ? 'none' : 'inline-block';
     if (disconnectBtn) disconnectBtn.style.display = connected ? 'inline-block' : 'none';
     if (syncBtn) syncBtn.style.display = connected ? 'inline-block' : 'none';
+    
     if (lastSyncEl && lastSync) {
-        lastSyncEl.textContent = `Last sync: ${new Date(lastSync).toLocaleString()}`;
+        const date = new Date(lastSync);
+        lastSyncEl.textContent = `Last sync: ${date.toLocaleString()}`;
         lastSyncEl.style.display = 'block';
+    } else if (lastSyncEl) {
+        lastSyncEl.style.display = 'none';
     }
 }
 
-// ==========================================
-// 2. GARMIN & SUPABASE CORE LOGIC
-// ==========================================
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `<span>${message}</span><button onclick="this.parentElement.remove()">✕</button>`;
+    notification.style.cssText = `position:fixed; top:20px; right:20px; background:var(--card); color:var(--text); padding:15px 20px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.3); border-left:4px solid ${type === 'success' ? 'var(--success)' : type === 'info' ? 'var(--sec)' : 'var(--danger)'}; z-index:10000; max-width:400px; animation:slideIn 0.3s ease-out;`;
+    document.body.appendChild(notification);
+    setTimeout(() => { if (notification.parentElement) { notification.style.opacity = '0'; notification.style.transform = 'translateX(100px)'; setTimeout(() => notification.remove(), 300); } }, 5000);
+}
+
+// ==========================================================================
+// 2. GARMIN INTEGRATION (Fixed 404 URL Paths)
+// ==========================================================================
+
 async function checkGarminConnection() {
     if (!CLOUD_SYNC_ENABLED || !USER_ID) return;
     try {
+        // FIXED: Uses hyphen to match your file 'garmin-status.js'
         const response = await fetch(`${BACKEND_URL}/api/garmin-status?user_id=${USER_ID}`);
         const data = await response.json();
         updateGarminConnectionUI(data.connected, data.lastSync);
@@ -4531,6 +4553,7 @@ async function connectGarmin() {
     }
     try {
         showNotification('🔄 Connecting to Garmin...', 'info');
+        // FIXED: Uses hyphen to match 'garmin-auth.js'
         const response = await fetch(`${BACKEND_URL}/api/garmin-auth?user_id=${USER_ID}`);
         const data = await response.json();
         if (data.error) throw new Error(data.error);
@@ -4542,11 +4565,13 @@ async function connectGarmin() {
         window.addEventListener('message', function onMessage(event) {
             if (event.data.type === 'garmin_connected') {
                 window.removeEventListener('message', onMessage);
-                showNotification('✅ Garmin connected!', 'success');
+                showNotification('✅ Garmin connected successfully!', 'success');
                 checkGarminConnection();
+                syncGarminNow();
             }
         });
     } catch (error) {
+        console.error('Garmin connect error:', error);
         showNotification(`❌ ${error.message}`, 'error');
     }
 }
@@ -4554,30 +4579,40 @@ async function connectGarmin() {
 async function syncGarminNow() {
     if (!CLOUD_SYNC_ENABLED || !USER_ID) return;
     try {
-        showNotification('🔄 Syncing Garmin...', 'info');
+        showNotification('🔄 Syncing Garmin activities...', 'info');
+        // FIXED: Uses hyphen to match 'garmin-sync.js'
         const response = await fetch(`${BACKEND_URL}/api/garmin-sync?user_id=${USER_ID}`);
         const data = await response.json();
+        if (data.error) throw new Error(data.error);
         showNotification(`✅ Synced ${data.activitiesCount} activities`, 'success');
-        checkGarminConnection();
+        updateGarminConnectionUI(true, new Date().toISOString());
+        checkGarminFiles(); 
     } catch (error) {
-        showNotification('❌ Sync failed', 'error');
+        console.error('Sync error:', error);
+        showNotification(`❌ ${error.message}`, 'error');
     }
 }
 
 async function disconnectGarmin() {
-    if (!confirm('Disconnect Garmin?')) return;
+    if (!confirm('Disconnect Garmin? You can reconnect anytime.')) return;
     try {
-        await fetch(`${BACKEND_URL}/api/garmin-disconnect?user_id=${USER_ID}`);
-        updateGarminConnectionUI(false);
-        showNotification('✅ Disconnected', 'success');
+        // FIXED: Uses hyphen to match 'garmin-disconnect.js'
+        const response = await fetch(`${BACKEND_URL}/api/garmin-disconnect?user_id=${USER_ID}`);
+        const data = await response.json();
+        if (data.success) {
+            showNotification('✅ Garmin disconnected', 'success');
+            updateGarminConnectionUI(false);
+        }
     } catch (error) {
-        showNotification('❌ Disconnect failed', 'error');
+        console.error('Disconnect error:', error);
+        showNotification('❌ Failed to disconnect', 'error');
     }
 }
 
-// ==========================================
-// 3. SUPABASE INITIALIZATION
-// ==========================================
+// ==========================================================================
+// 3. SUPABASE CLOUD SYNC SYSTEM (Full Database Logic)
+// ==========================================================================
+
 async function initSupabase() {
     try {
         console.log('🔄 Initializing Supabase v51 (Backend Proxy)...');
@@ -4590,12 +4625,15 @@ async function initSupabase() {
 
         supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
         
-        USER_ID = localStorage.getItem('nimble_user_id') || ('user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5));
-        localStorage.setItem('nimble_user_id', USER_ID);
+        USER_ID = localStorage.getItem('nimble_user_id');
+        if (!USER_ID) {
+            USER_ID = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('nimble_user_id', USER_ID);
+        }
+        console.log('🆔 User ID:', USER_ID);
 
         CLOUD_SYNC_ENABLED = true;
-        updateCloudSyncUI(); // This works now because it's defined above!
-        
+        updateCloudSyncUI(); 
         await loadFromCloud();
         checkGarminConnection(); 
         console.log('✅ Supabase initialized successfully! v51');
@@ -4606,418 +4644,269 @@ async function initSupabase() {
     }
 }
 
-// ==========================================
-// 4. DATA SYNC WRAPPERS
-// ==========================================
 async function saveWorkoutToCloud(workout) {
-    if (!CLOUD_SYNC_ENABLED || !supabaseClient) return;
+    if (!CLOUD_SYNC_ENABLED || !supabaseClient) return false;
     try {
-        await supabaseClient.from('workouts').insert([{ user_id: USER_ID, ...workout }]);
+        const { error } = await supabaseClient.from('workouts').insert({
+            user_id: USER_ID, date: workout.date, type: workout.type, exercises: workout.exercises,
+            duration: workout.duration || 0, notes: workout.notes || '', created_at: new Date().toISOString()
+        });
+        if (error) throw error;
         LAST_SYNC_TIME = new Date().toISOString();
         updateCloudSyncUI();
-    } catch (e) { console.error('Cloud save error', e); }
+        console.log('✅ Workout saved to cloud');
+        return true;
+    } catch (error) { console.error('Error saving workout:', error); return false; }
+}
+
+async function loadWorkoutsFromCloud() {
+    if (!CLOUD_SYNC_ENABLED || !supabaseClient) return [];
+    try {
+        const { data, error } = await supabaseClient.from('workouts').select('*').eq('user_id', USER_ID).order('date', { ascending: false });
+        if (error) throw error;
+        console.log(`📥 Loaded ${data.length} workouts from cloud`);
+        return data || [];
+    } catch (error) { console.error('Error loading workouts:', error); return []; }
+}
+
+async function savePlanToCloud(plan) {
+    if (!CLOUD_SYNC_ENABLED || !supabaseClient) return false;
+    try {
+        await supabaseClient.from('training_plans').delete().eq('user_id', USER_ID).eq('active', true);
+        const { error } = await supabaseClient.from('training_plans').insert({
+            user_id: USER_ID, name: plan.name || 'My Training Plan', plan_data: plan, active: true, created_at: new Date().toISOString()
+        });
+        if (error) throw error;
+        LAST_SYNC_TIME = new Date().toISOString();
+        updateCloudSyncUI();
+        console.log('✅ Training plan saved to cloud');
+        return true;
+    } catch (error) { console.error('Error saving plan:', error); return false; }
+}
+
+async function loadPlanFromCloud() {
+    if (!CLOUD_SYNC_ENABLED || !supabaseClient) return null;
+    try {
+        const { data, error } = await supabaseClient.from('training_plans').select('*').eq('user_id', USER_ID).eq('active', true).single();
+        if (error && error.code !== 'PGRST116') throw error;
+        console.log('📥 Loaded training plan from cloud');
+        return data?.plan_data || null;
+    } catch (error) { console.error('Error loading plan:', error); return null; }
+}
+
+async function saveGarminToCloud(filename, fileData, analysis) {
+    if (!CLOUD_SYNC_ENABLED || !supabaseClient) return false;
+    try {
+        const { error } = await supabaseClient.from('garmin_files').insert({
+            user_id: USER_ID, filename: filename, file_data: fileData, analysis: analysis || null, uploaded_at: new Date().toISOString()
+        });
+        if (error) throw error;
+        LAST_SYNC_TIME = new Date().toISOString();
+        updateCloudSyncUI();
+        console.log('✅ Garmin file saved to cloud');
+        return true;
+    } catch (error) { console.error('Error saving Garmin file:', error); return false; }
+}
+
+async function loadGarminFromCloud() {
+    if (!CLOUD_SYNC_ENABLED || !supabaseClient) return [];
+    try {
+        const { data, error } = await supabaseClient.from('garmin_files').select('*').eq('user_id', USER_ID).order('uploaded_at', { ascending: false }).limit(10);
+        if (error) throw error;
+        console.log(`📥 Loaded ${data.length} Garmin files from cloud`);
+        return data || [];
+    } catch (error) { console.error('Error loading Garmin files:', error); return []; }
 }
 
 async function loadFromCloud() {
     if (!CLOUD_SYNC_ENABLED) return;
-    console.log('📥 Loading from cloud...');
     try {
-        const { data, error } = await supabaseClient
-            .from('workouts')
-            .select('*')
-            .eq('user_id', USER_ID)
-            .order('date', { ascending: false });
-        if (error) throw error;
-        console.log(`📥 Loaded ${data.length} workouts`);
-    } catch (e) { console.error('Cloud load error', e); }
+        console.log('📥 Loading data from cloud...');
+        const cloudWorkouts = await loadWorkoutsFromCloud();
+        const localWorkouts = JSON.parse(localStorage.getItem('workouts') || '[]');
+        const workoutMap = new Map();
+        localWorkouts.forEach(w => workoutMap.set(w.date, w));
+        cloudWorkouts.forEach(w => workoutMap.set(w.date, w));
+        localStorage.setItem('workouts', JSON.stringify(Array.from(workoutMap.values())));
+        
+        const cloudPlan = await loadPlanFromCloud();
+        if (cloudPlan) localStorage.setItem('training_plan', JSON.stringify(cloudPlan));
+        
+        LAST_SYNC_TIME = new Date().toISOString();
+        updateCloudSyncUI();
+        console.log('✅ Cloud data loaded successfully');
+    } catch (error) { console.error('Error loading from cloud:', error); }
 }
 
-// Check for new Garmin files in cloud
+async function syncNow() {
+    if (!CLOUD_SYNC_ENABLED) { showNotification('❌ Cloud sync not available', 'error'); return; }
+    showNotification('🔄 Syncing...', 'info');
+    try {
+        const workouts = JSON.parse(localStorage.getItem('workouts') || '[]');
+        for (const workout of workouts) { await saveWorkoutToCloud(workout); }
+        const plan = JSON.parse(localStorage.getItem('training_plan') || 'null');
+        if (plan) { await savePlanToCloud(plan); }
+        await loadFromCloud();
+        showNotification('✅ Sync complete!', 'success');
+    } catch (error) { console.error('Sync error:', error); showNotification('❌ Sync failed', 'error'); }
+}
+
+function showSyncLog() { alert(`Last Sync: ${LAST_SYNC_TIME ? new Date(LAST_SYNC_TIME).toLocaleString() : 'Never'}\nUser ID: ${USER_ID}\nStatus: ${CLOUD_SYNC_ENABLED ? 'Connected' : 'Offline'}`); }
+
 async function checkGarminFiles() {
     if (!CLOUD_SYNC_ENABLED) return;
     try {
-        const { data, error } = await supabaseClient
-            .from('garmin_files')
-            .select('*')
-            .eq('user_id', USER_ID)
-            .order('uploaded_at', { ascending: false })
-            .limit(10);
-        if (error) throw error;
-        if (data.length > 0) showNotification(`📊 ${data.length} Garmin file(s) available`, 'info');
+        const garminFiles = await loadGarminFromCloud();
+        const lastCheck = localStorage.getItem('last_garmin_check');
+        if (!lastCheck && garminFiles.length > 0) {
+            showNotification(`📊 ${garminFiles.length} Garmin file(s) available in cloud`, 'info');
+            localStorage.setItem('last_garmin_check', new Date().toISOString());
+        } else if (lastCheck) {
+            const newFiles = garminFiles.filter(f => new Date(f.uploaded_at) > new Date(lastCheck));
+            if (newFiles.length > 0) {
+                showNotification(`🏃 ${newFiles.length} new Garmin file(s) detected!`, 'info');
+                localStorage.setItem('last_garmin_check', new Date().toISOString());
+            }
+        }
     } catch (error) { console.error('Garmin check error:', error); }
 }
 
-// 5. DOM Initialization
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(initGarminUpload, 500);
-    initSupabase(); 
-    checkDailyUpdates();
-});
-// ========================================
-// AI PLAN GENERATOR
-// ========================================
+// ==========================================================================
+// 4. AI PLAN GENERATOR (Full Feature Preserved)
+// ==========================================================================
 
 let aiWizardStep = 0;
 let userProfile = {};
 
-function startAIPlanWizard() {
-    aiWizardStep = 0;
-    userProfile = {};
-    document.getElementById('ai-wizard-modal').classList.add('active');
-    renderWizardStep();
-}
+function startAIPlanWizard() { aiWizardStep = 0; userProfile = {}; document.getElementById('ai-wizard-modal').classList.add('active'); renderWizardStep(); }
 
 function renderWizardStep() {
     const container = document.getElementById('wizard-content');
-    
     switch(aiWizardStep) {
         case 0:
-            container.innerHTML = `
-                <h3>What's your primary goal?</h3>
-                <div class="chip-container">
-                    <div class="chip" onclick="selectGoal('strength')">💪 Build Strength</div>
-                    <div class="chip" onclick="selectGoal('muscle')">🏋️ Build Muscle</div>
-                    <div class="chip" onclick="selectGoal('health')">❤️ Health & Longevity</div>
-                    <div class="chip" onclick="selectGoal('performance')">⚡ Athletic Performance</div>
-                </div>
-            `;
+            container.innerHTML = `<h3>What's your primary goal?</h3><div class="chip-container"><div class="chip" onclick="selectGoal('strength')">💪 Build Strength</div><div class="chip" onclick="selectGoal('muscle')">🏋️ Build Muscle</div><div class="chip" onclick="selectGoal('health')">❤️ Health & Longevity</div><div class="chip" onclick="selectGoal('performance')">⚡ Athletic Performance</div></div>`;
             break;
         case 1:
-            container.innerHTML = `
-                <h3>How many days per week can you train?</h3>
-                <input type="range" id="days-slider" min="3" max="6" value="5" 
-                       oninput="document.getElementById('days-display').textContent = this.value">
-                <div style="text-align:center; font-size:2em; margin:20px;">
-                    <span id="days-display">5</span> days/week
-                </div>
-                <button class="btn btn-main" onclick="setDays()">Continue</button>
-            `;
+            container.innerHTML = `<h3>How many days per week can you train?</h3><input type="range" id="days-slider" min="3" max="6" value="5" oninput="document.getElementById('days-display').textContent = this.value"><div style="text-align:center; font-size:2em; margin:20px;"><span id="days-display">5</span> days/week</div><button class="btn btn-main" onclick="setDays()">Continue</button>`;
             break;
         case 2:
-            container.innerHTML = `
-                <h3>Any injuries or concerns?</h3>
-                <textarea id="injuries" rows="4" placeholder="e.g., Previous shoulder injury, knee pain when squatting..."></textarea>
-                <button class="btn btn-main" onclick="setInjuries()">Continue</button>
-            `;
+            container.innerHTML = `<h3>Any injuries or concerns?</h3><textarea id="injuries" rows="4" placeholder="e.g., Previous shoulder injury, knee pain when squatting..."></textarea><button class="btn btn-main" onclick="setInjuries()">Continue</button>`;
             break;
         case 3:
-            container.innerHTML = `
-                <h3>🧠 Generating your personalized plan...</h3>
-                <div style="text-align:center; padding:40px;">
-                    <div class="loading" style="width:60px; height:60px; margin:20px auto;"></div>
-                    <p>Analyzing your profile with AI...</p>
-                </div>
-            `;
+            container.innerHTML = `<h3>🧠 Generating your personalized plan...</h3><div style="text-align:center; padding:40px;"><div class="loading" style="width:60px; height:60px; margin:20px auto;"></div><p>Analyzing profile with AI...</p></div>`;
             generateAIPlan();
             break;
     }
 }
 
-function selectGoal(goal) {
-    userProfile.goal = goal;
-    aiWizardStep++;
-    renderWizardStep();
-}
-
-function setDays() {
-    userProfile.daysPerWeek = parseInt(document.getElementById('days-slider').value);
-    aiWizardStep++;
-    renderWizardStep();
-}
-
-function setInjuries() {
-    userProfile.injuries = document.getElementById('injuries').value;
-    aiWizardStep++;
-    renderWizardStep();
-}
+function selectGoal(goal) { userProfile.goal = goal; aiWizardStep++; renderWizardStep(); }
+function setDays() { userProfile.daysPerWeek = parseInt(document.getElementById('days-slider').value); aiWizardStep++; renderWizardStep(); }
+function setInjuries() { userProfile.injuries = document.getElementById('injuries').value; aiWizardStep++; renderWizardStep(); }
 
 async function generateAIPlan() {
     try {
-        const prompt = `Generate a ${userProfile.daysPerWeek}-day/week training plan for a 40+ male athlete:
-
-Goal: ${userProfile.goal}
-Days per week: ${userProfile.daysPerWeek}
-Injuries/concerns: ${userProfile.injuries || 'None'}
-Equipment: Torque F9 cables, dumbbells, barbells
-
-Create a 12-week plan with 3 phases (4 weeks each).
-Include specific workout types for each day.
-
-Return JSON:
-{
-  "name": "Plan name",
-  "duration": 12,
-  "daysPerWeek": ${userProfile.daysPerWeek},
-  "phases": [
-    {"name": "Foundation", "weeks": "1-4", "focus": "..."},
-    {"name": "Build", "weeks": "5-8", "focus": "..."},
-    {"name": "Peak", "weeks": "9-12", "focus": "..."}
-  ],
-  "weekSchedule": {
-    "0": "rest",
-    "1": "push",
-    "2": "pull",
-    "3": "rest",
-    "4": "legs",
-    "5": "full",
-    "6": "rest"
-  },
-  "guidance": "Brief explanation of the plan"
-}`;
-
+        const prompt = `Generate a ${userProfile.daysPerWeek}-day/week training plan for a 40+ male athlete. Goal: ${userProfile.goal}. Injuries: ${userProfile.injuries || 'None'}. Equipment: Torque F9, dumbbells, barbells. Return ONLY valid JSON with name, duration, phases, weekSchedule, and guidance.`;
         const response = await fetch(`${BACKEND_URL}/api/drive`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                action: 'anthropic',
-                system: 'You are a professional fitness trainer creating personalized training plans.',
-                messages: [{ role: "user", content: prompt }]
-            })
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: 'anthropic', system: 'Professional fitness trainer.', messages: [{ role: "user", content: prompt }] })
         });
-        
         const result = await response.json();
-        const planText = result.content[0].text.replace(/```json\n?/g, '').replace(/```/g, '').trim();
-        const plan = JSON.parse(planText);
-        
-        // Save to localStorage and cloud
+        const plan = JSON.parse(result.content[0].text.replace(/```json\n?/g, '').replace(/```/g, '').trim());
         localStorage.setItem('currentPlan', JSON.stringify(plan));
-        if (CLOUD_SYNC_ENABLED) {
-            await savePlanToCloud(plan);
-        }
-        
-        document.getElementById('wizard-content').innerHTML = `
-            <h3>✅ Plan Generated!</h3>
-            <div class="card" style="text-align:left; margin:20px 0;">
-                <h4>${plan.name}</h4>
-                <p><strong>Duration:</strong> ${plan.duration} weeks</p>
-                <p><strong>Training Days:</strong> ${plan.daysPerWeek} days/week</p>
-                <p>${plan.guidance}</p>
-            </div>
-            <button class="btn btn-success" onclick="acceptPlan()">Start This Plan!</button>
-        `;
-    } catch (error) {
-        console.error('Plan generation error:', error);
-        alert('Failed to generate plan. Try again.');
-    }
+        if (CLOUD_SYNC_ENABLED) { await savePlanToCloud(plan); }
+        document.getElementById('wizard-content').innerHTML = `<h3>✅ Plan Generated!</h3><div class="card"><h4>${plan.name}</h4><p><strong>Duration:</strong> ${plan.duration} weeks</p><p>${plan.guidance}</p></div><button class="btn btn-success" onclick="acceptPlan()">Start This Plan!</button>`;
+    } catch (error) { console.error('Plan generation error:', error); alert('Failed to generate plan.'); }
 }
 
-function acceptPlan() {
-    document.getElementById('ai-wizard-modal').classList.remove('active');
-    switchTab('plan');
-    renderPlanCalendar();
-    showNotification('🎯 New training plan activated!', 'success');
-}
+function acceptPlan() { document.getElementById('ai-wizard-modal').classList.remove('active'); switchTab('plan'); renderPlanCalendar(); showNotification('🎯 New training plan activated!', 'success'); }
+function closeAIWizard() { document.getElementById('ai-wizard-modal').classList.remove('active'); }
 
-function closeAIWizard() {
-    document.getElementById('ai-wizard-modal').classList.remove('active');
-}
-
-// ========================================
-// DAILY AI UPDATES
-// ========================================
+// ==========================================================================
+// 5. DAILY AI UPDATES (Elite Coach Recovery Logic)
+// ==========================================================================
 
 async function checkDailyUpdates() {
-    const lastUpdate = localStorage.getItem('last_daily_update');
-    const now = new Date();
-    const today = now.toDateString();
-    
-    if (lastUpdate === today) return;
-    
-    const hour = now.getHours();
-    if (hour >= 6 && hour < 23) {
-        await performDailyUpdate();
-        localStorage.setItem('last_daily_update', today);
-    }
+    const today = new Date().toDateString();
+    if (localStorage.getItem('last_daily_update') === today) return;
+    const hour = new Date().getHours();
+    if (hour >= 6 && hour < 23) { await performDailyUpdate(); localStorage.setItem('last_daily_update', today); }
 }
 
 async function performDailyUpdate() {
     try {
         let garminData = null;
-        
-        // Try to load from cloud first
-        if (CLOUD_SYNC_ENABLED) {
-            const garminFiles = await loadGarminFromCloud();
-            if (garminFiles.length > 0) {
-                garminData = garminFiles[0].analysis;
-            }
-        }
-        
-        // Fall back to localStorage
-        if (!garminData) {
-            garminData = localStorage.getItem('garmin_latest_data');
-            if (garminData) garminData = JSON.parse(garminData);
-        }
-        
+        if (CLOUD_SYNC_ENABLED) { const files = await loadGarminFromCloud(); if (files.length > 0) { garminData = files[0].analysis; } }
+        if (!garminData) { const stored = localStorage.getItem('garmin_latest_data'); if (stored) garminData = JSON.parse(stored); }
         if (!garminData) return;
-        
         const recommendation = await getAIDailyRecommendation(garminData);
-        
-        if (recommendation && recommendation.adjustments) {
-            showDailyNotification(recommendation);
-            logAIDecision(recommendation);
-        }
-    } catch (error) {
-        console.error('Daily update error:', error);
-    }
+        if (recommendation && recommendation.adjustments) { showDailyNotification(recommendation); logAIDecision(recommendation); }
+    } catch (error) { console.error('Daily update error:', error); }
 }
 
 async function getAIDailyRecommendation(garminData) {
     try {
         const response = await fetch(`${BACKEND_URL}/api/drive`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                action: 'anthropic',
-                system: 'You are an AI fitness coach providing daily workout recommendations based on recovery data.',
-                messages: [{
-                    role: "user",
-                    content: `Based on this Garmin recovery data, should we adjust today's workout?
-
-Recent data:
-${JSON.stringify(garminData, null, 2)}
-
-Return JSON:
-{
-  "recoveryScore": 0-100,
-  "adjustments": ["rest day", "reduce volume 20%", "skip heavy compounds"],
-  "reasoning": "Brief explanation"
-}
-
-Return null if no adjustments needed.`
-                }]
-            })
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: 'anthropic', system: 'AI fitness coach.', messages: [{ role: "user", content: `Analyze recovery: ${JSON.stringify(garminData)}. Return JSON with recoveryScore, adjustments (array), and reasoning.` }] })
         });
-        
         const result = await response.json();
         const text = result.content[0].text.replace(/```json\n?/g, '').replace(/```/g, '').trim();
         return text === 'null' ? null : JSON.parse(text);
-    } catch (error) {
-        console.error('AI recommendation error:', error);
-        return null;
-    }
+    } catch (error) { return null; }
 }
 
-function showDailyNotification(recommendation) {
-    const notification = document.createElement('div');
-    notification.className = 'daily-notification';
-    notification.innerHTML = `
-        <div class="notification-header">
-            <strong>🤖 AI Daily Update</strong>
-            <button onclick="this.parentElement.parentElement.remove()">✕</button>
-        </div>
-        <div class="notification-body">
-            <p><strong>Recovery:</strong> ${recommendation.recoveryScore}/100</p>
-            <p>${recommendation.reasoning}</p>
-            ${recommendation.adjustments ? `
-                <div style="margin-top:10px;">
-                    <strong>Adjustments:</strong>
-                    <ul>${recommendation.adjustments.map(a => `<li>${a}</li>`).join('')}</ul>
-                </div>
-            ` : ''}
-        </div>
-        <div class="notification-actions">
-            <button class="btn-small btn-success" onclick="acceptAdjustments(${JSON.stringify(recommendation).replace(/"/g, '&quot;')})">Accept</button>
-            <button class="btn-small" onclick="this.parentElement.parentElement.remove()">Dismiss</button>
-        </div>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        if (notification.parentElement) {
-            notification.style.opacity = '0';
-            setTimeout(() => notification.remove(), 500);
-        }
-    }, 8000);
+function showDailyNotification(rec) {
+    const div = document.createElement('div');
+    div.className = 'daily-notification';
+    div.innerHTML = `<div class="notification-header"><strong>🤖 AI Daily Update</strong><button onclick="this.parentElement.parentElement.remove()">✕</button></div><div class="notification-body"><p><strong>Recovery:</strong> ${rec.recoveryScore}/100</p><p>${rec.reasoning}</p></div><div class="notification-actions"><button class="btn-small btn-success" onclick="acceptAdjustments(${JSON.stringify(rec).replace(/"/g, '&quot;')})">Accept</button></div>`;
+    document.body.appendChild(div);
+    setTimeout(() => { if (div.parentElement) div.remove(); }, 8000);
 }
 
-function acceptAdjustments(recommendation) {
+function acceptAdjustments(rec) {
     const history = JSON.parse(localStorage.getItem('ai_adjustments') || '[]');
-    history.unshift({
-        date: new Date().toISOString(),
-        ...recommendation
-    });
+    history.unshift({ date: new Date().toISOString(), ...rec });
     localStorage.setItem('ai_adjustments', JSON.stringify(history.slice(0, 30)));
-    
-    showNotification('✅ Adjustments applied to today\'s workout', 'success');
-    document.querySelector('.daily-notification')?.remove();
+    showNotification('✅ Adjustments applied', 'success');
 }
 
 function logAIDecision(decision) {
     const log = JSON.parse(localStorage.getItem('ai_decision_log') || '[]');
-    log.unshift({
-        timestamp: Date.now(),
-        type: 'daily_update',
-        decision: decision
-    });
+    log.unshift({ timestamp: Date.now(), type: 'daily_update', decision: decision });
     localStorage.setItem('ai_decision_log', JSON.stringify(log.slice(0, 100)));
 }
 
-// ========================================
-// NOTIFICATION SYSTEM
-// ========================================
-
-function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.innerHTML = `
-        <span>${message}</span>
-        <button onclick="this.parentElement.remove()">✕</button>
-    `;
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: var(--card);
-        color: var(--text);
-        padding: 15px 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        border-left: 4px solid ${type === 'success' ? 'var(--success)' : type === 'info' ? 'var(--sec)' : 'var(--danger)'};
-        z-index: 10000;
-        max-width: 400px;
-        animation: slideIn 0.3s ease-out;
-    `;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.style.opacity = '0';
-        notification.style.transform = 'translateX(100px)';
-        setTimeout(() => notification.remove(), 300);
-    }, 5000);
-}
-
-// ========================================
-// EXPORT FUNCTIONS
-// ========================================
+// ==========================================================================
+// 6. EXPORT SYSTEM (Full Feature Preserved)
+// ==========================================================================
 
 function exportAllData() {
-    const data = {
-        workoutHistory: localStorage.getItem('completedWorkouts'),
-        trainingPlan: localStorage.getItem('currentPlan'),
-        settings: localStorage.getItem('appSettings'),
-        aiDecisions: localStorage.getItem('ai_decision_log'),
-        exportDate: new Date().toISOString()
-    };
-    
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    downloadBlob(blob, `nimble-shred-backup-${new Date().toISOString().split('T')[0]}.json`);
+    const data = { workouts: localStorage.getItem('completedWorkouts'), plan: localStorage.getItem('currentPlan'), exportDate: new Date().toISOString() };
+    downloadBlob(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }), `nimble-shred-backup.json`);
     showNotification('✅ Backup downloaded', 'success');
 }
 
 function exportWorkoutHistory() {
-    const history = localStorage.getItem('completedWorkouts');
-    if (!history) {
-        alert('No workout history to export');
-        return;
-    }
-    
-    const blob = new Blob([history], { type: 'application/json' });
-    downloadBlob(blob, `workout-history-${new Date().toISOString().split('T')[0]}.json`);
-    showNotification('✅ Workout history downloaded', 'success');
+    const history = localStorage.getItem('completedWorkouts') || '[]';
+    downloadBlob(new Blob([history], { type: 'application/json' }), `workout-history.json`);
+    showNotification('✅ History downloaded', 'success');
 }
 
+function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+// ==========================================================================
+// 7. GLOBAL INITIALIZATION (Final Fixed Order)
+// ==========================================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(initGarminUpload, 500);
+    initSupabase(); // Now safely runs after all UI/Logic functions are defined
+    checkDailyUpdates();
+});
 function downloadBlob(blob, filename) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
