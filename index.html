@@ -5191,20 +5191,18 @@ async function sendChatMessage(message = null) {
         scrollChatToBottom();
         saveChatHistory();
         
-    } catch (error) {
+  } catch (error) {
         console.error('Chat error:', error);
         hideTypingIndicator();
         
-        // Determine error message based on the issue
-        let errorContent = '';
-// FIXED: Removed the local variable check as keys are now handled by the Vercel backend
-        let errorContent = `Sorry, I encountered an error: ${error.message}. 
+        // FIXED: Declared only once to prevent SyntaxError
+        const errorContent = `Sorry, I encountered an error: ${error.message}. 
 
 Please check:
 - Your Gemini API Key is saved in Vercel
 - You have redeployed in Vercel without build cache
-- Your internet connection is stable`;        
-        // Add error message
+- Your internet connection is stable`;
+        
         const errorMessage = {
             role: 'assistant',
             content: errorContent,
@@ -5215,7 +5213,6 @@ Please check:
         renderChatMessages();
         scrollChatToBottom();
     }
-}
 
 // Build system prompt with context
 function buildSystemPrompt(contextData) {
