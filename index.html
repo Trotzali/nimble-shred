@@ -5197,31 +5197,13 @@ async function sendChatMessage(message = null) {
         
         // Determine error message based on the issue
         let errorContent = '';
-        if (ANTHROPIC_API_KEY === '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' || !ANTHROPIC_API_KEY) {
-            errorContent = `🔑 **API Key Not Configured**
-
-To enable AI chat, an Anthropic API key is needed.
-
-**Good news:** Your key is ready! Just needs to be added to the code.
-
-**In the meantime:**
-- All other app features work perfectly!
-- Cloud sync is active and backing up your data
-- Workout tracking, plans, and recovery analysis all function
-- The chat UI is ready and waiting
-
-Chat will be enabled once backend deployment is complete!`;
-        } else {
-            errorContent = `Sorry, I encountered an error: ${error.message}
+// FIXED: Removed the local variable check as keys are now handled by the Vercel backend
+        let errorContent = `Sorry, I encountered an error: ${error.message}. 
 
 Please check:
-- Your API key is correct
-- You have API credits available
-- Network connection is stable
-
-Visit https://console.anthropic.com to verify your account.`;
-        }
-        
+- Your Gemini API Key is saved in Vercel
+- You have redeployed in Vercel without build cache
+- Your internet connection is stable`;        
         // Add error message
         const errorMessage = {
             role: 'assistant',
