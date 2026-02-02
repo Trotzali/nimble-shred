@@ -5191,11 +5191,11 @@ async function sendChatMessage(message = null) {
         scrollChatToBottom();
         saveChatHistory();
         
-  } catch (error) {
+} catch (error) {
         console.error('Chat error:', error);
         hideTypingIndicator();
         
-        // FIXED: Declared only once to prevent SyntaxError
+        // Use ONE declaration only to prevent SyntaxError
         const errorContent = `Sorry, I encountered an error: ${error.message}. 
 
 Please check:
@@ -5213,7 +5213,7 @@ Please check:
         renderChatMessages();
         scrollChatToBottom();
     }
-
+} // <-- This second bracket is CRITICAL to close the function
 // Build system prompt with context
 function buildSystemPrompt(contextData) {
     let prompt = `You are an AI fitness coach assistant for Nimble Shred, a comprehensive workout tracking app. 
