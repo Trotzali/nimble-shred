@@ -2938,12 +2938,56 @@ function searchBuilderExercises() {
     renderBuilderExerciseList();
 }
 
+// ========================================
+// UPDATED: MULTI-SELECT FILTER LOGIC
+// ========================================
+
 function filterBuilder(category) {
-    appState.builderFilter = category;
-    
-    document.querySelectorAll('#custom-builder-modal .chip').forEach(c => c.classList.remove('active'));
-    event.target.classList.add('active');
-    
+    // 1. Initialize array if it doesn't exist (converts old single-select state)
+    if (!Array.isArray(appState.builderFilters)) {
+        appState.builderFilters = ['all'];
+    }
+
+    const allChip = document.querySelector("#custom-builder-modal .chip[onclick*=\"'all'\"]");
+    const clickedChip = event.target; // The chip you just clicked
+
+    if (category === 'all') {
+        // If clicking "All", clear everything else
+        appState.builderFilters = ['all'];
+        
+        // Visuals: Remove active from everything, add to All
+        document.querySelectorAll('#custom-builder-modal .chip').forEach(c => c.classList.remove('active'));
+        if(allChip) allChip.classList.add('active');
+        
+    } else {
+        // If clicking a specific category...
+        
+        // First, remove 'all' if it's currently selected
+        if (appState.builderFilters.includes('all')) {
+            appState.builderFilters = [];
+            if(allChip) allChip.classList.remove('active');
+        }
+
+        // Toggle the category (Add if new, Remove if exists)
+        const index = appState.builderFilters.indexOf(category);
+        if (index > -1) {
+            // It's already there -> Remove it
+            appState.builderFilters.splice(index, 1);
+            clickedChip.classList.remove('active');
+        } else {
+            // It's not there -> Add it
+            appState.builderFilters.push(category);
+            clickedChip.classList.add('active');
+        }
+
+        // Safety: If you uncheck everything, default back to 'All'
+        if (appState.builderFilters.length === 0) {
+            appState.builderFilters = ['all'];
+            if(allChip) allChip.classList.add('active');
+        }
+    }
+
+    // Refresh the list with the new combined filters
     renderBuilderExerciseList();
 }
 
@@ -2951,31 +2995,40 @@ function renderBuilderExerciseList() {
     const container = document.getElementById('builder-exercise-list');
     const searchTerm = document.getElementById('builder-search').value.toLowerCase();
     
+    // Safety check for state
+    if (!Array.isArray(appState.builderFilters)) {
+        appState.builderFilters = ['all'];
+    }
+
     let exercises = window.allExercises;
     
-    // Apply filter
-    if(appState.builderFilter !== 'all') {
+    // 1. Apply Multi-Filters (OR Logic)
+    // Show exercise if it matches ANY of the selected buttons
+    if (!appState.builderFilters.includes('all')) {
         exercises = exercises.filter(ex => 
-            ex.cat.includes(appState.builderFilter) || 
-            ex.equip === appState.builderFilter ||
-            ex.type === appState.builderFilter
+            appState.builderFilters.some(filter => 
+                ex.cat.includes(filter) || 
+                ex.equip === filter ||
+                ex.type === filter
+            )
         );
     }
     
-    // Apply search
+    // 2. Apply Search Text (AND Logic)
     if(searchTerm) {
         exercises = exercises.filter(ex => ex.name.toLowerCase().includes(searchTerm));
     }
     
-    // Apply equipment
+    // 3. Apply Equipment Availability (Global Setting)
     exercises = filterExercisesByEquipment(exercises);
     
+    // Render Results
     container.innerHTML = '';
     
-    // Show total count
+    // Show count
     const totalEl = document.createElement('div');
     totalEl.style.cssText = 'padding: 10px; background: rgba(3,218,198,0.1); border-radius: 8px; margin-bottom: 10px; text-align: center; color: #03DAC6;';
-    totalEl.textContent = `${exercises.length} exercises available`;
+    totalEl.textContent = `${exercises.length} exercises found`;
     container.appendChild(totalEl);
     
     exercises.forEach(ex => {
