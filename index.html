@@ -3000,26 +3000,44 @@ function renderBuilderExerciseList() {
         appState.builderFilters = ['all'];
     }
 
+    // 1. Define Filter Groups
+    const muscles = ['Chest', 'Back', 'Legs', 'Shoulders', 'Arms'];
+    const equipment = ['Cable', 'Dumbbell', 'Barbell', 'Bodyweight'];
+    const styles = ['Mobility', 'Nimble', 'Calisthenics', 'Plyo'];
+
+    // 2. Sort active filters into buckets
+    const activeMuscles = appState.builderFilters.filter(f => muscles.includes(f));
+    const activeEquip = appState.builderFilters.filter(f => equipment.includes(f));
+    const activeStyles = appState.builderFilters.filter(f => styles.includes(f));
+
     let exercises = window.allExercises;
     
-    // 1. Apply Multi-Filters (OR Logic)
-    // Show exercise if it matches ANY of the selected buttons
+    // 3. SMART FILTER LOGIC: (Muscle OR Muscle) AND (Equip OR Equip) AND (Style OR Style)
     if (!appState.builderFilters.includes('all')) {
-        exercises = exercises.filter(ex => 
-            appState.builderFilters.some(filter => 
-                ex.cat.includes(filter) || 
-                ex.equip === filter ||
-                ex.type === filter
-            )
-        );
+        exercises = exercises.filter(ex => {
+            // Check Muscle Group (True if no muscles selected OR matches one of them)
+            const muscleMatch = activeMuscles.length === 0 || 
+                activeMuscles.some(m => ex.cat.includes(m));
+
+            // Check Equipment (True if no equipment selected OR matches)
+            const equipMatch = activeEquip.length === 0 || 
+                activeEquip.includes(ex.equip);
+
+            // Check Style/Type (True if no style selected OR matches)
+            const styleMatch = activeStyles.length === 0 || 
+                activeStyles.some(s => ex.cat.includes(s) || ex.type === s);
+
+            // Must match ALL active groups
+            return muscleMatch && equipMatch && styleMatch;
+        });
     }
     
-    // 2. Apply Search Text (AND Logic)
+    // 4. Apply Search Text
     if(searchTerm) {
         exercises = exercises.filter(ex => ex.name.toLowerCase().includes(searchTerm));
     }
     
-    // 3. Apply Equipment Availability (Global Setting)
+    // 5. Apply Global Equipment Settings
     exercises = filterExercisesByEquipment(exercises);
     
     // Render Results
@@ -3031,6 +3049,13 @@ function renderBuilderExerciseList() {
     totalEl.textContent = `${exercises.length} exercises found`;
     container.appendChild(totalEl);
     
+    if (exercises.length === 0) {
+        const emptyEl = document.createElement('div');
+        emptyEl.style.cssText = 'text-align:center; padding:20px; color:#888;';
+        emptyEl.innerHTML = 'No exercises match this exact combination.<br>Try removing a filter.';
+        container.appendChild(emptyEl);
+    }
+
     exercises.forEach(ex => {
         const div = document.createElement('div');
         div.className = 'exercise-list-item';
@@ -3054,7 +3079,6 @@ function renderBuilderExerciseList() {
         container.appendChild(div);
     });
 }
-
 function toggleExerciseSelection(exercise) {
     const index = appState.selectedExercises.findIndex(e => e.name === exercise.name);
     
