@@ -3113,7 +3113,6 @@ function startCustomWorkout() {
     closeCustomBuilder();
     startWorkout(appState.selectedExercises);
 }
-
 // ========================================
 // EXERCISE ENCYCLOPEDIA (Multi-Select & Smart Filter)
 // ========================================
@@ -3186,158 +3185,54 @@ function renderEncyclopedia() {
     let exercises = window.allExercises;
     
     // 3. SMART FILTER LOGIC: (Muscle OR Muscle) AND (Equip OR Equip) AND (Style OR Style)
-    if (!appState
-
-function viewExerciseDetails(exerciseName) {
-    const exercise = window.allExercises.find(ex => ex.name === exerciseName);
-    if(!exercise) return;
-    
-    document.getElementById('exercise-detail-name').textContent = exercise.name;
-    
-    const content = document.getElementById('exercise-detail-content');
-    let html = `
-        <div class="text-muted" style="margin-bottom:15px;">
-            ${exercise.cat.join(', ')} • ${exercise.equip} • ${exercise.type}
-        </div>
-    `;
-    
-    // GIF/Image placeholder
-    const gifUrl = localStorage.getItem(`gif_${exercise.name}`);
-    if(gifUrl) {
-        html += `
-            <div class="gif-container">
-                <img src="${gifUrl}" alt="${exercise.name}">
-            </div>
-            <div class="gif-actions">
-                <button class="btn-small btn-action" onclick="openGifSearch('${exercise.name.replace(/'/g,"\\'")}')">🔍 Find Different GIF</button>
-                <button class="btn-small btn-danger" onclick="removeExerciseGif('${exercise.name.replace(/'/g,"\\'")}')">🗑️ Remove</button>
-            </div>
-            <div style="margin-top: 10px;">
-                <input 
-                    type="text" 
-                    id="paste-url-${exercise.name.replace(/[^a-zA-Z0-9]/g, '_')}"
-                    placeholder="Or paste new image URL here..."
-                    style="margin-bottom: 5px;"
-                >
-                <button class="btn-small btn-success" onclick="pasteImageUrl('${exercise.name.replace(/'/g,"\\'")}')">💾 Save URL</button>
-            </div>
-        `;
-    } else {
-        html += `
-            <div class="gif-container">
-                <div>
-                    <p class="text-muted">No image added yet</p>
-                </div>
-            </div>
-            <div class="gif-actions">
-                <button class="btn-small btn-success" onclick="openGifSearch('${exercise.name.replace(/'/g,"\\'")}')">🔍 Search Google Images</button>
-                <label class="btn-small btn-action">
-                    📤 Upload Image
-                    <input type="file" accept="image/*" onchange="uploadExerciseGif('${exercise.name.replace(/'/g,"\\'")}', event)" style="display:none;">
-                </label>
-            </div>
-            <div style="margin-top: 10px;">
-                <input 
-                    type="text" 
-                    id="paste-url-${exercise.name.replace(/[^a-zA-Z0-9]/g, '_')}"
-                    placeholder="Paste image URL here..."
-                    style="margin-bottom: 5px;"
-                >
-                <button class="btn-small btn-success" onclick="pasteImageUrl('${exercise.name.replace(/'/g,"\\'")}')">💾 Save URL</button>
-            </div>
-        `;
+    if (!appState.encyclopediaFilters.includes('all')) {
+        exercises = exercises.filter(ex => {
+            const muscleMatch = activeMuscles.length === 0 || activeMuscles.some(m => ex.cat.includes(m));
+            const equipMatch = activeEquip.length === 0 || activeEquip.includes(ex.equip);
+            const styleMatch = activeStyles.length === 0 || activeStyles.some(s => ex.cat.includes(s) || ex.type === s);
+            
+            return muscleMatch && equipMatch && styleMatch;
+        });
     }
     
-    // Preparation
-    if(exercise.guide.prep && exercise.guide.prep.length > 0) {
-        html += `
-            <div class="encyclopedia-section">
-                <h4>🎯 PREPARATION</h4>
-                <ul>
-                    ${exercise.guide.prep.map(p => `<li>${p}</li>`).join('')}
-                </ul>
-            </div>
-        `;
+    // 4. Apply Search
+    if(searchTerm) {
+        exercises = exercises.filter(ex => ex.name.toLowerCase().includes(searchTerm));
     }
     
-    // Execution
-    if(exercise.guide.exec && exercise.guide.exec.length > 0) {
-        html += `
-            <div class="encyclopedia-section">
-                <h4>▶️ EXECUTION</h4>
-                <ul>
-                    ${exercise.guide.exec.map(e => `<li>${e}</li>`).join('')}
-                </ul>
-            </div>
-        `;
+    // Render Results
+    container.innerHTML = '';
+    
+    // Show count
+    const totalEl = document.createElement('div');
+    totalEl.style.cssText = 'padding: 10px; background: rgba(187,134,252,0.1); border-radius: 8px; margin-bottom: 15px; text-align: center; color: #BB86FC; font-weight: bold;';
+    totalEl.textContent = `📚 ${exercises.length} exercises found`;
+    container.appendChild(totalEl);
+    
+    if (exercises.length === 0) {
+        const emptyEl = document.createElement('div');
+        emptyEl.style.cssText = 'text-align:center; padding:30px; color:#888;';
+        emptyEl.innerHTML = 'No exercises match this combination.<br>Try unchecking some filters.';
+        container.appendChild(emptyEl);
     }
     
-    // Tips
-    if(exercise.guide.tips && exercise.guide.tips.length > 0) {
-        html += `
-            <div class="encyclopedia-section">
-                <h4>💡 TIPS</h4>
-                <ul>
-                    ${exercise.guide.tips.map(t => `<li>${t}</li>`).join('')}
-                </ul>
-            </div>
+    exercises.forEach(ex => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.cursor = 'pointer';
+        card.onclick = () => viewExerciseDetails(ex.name);
+        
+        card.innerHTML = `
+            <h3 style="margin:0 0 5px 0;">${ex.name}</h3>
+            <div class="text-muted">${ex.cat.join(', ')} • ${ex.equip} • ${ex.type}</div>
         `;
-    }
-    
-    // Benefits
-    if(exercise.guide.benefits && exercise.guide.benefits.length > 0) {
-        html += `
-            <div class="encyclopedia-section">
-                <h4>✨ BENEFITS</h4>
-                <ul>
-                    ${exercise.guide.benefits.map(b => `<li>${b}</li>`).join('')}
-                </ul>
-            </div>
-        `;
-    }
-    
-    // Muscles
-    if(exercise.guide.muscles && exercise.guide.muscles.length > 0) {
-        html += `
-            <div class="encyclopedia-section">
-                <h4>💪 TARGET MUSCLES</h4>
-                <div>
-                    ${exercise.guide.muscles.map(m => `<span class="muscle-badge">${m}</span>`).join('')}
-                </div>
-            </div>
-        `;
-    }
-    
-    // Setup (if Torque F9)
-    if(exercise.setup && (exercise.setup.arms !== 'N/A' || exercise.setup.pulleys !== 'N/A')) {
-        html += `
-            <div class="encyclopedia-section">
-                <h4>🔧 TORQUE F9 SETUP</h4>
-                <p><strong>Arms:</strong> ${exercise.setup.arms}</p>
-                <p><strong>Pulleys:</strong> ${exercise.setup.pulleys}</p>
-            </div>
-        `;
-    }
-    
-    content.innerHTML = html;
-    document.getElementById('exercise-detail-modal').classList.add('active');
+        
+        container.appendChild(card);
+    });
 }
 
-function closeExerciseDetail() {
-    document.getElementById('exercise-detail-modal').classList.remove('active');
-}
-
-function uploadExerciseGif(exerciseName, event) {
-    const file = event.target.files[0];
-    if(!file) return;
-    
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        localStorage.setItem(`gif_${exerciseName}`, e.target.result);
-        viewExerciseDetails(exerciseName); // Refresh
-        speak('GIF uploaded');
-    };
-    reader.readAsDataURL(file);
+function searchEncyclopedia() {
+    renderEncyclopedia();
 }
 
 // ========================================
