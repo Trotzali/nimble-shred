@@ -3115,84 +3115,78 @@ function startCustomWorkout() {
 }
 
 // ========================================
-// EXERCISE ENCYCLOPEDIA
+// EXERCISE ENCYCLOPEDIA (Multi-Select & Smart Filter)
 // ========================================
+
+function filterEncyclopedia(category) {
+    // 1. Initialize state if missing
+    if (!Array.isArray(appState.encyclopediaFilters)) {
+        appState.encyclopediaFilters = ['all'];
+    }
+
+    // Get the "All" chip specifically inside the encyclopedia view
+    const allChip = document.querySelector("#view-encyclopedia .chip[onclick*=\"'all'\"]");
+    const clickedChip = event.target; 
+
+    if (category === 'all') {
+        // Reset to All
+        appState.encyclopediaFilters = ['all'];
+        document.querySelectorAll('#view-encyclopedia .chip').forEach(c => c.classList.remove('active'));
+        if(allChip) allChip.classList.add('active');
+        
+    } else {
+        // Toggle Filters
+        if (appState.encyclopediaFilters.includes('all')) {
+            appState.encyclopediaFilters = [];
+            if(allChip) allChip.classList.remove('active');
+        }
+
+        const index = appState.encyclopediaFilters.indexOf(category);
+        if (index > -1) {
+            // Remove if already selected
+            appState.encyclopediaFilters.splice(index, 1);
+            clickedChip.classList.remove('active');
+        } else {
+            // Add if not selected
+            appState.encyclopediaFilters.push(category);
+            clickedChip.classList.add('active');
+        }
+
+        // Default back to All if empty
+        if (appState.encyclopediaFilters.length === 0) {
+            appState.encyclopediaFilters = ['all'];
+            if(allChip) allChip.classList.add('active');
+        }
+    }
+
+    renderEncyclopedia();
+}
+
 function renderEncyclopedia() {
     const container = document.getElementById('encyclopedia-list');
     if(!container) return;
     
     const searchTerm = document.getElementById('encyclopedia-search')?.value.toLowerCase() || '';
     
+    // Safety check
+    if (!Array.isArray(appState.encyclopediaFilters)) {
+        appState.encyclopediaFilters = ['all'];
+    }
+
+    // 1. Define Filter Groups
+    const muscles = ['Chest', 'Back', 'Legs', 'Shoulders', 'Arms'];
+    const equipment = ['Cable', 'Dumbbell', 'Barbell', 'Bodyweight'];
+    const styles = ['Mobility', 'Nimble', 'Calisthenics', 'Plyo'];
+
+    // 2. Sort active filters
+    const activeMuscles = appState.encyclopediaFilters.filter(f => muscles.includes(f));
+    const activeEquip = appState.encyclopediaFilters.filter(f => equipment.includes(f));
+    const activeStyles = appState.encyclopediaFilters.filter(f => styles.includes(f));
+
     let exercises = window.allExercises;
     
-    if(searchTerm) {
-        exercises = exercises.filter(ex => ex.name.toLowerCase().includes(searchTerm));
-    }
-    
-    container.innerHTML = '';
-    
-    // Show total count
-    const totalEl = document.createElement('div');
-    totalEl.style.cssText = 'padding: 10px; background: rgba(187,134,252,0.1); border-radius: 8px; margin-bottom: 15px; text-align: center; color: #BB86FC; font-weight: bold;';
-    totalEl.textContent = `📚 ${exercises.length} exercises in library`;
-    container.appendChild(totalEl);
-    
-    exercises.forEach(ex => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.style.cursor = 'pointer';
-        card.onclick = () => viewExerciseDetails(ex.name);
-        
-        card.innerHTML = `
-            <h3 style="margin:0 0 5px 0;">${ex.name}</h3>
-            <div class="text-muted">${ex.cat.join(', ')} • ${ex.equip} • ${ex.type}</div>
-        `;
-        
-        container.appendChild(card);
-    });
-}
-
-function searchEncyclopedia() {
-    renderEncyclopedia();
-}
-
-function filterEncyclopedia(category) {
-    document.querySelectorAll('#view-encyclopedia .chip').forEach(c => c.classList.remove('active'));
-    event.target.classList.add('active');
-    
-    const container = document.getElementById('encyclopedia-list');
-    let exercises = window.allExercises;
-    
-    if(category !== 'all') {
-        exercises = exercises.filter(ex => 
-            ex.cat.includes(category) || 
-            ex.equip === category ||
-            ex.type === category
-        );
-    }
-    
-    container.innerHTML = '';
-    
-    // Show total count
-    const totalEl = document.createElement('div');
-    totalEl.style.cssText = 'padding: 10px; background: rgba(187,134,252,0.1); border-radius: 8px; margin-bottom: 15px; text-align: center; color: #BB86FC; font-weight: bold;';
-    totalEl.textContent = `📚 ${exercises.length} exercises ${category !== 'all' ? 'in ' + category : 'total'}`;
-    container.appendChild(totalEl);
-    
-    exercises.forEach(ex => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.style.cursor = 'pointer';
-        card.onclick = () => viewExerciseDetails(ex.name);
-        
-        card.innerHTML = `
-            <h3 style="margin:0 0 5px 0;">${ex.name}</h3>
-            <div class="text-muted">${ex.cat.join(', ')} • ${ex.equip} • ${ex.type}</div>
-        `;
-        
-        container.appendChild(card);
-    });
-}
+    // 3. SMART FILTER LOGIC: (Muscle OR Muscle) AND (Equip OR Equip) AND (Style OR Style)
+    if (!appState
 
 function viewExerciseDetails(exerciseName) {
     const exercise = window.allExercises.find(ex => ex.name === exerciseName);
