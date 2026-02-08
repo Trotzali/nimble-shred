@@ -3542,7 +3542,7 @@ function renderPlanCalendar() {
             <div class="day-icon">${icon}</div>
             <div class="day-letter">${letter}</div>
             <div class="day-type">${type.substring(0,4)}</div>
-            ${completed ? '<div class="day-check">âœ…</div>' : ''}
+            ${completed ? '<div class="day-check"><i data-lucide="check"></i></div>' : ''}
         `;
         
         grid.appendChild(bubble);
@@ -3651,6 +3651,7 @@ function selectGoal(goal) {
         const type = appState.activePlan.schedule[idx];
         const iconMap = {push:'<i data-lucide="dumbbell"></i>',pull:'<i data-lucide="trending-up"></i>',legs:'<i data-lucide="zap"></i>',cardio:'<i data-lucide="heart"></i>',nimble:'<i data-lucide="wind"></i>',rest:'<i data-lucide="moon"></i>'};
         const icon = iconMap[type];
+        html += `<div style="padding:8px; background:#2c2c2c; margin:5px 0; border-radius:6px;">
             ${icon} <strong>${name}:</strong> ${type}
         </div>`;
     });
@@ -3696,6 +3697,7 @@ function updateTodaysBanner() {
     
     const iconMap = {push:'<i data-lucide="dumbbell"></i>',pull:'<i data-lucide="trending-up"></i>',legs:'<i data-lucide="zap"></i>',cardio:'<i data-lucide="heart"></i>',nimble:'<i data-lucide="wind"></i>'};
     const icon = iconMap[type];
+    document.getElementById('today-workout').innerHTML = `${icon} ${type.toUpperCase()}`;
     
     // Initialize Lucide icons
     if (typeof lucide !== 'undefined') lucide.createIcons();
