@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#1e1e1e">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Nimble Shred v60 - AI Edition</title>
+    <title>Nimble Shred v61 - AI Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Load Supabase from backend proxy to bypass CDN blocks -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -856,7 +856,7 @@
 <div class="container active" id="view-coach">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
         <h2>💪 Workout Coach</h2>
-        <span style="font-size: 0.75em; color: #666; font-family: monospace;">v60</span>
+        <span style="font-size: 0.75em; color: #666; font-family: monospace;">v61</span>
     </div>
     
     <div class="card">
@@ -928,6 +928,11 @@
     </div>
     
     <div id="ai-coach-suggestions"></div>
+    
+    <button class="btn btn-action" onclick="toggleFullPlanView()" style="width:100%; margin-top:10px;">
+        📋 View Full Plan Details
+    </button>
+    <div id="full-plan-view" style="display:none; margin-top:10px;"></div>
 </div>
 
 <!-- CARDIO PAGE -->
@@ -3316,6 +3321,93 @@ function updatePhaseDisplay() {
 }
 
 // ========================================
+// FULL PLAN VIEW
+// ========================================
+function toggleFullPlanView() {
+    const view = document.getElementById('full-plan-view');
+    if (view.style.display === 'none') {
+        renderFullPlanView();
+        view.style.display = 'block';
+    } else {
+        view.style.display = 'none';
+    }
+}
+
+function renderFullPlanView() {
+    const container = document.getElementById('full-plan-view');
+    const plan = appState.activePlan;
+    
+    // Check for AI-generated plan with phases
+    const aiPlan = JSON.parse(localStorage.getItem('currentPlan') || 'null');
+    
+    let html = '';
+    
+    // Plan overview
+    if (aiPlan && aiPlan.name) {
+        html += `<div class="card" style="border-left:3px solid var(--primary);">`;
+        html += `<h3 style="margin:0 0 8px 0;">${aiPlan.name}</h3>`;
+        if (aiPlan.duration) html += `<p style="color:#aaa; margin:4px 0;">Duration: <strong>${aiPlan.duration} weeks</strong></p>`;
+        if (aiPlan.guidance) html += `<p style="color:#aaa; margin:4px 0;">${aiPlan.guidance}</p>`;
+        html += `</div>`;
+        
+        // Phases
+        if (aiPlan.phases && aiPlan.phases.length) {
+            html += `<div class="card"><h3 style="margin:0 0 10px 0;">📊 Phases</h3>`;
+            aiPlan.phases.forEach(phase => {
+                html += `<div style="padding:8px 0; border-bottom:1px solid #333;">`;
+                html += `<strong style="color:var(--sec);">${phase.name}</strong>`;
+                if (phase.weeks) html += ` <span style="color:#888;">(Weeks ${phase.weeks})</span>`;
+                if (phase.focus) html += `<p style="color:#aaa; margin:4px 0 0 0; font-size:0.9em;">${phase.focus}</p>`;
+                html += `</div>`;
+            });
+            html += `</div>`;
+        }
+    }
+    
+    // Weekly schedule with exercises
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const typeColors = {push:'#FF6B6B', pull:'#4ECDC4', legs:'#FFE66D', cardio:'#FF8C42', nimble:'#A78BFA', rest:'#666'};
+    const typeIcons = {push:'💪', pull:'🏋️', legs:'🦵', cardio:'🚴', nimble:'🧘', rest:'😴'};
+    
+    html += `<div class="card"><h3 style="margin:0 0 12px 0;">📅 Weekly Schedule</h3>`;
+    
+    dayNames.forEach((dayName, idx) => {
+        const type = plan.schedule[idx] || 'rest';
+        const completed = isDayCompleted(idx);
+        const color = typeColors[type] || '#888';
+        
+        html += `<div style="padding:10px; margin-bottom:8px; background:#1a1a1a; border-radius:8px; border-left:3px solid ${color};">`;
+        html += `<div style="display:flex; justify-content:space-between; align-items:center;">`;
+        html += `<span><strong>${dayName}</strong></span>`;
+        html += `<span style="color:${color}; font-size:0.9em;">${typeIcons[type] || '🔥'} ${type.toUpperCase()}</span>`;
+        if (completed) html += `<span>✅</span>`;
+        html += `</div>`;
+        
+        if (type !== 'rest') {
+            try {
+                const exercises = generateWorkoutByType(type, appState.exerciseCount);
+                if (exercises && exercises.length) {
+                    html += `<div style="margin-top:8px; padding-left:8px; font-size:0.85em; color:#aaa;">`;
+                    exercises.forEach((ex, i) => {
+                        html += `<div style="padding:2px 0;">${i + 1}. ${ex.name}</div>`;
+                    });
+                    html += `</div>`;
+                }
+            } catch(e) { /* skip if generateWorkoutByType not available */ }
+        }
+        
+        html += `</div>`;
+    });
+    
+    html += `</div>`;
+    
+    // Close button
+    html += `<button class="btn btn-action" onclick="document.getElementById('full-plan-view').style.display='none'" style="width:100%; margin-top:8px;">Hide Plan Details</button>`;
+    
+    container.innerHTML = html;
+}
+
+// ========================================
 // PLAN GENERATOR
 // ========================================
 let planData = {};
@@ -4788,6 +4880,11 @@ var wizardQuestions = [
         chips: ['3 days', '4 days', '5 days', '6 days']
     },
     {
+        key: 'planDuration',
+        text: "How long do you want this plan to run?",
+        chips: ['1 week', '4 weeks', '8 weeks', '12 weeks', '16 weeks']
+    },
+    {
         key: 'sessionLength',
         text: "How long do you want each session to be?",
         chips: ['30-40 mins', '45-60 mins', '60-90 mins']
@@ -4856,7 +4953,7 @@ function askWizardQuestion() {
         showWizardChips(q.chips);
     } else {
         // All questions asked - show summary and allow chat
-        const summary = `Here's what I've got:\n• Goal: ${wizardProfile.goal || 'Not set'}\n• Experience: ${wizardProfile.experience || 'Not set'}\n• Training days: ${wizardProfile.daysPerWeek || 'Not set'}\n• Session length: ${wizardProfile.sessionLength || 'Not set'}\n• Equipment: ${wizardProfile.equipment || 'Not set'}\n• Injuries: ${wizardProfile.injuries || 'None'}\n• Preferences: ${wizardProfile.preferences || 'None'}\n\nLook good? Hit "Generate My Plan" below, or type any changes/extra details you'd like to add!`.replace(/\n/g, '<br>');
+        const summary = `Here's what I've got:\n• Goal: ${wizardProfile.goal || 'Not set'}\n• Experience: ${wizardProfile.experience || 'Not set'}\n• Training days: ${wizardProfile.daysPerWeek || 'Not set'}\n• Plan duration: ${wizardProfile.planDuration || 'Not set'}\n• Session length: ${wizardProfile.sessionLength || 'Not set'}\n• Equipment: ${wizardProfile.equipment || 'Not set'}\n• Injuries: ${wizardProfile.injuries || 'None'}\n• Preferences: ${wizardProfile.preferences || 'None'}\n\nLook good? Hit "Generate My Plan" below, or type any changes/extra details you'd like to add!`.replace(/\n/g, '<br>');
         addWizardMessage(summary, 'assistant');
         document.getElementById('wizard-actions').style.display = 'block';
         
@@ -4877,6 +4974,7 @@ async function generateFromChat() {
 - Goal: ${wizardProfile.goal || 'general fitness'}
 - Experience: ${wizardProfile.experience || 'intermediate'}
 - Days per week: ${wizardProfile.daysPerWeek || '5'}
+- Plan duration: ${wizardProfile.planDuration || '8 weeks'}
 - Session length: ${wizardProfile.sessionLength || '45-60 mins'}
 - Equipment: ${wizardProfile.equipment || 'full gym'}
 - Injuries/limitations: ${wizardProfile.injuries || 'none'}
@@ -4892,6 +4990,7 @@ Return ONLY valid JSON with these fields:
   "guidance": "Brief overview of the plan approach"
 }
 
+The plan MUST be exactly ${wizardProfile.planDuration || '8 weeks'} long. Split into appropriate phases.
 Use workout types: push, pull, legs, cardio, nimble, rest. Match the number of training days to ${wizardProfile.daysPerWeek || '5'}.`;
 
     try {
