@@ -6,8 +6,6 @@
     <meta name="theme-color" content="#1e1e1e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Nimble Shred AI Edition - Cloud Sync</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Load Supabase from backend proxy to bypass CDN blocks -->
@@ -16,9 +14,9 @@
     // ==========================================
     // SUPABASE CLOUD SYNC CONFIGURATION
     // ==========================================
-    // âœ… Supabase library loaded via backend proxy (bypasses CDN blocks)
-    // âœ… Database tables created (workouts, training_plans, garmin_files, user_settings)
-    // âœ… gemini API Key stored securely in backend
+    //   Supabase library loaded via backend proxy (bypasses CDN blocks)
+    //   Database tables created (workouts, training_plans, garmin_files, user_settings)
+    //   gemini API Key stored securely in backend
     var SUPABASE_CONFIG = {
         url: 'https://wytyvtvmupsmtgjbcybc.supabase.co',
         anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5dHl2dHZtdXBzbXRnamJjeWJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MzA1MDAsImV4cCI6MjA4NTUwNjUwMH0.Qr1YFdN0QyZ-bLlKB5-LORpFBA2EhlHb-JcRKTYqnP0'
@@ -35,25 +33,11 @@
     </script>
     <style>
         :root { 
-            /* Minimal Dark Theme - Professional Look */
-            --bg: #000000; 
-            --card: #1C1C1E; 
-            --primary: #0A84FF; 
-            --sec: #5E5CE6; 
-            --text: #FFFFFF; 
-            --text-secondary: #8E8E93;
-            --gold: #FFD700; 
-            --danger: #FF453A; 
-            --warn: #FF9F0A; 
-            --success: #32D74B; 
-            --push-color: #FF453A; 
-            --pull-color: #64D2FF; 
-            --legs-color: #BF5AF2; 
-            --cardio-color: #0A84FF; 
-            --nimble-color: #5E5CE6; 
-            --rest-color: #636366;
-            --border: rgba(255, 255, 255, 0.1);
-            --shadow: rgba(0, 0, 0, 0.3);
+            --bg: #000000; --card: #1C1C1E; --primary: #0A84FF; --sec: #5E5CE6; 
+            --text: #fff; --gold: #FFD700; --danger: #CF6679; --warn: #FF9800; 
+            --success: #00C853; --push-color: #FF6B6B; --pull-color: #4ECDC4; 
+            --legs-color: #95E1D3; --cardio-color: #3498db; --nimble-color: #9b59b6; 
+            --rest-color: #555;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
@@ -67,33 +51,16 @@
         .container.active { display: block; }
         .card { 
             background: var(--card); padding: 15px; border-radius: 12px; 
-            margin-bottom: 15px; 
-            box-shadow: 0 8px 16px var(--shadow); 
-            border: 1px solid var(--border);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px var(--shadow);
+            margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
         }
         
         /* BUTTONS */
         .btn { 
             display: block; width: 100%; padding: 14px; border: none; 
-            border-radius: 8px; font-weight: 600; cursor: pointer; 
-            margin-top: 10px; font-size: 16px; 
-            transition: all 0.2s ease; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            border-radius: 8px; font-weight: bold; cursor: pointer; 
+            margin-top: 10px; font-size: 16px; transition: 0.2s; 
         }
-        .btn:hover { 
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-        .btn:active {
-            transform: translateY(0) scale(0.98);
-        }
+        .btn:hover { opacity: 0.9; transform: translateY(-2px); }
         .btn-main { background: var(--sec); color: #fff; }
         .btn-action { background: var(--primary); color: #fff; }
         .btn-danger { background: var(--danger); color: #fff; }
@@ -105,17 +72,12 @@
         
         /* INPUTS */
         input, select, textarea { 
-            width: 100%; padding: 10px; background: rgba(44, 44, 44, 0.5); 
-            border: 1px solid var(--border); border-radius: 6px; color: #fff; 
+            width: 100%; padding: 10px; background: #2c2c2c; 
+            border: 1px solid #444; border-radius: 6px; color: #fff; 
             font-size: 16px; margin: 5px 0;
-            transition: all 0.2s ease;
-            backdrop-filter: blur(10px);
         }
         input:focus, select:focus, textarea:focus { 
-            border-color: var(--primary); 
-            outline: none; 
-            background: rgba(44, 44, 44, 0.8);
-            box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.1);
+            border-color: var(--sec); outline: none; 
         }
         
         /* LAYOUT */
@@ -132,13 +94,9 @@
         .nav-btn { 
             background: none; color: #777; border: none; font-size: 0.7em; 
             display: flex; flex-direction: column; align-items: center; 
-            gap: 3px; cursor: pointer; padding: 5px; 
-            transition: all 0.2s ease; flex: 1;
+            gap: 3px; cursor: pointer; padding: 5px; transition: 0.2s; flex: 1;
         }
-        .nav-btn.active { color: var(--primary); }
-        .nav-btn:active {
-            transform: scale(0.95);
-        }
+        .nav-btn.active { color: var(--sec); }
         .nav-icon { font-size: 1.4em; }
         
         /* CHIPS */
@@ -249,7 +207,7 @@
             padding: 5px 0 5px 20px; position: relative; 
         }
         .encyclopedia-section li:before { 
-            content: 'â–¸'; position: absolute; left: 0; color: var(--sec); 
+            content: ' '; position: absolute; left: 0; color: var(--sec); 
         }
         .muscle-badge { 
             display: inline-block; background: var(--primary); 
@@ -884,17 +842,17 @@
 
 <!-- TODAY'S BANNER -->
 <div id="todays-banner" class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: none;">
-    <h3 style="margin-bottom: 10px;">ðŸ“… <span id="today-date"></span></h3>
+    <h3 style="margin-bottom: 10px;">  <span id="today-date"></span></h3>
     <div style="font-size: 1.1em; margin-bottom: 15px;">
         Planned: <span id="today-workout"></span>
     </div>
-    <button class="btn btn-main" onclick="startTodaysWorkout()">â–¶ï¸ Start Workout</button>
+    <button class="btn btn-main" onclick="startTodaysWorkout()">▶️ Start Workout</button>
 </div>
 
 <!-- COACH PAGE -->
 <div class="container active" id="view-coach">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-        <h2>ðŸ’ª Workout Coach</h2>
+        <h2>💪 Workout Coach</h2>
         <span style="font-size: 0.75em; color: #666; font-family: monospace;">v51</span>
     </div>
     
@@ -922,14 +880,14 @@
         </div>
         
         <div class="chip-container">
-            <div class="chip" onclick="quickStartWorkout('push')">ðŸ’ª Push</div>
-            <div class="chip" onclick="quickStartWorkout('pull')">ðŸ‹ï¸ Pull</div>
-            <div class="chip" onclick="quickStartWorkout('legs')">ðŸ¦µ Legs</div>
-            <div class="chip" onclick="quickStartWorkout('full')">ðŸ”¥ Full</div>
-            <div class="chip" onclick="quickStartWorkout('nimble')">ðŸ§˜ Nimble</div>
+            <div class="chip" onclick="quickStartWorkout('push')">💪 Push</div>
+            <div class="chip" onclick="quickStartWorkout('pull')">📈 Pull</div>
+            <div class="chip" onclick="quickStartWorkout('legs')">⚡ Legs</div>
+            <div class="chip" onclick="quickStartWorkout('full')">🔥 Full</div>
+            <div class="chip" onclick="quickStartWorkout('nimble')">🧘 Nimble</div>
         </div>
-        <button class="btn btn-main" onclick="openCustomBuilder()">ðŸ› ï¸ Custom Workout Builder</button>
-        <button class="btn btn-action" onclick="generateRandomWorkout()">ðŸŽ² Random Workout</button>
+        <button class="btn btn-main" onclick="openCustomBuilder()">🔧 Custom Workout Builder</button>
+        <button class="btn btn-action" onclick="generateRandomWorkout()">🎲 Random Workout</button>
     </div>
     
     <div id="workout-interface" style="display:none;">
@@ -943,13 +901,13 @@
 
 <!-- PLAN PAGE -->
 <div class="container" id="view-plan">
-    <h2>ðŸ“… Training Plan</h2>
+    <h2>  Training Plan</h2>
     
     <div class="card" style="background: linear-gradient(135deg, rgba(187,134,252,0.1), rgba(3,218,198,0.1)); border: 2px solid var(--primary);">
-        <h3>ðŸ¤– AI-Powered Planning</h3>
+        <h3>  AI-Powered Planning</h3>
         <p style="margin-bottom: 15px; color: #888;">Let AI create a personalized training plan based on your goals, schedule, and recovery data.</p>
         <button class="btn btn-main" onclick="startAIPlanWizard()">
-            âœ¨ Generate AI Plan
+              Generate AI Plan
         </button>
     </div>
     
@@ -961,7 +919,7 @@
                     Adherence: <span id="adherence-display">0/6</span>
                 </div>
             </div>
-            <button class="btn-small btn-action" onclick="openPlanGenerator()">ðŸ”„ New Plan</button>
+            <button class="btn-small btn-action" onclick="openPlanGenerator()">  New Plan</button>
         </div>
         <div class="calendar-grid" id="week-grid"></div>
     </div>
@@ -971,34 +929,34 @@
 
 <!-- CARDIO PAGE -->
 <div class="container" id="view-cardio">
-    <h2>ðŸš´ Cardio Tracking</h2>
+    <h2>  Cardio Tracking</h2>
     
     <div class="card">
-        <h3>ðŸ“ Live GPS Tracking</h3>
+        <h3>  Live GPS Tracking</h3>
         <p class="text-muted" style="margin-bottom:10px;">Track your run or bike ride with live GPS</p>
         <select id="gps-activity-type" style="margin-bottom:10px;">
-            <option value="run">ðŸƒ Running</option>
-            <option value="bike">ðŸš´ Cycling</option>
-            <option value="walk">ðŸš¶ Walking</option>
+            <option value="run">  Running</option>
+            <option value="bike">  Cycling</option>
+            <option value="walk">  Walking</option>
         </select>
-        <button class="btn btn-success" onclick="startGpsTracking()">ðŸ“ Start GPS Tracking</button>
+        <button class="btn btn-success" onclick="startGpsTracking()">  Start GPS Tracking</button>
     </div>
     
     <div class="card">
         <h3>Quick Log Cardio</h3>
         <label>Type:</label>
         <select id="cardio-type">
-            <option value="run">ðŸƒ Run</option>
-            <option value="bike">ðŸš´ Bike</option>
-            <option value="swim">ðŸŠ Swim</option>
-            <option value="walk">ðŸš¶ Walk</option>
-            <option value="row">ðŸš£ Row</option>
+            <option value="run">  Run</option>
+            <option value="bike">  Bike</option>
+            <option value="swim">  Swim</option>
+            <option value="walk">  Walk</option>
+            <option value="row">  Row</option>
         </select>
         <label>Duration (minutes):</label>
         <input type="number" id="cardio-duration" value="30" min="5">
         <label>Distance (km) - optional:</label>
         <input type="number" id="cardio-distance" placeholder="e.g. 5.5" step="0.1">
-        <button class="btn btn-main" onclick="logCardioSession()">ðŸ’¾ Log Cardio</button>
+        <button class="btn btn-main" onclick="logCardioSession()">  Log Cardio</button>
     </div>
     
     <div class="card">
@@ -1009,10 +967,10 @@
 
 <!-- SETTINGS PAGE -->
 <div class="container" id="view-settings">
-    <h2>âš™ï¸ Settings</h2>
+    <h2>  Settings</h2>
     
     <div class="card" style="background: linear-gradient(135deg, rgba(0,124,195,0.1), rgba(0,212,255,0.1)); border: 2px solid #007CC3;">
-        <h3>â˜ï¸ Cloud Sync</h3>
+        <h3>  Cloud Sync</h3>
         <p style="font-size: 0.9em; color: #888; margin-bottom: 15px;">
             Automatic cloud backup for workouts, plans, and Garmin data across all your devices.
         </p>
@@ -1025,13 +983,13 @@
       <div id="cloud-sync-info" style="margin-top: 15px;">
             <p><strong>Last sync:</strong> <span id="last-sync-time">Never</span></p>
             <div style="margin-top: 10px;">
-                <button class="btn btn-action" onclick="syncNow()">ðŸ”„ Sync Now</button>
-                <button class="btn btn-small" onclick="showSyncLog()">ðŸ“‹ View Log</button>
+                <button class="btn btn-action" onclick="syncNow()">  Sync Now</button>
+                <button class="btn btn-small" onclick="showSyncLog()">  View Log</button>
             </div>
             
             <div style="margin-top: 30px; padding-top: 30px; border-top: 1px solid #333;">
                 <h3 style="color: var(--sec); margin-bottom: 15px;">
-                    ðŸƒ Garmin Auto-Sync
+                      Garmin Auto-Sync
                 </h3>
                 <p style="color: #888; font-size: 14px; margin-bottom: 20px;">
                     Automatically sync your Garmin activities, heart rate, and training data
@@ -1040,7 +998,7 @@
                 <div style="background: rgba(187, 134, 252, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                         <span style="font-weight: bold;">Status:</span>
-                        <span id="garmin-connection-status" style="font-weight: bold;">âŒ Not Connected</span>
+                        <span id="garmin-connection-status" style="font-weight: bold;">  Not Connected</span>
                     </div>
                     <div id="garmin-last-sync" style="font-size: 12px; color: #888; display: none;"></div>
                 </div>
@@ -1051,7 +1009,7 @@
                         class="btn btn-action" 
                         onclick="connectGarmin()"
                         style="flex: 1; min-width: 150px;">
-                        ðŸ”— Connect Garmin
+                          Connect Garmin
                     </button>
                     
                     <button 
@@ -1059,7 +1017,7 @@
                         class="btn btn-action" 
                         onclick="syncNow()"
                         style="flex: 1; min-width: 150px; display: none;">
-                        ðŸ”„ Sync Now
+                          Sync Now
                     </button>
                     
                     <button 
@@ -1067,12 +1025,12 @@
                         class="btn" 
                         onclick="disconnectGarmin()"
                         style="flex: 1; min-width: 150px; display: none; background: var(--danger);">
-                        âŒ Disconnect
+                          Disconnect
                     </button>
                 </div>
                 
                 <div style="margin-top: 15px; padding: 12px; background: rgba(3, 218, 198, 0.1); border-radius: 6px; font-size: 13px; color: #888;">
-                    <strong style="color: var(--sec);">ðŸ’¡ How it works:</strong>
+                    <strong style="color: var(--sec);">  How it works:</strong>
                     <ul style="margin: 8px 0 0 20px; padding: 0;">
                         <li>Click "Connect Garmin" to authorize access</li>
                         <li>Activities sync automatically every hour</li>
@@ -1083,13 +1041,13 @@
             </div>
         </div>
         <div style="margin-top: 15px; padding: 10px; background: rgba(3, 218, 198, 0.1); border-radius: 6px; font-size: 0.85em; border-left: 3px solid var(--sec);">
-            <strong>âœ… Auto-Sync Enabled:</strong> All data automatically backed up to cloud after each workout.
+            <strong>  Auto-Sync Enabled:</strong> All data automatically backed up to cloud after each workout.
         </div>
     </div>
     
     <div class="card">
-        <h3>ðŸ¤– AI Coach</h3>
-        <button class="btn btn-main" onclick="startAIPlanWizard()">âœ¨ Generate New AI Plan</button>
+        <h3>  AI Coach</h3>
+        <button class="btn btn-main" onclick="startAIPlanWizard()">  Generate New AI Plan</button>
         
         <div style="margin-top: 15px;">
             <label>Chat History Duration:</label>
@@ -1125,27 +1083,27 @@
         </div>
         
         <div style="margin-top: 15px; display: flex; gap: 10px;">
-            <button class="btn btn-action btn-small" onclick="toggleChatPanel()">ðŸ’¬ Open Chat</button>
-            <button class="btn btn-danger btn-small" onclick="clearChatHistory()">ðŸ—‘ï¸ Clear History</button>
+            <button class="btn btn-action btn-small" onclick="toggleChatPanel()">  Open Chat</button>
+            <button class="btn btn-danger btn-small" onclick="clearChatHistory()">  Clear History</button>
         </div>
     </div>
     
     <div class="card">
-        <h3>ðŸ’¾ Export & Backup</h3>
+        <h3>  Export & Backup</h3>
         <p style="font-size: 0.9em; color: #888; margin-bottom: 10px;">
             Download backups of your data (works even if Drive isn't connected)
         </p>
-        <button class="btn btn-action" onclick="exportAllData()">ðŸ“¦ Export All Data</button>
-        <button class="btn btn-action" onclick="exportWorkoutHistory()">ðŸ“Š Export Workout History</button>
+        <button class="btn btn-action" onclick="exportAllData()">  Export All Data</button>
+        <button class="btn btn-action" onclick="exportWorkoutHistory()">  Export Workout History</button>
     </div>
     
     <div class="card">
-        <h3>ðŸ‹ï¸ Equipment Available</h3>
+        <h3>  Equipment Available</h3>
         <div id="equipment-presets"></div>
     </div>
     
     <div class="card">
-        <h3>ðŸ”Š Voice Coach</h3>
+        <h3>  Voice Coach</h3>
         <label>
             <input type="checkbox" id="voice-enabled" checked onchange="saveVoiceSettings()"> 
             Enable Voice
@@ -1157,16 +1115,16 @@
             <option value="standard" selected>Standard</option>
             <option value="motivational">Motivational</option>
         </select>
-        <button class="btn btn-action" onclick="testVoice()">ðŸŽµ Test Voice</button>
+        <button class="btn btn-action" onclick="testVoice()">  Test Voice</button>
     </div>
     
     <div class="card">
-        <h3>ðŸ’¾ Backup Exercise Images</h3>
+        <h3>  Backup Exercise Images</h3>
         <p class="text-muted" style="margin-bottom:10px;">
             Export your saved images to a file, so you can restore them if you clear browser data.
         </p>
-        <button class="btn btn-success" onclick="exportImages()">ðŸ“¥ Export Images</button>
-        <button class="btn btn-action" onclick="document.getElementById('import-file').click()">ðŸ“¤ Import Images</button>
+        <button class="btn btn-success" onclick="exportImages()">  Export Images</button>
+        <button class="btn btn-action" onclick="document.getElementById('import-file').click()">  Import Images</button>
         <input type="file" id="import-file" accept=".json" onchange="importImages(event)" style="display:none;">
         <p class="text-muted" style="margin-top:10px; font-size:0.75em;">
             <strong>Tip:</strong> Store the exported file in your GitHub repo so you never lose your images!
@@ -1177,7 +1135,7 @@
 
 <!-- ENCYCLOPEDIA PAGE -->
 <div class="container" id="view-encyclopedia">
-    <h2>ðŸ“š Exercise Encyclopedia</h2>
+    <h2>  Exercise Encyclopedia</h2>
     
     <div class="card">
         <input type="text" id="encyclopedia-search" placeholder="Search exercises..." 
@@ -1201,12 +1159,12 @@
             <div class="chip" onclick="filterEncyclopedia('Bodyweight')">Bodyweight</div>
         </div>
         
-        <label style="margin-top: 10px; display: block; color: #9b59b6; font-weight: bold;">ðŸ’œ 40+ Friendly:</label>
+        <label style="margin-top: 10px; display: block; color: #9b59b6; font-weight: bold;">  40+ Friendly:</label>
         <div class="chip-container">
-            <div class="chip" onclick="filterEncyclopedia('Mobility')" style="border-color: #9b59b6;">ðŸ§˜ Mobility (36)</div>
-            <div class="chip" onclick="filterEncyclopedia('Nimble')" style="border-color: #9b59b6;">ðŸ¤¸ Nimble (25)</div>
-            <div class="chip" onclick="filterEncyclopedia('Calisthenics')" style="border-color: #9b59b6;">ðŸ’ª Calisthenics (41)</div>
-            <div class="chip" onclick="filterEncyclopedia('Plyo')" style="border-color: #FF9800;">âš¡ Plyometric</div>
+            <div class="chip" onclick="filterEncyclopedia('Mobility')" style="border-color: #9b59b6;">  Mobility (36)</div>
+            <div class="chip" onclick="filterEncyclopedia('Nimble')" style="border-color: #9b59b6;">  Nimble (25)</div>
+            <div class="chip" onclick="filterEncyclopedia('Calisthenics')" style="border-color: #9b59b6;">  Calisthenics (41)</div>
+            <div class="chip" onclick="filterEncyclopedia('Plyo')" style="border-color: #FF9800;">  Plyometric</div>
         </div>
     </div>
     
@@ -1217,13 +1175,13 @@
 <div class="container" id="view-garmin">
     <div class="card" style="background: linear-gradient(135deg, rgba(0,124,195,0.1), rgba(0,212,255,0.1)); border: 2px solid #007CC3;">
         <h2 style="font-size: 2em; margin-bottom: 10px; background: linear-gradient(135deg, #00ff9d, #00d4ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-            ðŸƒ Garmin AI Recovery Coach
+              Garmin AI Recovery Coach
         </h2>
         <p style="color: #888; margin-bottom: 30px;">Upload your Garmin data for AI-powered recovery analysis</p>
         
         <!-- UPLOAD ZONE -->
         <div class="drop-zone" id="dropZone">
-            <div style="font-size: 3em; margin-bottom: 10px;">ðŸ“Š</div>
+            <div style="font-size: 3em; margin-bottom: 10px;"> </div>
             <h3>Drop Garmin CSV Files Here</h3>
             <p style="color: #888; margin-top: 10px;">or click to browse</p>
             <input type="file" id="fileInput" multiple accept=".csv" style="display: none;">
@@ -1232,16 +1190,16 @@
         <div id="fileList" class="file-list"></div>
         
         <button class="btn btn-main" id="analyzeBtn" style="display: none;">
-            ðŸ¤– Analyze with AI Coach
+              Analyze with AI Coach
         </button>
         
         <!-- HOW TO GET DATA -->
         <div style="margin-top: 30px; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 12px;">
-            <h3 style="color: #00d4ff; margin-bottom: 15px;">ðŸ“¥ How to Export from Garmin Connect</h3>
+            <h3 style="color: #00d4ff; margin-bottom: 15px;">  How to Export from Garmin Connect</h3>
             <ol style="line-height: 2; padding-left: 20px;">
                 <li>Go to <a href="https://connect.garmin.com" target="_blank" style="color: #00ff9d;">connect.garmin.com</a></li>
                 <li>Sign in to your account</li>
-                <li>Click your profile icon â†’ Settings</li>
+                <li>Click your profile icon   Settings</li>
                 <li>Look for "Data Management" or "Export Data"</li>
                 <li>Select last 7-30 days</li>
                 <li>Download CSVs for: Activities, Sleep, Daily Summary</li>
@@ -1266,13 +1224,13 @@
         
         <!-- METRICS -->
         <div class="card">
-            <h3 style="margin-bottom: 20px;">ðŸ“Š Key Metrics</h3>
+            <h3 style="margin-bottom: 20px;">  Key Metrics</h3>
             <div class="metric-grid" id="metricsGrid"></div>
         </div>
         
         <!-- AI RECOMMENDATIONS -->
         <div class="card">
-            <h3 style="margin-bottom: 20px;">ðŸ¤– AI Coach Recommendations</h3>
+            <h3 style="margin-bottom: 20px;">  AI Coach Recommendations</h3>
             <div id="aiRecommendations"></div>
         </div>
         
@@ -1280,14 +1238,14 @@
         <div class="card">
             <details>
                 <summary style="cursor: pointer; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                    ðŸ” View Raw Garmin Data
+                      View Raw Garmin Data
                 </summary>
                 <div id="rawData" style="margin-top: 15px; font-family: monospace; font-size: 0.85em; background: #000; padding: 15px; border-radius: 8px; overflow-x: auto; max-height: 400px; overflow-y: auto;"></div>
             </details>
         </div>
         
         <button class="btn btn-action" onclick="resetGarminUpload()">
-            ðŸ”„ Upload New Data
+              Upload New Data
         </button>
     </div>
 </div>
@@ -1296,8 +1254,8 @@
 <div class="modal-overlay" id="ai-wizard-modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>ðŸ¤– AI Plan Generator</h2>
-            <button class="modal-close" onclick="closeAIWizard()">âœ•</button>
+            <h2>  AI Plan Generator</h2>
+            <button class="modal-close" onclick="closeAIWizard()"> </button>
         </div>
         <div id="wizard-content"></div>
     </div>
@@ -1306,39 +1264,28 @@
 <!-- NAVIGATION -->
 <div class="nav-bar">
     <button class="nav-btn active" onclick="switchTab('coach')">
-        <div class="nav-icon">ðŸ’ª</div>Coach
+        <div class="nav-icon"> </div>Coach
     </button>
     <button class="nav-btn" onclick="switchTab('garmin')">
-        <div class="nav-icon">ðŸƒ</div>Recovery
+        <div class="nav-icon"> </div>Recovery
     </button>
     <button class="nav-btn" onclick="switchTab('plan')">
-        <div class="nav-icon">ðŸ“…</div>Plan
+        <div class="nav-icon"> </div>Plan
     </button>
     <button class="nav-btn" onclick="switchTab('encyclopedia')">
-        <div class="nav-icon">ðŸ“š</div>Library
+        <div class="nav-icon"> </div>Library
     </button>
     <button class="nav-btn" onclick="switchTab('settings')">
-        <div class="nav-icon">âš™ï¸</div>Settings
+        <div class="nav-icon"> </div>Settings
     </button>
-</div>
-
-<!-- EXERCISE DETAILS MODAL -->
-<div class="modal-overlay" id="exercise-details-modal">
-    <div class="modal-content" style="max-width: 600px;">
-        <div class="modal-header">
-            <h2 id="exercise-modal-title">Exercise Details</h2>
-            <button class="modal-close" onclick="closeExerciseDetails()">âœ•</button>
-        </div>
-        <div id="exercise-modal-content" style="max-height: 70vh; overflow-y: auto;"></div>
-    </div>
 </div>
 
 <!-- CUSTOM BUILDER MODAL -->
 <div class="modal-overlay" id="custom-builder-modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>ðŸ› ï¸ Custom Workout Builder</h2>
-            <button class="modal-close" onclick="closeCustomBuilder()">âœ•</button>
+            <h2>🔧 Custom Workout Builder</h2>
+            <button class="modal-close" onclick="closeCustomBuilder()"> </button>
         </div>
         
         <div style="margin-bottom: 15px;">
@@ -1371,12 +1318,12 @@
                 <div class="chip" onclick="filterBuilder('Bodyweight')">Bodyweight</div>
             </div>
             
-            <label style="margin-top: 10px; display: block; color: #9b59b6; font-weight: bold;">ðŸ’œ 40+ Friendly:</label>
+            <label style="margin-top: 10px; display: block; color: #9b59b6; font-weight: bold;">  40+ Friendly:</label>
             <div class="chip-container">
-                <div class="chip" onclick="filterBuilder('Mobility')" style="border-color: #9b59b6;">ðŸ§˜ Mobility (36)</div>
-                <div class="chip" onclick="filterBuilder('Nimble')" style="border-color: #9b59b6;">ðŸ¤¸ Nimble (25)</div>
-                <div class="chip" onclick="filterBuilder('Calisthenics')" style="border-color: #9b59b6;">ðŸ’ª Calisthenics (41)</div>
-                <div class="chip" onclick="filterBuilder('Plyo')" style="border-color: #FF9800;">âš¡ Plyometric</div>
+                <div class="chip" onclick="filterBuilder('Mobility')" style="border-color: #9b59b6;">  Mobility (36)</div>
+                <div class="chip" onclick="filterBuilder('Nimble')" style="border-color: #9b59b6;">  Nimble (25)</div>
+                <div class="chip" onclick="filterBuilder('Calisthenics')" style="border-color: #9b59b6;">  Calisthenics (41)</div>
+                <div class="chip" onclick="filterBuilder('Plyo')" style="border-color: #FF9800;">  Plyometric</div>
             </div>
         </div>
         
@@ -1385,7 +1332,7 @@
         <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #333;">
             <p class="text-muted">Selected: <span id="selected-count">0</span> exercises</p>
             <button class="btn btn-main" onclick="startCustomWorkout()">
-                â–¶ï¸ Start Custom Workout
+                  Start Custom Workout
             </button>
         </div>
     </div>
@@ -1396,7 +1343,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <h2 id="exercise-detail-name">Exercise Name</h2>
-            <button class="modal-close" onclick="closeExerciseDetail()">âœ•</button>
+            <button class="modal-close" onclick="closeExerciseDetail()"> </button>
         </div>
         <div id="exercise-detail-content"></div>
     </div>
@@ -1406,8 +1353,8 @@
 <div class="modal-overlay" id="gps-tracking-modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>ðŸ“ GPS Tracking</h2>
-            <button class="modal-close" onclick="stopGpsTracking()">âœ• Stop</button>
+            <h2>  GPS Tracking</h2>
+            <button class="modal-close" onclick="stopGpsTracking()">  Stop</button>
         </div>
         <div id="gps-tracking-content">
             <div class="gps-stats">
@@ -1428,7 +1375,7 @@
                 <canvas id="gps-map-canvas" width="600" height="300"></canvas>
             </div>
             <div style="text-align:center; margin-top:15px;">
-                <button class="btn btn-success" onclick="saveGpsRoute()">ðŸ’¾ Save Route</button>
+                <button class="btn btn-success" onclick="saveGpsRoute()">  Save Route</button>
             </div>
         </div>
     </div>
@@ -1438,7 +1385,7 @@
 <div class="modal-overlay" id="warmup-modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>ðŸ”¥ Warm-up Sequence</h2>
+            <h2>  Warm-up Sequence</h2>
             <button class="modal-close" onclick="skipWarmup()">Skip</button>
         </div>
         <div id="warmup-content">
@@ -1462,7 +1409,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <h2>Generate Training Plan</h2>
-            <button class="modal-close" onclick="closePlanGenerator()">âœ•</button>
+            <button class="modal-close" onclick="closePlanGenerator()"> </button>
         </div>
         
         <div id="generator-step-1">
@@ -1480,17 +1427,17 @@
             <h3>Training Focus</h3>
             <p class="text-muted">Balanced approach for sustainable fitness</p>
             <div class="chip-container">
-                <div class="chip" onclick="selectGoal('balanced')">âš–ï¸ Balanced Performance</div>
-                <div class="chip" onclick="selectGoal('vitality')">ðŸ§˜ Health & Vitality</div>
-                <div class="chip" onclick="selectGoal('functional')">ðŸŽ¯ Functional Fitness</div>
+                <div class="chip" onclick="selectGoal('balanced')">  Balanced Performance</div>
+                <div class="chip" onclick="selectGoal('vitality')">  Health & Vitality</div>
+                <div class="chip" onclick="selectGoal('functional')">  Functional Fitness</div>
             </div>
         </div>
         
         <div id="generator-step-3" style="display:none;">
-            <h3>âœ… Plan Generated!</h3>
+            <h3>  Plan Generated!</h3>
             <div id="plan-preview"></div>
             <button class="btn btn-main" onclick="acceptPlan()">Accept & Start</button>
-            <button class="btn btn-action" onclick="regeneratePlan()">ðŸ”„ Regenerate</button>
+            <button class="btn btn-action" onclick="regeneratePlan()">  Regenerate</button>
         </div>
     </div>
 </div>
@@ -1499,108 +1446,6 @@
 // ========================================
 // EXERCISE DATABASE
 // ========================================
-// ==========================================
-// EXERCISE MEDIA DATABASE - GIFs & YouTube Tutorials
-// ==========================================
-const exerciseMedia = {
-    "Cable Chest Press": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Standing-Cable-Chest-Press.gif", youtube: "https://www.youtube.com/watch?v=Dz61Kd6YvYM" },
-    "Cable Chest Fly (High)": { gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/08/high-cable-fly.gif", youtube: "https://www.youtube.com/watch?v=taI4XduLpTk" },
-    "Cable Chest Fly (Low)": { gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/08/low-cable-fly.gif", youtube: "https://www.youtube.com/watch?v=RZwPosBv7p4" },
-    "Cable Chest Fly (Mid)": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Crossover.gif", youtube: "https://www.youtube.com/watch?v=fIRtKk9EMIg" },
-    "Single Arm Cable Chest Press": { gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/single-arm-cable-chest-press.gif", youtube: "https://www.youtube.com/watch?v=8iPEnn-CzS8" },
-    "Cable Crossover": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Crossover.gif", youtube: "https://www.youtube.com/watch?v=taI4XduLpTk" },
-    "Cable Pullover (Bench)": { gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-pullover.gif", youtube: "https://www.youtube.com/watch?v=K2nS3mLkFPw" },
-    "Lat Pulldown (Standing)": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Lat-Pulldown.gif", youtube: "https://www.youtube.com/watch?v=CAwf7n6Luuc" },
-    "Seated Cable Row": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Seated-Cable-Row.gif", youtube: "https://www.youtube.com/watch?v=xQNrFHEMhI4" },
-    "Face Pulls": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Face-Pull.gif", youtube: "https://www.youtube.com/watch?v=rep-qVOkqgk" },
-    "Straight Arm Pulldown": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Straight-Arm-Lat-Pulldown.gif", youtube: "https://www.youtube.com/watch?v=oCTLN8fwz_8" },
-    "Single Arm Cable Row": { gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/single-arm-cable-row.gif", youtube: "https://www.youtube.com/watch?v=kDI2z0tTwHw" },
-    "Cable Bicep Curl": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Curl.gif", youtube: "https://www.youtube.com/watch?v=cbJdFtDcCFw" },
-    "Cable Hammer Curl": { gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-hammer-curl.gif", youtube: "https://www.youtube.com/watch?v=TwD-YGVP4Bw" },
-    "Cable Tricep Extension": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Overhead-Cable-Triceps-Extension.gif", youtube: "https://www.youtube.com/watch?v=6lD4bs_tBJI" },
-    "Cable Tricep Pushdown": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Triceps-Pushdown.gif", youtube: "https://www.youtube.com/watch?v=2-LAMcpzODU" },
-    "Cable Shoulder Press": { gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-shoulder-press.gif", youtube: "https://www.youtube.com/watch?v=aKNiIy0xWFk" },
-    "Cable Lateral Raise": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Lateral-Raise.gif", youtube: "https://www.youtube.com/watch?v=PPrzBWZDOhA" },
-    "Cable Front Raise": { gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-front-raise.gif", youtube: "https://www.youtube.com/watch?v=8iXW8QP3vyg" },
-    "Cable Rear Delt Fly": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Rear-Delt-Fly.gif", youtube: "https://www.youtube.com/watch?v=9BIj2U0GvCE" },
-    "Cable Upright Row": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Upright-Row.gif", youtube: "https://www.youtube.com/watch?v=Q5AaWQz-JsE" },
-    "Cable Crunch": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Crunch.gif", youtube: "https://www.youtube.com/watch?v=2ulgnVlfJ64" },
-    "Cable Woodchop": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Standing-Cable-Wood-Chop.gif", youtube: "https://www.youtube.com/watch?v=pAplQXk3dkU" },
-    "Barbell Bench Press": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Bench-Press.gif", youtube: "https://www.youtube.com/watch?v=rT7DgCr-3pg" },
-    "Incline Barbell Bench Press": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Incline-Barbell-Bench-Press.gif", youtube: "https://www.youtube.com/watch?v=SrqOu55lrYU" },
-    "Decline Barbell Bench Press": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Decline-Barbell-Bench-Press.gif", youtube: "https://www.youtube.com/watch?v=LfyQBUKR8SE" },
-    "Barbell Row": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Row.gif", youtube: "https://www.youtube.com/watch?v=XZr85fu_57s" },
-    "Deadlift": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Deadlift.gif", youtube: "https://www.youtube.com/watch?v=op9kVnSso6Q" },
-    "Barbell Squat": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Squat.gif", youtube: "https://www.youtube.com/watch?v=ultWZbUMPL8" },
-    "Front Squat": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Front-Squat.gif", youtube: "https://www.youtube.com/watch?v=uYumuL_G_V0" },
-    "Barbell Lunge": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Lunge.gif", youtube: "https://www.youtube.com/watch?v=z0uRLbwLbAo" },
-    "Romanian Deadlift": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Romanian-Deadlift.gif", youtube: "https://www.youtube.com/watch?v=xxFpHWEi6UE" },
-    "Barbell Curl": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Curl.gif", youtube: "https://www.youtube.com/watch?v=kwG2ipFRgfo" },
-    "Barbell Overhead Press": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/barbell-shoulder-press.gif", youtube: "https://www.youtube.com/watch?v=2yjwXTZQDDI" },
-    "Barbell Shrug": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Shrug.gif", youtube: "https://www.youtube.com/watch?v=cJRVVxmytaM" },
-    "Dumbbell Bench Press": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Bench-Press.gif", youtube: "https://www.youtube.com/watch?v=VmB1G1K7v94" },
-    "Incline Dumbbell Press": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Incline-Dumbbell-Press.gif", youtube: "https://www.youtube.com/watch?v=8iPEnn-CzS8" },
-    "Dumbbell Fly": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Fly.gif", youtube: "https://www.youtube.com/watch?v=eozdVDA78K0" },
-    "Dumbbell Pullover": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Pullover.gif", youtube: "https://www.youtube.com/watch?v=FK1eZG0YrJw" },
-    "Dumbbell Row": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Row.gif", youtube: "https://www.youtube.com/watch?v=roCP6wCXPqo" },
-    "Dumbbell Shoulder Press": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Shoulder-Press.gif", youtube: "https://www.youtube.com/watch?v=qEwKCR5JCog" },
-    "Dumbbell Lateral Raise": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Lateral-Raise.gif", youtube: "https://www.youtube.com/watch?v=3VcKaXpzqRo" },
-    "Dumbbell Front Raise": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Front-Raise.gif", youtube: "https://www.youtube.com/watch?v=qOodA1OZuqw" },
-    "Dumbbell Shrug": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Shrug.gif", youtube: "https://www.youtube.com/watch?v=TRzDZF8EHi8" },
-    "Dumbbell Curl": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Curl.gif", youtube: "https://www.youtube.com/watch?v=ykJmrZ5v0Oo" },
-    "Hammer Curl": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Hammer-Curl.gif", youtube: "https://www.youtube.com/watch?v=TwD-YGVP4Bw" },
-    "Dumbbell Tricep Extension": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Overhead-Triceps-Extension.gif", youtube: "https://www.youtube.com/watch?v=YbX7Wd8jQ-Q" },
-    "Dumbbell Goblet Squat": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Goblet-Squat.gif", youtube: "https://www.youtube.com/watch?v=MeIiIdhvXT4" },
-    "Dumbbell Lunge": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Lunge.gif", youtube: "https://www.youtube.com/watch?v=D7KaRcUTQeE" },
-    "Dumbbell Romanian Deadlift": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Romanian-Deadlift.gif", youtube: "https://www.youtube.com/watch?v=xxFpHWEi6UE" },
-    "Push-Up": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Push-up.gif", youtube: "https://www.youtube.com/watch?v=IODxDxX7oi4" },
-    "Pull-Up": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Pull-up.gif", youtube: "https://www.youtube.com/watch?v=eGo4IYlbE5g" },
-    "Chin-Up": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Chin-up.gif", youtube: "https://www.youtube.com/watch?v=brhRXlOhkAM" },
-    "Dip": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Chest-Dips.gif", youtube: "https://www.youtube.com/watch?v=2z8JmcrW-As" },
-    "Plank": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Plank.gif", youtube: "https://www.youtube.com/watch?v=pSHjTRCQxIw" },
-    "Side Plank": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Side-Plank.gif", youtube: "https://www.youtube.com/watch?v=K2VljzCC16g" },
-    "Mountain Climber": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Mountain-Climber.gif", youtube: "https://www.youtube.com/watch?v=nmwgirgXLYM" },
-    "Burpee": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Burpee.gif", youtube: "https://www.youtube.com/watch?v=TU8QYVW0gDU" },
-    "Jump Squat": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Jump-Squat.gif", youtube: "https://www.youtube.com/watch?v=A-cFYWvaHr0" },
-    "Box Jump": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Box-Jump.gif", youtube: "https://www.youtube.com/watch?v=hxldG9FX4j4" },
-    "Leg Press": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/LEG-PRESS.gif", youtube: "https://www.youtube.com/watch?v=IZxyjW7MPJQ" },
-    "Leg Curl": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Leg-Curl.gif", youtube: "https://www.youtube.com/watch?v=1Tq3QdYUuHs" },
-    "Leg Extension": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/LEG-EXTENSION.gif", youtube: "https://www.youtube.com/watch?v=YyvSfEjZIsc" },
-    "Calf Raise": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Calf-Raise.gif", youtube: "https://www.youtube.com/watch?v=gwLzBJYoWlI" },
-    "Seated Calf Raise": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Seated-Calf-Raise.gif", youtube: "https://www.youtube.com/watch?v=JbyjNymZO_A" },
-    "Ab Wheel Rollout": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Ab-Wheel-Rollout.gif", youtube: "https://www.youtube.com/watch?v=8mLCRMXLjKE" },
-    "Hanging Leg Raise": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Hanging-Leg-Raise.gif", youtube: "https://www.youtube.com/watch?v=Pr1ieGZ5atk" },
-    "Russian Twist": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Russian-Twist.gif", youtube: "https://www.youtube.com/watch?v=wkD8rjkodUI" },
-    "Bicycle Crunch": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Bicycle-Crunch.gif", youtube: "https://www.youtube.com/watch?v=Iwyvozckjak" },
-    "Sit-Up": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Sit-up.gif", youtube: "https://www.youtube.com/watch?v=1fbU_MkV7NE" },
-    "Crunch": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Crunch.gif", youtube: "https://www.youtube.com/watch?v=Xyd_fa5zoEU" },
-    "Treadmill Run": { gif: "https://i.pinimg.com/originals/89/04/1f/89041f2f3d3e5dc80e759fa1c8db0f9e.gif", youtube: "https://www.youtube.com/watch?v=wCVSv7UxB2E" },
-    "Rowing Machine": { gif: "https://www.inspireusafoundation.org/wp-content/uploads/2022/05/rowing-machine.gif", youtube: "https://www.youtube.com/watch?v=4 atlsQIBYpw" },
-    "Assault Bike": { gif: "https://www.inspireusafoundation.org/wp-content/uploads/2022/05/assault-bike.gif", youtube: "https://www.youtube.com/watch?v=i57fG3Z9Kx8" },
-    "Jump Rope": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Skipping.gif", youtube: "https://www.youtube.com/watch?v=FJmRQ5iTXKE" },
-    "Battle Ropes": { gif: "https://www.inspireusafoundation.org/wp-content/uploads/2022/05/battle-ropes.gif", youtube: "https://www.youtube.com/watch?v=0319LPzdF6o" },
-    "Kettlebell Swing": { gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Kettlebell-Swing.gif", youtube: "https://www.youtube.com/watch?v=YSxHifyI6s8" },
-    "Turkish Get-Up": { gif: "https://www.inspireusafoundation.org/wp-content/uploads/2022/05/turkish-get-up.gif", youtube: "https://www.youtube.com/watch?v=0bWRPC49-KI" },
-    "Farmers Walk": { gif: "https://www.inspireusafoundation.org/wp-content/uploads/2022/05/farmers-walk.gif", youtube: "https://www.youtube.com/watch?v=rt17lmnaLSM" },
-    "Sled Push": { gif: "https://www.inspireusafoundation.org/wp-content/uploads/2022/05/sled-push.gif", youtube: "https://www.youtube.com/watch?v=_YZrm8ELzTU" },
-    "Sled Pull": { gif: "https://www.inspireusafoundation.org/wp-content/uploads/2022/05/sled-drag.gif", youtube: "https://www.youtube.com/watch?v=awwF-3-hKrg" }
-};
-
-// Helper functions to get exercise media
-function getExerciseGif(exerciseName) {
-    if (exerciseMedia[exerciseName] && exerciseMedia[exerciseName].gif) {
-        return exerciseMedia[exerciseName].gif;
-    }
-    return "https://via.placeholder.com/400x300/1C1C1E/0A84FF?text=No+GIF+Available";
-}
-
-function getExerciseYouTube(exerciseName) {
-    if (exerciseMedia[exerciseName] && exerciseMedia[exerciseName].youtube) {
-        return exerciseMedia[exerciseName].youtube;
-    }
-    return null;
-}
-
 function createEx(name, cat, equip, type, prep, exec, tips, benefits, muscles, setupF9) {
     return {
         name: name,
@@ -1628,7 +1473,7 @@ window.allExercises = [
             ["Pectoralis Major", "Triceps", "Front Delts"], {arms: "Wide (Pos 8-9)", pulleys: "Chest Height"}),
 
         createEx("Cable Chest Fly (High)", ["Chest"], "Cable", "Muscle Build",
-            ["Set Pulleys to Top Position. Arms Wide.", "Step forward, lean torso 30Â° forward.", "Start with arms open wide, elbows slightly bent."],
+            ["Set Pulleys to Top Position. Arms Wide.", "Step forward, lean torso 30  forward.", "Start with arms open wide, elbows slightly bent."],
             ["Fly hands down and together towards your waist.", "Imagine hugging a large tree trunk.", "Squeeze inner chest hard at the bottom.", "Control the return to the stretch position."],
             ["Don't turn it into a press; keep the elbow angle fixed.", "Keep chest proud, don't round shoulders forward."],
             ["Targets the lower (sternal) head of the chest.", "Excellent for creating the lower pec outline."],
@@ -2257,7 +2102,7 @@ window.allExercises = [
             ["Hips", "Thoracic Spine", "Hamstrings"]),
 
         createEx("90/90 Hip Switch", ["Legs"], "Bodyweight", "Mobility", 
-            ["Sit on floor.", "Front leg bent 90Â° in front, back leg 90Â° to side.", "Torso upright."],
+            ["Sit on floor.", "Front leg bent 90  in front, back leg 90  to side.", "Torso upright."],
             ["Rotate hips to switch leg positions to the other side.", "Keep heels driven into the floor.", "Try not to use hands for support."],
             ["Stay tall through the spine.", "Move from the hips, not the lower back."],
             ["Internal and external hip rotation.", "Unlocks tight hips."],
@@ -2315,7 +2160,7 @@ window.allExercises = [
 
         createEx("Cable Donkey Kick", ["Legs", "Glutes"], "Cable", "Muscle Build", 
             ["Set Pulley Low. Ankle strap.", "Hands on machine for support.", "Bent over."],
-            ["Keep knee bent 90Â°.", "Drive heel up to ceiling.", "Squeeze."],
+            ["Keep knee bent 90 .", "Drive heel up to ceiling.", "Squeeze."],
             ["Don't extend knee.", "Movement comes from hip."],
             ["Upper glute focus.", "Shelf builder."],
             ["Glute Maximus"], {arms: "Narrow", pulleys: "Low"}),
@@ -2726,15 +2571,15 @@ function loadPreloadedImages() {
     Object.keys(preloadedImages).forEach(key => {
         if(!localStorage.getItem(key)) {
             localStorage.setItem(key, preloadedImages[key]);
-            console.log('âœ… Loaded: ' + key);
+            console.log('  Loaded: ' + key);
         }
     });
-    console.log('âœ… Pre-loaded 50 exercise images');
+    console.log('  Pre-loaded 50 exercise images');
 }
 
 window.onload = () => {
     loadAppState();
-    loadPreloadedImages(); // â† Load exercise GIFs
+    loadPreloadedImages(); //   Load exercise GIFs
     renderPlanCalendar();
     renderEquipmentPresets();
     updateTodaysBanner();
@@ -2886,12 +2731,12 @@ function renderWorkout(exercises) {
             <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
                 <div>
                     <h3 style="margin:0;">${ex.name}</h3>
-                    <div class="text-muted">${ex.cat.join(', ')} â€¢ ${ex.equip}</div>
+                    <div class="text-muted">${ex.cat.join(', ')}   ${ex.equip}</div>
                 </div>
                 <div style="text-align:right;">
                     ${progression.suggest ? `<div class="progression-badge">${progression.suggest}</div>` : ''}
                     <button class="btn-small btn-action" onclick="viewExerciseDetails('${ex.name.replace(/'/g,"\\'")}')">
-                        â„¹ï¸
+                         
                     </button>
                 </div>
             </div>
@@ -2899,7 +2744,7 @@ function renderWorkout(exercises) {
         
         if(progression.lastWorkout) {
             html += `<div style="background:#1a1a1a; padding:8px; border-radius:6px; margin-bottom:10px; font-size:0.85em;">
-                ðŸ“Š Last: ${progression.lastWorkout.weight} lbs Ã— ${progression.lastWorkout.reps.join(',')} reps
+                  Last: ${progression.lastWorkout.weight} lbs   ${progression.lastWorkout.reps.join(',')} reps
             </div>`;
         }
         
@@ -2908,7 +2753,7 @@ function renderWorkout(exercises) {
             const set = setData[i];
             if(set) {
                 html += `<div class="set-completed">
-                    <span>âœ… Set ${i+1}: ${set.weight} lbs Ã— ${set.reps} reps</span>
+                    <span>  Set ${i+1}: ${set.weight} lbs   ${set.reps} reps</span>
                 </div>`;
             }
         }
@@ -2930,13 +2775,13 @@ function renderWorkout(exercises) {
                         </div>
                     </div>
                     <button class="btn btn-main" onclick="logSet('${ex.name.replace(/'/g,"\\'")}', ${idx})">
-                        âœ“ Log Set
+                          Log Set
                     </button>
                 </div>
             `;
         } else {
             html += `<div style="text-align:center; padding:15px; background:#1a4d2e; border-radius:6px;">
-                âœ… Exercise Complete!
+                  Exercise Complete!
             </div>`;
         }
         
@@ -2949,7 +2794,7 @@ function renderWorkout(exercises) {
     if(allDone) {
         const btn = document.createElement('button');
         btn.className = 'btn btn-success';
-        btn.textContent = 'ðŸŽ‰ Workout Complete!';
+        btn.textContent = '  Workout Complete!';
         btn.onclick = finishWorkout;
         container.appendChild(btn);
     }
@@ -3039,7 +2884,7 @@ function finishWorkout() {
     appState.currentSetIndex = {};
     saveAppState();
     
-    alert('Workout saved! Great job! ðŸ’ª');
+    alert('Workout saved! Great job!  ');
     speak('Workout complete! Great work!');
 }
 
@@ -3083,110 +2928,6 @@ function openCustomBuilder() {
 function closeCustomBuilder() {
     document.getElementById('custom-builder-modal').classList.remove('active');
 }
-
-// ==========================================
-// EXERCISE DETAILS MODAL
-// ==========================================
-function viewExerciseDetails(exerciseName) {
-    const exercise = window.allExercises.find(ex => ex.name === exerciseName);
-    if (!exercise) {
-        alert('Exercise not found');
-        return;
-    }
-    
-    const modal = document.getElementById('exercise-details-modal');
-    const title = document.getElementById('exercise-modal-title');
-    const content = document.getElementById('exercise-modal-content');
-    
-    title.textContent = exercise.name;
-    
-    // Get GIF and YouTube link
-    const gifUrl = getExerciseGif(exercise.name);
-    const youtubeUrl = getExerciseYouTube(exercise.name);
-    
-    // Build modal content
-    let html = '';
-    
-    // Add GIF
-    html += `<div style="text-align: center; margin-bottom: 20px;">
-        <img src="${gifUrl}" alt="${exercise.name}" style="max-width: 100%; border-radius: 8px; max-height: 300px;">
-    </div>`;
-    
-    // Add YouTube button if available
-    if (youtubeUrl) {
-        html += `<div style="text-align: center; margin-bottom: 20px;">
-            <a href="${youtubeUrl}" target="_blank" class="btn btn-action" style="display: inline-block; width: auto; padding: 10px 20px;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg> Watch Tutorial on YouTube
-            </a>
-        </div>`;
-    }
-    
-    // Add exercise info
-    html += `<div class="card" style="background: rgba(0,0,0,0.3); margin-bottom: 15px;">
-        <p><strong>Category:</strong> ${exercise.cat.join(', ')}</p>
-        <p><strong>Equipment:</strong> ${exercise.equip}</p>
-        <p><strong>Type:</strong> ${exercise.type}</p>
-    </div>`;
-    
-    // Add setup info if available
-    if (exercise.setup && exercise.setup.arms !== 'N/A') {
-        html += `<div class="card" style="background: rgba(0,0,0,0.3); margin-bottom: 15px;">
-            <h4 style="margin-top: 0;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg> Setup (Torque F9)</h4>
-            <p><strong>Arms:</strong> ${exercise.setup.arms}</p>
-            <p><strong>Pulleys:</strong> ${exercise.setup.pulleys}</p>
-        </div>`;
-    }
-    
-    // Add guide sections
-    if (exercise.guide) {
-        html += `<div class="card" style="background: rgba(0,0,0,0.3); margin-bottom: 15px;">
-            <h4 style="margin-top: 0;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg> Preparation</h4>
-            <ul style="margin: 10px 0; padding-left: 20px;">`;
-        exercise.guide.prep.forEach(step => {
-            html += `<li style="margin-bottom: 8px;">${step}</li>`;
-        });
-        html += `</ul></div>`;
-        
-        html += `<div class="card" style="background: rgba(0,0,0,0.3); margin-bottom: 15px;">
-            <h4 style="margin-top: 0;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg> Execution</h4>
-            <ul style="margin: 10px 0; padding-left: 20px;">`;
-        exercise.guide.exec.forEach(step => {
-            html += `<li style="margin-bottom: 8px;">${step}</li>`;
-        });
-        html += `</ul></div>`;
-        
-        html += `<div class="card" style="background: rgba(0,0,0,0.3); margin-bottom: 15px;">
-            <h4 style="margin-top: 0;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg> Pro Tips</h4>
-            <ul style="margin: 10px 0; padding-left: 20px;">`;
-        exercise.guide.tips.forEach(tip => {
-            html += `<li style="margin-bottom: 8px;">${tip}</li>`;
-        });
-        html += `</ul></div>`;
-        
-        html += `<div class="card" style="background: rgba(0,0,0,0.3); margin-bottom: 15px;">
-            <h4 style="margin-top: 0;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Benefits</h4>
-            <ul style="margin: 10px 0; padding-left: 20px;">`;
-        exercise.guide.benefits.forEach(benefit => {
-            html += `<li style="margin-bottom: 8px;">${benefit}</li>`;
-        });
-        html += `</ul></div>`;
-        
-        if (exercise.guide.muscles && exercise.guide.muscles.length > 0) {
-            html += `<div class="card" style="background: rgba(0,0,0,0.3);">
-                <h4 style="margin-top: 0;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Target Muscles</h4>
-                <p>${exercise.guide.muscles.join(', ')}</p>
-            </div>`;
-        }
-    }
-    
-    content.innerHTML = html;
-    modal.classList.add('active');
-}
-
-function closeExerciseDetails() {
-    document.getElementById('exercise-details-modal').classList.remove('active');
-}
-
 
 function updateExerciseCount(value) {
     appState.exerciseCount = parseInt(value);
@@ -3327,10 +3068,10 @@ function renderBuilderExerciseList() {
             <div style="display:flex; justify-content:space-between;">
                 <div>
                     <strong>${ex.name}</strong><br>
-                    <small class="text-muted">${ex.cat.join(', ')} â€¢ ${ex.equip}</small>
+                    <small class="text-muted">${ex.cat.join(', ')}   ${ex.equip}</small>
                 </div>
                 <button class="btn-small btn-action" onclick="event.stopPropagation(); viewExerciseDetails('${ex.name.replace(/'/g,"\\'")}')">
-                    â„¹ï¸
+                     
                 </button>
             </div>
         `;
@@ -3466,7 +3207,7 @@ function renderEncyclopedia() {
     // Show count
     const totalEl = document.createElement('div');
     totalEl.style.cssText = 'padding: 10px; background: rgba(187,134,252,0.1); border-radius: 8px; margin-bottom: 15px; text-align: center; color: #BB86FC; font-weight: bold;';
-    totalEl.textContent = `ðŸ“š ${exercises.length} exercises found`;
+    totalEl.textContent = `  ${exercises.length} exercises found`;
     container.appendChild(totalEl);
     
     if (exercises.length === 0) {
@@ -3484,7 +3225,7 @@ function renderEncyclopedia() {
         
         card.innerHTML = `
             <h3 style="margin:0 0 5px 0;">${ex.name}</h3>
-            <div class="text-muted">${ex.cat.join(', ')} â€¢ ${ex.equip} â€¢ ${ex.type}</div>
+            <div class="text-muted">${ex.cat.join(', ')}   ${ex.equip}   ${ex.type}</div>
         `;
         
         container.appendChild(card);
@@ -3512,14 +3253,14 @@ function renderPlanCalendar() {
         bubble.className = `day-bubble workout-type-${type}`;
         bubble.onclick = () => editDay(idx);
         
-        const icon = {push:'ðŸ’ª',pull:'ðŸ‹ï¸',legs:'ðŸ¦µ',cardio:'ðŸš´',nimble:'ðŸ§˜',rest:'ðŸ˜´'}[type] || 'ðŸ”¥';
+        const icon = {push:' ',pull:' ',legs:' ',cardio:' ',nimble:' ',rest:' '}[type] || ' ';
         const completed = isDayCompleted(idx);
         
         bubble.innerHTML = `
             <div class="day-icon">${icon}</div>
             <div class="day-letter">${letter}</div>
             <div class="day-type">${type.substring(0,4)}</div>
-            ${completed ? '<div class="day-check">âœ…</div>' : ''}
+            ${completed ? '<div class="day-check"> </div>' : ''}
         `;
         
         grid.appendChild(bubble);
@@ -3623,7 +3364,7 @@ function selectGoal(goal) {
     let html = '<div style="margin:15px 0;">';
     dayNames.forEach((name, idx) => {
         const type = appState.activePlan.schedule[idx];
-        const icon = {push:'ðŸ’ª',pull:'ðŸ‹ï¸',legs:'ðŸ¦µ',cardio:'ðŸš´',nimble:'ðŸ§˜',rest:'ðŸ˜´'}[type];
+        const icon = {push:' ',pull:' ',legs:' ',cardio:' ',nimble:' ',rest:' '}[type];
         html += `<div style="padding:8px; background:#2c2c2c; margin:5px 0; border-radius:6px;">
             ${icon} <strong>${name}:</strong> ${type}
         </div>`;
@@ -3665,7 +3406,7 @@ function updateTodaysBanner() {
     document.getElementById('today-date').textContent = 
         today.toLocaleDateString('en-US', {weekday:'long', month:'short', day:'numeric'});
     
-    const icon = {push:'ðŸ’ª',pull:'ðŸ‹ï¸',legs:'ðŸ¦µ',cardio:'ðŸš´',nimble:'ðŸ§˜'}[type];
+    const icon = {push:' ',pull:' ',legs:' ',cardio:' ',nimble:' '}[type];
     document.getElementById('today-workout').textContent = `${icon} ${type.toUpperCase()}`;
     
     banner.style.display = 'block';
@@ -3699,7 +3440,7 @@ function logCardioSession() {
     // Mark day completed
     markDayCompleted(new Date().getDay());
     
-    alert('Cardio logged! ðŸš´');
+    alert('Cardio logged!  ');
     speak('Cardio session logged');
     loadCardioHistory();
 }
@@ -3722,12 +3463,12 @@ function loadCardioHistory() {
         div.style.borderBottom = '1px solid #333';
         
         const date = new Date(session.date).toLocaleDateString();
-        const icon = {run:'ðŸƒ',bike:'ðŸš´',swim:'ðŸŠ',walk:'ðŸš¶',row:'ðŸš£'}[session.type];
+        const icon = {run:' ',bike:' ',swim:' ',walk:' ',row:' '}[session.type];
         
         div.innerHTML = `
             <strong>${icon} ${session.type}</strong><br>
             <small class="text-muted">
-                ${date} â€¢ ${session.duration} min${session.distance ? ` â€¢ ${session.distance} km` : ''}
+                ${date}   ${session.duration} min${session.distance ? `   ${session.distance} km` : ''}
             </small>
         `;
         
@@ -3743,9 +3484,9 @@ function renderEquipmentPresets() {
     if(!container) return;
     
     const presets = [
-        {key:'home', name:'ðŸ  Home Gym', desc:'Cables, Dumbbells, Bench'},
-        {key:'hotel', name:'ðŸ¨ Hotel/Travel', desc:'Bodyweight & Bands'},
-        {key:'gym', name:'ðŸ’ª Full Gym', desc:'All Equipment'}
+        {key:'home', name:'  Home Gym', desc:'Cables, Dumbbells, Bench'},
+        {key:'hotel', name:'  Hotel/Travel', desc:'Bodyweight & Bands'},
+        {key:'gym', name:'  Full Gym', desc:'All Equipment'}
     ];
     
     container.innerHTML = '';
@@ -3847,7 +3588,7 @@ function exportImages() {
     URL.revokeObjectURL(url);
     
     speak(`Exported ${count} exercise images`);
-    alert(`âœ… Exported ${count} exercise images!\n\nSave this file in your GitHub repo or safe location.`);
+    alert(`  Exported ${count} exercise images!\n\nSave this file in your GitHub repo or safe location.`);
 }
 
 function importImages(event) {
@@ -3869,13 +3610,13 @@ function importImages(event) {
             });
             
             speak(`Imported ${count} exercise images`);
-            alert(`âœ… Imported ${count} exercise images!\n\nYour images have been restored.`);
+            alert(`  Imported ${count} exercise images!\n\nYour images have been restored.`);
             
             // Clear file input
             event.target.value = '';
             
         } catch(err) {
-            alert('âŒ Error importing file. Make sure it\'s a valid backup file.');
+            alert('  Error importing file. Make sure it\'s a valid backup file.');
             console.error('Import error:', err);
         }
     };
@@ -4274,7 +4015,7 @@ function updateAiCoach() {
     if(adherenceRate >= 80) {
         html += `
             <div class="ai-coach-card success">
-                <h3>ðŸŽ¯ Excellent Progress!</h3>
+                <h3>  Excellent Progress!</h3>
                 <p>Adherence: <strong>${adherenceRate.toFixed(0)}%</strong> (${workoutsThisWeek}/${plannedThisWeek} workouts)</p>
                 <p style="margin-top:10px;">You're crushing it! Your consistency is outstanding. Keep up this momentum!</p>
             </div>
@@ -4282,7 +4023,7 @@ function updateAiCoach() {
     } else if(adherenceRate >= 50) {
         html += `
             <div class="ai-coach-card">
-                <h3>ðŸ’ª Good Work!</h3>
+                <h3>  Good Work!</h3>
                 <p>Adherence: <strong>${adherenceRate.toFixed(0)}%</strong> (${workoutsThisWeek}/${plannedThisWeek} workouts)</p>
                 <p style="margin-top:10px;">You're making solid progress. Try to hit all planned workouts for maximum results!</p>
             </div>
@@ -4290,7 +4031,7 @@ function updateAiCoach() {
     } else if(plannedThisWeek > 0) {
         html += `
             <div class="ai-coach-card warning">
-                <h3>âš ï¸ Need More Consistency</h3>
+                <h3>  Need More Consistency</h3>
                 <p>Adherence: <strong>${adherenceRate.toFixed(0)}%</strong> (${workoutsThisWeek}/${plannedThisWeek} workouts)</p>
                 <p style="margin-top:10px;">You've missed several workouts this week. Remember: consistency beats intensity!</p>
             </div>
@@ -4301,7 +4042,7 @@ function updateAiCoach() {
     if(workoutsThisWeek >= 6 && consecutiveDays >= 6) {
         html += `
             <div class="ai-coach-card warning">
-                <h3>ðŸ›‘ Recovery Check</h3>
+                <h3>  Recovery Check</h3>
                 <p>You've trained ${consecutiveDays} days in a row.</p>
                 <p style="margin-top:10px;">Consider taking a rest day soon to prevent overtraining and optimize recovery.</p>
             </div>
@@ -4312,7 +4053,7 @@ function updateAiCoach() {
     if(consecutiveDays >= 3) {
         html += `
             <div class="ai-coach-card success">
-                <h3>ðŸ”¥ ${consecutiveDays} Day Streak!</h3>
+                <h3>  ${consecutiveDays} Day Streak!</h3>
                 <p>Amazing consistency! Remember to balance intensity with recovery.</p>
             </div>
         `;
@@ -4388,7 +4129,7 @@ function displayGarminFileList() {
         const fileItem = document.createElement('div');
         fileItem.className = 'file-item';
         fileItem.innerHTML = `
-            <span class="file-name">ðŸ“„ ${file.name}</span>
+            <span class="file-name">  ${file.name}</span>
             <span class="file-size">${(file.size / 1024).toFixed(1)} KB</span>
         `;
         fileList.appendChild(fileItem);
@@ -4562,7 +4303,7 @@ If metrics show concerning patterns (sleep score <70, elevated RHR, low HRV, hig
     } catch (error) {
         console.error('Analysis failed:', error);
         alert(`Failed to analyze data:\n${error.message}\n\nCheck browser console (F12) for full details.`);
-        analyzeBtn.innerHTML = 'ðŸ¤– Analyze with AI Coach';
+        analyzeBtn.innerHTML = '  Analyze with AI Coach';
         analyzeBtn.disabled = false;
     }
 }
@@ -4637,10 +4378,10 @@ function displayGarminResults(analysis) {
     if (analysis.insights && analysis.insights.length > 0) {
         recDiv.innerHTML += `
             <div style="margin-top: 20px;">
-                <h4 style="color: #00d4ff; margin-bottom: 10px;">ðŸ’¡ Key Insights</h4>
+                <h4 style="color: #00d4ff; margin-bottom: 10px;">  Key Insights</h4>
                 ${analysis.insights.map(insight => `
                     <p style="padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; margin: 5px 0;">
-                        â†’ ${insight}
+                          ${insight}
                     </p>
                 `).join('')}
             </div>
@@ -4651,7 +4392,7 @@ function displayGarminResults(analysis) {
     if (analysis.warnings && analysis.warnings.length > 0) {
         recDiv.innerHTML += `
             <div style="margin-top: 20px;">
-                <h4 style="color: #CF6679; margin-bottom: 10px;">âš ï¸ Warnings</h4>
+                <h4 style="color: #CF6679; margin-bottom: 10px;">  Warnings</h4>
                 ${analysis.warnings.map(warning => `
                     <p style="padding: 10px; background: rgba(207,102,121,0.1); border-radius: 8px; margin: 5px 0; border-left: 3px solid #CF6679;">
                         ${warning}
@@ -4707,7 +4448,7 @@ function updateCloudSyncUI() {
     const lastSyncText = document.getElementById('last-sync-time');
     
     if (statusText) {
-        statusText.textContent = CLOUD_SYNC_ENABLED ? 'âœ… Connected' : 'âŒ Offline';
+        statusText.textContent = CLOUD_SYNC_ENABLED ? '  Connected' : '  Offline';
         statusText.style.color = CLOUD_SYNC_ENABLED ? 'var(--success)' : 'var(--danger)';
     }
     if (deviceIdText) deviceIdText.textContent = USER_ID ? USER_ID.substr(0, 20) + '...' : 'Not set';
@@ -4723,10 +4464,10 @@ function updateGarminConnectionUI(connected, lastSync = null) {
     
     if (statusEl) {
         if (connected) {
-            statusEl.innerHTML = 'âœ… Connected';
+            statusEl.innerHTML = '  Connected';
             statusEl.style.color = 'var(--success)';
         } else {
-            statusEl.innerHTML = 'âŒ Not Connected';
+            statusEl.innerHTML = '  Not Connected';
             statusEl.style.color = 'var(--danger)';
         }
     }
@@ -4747,7 +4488,7 @@ function updateGarminConnectionUI(connected, lastSync = null) {
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
-    notification.innerHTML = `<span>${message}</span><button onclick="this.parentElement.remove()">âœ•</button>`;
+    notification.innerHTML = `<span>${message}</span><button onclick="this.parentElement.remove()"> </button>`;
     notification.style.cssText = `position:fixed; top:20px; right:20px; background:var(--card); color:var(--text); padding:15px 20px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.3); border-left:4px solid ${type === 'success' ? 'var(--success)' : type === 'info' ? 'var(--sec)' : 'var(--danger)'}; z-index:10000; max-width:400px; animation:slideIn 0.3s ease-out;`;
     document.body.appendChild(notification);
     setTimeout(() => { if (notification.parentElement) { notification.style.opacity = '0'; notification.style.transform = 'translateX(100px)'; setTimeout(() => notification.remove(), 300); } }, 5000);
@@ -4772,11 +4513,11 @@ async function checkGarminConnection() {
 
 async function connectGarmin() {
     if (!CLOUD_SYNC_ENABLED || !USER_ID) {
-        showNotification('âŒ Cloud sync must be enabled first', 'error');
+        showNotification('  Cloud sync must be enabled first', 'error');
         return;
     }
     try {
-        showNotification('ðŸ”„ Connecting to Garmin...', 'info');
+        showNotification('  Connecting to Garmin...', 'info');
         // FIXED: Uses hyphen to match 'garmin-auth.js'
         const response = await fetch(`${BACKEND_URL}/api/garmin-auth?user_id=${USER_ID}`);
         const data = await response.json();
@@ -4789,31 +4530,31 @@ async function connectGarmin() {
         window.addEventListener('message', function onMessage(event) {
             if (event.data.type === 'garmin_connected') {
                 window.removeEventListener('message', onMessage);
-                showNotification('âœ… Garmin connected successfully!', 'success');
+                showNotification('  Garmin connected successfully!', 'success');
                 checkGarminConnection();
                 syncGarminNow();
             }
         });
     } catch (error) {
         console.error('Garmin connect error:', error);
-        showNotification(`âŒ ${error.message}`, 'error');
+        showNotification(`  ${error.message}`, 'error');
     }
 }
 
 async function syncGarminNow() {
     if (!CLOUD_SYNC_ENABLED || !USER_ID) return;
     try {
-        showNotification('ðŸ”„ Syncing Garmin activities...', 'info');
+        showNotification('  Syncing Garmin activities...', 'info');
         // FIXED: Uses hyphen to match 'garmin-sync.js'
         const response = await fetch(`${BACKEND_URL}/api/garmin-sync?user_id=${USER_ID}`);
         const data = await response.json();
         if (data.error) throw new Error(data.error);
-        showNotification(`âœ… Synced ${data.activitiesCount} activities`, 'success');
+        showNotification(`  Synced ${data.activitiesCount} activities`, 'success');
         updateGarminConnectionUI(true, new Date().toISOString());
         checkGarminFiles(); 
     } catch (error) {
         console.error('Sync error:', error);
-        showNotification(`âŒ ${error.message}`, 'error');
+        showNotification(`  ${error.message}`, 'error');
     }
 }
 
@@ -4824,12 +4565,12 @@ async function disconnectGarmin() {
         const response = await fetch(`${BACKEND_URL}/api/garmin-disconnect?user_id=${USER_ID}`);
         const data = await response.json();
         if (data.success) {
-            showNotification('âœ… Garmin disconnected', 'success');
+            showNotification('  Garmin disconnected', 'success');
             updateGarminConnectionUI(false);
         }
     } catch (error) {
         console.error('Disconnect error:', error);
-        showNotification('âŒ Failed to disconnect', 'error');
+        showNotification('  Failed to disconnect', 'error');
     }
 }
 
@@ -4839,7 +4580,7 @@ async function disconnectGarmin() {
 
 async function initSupabase() {
     try {
-        console.log('ðŸ”„ Initializing Supabase v51 (Backend Proxy)...');
+        console.log('  Initializing Supabase v51 (Backend Proxy)...');
         let attempts = 0;
         while (typeof window.supabase?.createClient !== 'function' && attempts < 100) {
             await new Promise(res => setTimeout(res, 100));
@@ -4854,15 +4595,15 @@ async function initSupabase() {
             USER_ID = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             localStorage.setItem('nimble_user_id', USER_ID);
         }
-        console.log('ðŸ†” User ID:', USER_ID);
+        console.log('  User ID:', USER_ID);
 
         CLOUD_SYNC_ENABLED = true;
         updateCloudSyncUI(); 
         await loadFromCloud();
         checkGarminConnection(); 
-        console.log('âœ… Supabase initialized successfully! v51');
+        console.log('  Supabase initialized successfully! v51');
     } catch (error) {
-        console.error('âŒ Supabase init error:', error);
+        console.error('  Supabase init error:', error);
         CLOUD_SYNC_ENABLED = false;
         updateCloudSyncUI();
     }
@@ -4878,7 +4619,7 @@ async function saveWorkoutToCloud(workout) {
         if (error) throw error;
         LAST_SYNC_TIME = new Date().toISOString();
         updateCloudSyncUI();
-        console.log('âœ… Workout saved to cloud');
+        console.log('  Workout saved to cloud');
         return true;
     } catch (error) { console.error('Error saving workout:', error); return false; }
 }
@@ -4888,7 +4629,7 @@ async function loadWorkoutsFromCloud() {
     try {
         const { data, error } = await supabaseClient.from('workouts').select('*').eq('user_id', USER_ID).order('date', { ascending: false });
         if (error) throw error;
-        console.log(`ðŸ“¥ Loaded ${data.length} workouts from cloud`);
+        console.log(`  Loaded ${data.length} workouts from cloud`);
         return data || [];
     } catch (error) { console.error('Error loading workouts:', error); return []; }
 }
@@ -4903,7 +4644,7 @@ async function savePlanToCloud(plan) {
         if (error) throw error;
         LAST_SYNC_TIME = new Date().toISOString();
         updateCloudSyncUI();
-        console.log('âœ… Training plan saved to cloud');
+        console.log('  Training plan saved to cloud');
         return true;
     } catch (error) { console.error('Error saving plan:', error); return false; }
 }
@@ -4913,7 +4654,7 @@ async function loadPlanFromCloud() {
     try {
     const { data, error } = await supabaseClient.from('training_plans').select('*').eq('user_id', USER_ID).eq('active', true).maybeSingle();
         if (error && error.code !== 'PGRST116') throw error;
-        console.log('ðŸ“¥ Loaded training plan from cloud');
+        console.log('  Loaded training plan from cloud');
         return data?.plan_data || null;
     } catch (error) { console.error('Error loading plan:', error); return null; }
 }
@@ -4927,7 +4668,7 @@ async function saveGarminToCloud(filename, fileData, analysis) {
         if (error) throw error;
         LAST_SYNC_TIME = new Date().toISOString();
         updateCloudSyncUI();
-        console.log('âœ… Garmin file saved to cloud');
+        console.log('  Garmin file saved to cloud');
         return true;
     } catch (error) { console.error('Error saving Garmin file:', error); return false; }
 }
@@ -4937,7 +4678,7 @@ async function loadGarminFromCloud() {
     try {
         const { data, error } = await supabaseClient.from('garmin_files').select('*').eq('user_id', USER_ID).order('uploaded_at', { ascending: false }).limit(10);
         if (error) throw error;
-        console.log(`ðŸ“¥ Loaded ${data.length} Garmin files from cloud`);
+        console.log(`  Loaded ${data.length} Garmin files from cloud`);
         return data || [];
     } catch (error) { console.error('Error loading Garmin files:', error); return []; }
 }
@@ -4945,7 +4686,7 @@ async function loadGarminFromCloud() {
 async function loadFromCloud() {
     if (!CLOUD_SYNC_ENABLED) return;
     try {
-        console.log('ðŸ“¥ Loading data from cloud...');
+        console.log('  Loading data from cloud...');
         const cloudWorkouts = await loadWorkoutsFromCloud();
         const localWorkouts = JSON.parse(localStorage.getItem('workouts') || '[]');
         const workoutMap = new Map();
@@ -4958,21 +4699,21 @@ async function loadFromCloud() {
         
         LAST_SYNC_TIME = new Date().toISOString();
         updateCloudSyncUI();
-        console.log('âœ… Cloud data loaded successfully');
+        console.log('  Cloud data loaded successfully');
     } catch (error) { console.error('Error loading from cloud:', error); }
 }
 
 async function syncNow() {
-    if (!CLOUD_SYNC_ENABLED) { showNotification('âŒ Cloud sync not available', 'error'); return; }
-    showNotification('ðŸ”„ Syncing...', 'info');
+    if (!CLOUD_SYNC_ENABLED) { showNotification('  Cloud sync not available', 'error'); return; }
+    showNotification('  Syncing...', 'info');
     try {
         const workouts = JSON.parse(localStorage.getItem('workouts') || '[]');
         for (const workout of workouts) { await saveWorkoutToCloud(workout); }
         const plan = JSON.parse(localStorage.getItem('training_plan') || 'null');
         if (plan) { await savePlanToCloud(plan); }
         await loadFromCloud();
-        showNotification('âœ… Sync complete!', 'success');
-    } catch (error) { console.error('Sync error:', error); showNotification('âŒ Sync failed', 'error'); }
+        showNotification('  Sync complete!', 'success');
+    } catch (error) { console.error('Sync error:', error); showNotification('  Sync failed', 'error'); }
 }
 
 function showSyncLog() { alert(`Last Sync: ${LAST_SYNC_TIME ? new Date(LAST_SYNC_TIME).toLocaleString() : 'Never'}\nUser ID: ${USER_ID}\nStatus: ${CLOUD_SYNC_ENABLED ? 'Connected' : 'Offline'}`); }
@@ -4983,12 +4724,12 @@ async function checkGarminFiles() {
         const garminFiles = await loadGarminFromCloud();
         const lastCheck = localStorage.getItem('last_garmin_check');
         if (!lastCheck && garminFiles.length > 0) {
-            showNotification(`ðŸ“Š ${garminFiles.length} Garmin file(s) available in cloud`, 'info');
+            showNotification(`  ${garminFiles.length} Garmin file(s) available in cloud`, 'info');
             localStorage.setItem('last_garmin_check', new Date().toISOString());
         } else if (lastCheck) {
             const newFiles = garminFiles.filter(f => new Date(f.uploaded_at) > new Date(lastCheck));
             if (newFiles.length > 0) {
-                showNotification(`ðŸƒ ${newFiles.length} new Garmin file(s) detected!`, 'info');
+                showNotification(`  ${newFiles.length} new Garmin file(s) detected!`, 'info');
                 localStorage.setItem('last_garmin_check', new Date().toISOString());
             }
         }
@@ -5008,7 +4749,7 @@ function renderWizardStep() {
     const container = document.getElementById('wizard-content');
     switch(aiWizardStep) {
         case 0:
-            container.innerHTML = `<h3>What's your primary goal?</h3><div class="chip-container"><div class="chip" onclick="selectGoal('strength')">ðŸ’ª Build Strength</div><div class="chip" onclick="selectGoal('muscle')">ðŸ‹ï¸ Build Muscle</div><div class="chip" onclick="selectGoal('health')">â¤ï¸ Health & Longevity</div><div class="chip" onclick="selectGoal('performance')">âš¡ Athletic Performance</div></div>`;
+            container.innerHTML = `<h3>What's your primary goal?</h3><div class="chip-container"><div class="chip" onclick="selectGoal('strength')">  Build Strength</div><div class="chip" onclick="selectGoal('muscle')">  Build Muscle</div><div class="chip" onclick="selectGoal('health')">  Health & Longevity</div><div class="chip" onclick="selectGoal('performance')">  Athletic Performance</div></div>`;
             break;
         case 1:
             container.innerHTML = `<h3>How many days per week can you train?</h3><input type="range" id="days-slider" min="3" max="6" value="5" oninput="document.getElementById('days-display').textContent = this.value"><div style="text-align:center; font-size:2em; margin:20px;"><span id="days-display">5</span> days/week</div><button class="btn btn-main" onclick="setDays()">Continue</button>`;
@@ -5017,7 +4758,7 @@ function renderWizardStep() {
             container.innerHTML = `<h3>Any injuries or concerns?</h3><textarea id="injuries" rows="4" placeholder="e.g., Previous shoulder injury, knee pain when squatting..."></textarea><button class="btn btn-main" onclick="setInjuries()">Continue</button>`;
             break;
         case 3:
-            container.innerHTML = `<h3>ðŸ§  Generating your personalized plan...</h3><div style="text-align:center; padding:40px;"><div class="loading" style="width:60px; height:60px; margin:20px auto;"></div><p>Analyzing profile with AI...</p></div>`;
+            container.innerHTML = `<h3>  Generating your personalized plan...</h3><div style="text-align:center; padding:40px;"><div class="loading" style="width:60px; height:60px; margin:20px auto;"></div><p>Analyzing profile with AI...</p></div>`;
             generateAIPlan();
             break;
     }
@@ -5038,11 +4779,11 @@ async function generateAIPlan() {
         const plan = JSON.parse(result.content[0].text.replace(/```json\n?/g, '').replace(/```/g, '').trim());
         localStorage.setItem('currentPlan', JSON.stringify(plan));
         if (CLOUD_SYNC_ENABLED) { await savePlanToCloud(plan); }
-        document.getElementById('wizard-content').innerHTML = `<h3>âœ… Plan Generated!</h3><div class="card"><h4>${plan.name}</h4><p><strong>Duration:</strong> ${plan.duration} weeks</p><p>${plan.guidance}</p></div><button class="btn btn-success" onclick="acceptPlan()">Start This Plan!</button>`;
+        document.getElementById('wizard-content').innerHTML = `<h3>  Plan Generated!</h3><div class="card"><h4>${plan.name}</h4><p><strong>Duration:</strong> ${plan.duration} weeks</p><p>${plan.guidance}</p></div><button class="btn btn-success" onclick="acceptPlan()">Start This Plan!</button>`;
     } catch (error) { console.error('Plan generation error:', error); alert('Failed to generate plan.'); }
 }
 
-function acceptPlan() { document.getElementById('ai-wizard-modal').classList.remove('active'); switchTab('plan'); renderPlanCalendar(); showNotification('ðŸŽ¯ New training plan activated!', 'success'); }
+function acceptPlan() { document.getElementById('ai-wizard-modal').classList.remove('active'); switchTab('plan'); renderPlanCalendar(); showNotification('  New training plan activated!', 'success'); }
 function closeAIWizard() { document.getElementById('ai-wizard-modal').classList.remove('active'); }
 
 // ==========================================================================
@@ -5082,7 +4823,7 @@ async function getAIDailyRecommendation(garminData) {
 function showDailyNotification(rec) {
     const div = document.createElement('div');
     div.className = 'daily-notification';
-    div.innerHTML = `<div class="notification-header"><strong>ðŸ¤– AI Daily Update</strong><button onclick="this.parentElement.parentElement.remove()">âœ•</button></div><div class="notification-body"><p><strong>Recovery:</strong> ${rec.recoveryScore}/100</p><p>${rec.reasoning}</p></div><div class="notification-actions"><button class="btn-small btn-success" onclick="acceptAdjustments(${JSON.stringify(rec).replace(/"/g, '&quot;')})">Accept</button></div>`;
+    div.innerHTML = `<div class="notification-header"><strong>  AI Daily Update</strong><button onclick="this.parentElement.parentElement.remove()"> </button></div><div class="notification-body"><p><strong>Recovery:</strong> ${rec.recoveryScore}/100</p><p>${rec.reasoning}</p></div><div class="notification-actions"><button class="btn-small btn-success" onclick="acceptAdjustments(${JSON.stringify(rec).replace(/"/g, '&quot;')})">Accept</button></div>`;
     document.body.appendChild(div);
     setTimeout(() => { if (div.parentElement) div.remove(); }, 8000);
 }
@@ -5091,7 +4832,7 @@ function acceptAdjustments(rec) {
     const history = JSON.parse(localStorage.getItem('ai_adjustments') || '[]');
     history.unshift({ date: new Date().toISOString(), ...rec });
     localStorage.setItem('ai_adjustments', JSON.stringify(history.slice(0, 30)));
-    showNotification('âœ… Adjustments applied', 'success');
+    showNotification('  Adjustments applied', 'success');
 }
 
 function logAIDecision(decision) {
@@ -5107,13 +4848,13 @@ function logAIDecision(decision) {
 function exportAllData() {
     const data = { workouts: localStorage.getItem('completedWorkouts'), plan: localStorage.getItem('currentPlan'), exportDate: new Date().toISOString() };
     downloadBlob(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }), `nimble-shred-backup.json`);
-    showNotification('âœ… Backup downloaded', 'success');
+    showNotification('  Backup downloaded', 'success');
 }
 
 function exportWorkoutHistory() {
     const history = localStorage.getItem('completedWorkouts') || '[]';
     downloadBlob(new Blob([history], { type: 'application/json' }), `workout-history.json`);
-    showNotification('âœ… History downloaded', 'success');
+    showNotification('  History downloaded', 'success');
 }
 
 function downloadBlob(blob, filename) {
@@ -5484,7 +5225,7 @@ function renderChatMessages() {
         if (!emptyState) {
             container.innerHTML = `
                 <div class="chat-empty-state">
-                    <div class="emoji">ðŸ’¬</div>
+                    <div class="emoji"> </div>
                     <h3>Chat with AI Coach</h3>
                     <p>Ask me anything about your training, exercises, or recovery!</p>
                 </div>
@@ -5504,7 +5245,7 @@ function renderChatMessages() {
         
         let contextBadge = '';
         if (msg.context && chatSettings.contextAware) {
-            contextBadge = `<div class="message-context">ðŸ“ ${msg.context}</div>`;
+            contextBadge = `<div class="message-context">  ${msg.context}</div>`;
         }
         
         const timestamp = new Date(msg.timestamp).toLocaleTimeString('en-US', {
@@ -5670,33 +5411,33 @@ function notifyUserOfAIUpdate(updateType, changes) {
 
 <!-- AI CHAT INTERFACE -->
 <button id="ai-chat-button" onclick="toggleChatPanel()" title="Chat with AI Coach">
-    ðŸ¤–
+     
 </button>
 
 <div id="ai-chat-panel">
     <div class="chat-header">
         <h3>
-            <span>ðŸ¤–</span>
+            <span> </span>
             <span>AI Coach</span>
         </h3>
-        <button class="chat-minimize" onclick="toggleChatPanel()" title="Minimize">âˆ’</button>
+        <button class="chat-minimize" onclick="toggleChatPanel()" title="Minimize"> </button>
     </div>
     
     <div class="chat-quick-actions" id="quick-actions">
         <button class="quick-action-btn" onclick="quickActionModifyWorkout()">
-            âš¡ Modify Workout
+              Modify Workout
         </button>
         <button class="quick-action-btn" onclick="quickActionExplainChanges()">
-            ðŸ“Š Explain Changes
+              Explain Changes
         </button>
         <button class="quick-action-btn" onclick="quickActionAdjustPlan()">
-            ðŸ“… Adjust Plan
+              Adjust Plan
         </button>
     </div>
     
     <div class="chat-messages" id="chat-messages">
         <div class="chat-empty-state">
-            <div class="emoji">ðŸ’¬</div>
+            <div class="emoji"> </div>
             <h3>Chat with AI Coach</h3>
             <p>Ask me anything about your training, exercises, or recovery!</p>
         </div>
@@ -5710,7 +5451,7 @@ function notifyUserOfAIUpdate(updateType, changes) {
             rows="1"
         ></textarea>
         <button class="chat-send-btn" onclick="sendChatMessage()" title="Send message">
-            âž¤
+             
         </button>
     </div>
 </div>
