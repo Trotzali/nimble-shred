@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Load Supabase from backend proxy to bypass CDN blocks -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -140,6 +142,14 @@
             transform: scale(0.95);
         }
         .nav-icon { font-size: 1.4em; }
+        
+        /* Lucide Icon Sizing */
+        .nav-icon svg { width: 24px; height: 24px; }
+        .day-icon svg { width: 28px; height: 28px; }
+        .chip svg { width: 16px; height: 16px; margin-right: 4px; vertical-align: -2px; }
+        .btn svg { width: 18px; height: 18px; margin-right: 6px; vertical-align: -3px; }
+        .modal-header svg { width: 24px; height: 24px; margin-right: 8px; vertical-align: -4px; }
+        .day-check svg { width: 18px; height: 18px; }
         
         /* CHIPS */
         .chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
@@ -888,7 +898,7 @@
     <div style="font-size: 1.1em; margin-bottom: 15px;">
         Planned: <span id="today-workout"></span>
     </div>
-    <button class="btn btn-main" onclick="startTodaysWorkout()">â–¶ï¸ Start Workout</button>
+    <button class="btn btn-main" onclick="startTodaysWorkout()"><i data-lucide="play"></i> Start Workout</button>
 </div>
 
 <!-- COACH PAGE -->
@@ -922,14 +932,14 @@
         </div>
         
         <div class="chip-container">
-            <div class="chip" onclick="quickStartWorkout('push')">ðŸ’ª Push</div>
-            <div class="chip" onclick="quickStartWorkout('pull')">ðŸ‹ï¸ Pull</div>
-            <div class="chip" onclick="quickStartWorkout('legs')">ðŸ¦µ Legs</div>
-            <div class="chip" onclick="quickStartWorkout('full')">ðŸ”¥ Full</div>
-            <div class="chip" onclick="quickStartWorkout('nimble')">ðŸ§˜ Nimble</div>
+            <div class="chip" onclick="quickStartWorkout('push')"><i data-lucide="dumbbell"></i> Push</div>
+            <div class="chip" onclick="quickStartWorkout('pull')"><i data-lucide="trending-up"></i> Pull</div>
+            <div class="chip" onclick="quickStartWorkout('legs')"><i data-lucide="zap"></i> Legs</div>
+            <div class="chip" onclick="quickStartWorkout('full')"><i data-lucide="flame"></i> Full</div>
+            <div class="chip" onclick="quickStartWorkout('nimble')"><i data-lucide="wind"></i> Nimble</div>
         </div>
         <button class="btn btn-main" onclick="openCustomBuilder()">ðŸ› ï¸ Custom Workout Builder</button>
-        <button class="btn btn-action" onclick="generateRandomWorkout()">ðŸŽ² Random Workout</button>
+        <button class="btn btn-action" onclick="generateRandomWorkout()"><i data-lucide="shuffle"></i> Random Workout</button>
     </div>
     
     <div id="workout-interface" style="display:none;">
@@ -1296,7 +1306,7 @@
 <div class="modal-overlay" id="ai-wizard-modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>ðŸ¤– AI Plan Generator</h2>
+            <h2><i data-lucide="sparkles"></i> AI Plan Generator</h2>
             <button class="modal-close" onclick="closeAIWizard()">âœ•</button>
         </div>
         <div id="wizard-content"></div>
@@ -1306,19 +1316,19 @@
 <!-- NAVIGATION -->
 <div class="nav-bar">
     <button class="nav-btn active" onclick="switchTab('coach')">
-        <div class="nav-icon">ðŸ’ª</div>Coach
+        <div class="nav-icon"><i data-lucide="dumbbell"></i></div>Coach
     </button>
     <button class="nav-btn" onclick="switchTab('garmin')">
-        <div class="nav-icon">ðŸƒ</div>Recovery
+        <div class="nav-icon"><i data-lucide="activity"></i></div>Recovery
     </button>
     <button class="nav-btn" onclick="switchTab('plan')">
-        <div class="nav-icon">ðŸ“…</div>Plan
+        <div class="nav-icon"><i data-lucide="calendar"></i></div>Plan
     </button>
     <button class="nav-btn" onclick="switchTab('encyclopedia')">
-        <div class="nav-icon">ðŸ“š</div>Library
+        <div class="nav-icon"><i data-lucide="book-open"></i></div>Library
     </button>
     <button class="nav-btn" onclick="switchTab('settings')">
-        <div class="nav-icon">âš™ï¸</div>Settings
+        <div class="nav-icon"><i data-lucide="settings"></i></div>Settings
     </button>
 </div>
 
@@ -2741,6 +2751,14 @@ window.onload = () => {
     renderEncyclopedia();
     updateSettingsUI();
 };
+    
+    // Initialize Lucide icons
+    setTimeout(() => {
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+            console.log('✅ Lucide icons initialized');
+        }
+    }, 100);
 
 function loadAppState() {
     const saved = localStorage.getItem('nimbleState_v45');
@@ -2787,6 +2805,11 @@ function switchTab(tab) {
     if(tab === 'cardio') loadCardioHistory();
     if(tab === 'encyclopedia') renderEncyclopedia();
     if(tab === 'settings') updateSettingsUI();
+    
+    // Initialize Lucide icons after tab switch
+    setTimeout(() => {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }, 50);
 }
 
 // ========================================
@@ -3512,8 +3535,8 @@ function renderPlanCalendar() {
         bubble.className = `day-bubble workout-type-${type}`;
         bubble.onclick = () => editDay(idx);
         
-        const icon = {push:'ðŸ’ª',pull:'ðŸ‹ï¸',legs:'ðŸ¦µ',cardio:'ðŸš´',nimble:'ðŸ§˜',rest:'ðŸ˜´'}[type] || 'ðŸ”¥';
-        const completed = isDayCompleted(idx);
+        const iconMap = {push:'<i data-lucide="dumbbell"></i>',pull:'<i data-lucide="trending-up"></i>',legs:'<i data-lucide="zap"></i>',cardio:'<i data-lucide="heart"></i>',nimble:'<i data-lucide="wind"></i>',rest:'<i data-lucide="moon"></i>'};
+        const icon = iconMap[type] || '<i data-lucide="flame"></i>';
         
         bubble.innerHTML = `
             <div class="day-icon">${icon}</div>
@@ -3524,6 +3547,9 @@ function renderPlanCalendar() {
         
         grid.appendChild(bubble);
     });
+    
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') lucide.createIcons();
     
     updatePhaseDisplay();
     updateAiCoach(); // Update AI coach suggestions
@@ -3623,13 +3649,16 @@ function selectGoal(goal) {
     let html = '<div style="margin:15px 0;">';
     dayNames.forEach((name, idx) => {
         const type = appState.activePlan.schedule[idx];
-        const icon = {push:'ðŸ’ª',pull:'ðŸ‹ï¸',legs:'ðŸ¦µ',cardio:'ðŸš´',nimble:'ðŸ§˜',rest:'ðŸ˜´'}[type];
-        html += `<div style="padding:8px; background:#2c2c2c; margin:5px 0; border-radius:6px;">
+        const iconMap = {push:'<i data-lucide="dumbbell"></i>',pull:'<i data-lucide="trending-up"></i>',legs:'<i data-lucide="zap"></i>',cardio:'<i data-lucide="heart"></i>',nimble:'<i data-lucide="wind"></i>',rest:'<i data-lucide="moon"></i>'};
+        const icon = iconMap[type];
             ${icon} <strong>${name}:</strong> ${type}
         </div>`;
     });
     html += '</div>';
     preview.innerHTML = html;
+    
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') lucide.createIcons();
     
     setTimeout(() => showGenStep(3), 300);
 }
@@ -3665,8 +3694,11 @@ function updateTodaysBanner() {
     document.getElementById('today-date').textContent = 
         today.toLocaleDateString('en-US', {weekday:'long', month:'short', day:'numeric'});
     
-    const icon = {push:'ðŸ’ª',pull:'ðŸ‹ï¸',legs:'ðŸ¦µ',cardio:'ðŸš´',nimble:'ðŸ§˜'}[type];
-    document.getElementById('today-workout').textContent = `${icon} ${type.toUpperCase()}`;
+    const iconMap = {push:'<i data-lucide="dumbbell"></i>',pull:'<i data-lucide="trending-up"></i>',legs:'<i data-lucide="zap"></i>',cardio:'<i data-lucide="heart"></i>',nimble:'<i data-lucide="wind"></i>'};
+    const icon = iconMap[type];
+    
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') lucide.createIcons();
     
     banner.style.display = 'block';
 }
