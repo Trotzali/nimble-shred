@@ -896,7 +896,7 @@
 <!-- COACH PAGE -->
 <div class="container active" id="view-coach">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-        <h2>ðŸ’ª Workout Coach</h2>
+        <h2><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg> Workout Coach</h2>
         <span style="font-size: 0.75em; color: #666; font-family: monospace;">v51</span>
     </div>
     
@@ -930,7 +930,7 @@
             <div class="chip" onclick="quickStartWorkout('full')"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> Full</div>
             <div class="chip" onclick="quickStartWorkout('nimble')"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></svg> Nimble</div>
         </div>
-        <button class="btn btn-main" onclick="openCustomBuilder()">ðŸ› ï¸ Custom Workout Builder</button>
+        <button class="btn btn-main" onclick="openCustomBuilder()"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Custom Workout Builder</button>
         <button class="btn btn-action" onclick="generateRandomWorkout()"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/></svg> Random Workout</button>
     </div>
     
@@ -1339,7 +1339,7 @@
 <div class="modal-overlay" id="custom-builder-modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>ðŸ› ï¸ Custom Workout Builder</h2>
+            <h2><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Custom Workout Builder</h2>
             <button class="modal-close" onclick="closeCustomBuilder()">âœ•</button>
         </div>
         
@@ -3123,7 +3123,7 @@ function viewExerciseDetails(exerciseName) {
     if (youtubeUrl) {
         html += `<div style="text-align: center; margin-bottom: 20px;">
             <a href="${youtubeUrl}" target="_blank" class="btn btn-action" style="display: inline-block; width: auto; padding: 10px 20px;">
-                📺 Watch Tutorial on YouTube
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg> Watch Tutorial on YouTube
             </a>
         </div>`;
     }
@@ -3138,7 +3138,7 @@ function viewExerciseDetails(exerciseName) {
     // Add setup info if available
     if (exercise.setup && exercise.setup.arms !== 'N/A') {
         html += `<div class="card" style="background: rgba(0,0,0,0.3); margin-bottom: 15px;">
-            <h4 style="margin-top: 0;">⚙️ Setup (Torque F9)</h4>
+            <h4 style="margin-top: 0;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>️ Setup (Torque F9)</h4>
             <p><strong>Arms:</strong> ${exercise.setup.arms}</p>
             <p><strong>Pulleys:</strong> ${exercise.setup.pulleys}</p>
         </div>`;
@@ -3147,7 +3147,7 @@ function viewExerciseDetails(exerciseName) {
     // Add guide sections
     if (exercise.guide) {
         html += `<div class="card" style="background: rgba(0,0,0,0.3); margin-bottom: 15px;">
-            <h4 style="margin-top: 0;">📋 Preparation</h4>
+            <h4 style="margin-top: 0;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg> Preparation</h4>
             <ul style="margin: 10px 0; padding-left: 20px;">`;
         exercise.guide.prep.forEach(step => {
             html += `<li style="margin-bottom: 8px;">${step}</li>`;
@@ -3155,7 +3155,7 @@ function viewExerciseDetails(exerciseName) {
         html += `</ul></div>`;
         
         html += `<div class="card" style="background: rgba(0,0,0,0.3); margin-bottom: 15px;">
-            <h4 style="margin-top: 0;">💪 Execution</h4>
+            <h4 style="margin-top: 0;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg> Execution</h4>
             <ul style="margin: 10px 0; padding-left: 20px;">`;
         exercise.guide.exec.forEach(step => {
             html += `<li style="margin-bottom: 8px;">${step}</li>`;
@@ -3163,7 +3163,7 @@ function viewExerciseDetails(exerciseName) {
         html += `</ul></div>`;
         
         html += `<div class="card" style="background: rgba(0,0,0,0.3); margin-bottom: 15px;">
-            <h4 style="margin-top: 0;">💡 Pro Tips</h4>
+            <h4 style="margin-top: 0;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg> Pro Tips</h4>
             <ul style="margin: 10px 0; padding-left: 20px;">`;
         exercise.guide.tips.forEach(tip => {
             html += `<li style="margin-bottom: 8px;">${tip}</li>`;
@@ -3171,7 +3171,7 @@ function viewExerciseDetails(exerciseName) {
         html += `</ul></div>`;
         
         html += `<div class="card" style="background: rgba(0,0,0,0.3); margin-bottom: 15px;">
-            <h4 style="margin-top: 0;">✅ Benefits</h4>
+            <h4 style="margin-top: 0;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Benefits</h4>
             <ul style="margin: 10px 0; padding-left: 20px;">`;
         exercise.guide.benefits.forEach(benefit => {
             html += `<li style="margin-bottom: 8px;">${benefit}</li>`;
@@ -3180,7 +3180,7 @@ function viewExerciseDetails(exerciseName) {
         
         if (exercise.guide.muscles && exercise.guide.muscles.length > 0) {
             html += `<div class="card" style="background: rgba(0,0,0,0.3);">
-                <h4 style="margin-top: 0;">🎯 Target Muscles</h4>
+                <h4 style="margin-top: 0;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Target Muscles</h4>
                 <p>${exercise.guide.muscles.join(', ')}</p>
             </div>`;
         }
