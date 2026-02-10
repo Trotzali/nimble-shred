@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#1e1e1e">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Nimble Shred v63 - AI Edition</title>
+    <title>Nimble Shred AI Edition - Cloud Sync</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Load Supabase from backend proxy to bypass CDN blocks -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -75,10 +75,6 @@
             border: 1px solid #444; border-radius: 6px; color: #fff; 
             font-size: 16px; margin: 5px 0;
         }
-        #wizard-chat-input {
-            width: 100%; margin: 0; min-height: 80px; resize: vertical;
-            line-height: 1.4; font-size: 0.95em;
-        }
         input:focus, select:focus, textarea:focus { 
             border-color: var(--sec); outline: none; 
         }
@@ -100,7 +96,8 @@
             gap: 3px; cursor: pointer; padding: 5px; transition: 0.2s; flex: 1;
         }
         .nav-btn.active { color: var(--sec); }
-        .nav-icon { font-size: 1.4em; }
+        .nav-icon { font-size: 1.4em; display: flex; align-items: center; justify-content: center; height: 24px; }
+        .nav-icon svg { flex-shrink: 0; }
         
         /* CHIPS */
         .chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
@@ -148,7 +145,8 @@
             padding: 8px; position: relative; transition: all 0.3s;
         }
         .day-bubble:hover { transform: translateY(-2px); }
-        .day-bubble .day-icon { font-size: 1.8em; margin-bottom: 4px; }
+        .day-bubble .day-icon { font-size: 1.8em; margin-bottom: 4px; display: flex; align-items: center; justify-content: center; }
+        .day-bubble .day-icon svg { width: 26px; height: 26px; }
         .day-bubble .day-letter { font-weight: bold; font-size: 0.75em; }
         .day-bubble .day-type { font-size: 0.65em; color: #aaa; }
         .day-bubble .day-check { 
@@ -780,6 +778,21 @@
         
         /* Mobile Responsive */
         @media (max-width: 768px) {
+            .calendar-grid {
+                gap: 4px;
+            }
+            .day-bubble {
+                padding: 4px 2px;
+                border-radius: 8px;
+                aspect-ratio: auto;
+                min-height: 60px;
+            }
+            .day-bubble .day-icon svg { width: 20px; height: 20px; }
+            .day-bubble .day-icon { margin-bottom: 2px; }
+            .day-bubble .day-letter { font-size: 0.7em; }
+            .day-bubble .day-type { font-size: 0.55em; }
+            .day-bubble .day-check svg { width: 12px; height: 12px; }
+            
             #ai-chat-button {
                 bottom: 80px;
                 right: 15px;
@@ -845,16 +858,19 @@
 
 <!-- TODAY'S BANNER -->
 <div id="todays-banner" class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: none;">
-    <h3 style="margin-bottom: 10px;">📅 <span id="today-date"></span></h3>
+    <h3 style="margin-bottom: 10px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg> <span id="today-date"></span></h3>
     <div style="font-size: 1.1em; margin-bottom: 15px;">
         Planned: <span id="today-workout"></span>
     </div>
-    <button class="btn btn-main" onclick="startTodaysWorkout()">▶️ Start Workout</button>
+    <button class="btn btn-main" onclick="startTodaysWorkout()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><polygon points="5 3 19 12 5 21 5 3"/></svg> Start Workout</button>
 </div>
 
 <!-- COACH PAGE -->
 <div class="container active" id="view-coach">
-    <h2 style="margin-bottom: 15px;">💪 Workout Coach <span style="color: var(--sec); font-family: monospace;">v63</span></h2>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
+        <span style="font-size: 0.75em; color: #666; font-family: monospace;">v52</span>
+    </div>
     
     <div class="card">
         <h3>Quick Start</h3>
@@ -880,14 +896,14 @@
         </div>
         
         <div class="chip-container">
-            <div class="chip" onclick="quickStartWorkout('push')">💪 Push</div>
-            <div class="chip" onclick="quickStartWorkout('pull')">🏋️ Pull</div>
-            <div class="chip" onclick="quickStartWorkout('legs')">🦵 Legs</div>
-            <div class="chip" onclick="quickStartWorkout('full')">🔥 Full</div>
-            <div class="chip" onclick="quickStartWorkout('nimble')">🧘 Nimble</div>
+            <div class="chip" onclick="quickStartWorkout('push')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Push</div>
+            <div class="chip" onclick="quickStartWorkout('pull')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M12 3v15"/><path d="m6 8 6-6 6 6"/><path d="M5 21h14"/></svg> Pull</div>
+            <div class="chip" onclick="quickStartWorkout('legs')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M15 4v4l-2 4-1 4-2 5"/><path d="M9 4v4l2 4 1 4 2 5"/><path d="M8 21h3"/><path d="M13 21h3"/></svg> Legs</div>
+            <div class="chip" onclick="quickStartWorkout('full')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> Full</div>
+            <div class="chip" onclick="quickStartWorkout('nimble')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><circle cx="12" cy="4" r="2"/><path d="M8 20h8"/><path d="M12 8v5"/><path d="M7 14c0 0 2-1 5-1s5 1 5 1"/><path d="M5 17c0 0 3-2 7-2s7 2 7 2"/></svg> Nimble</div>
         </div>
-        <button class="btn btn-main" onclick="openCustomBuilder()">🛠️ Custom Workout Builder</button>
-        <button class="btn btn-action" onclick="generateRandomWorkout()">🎲 Random Workout</button>
+        <button class="btn btn-main" onclick="openCustomBuilder()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Custom Workout Builder</button>
+        <button class="btn btn-action" onclick="generateRandomWorkout()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="8" cy="8" r="1" fill="currentColor"/><circle cx="16" cy="8" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="8" cy="16" r="1" fill="currentColor"/><circle cx="16" cy="16" r="1" fill="currentColor"/></svg> Random Workout</button>
     </div>
     
     <div id="workout-interface" style="display:none;">
@@ -901,13 +917,13 @@
 
 <!-- PLAN PAGE -->
 <div class="container" id="view-plan">
-    <h2>📅 Training Plan</h2>
+    <h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg> Training Plan</h2>
     
     <div class="card" style="background: linear-gradient(135deg, rgba(187,134,252,0.1), rgba(3,218,198,0.1)); border: 2px solid var(--primary);">
-        <h3>🤖 AI-Powered Planning</h3>
+        <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg> AI-Powered Planning</h3>
         <p style="margin-bottom: 15px; color: #888;">Let AI create a personalized training plan based on your goals, schedule, and recovery data.</p>
         <button class="btn btn-main" onclick="startAIPlanWizard()">
-            ✨ Generate AI Plan
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> Generate AI Plan
         </button>
     </div>
     
@@ -919,49 +935,44 @@
                     Adherence: <span id="adherence-display">0/6</span>
                 </div>
             </div>
-            <button class="btn-small btn-action" onclick="openPlanGenerator()">🔄 New Plan</button>
+            <button class="btn-small btn-action" onclick="openPlanGenerator()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg> New Plan</button>
         </div>
         <div class="calendar-grid" id="week-grid"></div>
-        <button class="btn btn-action" onclick="toggleFullPlanView()" style="width:100%; margin-top:12px;">
-            📋 View Full Plan Details
-        </button>
     </div>
-    
-    <div id="full-plan-view" style="display:none;"></div>
     
     <div id="ai-coach-suggestions"></div>
 </div>
 
 <!-- CARDIO PAGE -->
 <div class="container" id="view-cardio">
-    <h2>🚴 Cardio Tracking</h2>
+    <h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg> Cardio Tracking</h2>
     
     <div class="card">
-        <h3>📍 Live GPS Tracking</h3>
+        <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Live GPS Tracking</h3>
         <p class="text-muted" style="margin-bottom:10px;">Track your run or bike ride with live GPS</p>
         <select id="gps-activity-type" style="margin-bottom:10px;">
-            <option value="run">🏃 Running</option>
-            <option value="bike">🚴 Cycling</option>
-            <option value="walk">🚶 Walking</option>
+            <option value="run"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><circle cx="12" cy="4" r="2"/><path d="m7 21 3-7"/><path d="M10 14h4l3 7"/><path d="m8 10 4-2 4 2"/></svg> Running</option>
+            <option value="bike"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg> Cycling</option>
+            <option value="walk"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><circle cx="12" cy="4" r="2"/><path d="M14 20h-4l-1-5h6z"/><path d="M12 8v4"/></svg> Walking</option>
         </select>
-        <button class="btn btn-success" onclick="startGpsTracking()">📍 Start GPS Tracking</button>
+        <button class="btn btn-success" onclick="startGpsTracking()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Start GPS Tracking</button>
     </div>
     
     <div class="card">
         <h3>Quick Log Cardio</h3>
         <label>Type:</label>
         <select id="cardio-type">
-            <option value="run">🏃 Run</option>
-            <option value="bike">🚴 Bike</option>
-            <option value="swim">🏊 Swim</option>
-            <option value="walk">🚶 Walk</option>
-            <option value="row">🚣 Row</option>
+            <option value="run"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><circle cx="12" cy="4" r="2"/><path d="m7 21 3-7"/><path d="M10 14h4l3 7"/><path d="m8 10 4-2 4 2"/></svg> Run</option>
+            <option value="bike"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg> Bike</option>
+            <option value="swim"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M2 20c1.5-1 3.5-1 5 0s3.5 1 5 0 3.5-1 5 0"/><path d="M12 8V4"/><circle cx="12" cy="3" r="1"/><path d="M8 12c2-2 4-4 4-4l4 4"/></svg> Swim</option>
+            <option value="walk"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><circle cx="12" cy="4" r="2"/><path d="M14 20h-4l-1-5h6z"/><path d="M12 8v4"/></svg> Walk</option>
+            <option value="row"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M2 20c1.5-1 3.5-1 5 0s3.5 1 5 0 3.5-1 5 0"/><path d="M4 16l8-8 8 8"/><circle cx="12" cy="7" r="1"/></svg> Row</option>
         </select>
         <label>Duration (minutes):</label>
         <input type="number" id="cardio-duration" value="30" min="5">
         <label>Distance (km) - optional:</label>
         <input type="number" id="cardio-distance" placeholder="e.g. 5.5" step="0.1">
-        <button class="btn btn-main" onclick="logCardioSession()">💾 Log Cardio</button>
+        <button class="btn btn-main" onclick="logCardioSession()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Log Cardio</button>
     </div>
     
     <div class="card">
@@ -972,10 +983,10 @@
 
 <!-- SETTINGS PAGE -->
 <div class="container" id="view-settings">
-    <h2>⚙️ Settings</h2>
+    <h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg> Settings</h2>
     
     <div class="card" style="background: linear-gradient(135deg, rgba(0,124,195,0.1), rgba(0,212,255,0.1)); border: 2px solid #007CC3;">
-        <h3>☁️ Cloud Sync</h3>
+        <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg> Cloud Sync</h3>
         <p style="font-size: 0.9em; color: #888; margin-bottom: 15px;">
             Automatic cloud backup for workouts, plans, and Garmin data across all your devices.
         </p>
@@ -988,13 +999,13 @@
       <div id="cloud-sync-info" style="margin-top: 15px;">
             <p><strong>Last sync:</strong> <span id="last-sync-time">Never</span></p>
             <div style="margin-top: 10px;">
-                <button class="btn btn-action" onclick="syncNow()">🔄 Sync Now</button>
-                <button class="btn btn-small" onclick="showSyncLog()">📋 View Log</button>
+                <button class="btn btn-action" onclick="syncNow()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg> Sync Now</button>
+                <button class="btn btn-small" onclick="showSyncLog()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg> View Log</button>
             </div>
             
             <div style="margin-top: 30px; padding-top: 30px; border-top: 1px solid #333;">
                 <h3 style="color: var(--sec); margin-bottom: 15px;">
-                    🏃 Garmin Auto-Sync
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><circle cx="12" cy="4" r="2"/><path d="m7 21 3-7"/><path d="M10 14h4l3 7"/><path d="m8 10 4-2 4 2"/></svg> Garmin Auto-Sync
                 </h3>
                 <p style="color: #888; font-size: 14px; margin-bottom: 20px;">
                     Automatically sync your Garmin activities, heart rate, and training data
@@ -1003,7 +1014,7 @@
                 <div style="background: rgba(187, 134, 252, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                         <span style="font-weight: bold;">Status:</span>
-                        <span id="garmin-connection-status" style="font-weight: bold;">❌ Not Connected</span>
+                        <span id="garmin-connection-status" style="font-weight: bold;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg> Not Connected</span>
                     </div>
                     <div id="garmin-last-sync" style="font-size: 12px; color: #888; display: none;"></div>
                 </div>
@@ -1014,7 +1025,7 @@
                         class="btn btn-action" 
                         onclick="connectGarmin()"
                         style="flex: 1; min-width: 150px;">
-                        🔗 Connect Garmin
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Connect Garmin
                     </button>
                     
                     <button 
@@ -1022,7 +1033,7 @@
                         class="btn btn-action" 
                         onclick="syncNow()"
                         style="flex: 1; min-width: 150px; display: none;">
-                        🔄 Sync Now
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg> Sync Now
                     </button>
                     
                     <button 
@@ -1030,12 +1041,12 @@
                         class="btn" 
                         onclick="disconnectGarmin()"
                         style="flex: 1; min-width: 150px; display: none; background: var(--danger);">
-                        ❌ Disconnect
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg> Disconnect
                     </button>
                 </div>
                 
                 <div style="margin-top: 15px; padding: 12px; background: rgba(3, 218, 198, 0.1); border-radius: 6px; font-size: 13px; color: #888;">
-                    <strong style="color: var(--sec);">💡 How it works:</strong>
+                    <strong style="color: var(--sec);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.2 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg> How it works:</strong>
                     <ul style="margin: 8px 0 0 20px; padding: 0;">
                         <li>Click "Connect Garmin" to authorize access</li>
                         <li>Activities sync automatically every hour</li>
@@ -1046,13 +1057,13 @@
             </div>
         </div>
         <div style="margin-top: 15px; padding: 10px; background: rgba(3, 218, 198, 0.1); border-radius: 6px; font-size: 0.85em; border-left: 3px solid var(--sec);">
-            <strong>✅ Auto-Sync Enabled:</strong> All data automatically backed up to cloud after each workout.
+            <strong><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Auto-Sync Enabled:</strong> All data automatically backed up to cloud after each workout.
         </div>
     </div>
     
     <div class="card">
-        <h3>🤖 AI Coach</h3>
-        <button class="btn btn-main" onclick="startAIPlanWizard()">✨ Generate New AI Plan</button>
+        <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg> AI Coach</h3>
+        <button class="btn btn-main" onclick="startAIPlanWizard()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> Generate New AI Plan</button>
         
         <div style="margin-top: 15px;">
             <label>Chat History Duration:</label>
@@ -1088,27 +1099,27 @@
         </div>
         
         <div style="margin-top: 15px; display: flex; gap: 10px;">
-            <button class="btn btn-action btn-small" onclick="toggleChatPanel()">💬 Open Chat</button>
-            <button class="btn btn-danger btn-small" onclick="clearChatHistory()">🗑️ Clear History</button>
+            <button class="btn btn-action btn-small" onclick="toggleChatPanel()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Open Chat</button>
+            <button class="btn btn-danger btn-small" onclick="clearChatHistory()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg> Clear History</button>
         </div>
     </div>
     
     <div class="card">
-        <h3>💾 Export & Backup</h3>
+        <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Export & Backup</h3>
         <p style="font-size: 0.9em; color: #888; margin-bottom: 10px;">
             Download backups of your data (works even if Drive isn't connected)
         </p>
-        <button class="btn btn-action" onclick="exportAllData()">📦 Export All Data</button>
-        <button class="btn btn-action" onclick="exportWorkoutHistory()">📊 Export Workout History</button>
+        <button class="btn btn-action" onclick="exportAllData()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg> Export All Data</button>
+        <button class="btn btn-action" onclick="exportWorkoutHistory()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg> Export Workout History</button>
     </div>
     
     <div class="card">
-        <h3>🏋️ Equipment Available</h3>
+        <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Equipment Available</h3>
         <div id="equipment-presets"></div>
     </div>
     
     <div class="card">
-        <h3>🔊 Voice Coach</h3>
+        <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Voice Coach</h3>
         <label>
             <input type="checkbox" id="voice-enabled" checked onchange="saveVoiceSettings()"> 
             Enable Voice
@@ -1120,16 +1131,16 @@
             <option value="standard" selected>Standard</option>
             <option value="motivational">Motivational</option>
         </select>
-        <button class="btn btn-action" onclick="testVoice()">🎵 Test Voice</button>
+        <button class="btn btn-action" onclick="testVoice()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Test Voice</button>
     </div>
     
     <div class="card">
-        <h3>💾 Backup Exercise Images</h3>
+        <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Backup Exercise Images</h3>
         <p class="text-muted" style="margin-bottom:10px;">
             Export your saved images to a file, so you can restore them if you clear browser data.
         </p>
-        <button class="btn btn-success" onclick="exportImages()">📥 Export Images</button>
-        <button class="btn btn-action" onclick="document.getElementById('import-file').click()">📤 Import Images</button>
+        <button class="btn btn-success" onclick="exportImages()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg> Export Images</button>
+        <button class="btn btn-action" onclick="document.getElementById('import-file').click()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg> Import Images</button>
         <input type="file" id="import-file" accept=".json" onchange="importImages(event)" style="display:none;">
         <p class="text-muted" style="margin-top:10px; font-size:0.75em;">
             <strong>Tip:</strong> Store the exported file in your GitHub repo so you never lose your images!
@@ -1140,7 +1151,7 @@
 
 <!-- ENCYCLOPEDIA PAGE -->
 <div class="container" id="view-encyclopedia">
-    <h2>📚 Exercise Encyclopedia</h2>
+    <h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Exercise Encyclopedia</h2>
     
     <div class="card">
         <input type="text" id="encyclopedia-search" placeholder="Search exercises..." 
@@ -1164,12 +1175,12 @@
             <div class="chip" onclick="filterEncyclopedia('Bodyweight')">Bodyweight</div>
         </div>
         
-        <label style="margin-top: 10px; display: block; color: #9b59b6; font-weight: bold;">💜 40+ Friendly:</label>
+        <label style="margin-top: 10px; display: block; color: #9b59b6; font-weight: bold;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" fill="currentColor" opacity="0.3"/></svg> 40+ Friendly:</label>
         <div class="chip-container">
-            <div class="chip" onclick="filterEncyclopedia('Mobility')" style="border-color: #9b59b6;">🧘 Mobility (36)</div>
-            <div class="chip" onclick="filterEncyclopedia('Nimble')" style="border-color: #9b59b6;">🤸 Nimble (25)</div>
-            <div class="chip" onclick="filterEncyclopedia('Calisthenics')" style="border-color: #9b59b6;">💪 Calisthenics (41)</div>
-            <div class="chip" onclick="filterEncyclopedia('Plyo')" style="border-color: #FF9800;">⚡ Plyometric</div>
+            <div class="chip" onclick="filterEncyclopedia('Mobility')" style="border-color: #9b59b6;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><circle cx="12" cy="4" r="2"/><path d="M8 20h8"/><path d="M12 8v5"/><path d="M7 14c0 0 2-1 5-1s5 1 5 1"/><path d="M5 17c0 0 3-2 7-2s7 2 7 2"/></svg> Mobility (36)</div>
+            <div class="chip" onclick="filterEncyclopedia('Nimble')" style="border-color: #9b59b6;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><circle cx="12" cy="4" r="2"/><path d="M4 20l4-8 4 4 4-4 4 8"/></svg> Nimble (25)</div>
+            <div class="chip" onclick="filterEncyclopedia('Calisthenics')" style="border-color: #9b59b6;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Calisthenics (41)</div>
+            <div class="chip" onclick="filterEncyclopedia('Plyo')" style="border-color: #FF9800;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Plyometric</div>
         </div>
     </div>
     
@@ -1180,13 +1191,13 @@
 <div class="container" id="view-garmin">
     <div class="card" style="background: linear-gradient(135deg, rgba(0,124,195,0.1), rgba(0,212,255,0.1)); border: 2px solid #007CC3;">
         <h2 style="font-size: 2em; margin-bottom: 10px; background: linear-gradient(135deg, #00ff9d, #00d4ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-            🏃 Garmin AI Recovery Coach
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/></svg> Garmin AI Recovery Coach
         </h2>
         <p style="color: #888; margin-bottom: 30px;">Upload your Garmin data for AI-powered recovery analysis</p>
         
         <!-- UPLOAD ZONE -->
         <div class="drop-zone" id="dropZone">
-            <div style="font-size: 3em; margin-bottom: 10px;">📊</div>
+            <div style="margin-bottom: 10px;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg></div>
             <h3>Drop Garmin CSV Files Here</h3>
             <p style="color: #888; margin-top: 10px;">or click to browse</p>
             <input type="file" id="fileInput" multiple accept=".csv" style="display: none;">
@@ -1195,12 +1206,12 @@
         <div id="fileList" class="file-list"></div>
         
         <button class="btn btn-main" id="analyzeBtn" style="display: none;">
-            🤖 Analyze with AI Coach
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg> Analyze with AI Coach
         </button>
         
         <!-- HOW TO GET DATA -->
         <div style="margin-top: 30px; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 12px;">
-            <h3 style="color: #00d4ff; margin-bottom: 15px;">📥 How to Export from Garmin Connect</h3>
+            <h3 style="color: #00d4ff; margin-bottom: 15px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg> How to Export from Garmin Connect</h3>
             <ol style="line-height: 2; padding-left: 20px;">
                 <li>Go to <a href="https://connect.garmin.com" target="_blank" style="color: #00ff9d;">connect.garmin.com</a></li>
                 <li>Sign in to your account</li>
@@ -1229,13 +1240,13 @@
         
         <!-- METRICS -->
         <div class="card">
-            <h3 style="margin-bottom: 20px;">📊 Key Metrics</h3>
+            <h3 style="margin-bottom: 20px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg> Key Metrics</h3>
             <div class="metric-grid" id="metricsGrid"></div>
         </div>
         
         <!-- AI RECOMMENDATIONS -->
         <div class="card">
-            <h3 style="margin-bottom: 20px;">🤖 AI Coach Recommendations</h3>
+            <h3 style="margin-bottom: 20px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg> AI Coach Recommendations</h3>
             <div id="aiRecommendations"></div>
         </div>
         
@@ -1243,54 +1254,45 @@
         <div class="card">
             <details>
                 <summary style="cursor: pointer; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                    🔍 View Raw Garmin Data
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> View Raw Garmin Data
                 </summary>
                 <div id="rawData" style="margin-top: 15px; font-family: monospace; font-size: 0.85em; background: #000; padding: 15px; border-radius: 8px; overflow-x: auto; max-height: 400px; overflow-y: auto;"></div>
             </details>
         </div>
         
         <button class="btn btn-action" onclick="resetGarminUpload()">
-            🔄 Upload New Data
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg> Upload New Data
         </button>
     </div>
 </div>
 
 <!-- AI PLAN WIZARD MODAL -->
 <div class="modal-overlay" id="ai-wizard-modal">
-    <div class="modal-content" style="max-height:90vh; display:flex; flex-direction:column; overflow:visible;">
+    <div class="modal-content">
         <div class="modal-header">
-            <h2>🤖 AI Plan Generator</h2>
+            <h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg> AI Plan Generator</h2>
             <button class="modal-close" onclick="closeAIWizard()">✕</button>
         </div>
-        <div id="wizard-chat-messages" style="flex:1; overflow-y:auto; padding:10px; min-height:300px; max-height:55vh;"></div>
-        <div id="wizard-chips" style="padding:8px 10px;"></div>
-        <div style="padding:10px; border-top:1px solid #333;">
-            <textarea id="wizard-chat-input" rows="4" placeholder="Or type your own answer..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendWizardMessage();}"></textarea>
-            <button class="btn btn-main" onclick="sendWizardMessage()" style="padding:8px 20px; margin-top:6px; float:right; font-size:0.85em;">Send ➤</button>
-            <div style="clear:both;"></div>
-        </div>
-        <div id="wizard-actions" style="padding:8px 10px; display:none;">
-            <button class="btn btn-success" onclick="generateFromChat()" style="width:100%;">✨ Generate My Plan</button>
-        </div>
+        <div id="wizard-content"></div>
     </div>
 </div>
 
 <!-- NAVIGATION -->
 <div class="nav-bar">
     <button class="nav-btn active" onclick="switchTab('coach')">
-        <div class="nav-icon">💪</div>Coach
+        <div class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg></div>Coach
     </button>
     <button class="nav-btn" onclick="switchTab('garmin')">
-        <div class="nav-icon">🏃</div>Recovery
+        <div class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/></svg></div>Recovery
     </button>
     <button class="nav-btn" onclick="switchTab('plan')">
-        <div class="nav-icon">📅</div>Plan
+        <div class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg></div>Plan
     </button>
     <button class="nav-btn" onclick="switchTab('encyclopedia')">
-        <div class="nav-icon">📚</div>Library
+        <div class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>Library
     </button>
     <button class="nav-btn" onclick="switchTab('settings')">
-        <div class="nav-icon">⚙️</div>Settings
+        <div class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></div>Settings
     </button>
 </div>
 
@@ -1298,12 +1300,12 @@
 <div class="modal-overlay" id="custom-builder-modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>🛠️ Custom Workout Builder</h2>
+            <h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Custom Workout Builder</h2>
             <button class="modal-close" onclick="closeCustomBuilder()">✕</button>
         </div>
         
         <div style="margin-bottom: 15px;">
-            <label>Number of Exercises: <span id="exercise-count-display">6</span></label>
+            <label>Number of Exercises: <span id="builder-count-display">6</span></label>
             <input type="range" id="exercise-count-slider" min="3" max="10" value="6" 
                    oninput="updateExerciseCount(this.value)">
         </div>
@@ -1332,12 +1334,12 @@
                 <div class="chip" onclick="filterBuilder('Bodyweight')">Bodyweight</div>
             </div>
             
-            <label style="margin-top: 10px; display: block; color: #9b59b6; font-weight: bold;">💜 40+ Friendly:</label>
+            <label style="margin-top: 10px; display: block; color: #9b59b6; font-weight: bold;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" fill="currentColor" opacity="0.3"/></svg> 40+ Friendly:</label>
             <div class="chip-container">
-                <div class="chip" onclick="filterBuilder('Mobility')" style="border-color: #9b59b6;">🧘 Mobility (36)</div>
-                <div class="chip" onclick="filterBuilder('Nimble')" style="border-color: #9b59b6;">🤸 Nimble (25)</div>
-                <div class="chip" onclick="filterBuilder('Calisthenics')" style="border-color: #9b59b6;">💪 Calisthenics (41)</div>
-                <div class="chip" onclick="filterBuilder('Plyo')" style="border-color: #FF9800;">⚡ Plyometric</div>
+                <div class="chip" onclick="filterBuilder('Mobility')" style="border-color: #9b59b6;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><circle cx="12" cy="4" r="2"/><path d="M8 20h8"/><path d="M12 8v5"/><path d="M7 14c0 0 2-1 5-1s5 1 5 1"/><path d="M5 17c0 0 3-2 7-2s7 2 7 2"/></svg> Mobility (36)</div>
+                <div class="chip" onclick="filterBuilder('Nimble')" style="border-color: #9b59b6;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><circle cx="12" cy="4" r="2"/><path d="M4 20l4-8 4 4 4-4 4 8"/></svg> Nimble (25)</div>
+                <div class="chip" onclick="filterBuilder('Calisthenics')" style="border-color: #9b59b6;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Calisthenics (41)</div>
+                <div class="chip" onclick="filterBuilder('Plyo')" style="border-color: #FF9800;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Plyometric</div>
             </div>
         </div>
         
@@ -1346,7 +1348,7 @@
         <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #333;">
             <p class="text-muted">Selected: <span id="selected-count">0</span> exercises</p>
             <button class="btn btn-main" onclick="startCustomWorkout()">
-                ▶️ Start Custom Workout
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><polygon points="5 3 19 12 5 21 5 3"/></svg> Start Custom Workout
             </button>
         </div>
     </div>
@@ -1367,7 +1369,7 @@
 <div class="modal-overlay" id="gps-tracking-modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>📍 GPS Tracking</h2>
+            <h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> GPS Tracking</h2>
             <button class="modal-close" onclick="stopGpsTracking()">✕ Stop</button>
         </div>
         <div id="gps-tracking-content">
@@ -1389,7 +1391,7 @@
                 <canvas id="gps-map-canvas" width="600" height="300"></canvas>
             </div>
             <div style="text-align:center; margin-top:15px;">
-                <button class="btn btn-success" onclick="saveGpsRoute()">💾 Save Route</button>
+                <button class="btn btn-success" onclick="saveGpsRoute()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save Route</button>
             </div>
         </div>
     </div>
@@ -1399,7 +1401,7 @@
 <div class="modal-overlay" id="warmup-modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>🔥 Warm-up Sequence</h2>
+            <h2><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> Warm-up Sequence</h2>
             <button class="modal-close" onclick="skipWarmup()">Skip</button>
         </div>
         <div id="warmup-content">
@@ -1441,22 +1443,59 @@
             <h3>Training Focus</h3>
             <p class="text-muted">Balanced approach for sustainable fitness</p>
             <div class="chip-container">
-                <div class="chip" onclick="selectGoal('balanced')">⚖️ Balanced Performance</div>
-                <div class="chip" onclick="selectGoal('vitality')">🧘 Health & Vitality</div>
-                <div class="chip" onclick="selectGoal('functional')">🎯 Functional Fitness</div>
+                <div class="chip" onclick="selectGoal('balanced')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg> Balanced Performance</div>
+                <div class="chip" onclick="selectGoal('vitality')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><circle cx="12" cy="4" r="2"/><path d="M8 20h8"/><path d="M12 8v5"/><path d="M7 14c0 0 2-1 5-1s5 1 5 1"/><path d="M5 17c0 0 3-2 7-2s7 2 7 2"/></svg> Health & Vitality</div>
+                <div class="chip" onclick="selectGoal('functional')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Functional Fitness</div>
             </div>
         </div>
         
         <div id="generator-step-3" style="display:none;">
-            <h3>✅ Plan Generated!</h3>
+            <h3><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Plan Generated!</h3>
             <div id="plan-preview"></div>
             <button class="btn btn-main" onclick="acceptPlan()">Accept & Start</button>
-            <button class="btn btn-action" onclick="regeneratePlan()">🔄 Regenerate</button>
+            <button class="btn btn-action" onclick="regeneratePlan()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg> Regenerate</button>
         </div>
     </div>
 </div>
 
 <script>
+
+// ========================================
+// SVG ICON CONSTANTS (Professional Icons)
+// ========================================
+const IC = {
+    push: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg>',
+    pull: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v15"/><path d="m6 8 6-6 6 6"/><path d="M5 21h14"/></svg>',
+    legs: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4v4l-2 4-1 4-2 5"/><path d="M9 4v4l2 4 1 4 2 5"/><path d="M8 21h3"/><path d="M13 21h3"/></svg>',
+    cardio: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>',
+    nimble: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="2"/><path d="M8 20h8"/><path d="M12 8v5"/><path d="M7 14c0 0 2-1 5-1s5 1 5 1"/><path d="M5 17c0 0 3-2 7-2s7 2 7 2"/></svg>',
+    rest: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h20"/><path d="M2 12c2-4 6-4 10 0 4 4 8 4 10 0"/><path d="M2 20h20"/></svg>',
+    fire: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>',
+    run: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="2"/><path d="m7 21 3-7"/><path d="M10 14h4l3 7"/><path d="m8 10 4-2 4 2"/></svg>',
+    swim: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20c1.5-1 3.5-1 5 0s3.5 1 5 0 3.5-1 5 0"/><path d="M12 8V4"/><circle cx="12" cy="3" r="1"/><path d="M8 12c2-2 4-4 4-4l4 4"/></svg>',
+    walk: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="2"/><path d="M14 20h-4l-1-5h6z"/><path d="M12 8v4"/></svg>',
+    row: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20c1.5-1 3.5-1 5 0s3.5 1 5 0 3.5-1 5 0"/><path d="M4 16l8-8 8 8"/><circle cx="12" cy="7" r="1"/></svg>',
+    bike: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>',
+    check: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+    cross: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>',
+    robot: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>',
+    target: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+    warn: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>',
+    stop: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="8" x2="16" y1="12" y2="12"/></svg>',
+    brain: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>',
+    refresh: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>',
+    bulb: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.2 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>',
+    pin: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+    chat: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    doc: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+    chart: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>',
+    home: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    hotel: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z"/><path d="m9 16 .348-.24c1.465-1.013 3.84-1.013 5.304 0L15 16"/><path d="M8 7h.01"/><path d="M16 7h.01"/><path d="M12 7h.01"/><path d="M12 11h.01"/><path d="M16 11h.01"/><path d="M8 11h.01"/></svg>',
+    party: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.8 11.3 2 22l10.7-3.79"/><path d="M4 3h.01"/><path d="M22 8h.01"/><path d="M15 2h.01"/><path d="M22 20h.01"/><path d="m22 2-2.24.75a2.9 2.9 0 0 0-1.96 3.12v0c.1.86-.57 1.63-1.45 1.63h-.38c-.86 0-1.6.6-1.76 1.44L14 10"/><path d="m22 13-.82-.33c-.86-.34-1.82.2-1.98 1.11v0c-.11.7-.72 1.22-1.43 1.22H17"/><path d="m11 2 .33.82c.34.86-.2 1.82-1.11 1.98v0C9.52 4.9 9 5.52 9 6.23V7"/></svg>',
+    book: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
+    download: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>',
+};
+
 // ========================================
 // EXERCISE DATABASE
 // ========================================
@@ -1487,7 +1526,7 @@ window.allExercises = [
             ["Pectoralis Major", "Triceps", "Front Delts"], {arms: "Wide (Pos 8-9)", pulleys: "Chest Height"}),
 
         createEx("Cable Chest Fly (High)", ["Chest"], "Cable", "Muscle Build",
-            ["Set Pulleys to Top Position. Arms Wide.", "Step forward, lean torso 30° forward.", "Start with arms open wide, elbows slightly bent."],
+            ["Set Pulleys to Top Position. Arms Wide.", "Step forward, lean torso 30Â° forward.", "Start with arms open wide, elbows slightly bent."],
             ["Fly hands down and together towards your waist.", "Imagine hugging a large tree trunk.", "Squeeze inner chest hard at the bottom.", "Control the return to the stretch position."],
             ["Don't turn it into a press; keep the elbow angle fixed.", "Keep chest proud, don't round shoulders forward."],
             ["Targets the lower (sternal) head of the chest.", "Excellent for creating the lower pec outline."],
@@ -2116,7 +2155,7 @@ window.allExercises = [
             ["Hips", "Thoracic Spine", "Hamstrings"]),
 
         createEx("90/90 Hip Switch", ["Legs"], "Bodyweight", "Mobility", 
-            ["Sit on floor.", "Front leg bent 90° in front, back leg 90° to side.", "Torso upright."],
+            ["Sit on floor.", "Front leg bent 90Â° in front, back leg 90Â° to side.", "Torso upright."],
             ["Rotate hips to switch leg positions to the other side.", "Keep heels driven into the floor.", "Try not to use hands for support."],
             ["Stay tall through the spine.", "Move from the hips, not the lower back."],
             ["Internal and external hip rotation.", "Unlocks tight hips."],
@@ -2174,7 +2213,7 @@ window.allExercises = [
 
         createEx("Cable Donkey Kick", ["Legs", "Glutes"], "Cable", "Muscle Build", 
             ["Set Pulley Low. Ankle strap.", "Hands on machine for support.", "Bent over."],
-            ["Keep knee bent 90°.", "Drive heel up to ceiling.", "Squeeze."],
+            ["Keep knee bent 90Â°.", "Drive heel up to ceiling.", "Squeeze."],
             ["Don't extend knee.", "Movement comes from hip."],
             ["Upper glute focus.", "Shelf builder."],
             ["Glute Maximus"], {arms: "Narrow", pulleys: "Low"}),
@@ -2672,6 +2711,8 @@ function quickStartWorkout(type) {
 function updateExerciseCount(value) {
     appState.exerciseCount = parseInt(value);
     document.getElementById('exercise-count-display').textContent = value;
+    const builderEl = document.getElementById('builder-count-display');
+    if (builderEl) builderEl.textContent = value;
     saveAppState();
 }
 
@@ -2750,7 +2791,7 @@ function renderWorkout(exercises) {
                 <div style="text-align:right;">
                     ${progression.suggest ? `<div class="progression-badge">${progression.suggest}</div>` : ''}
                     <button class="btn-small btn-action" onclick="viewExerciseDetails('${ex.name.replace(/'/g,"\\'")}')">
-                        ℹ️
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
                     </button>
                 </div>
             </div>
@@ -2758,7 +2799,7 @@ function renderWorkout(exercises) {
         
         if(progression.lastWorkout) {
             html += `<div style="background:#1a1a1a; padding:8px; border-radius:6px; margin-bottom:10px; font-size:0.85em;">
-                📊 Last: ${progression.lastWorkout.weight} lbs × ${progression.lastWorkout.reps.join(',')} reps
+                ${IC.chart} Last: ${progression.lastWorkout.weight} lbs × ${progression.lastWorkout.reps.join(',')} reps
             </div>`;
         }
         
@@ -2767,7 +2808,7 @@ function renderWorkout(exercises) {
             const set = setData[i];
             if(set) {
                 html += `<div class="set-completed">
-                    <span>✅ Set ${i+1}: ${set.weight} lbs × ${set.reps} reps</span>
+                    <span>${IC.check} Set ${i+1}: ${set.weight} lbs × ${set.reps} reps</span>
                 </div>`;
             }
         }
@@ -2795,7 +2836,7 @@ function renderWorkout(exercises) {
             `;
         } else {
             html += `<div style="text-align:center; padding:15px; background:#1a4d2e; border-radius:6px;">
-                ✅ Exercise Complete!
+                '+IC.check+' Exercise Complete!
             </div>`;
         }
         
@@ -2808,7 +2849,7 @@ function renderWorkout(exercises) {
     if(allDone) {
         const btn = document.createElement('button');
         btn.className = 'btn btn-success';
-        btn.textContent = '🎉 Workout Complete!';
+        btn.innerHTML = IC.party+' Workout Complete!';
         btn.onclick = finishWorkout;
         container.appendChild(btn);
     }
@@ -2946,6 +2987,8 @@ function closeCustomBuilder() {
 function updateExerciseCount(value) {
     appState.exerciseCount = parseInt(value);
     document.getElementById('exercise-count-display').textContent = value;
+    const builderEl = document.getElementById('builder-count-display');
+    if (builderEl) builderEl.textContent = value;
     saveAppState();
 }
 
@@ -3085,7 +3128,7 @@ function renderBuilderExerciseList() {
                     <small class="text-muted">${ex.cat.join(', ')} • ${ex.equip}</small>
                 </div>
                 <button class="btn-small btn-action" onclick="event.stopPropagation(); viewExerciseDetails('${ex.name.replace(/'/g,"\\'")}')">
-                    ℹ️
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
                 </button>
             </div>
         `;
@@ -3221,7 +3264,7 @@ function renderEncyclopedia() {
     // Show count
     const totalEl = document.createElement('div');
     totalEl.style.cssText = 'padding: 10px; background: rgba(187,134,252,0.1); border-radius: 8px; margin-bottom: 15px; text-align: center; color: #BB86FC; font-weight: bold;';
-    totalEl.textContent = `📚 ${exercises.length} exercises found`;
+    totalEl.innerHTML = `${IC.book} ${exercises.length} exercises found`;
     container.appendChild(totalEl);
     
     if (exercises.length === 0) {
@@ -3267,14 +3310,14 @@ function renderPlanCalendar() {
         bubble.className = `day-bubble workout-type-${type}`;
         bubble.onclick = () => editDay(idx);
         
-        const icon = {push:'💪',pull:'🏋️',legs:'🦵',cardio:'🚴',nimble:'🧘',rest:'😴'}[type] || '🔥';
+        const icon = {push:IC.push,pull:IC.pull,legs:IC.legs,cardio:IC.cardio,nimble:IC.nimble,rest:IC.rest}[type] || IC.fire;
         const completed = isDayCompleted(idx);
         
         bubble.innerHTML = `
             <div class="day-icon">${icon}</div>
             <div class="day-letter">${letter}</div>
             <div class="day-type">${type.substring(0,4)}</div>
-            ${completed ? '<div class="day-check">✅</div>' : ''}
+            ${completed ? '<div class="day-check">'+IC.check+'</div>' : ''}
         `;
         
         grid.appendChild(bubble);
@@ -3315,93 +3358,6 @@ function updatePhaseDisplay() {
     
     const adherence = document.getElementById('adherence-display');
     if(adherence) adherence.textContent = `${done}/${total}`;
-}
-
-// ========================================
-// FULL PLAN VIEW
-// ========================================
-function toggleFullPlanView() {
-    const view = document.getElementById('full-plan-view');
-    if (view.style.display === 'none') {
-        renderFullPlanView();
-        view.style.display = 'block';
-    } else {
-        view.style.display = 'none';
-    }
-}
-
-function renderFullPlanView() {
-    const container = document.getElementById('full-plan-view');
-    const plan = appState.activePlan;
-    
-    // Check for AI-generated plan with phases
-    const aiPlan = JSON.parse(localStorage.getItem('currentPlan') || 'null');
-    
-    let html = '';
-    
-    // Plan overview
-    if (aiPlan && aiPlan.name) {
-        html += `<div class="card" style="border-left:3px solid var(--primary);">`;
-        html += `<h3 style="margin:0 0 8px 0;">${aiPlan.name}</h3>`;
-        if (aiPlan.duration) html += `<p style="color:#aaa; margin:4px 0;">Duration: <strong>${aiPlan.duration} weeks</strong></p>`;
-        if (aiPlan.guidance) html += `<p style="color:#aaa; margin:4px 0;">${aiPlan.guidance}</p>`;
-        html += `</div>`;
-        
-        // Phases
-        if (aiPlan.phases && aiPlan.phases.length) {
-            html += `<div class="card"><h3 style="margin:0 0 10px 0;">📊 Phases</h3>`;
-            aiPlan.phases.forEach(phase => {
-                html += `<div style="padding:8px 0; border-bottom:1px solid #333;">`;
-                html += `<strong style="color:var(--sec);">${phase.name}</strong>`;
-                if (phase.weeks) html += ` <span style="color:#888;">(Weeks ${phase.weeks})</span>`;
-                if (phase.focus) html += `<p style="color:#aaa; margin:4px 0 0 0; font-size:0.9em;">${phase.focus}</p>`;
-                html += `</div>`;
-            });
-            html += `</div>`;
-        }
-    }
-    
-    // Weekly schedule with exercises
-    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const typeColors = {push:'#FF6B6B', pull:'#4ECDC4', legs:'#FFE66D', cardio:'#FF8C42', nimble:'#A78BFA', rest:'#666'};
-    const typeIcons = {push:'💪', pull:'🏋️', legs:'🦵', cardio:'🚴', nimble:'🧘', rest:'😴'};
-    
-    html += `<div class="card"><h3 style="margin:0 0 12px 0;">📅 Weekly Schedule</h3>`;
-    
-    dayNames.forEach((dayName, idx) => {
-        const type = plan.schedule[idx] || 'rest';
-        const completed = isDayCompleted(idx);
-        const color = typeColors[type] || '#888';
-        
-        html += `<div style="padding:10px; margin-bottom:8px; background:#1a1a1a; border-radius:8px; border-left:3px solid ${color};">`;
-        html += `<div style="display:flex; justify-content:space-between; align-items:center;">`;
-        html += `<span><strong>${dayName}</strong></span>`;
-        html += `<span style="color:${color}; font-size:0.9em;">${typeIcons[type] || '🔥'} ${type.toUpperCase()}</span>`;
-        if (completed) html += `<span>✅</span>`;
-        html += `</div>`;
-        
-        if (type !== 'rest') {
-            try {
-                const exercises = generateWorkoutByType(type, appState.exerciseCount);
-                if (exercises && exercises.length) {
-                    html += `<div style="margin-top:8px; padding-left:8px; font-size:0.85em; color:#aaa;">`;
-                    exercises.forEach((ex, i) => {
-                        html += `<div style="padding:2px 0;">${i + 1}. ${ex.name}</div>`;
-                    });
-                    html += `</div>`;
-                }
-            } catch(e) { /* skip if generateWorkoutByType not available */ }
-        }
-        
-        html += `</div>`;
-    });
-    
-    html += `</div>`;
-    
-    // Close button
-    html += `<button class="btn btn-action" onclick="document.getElementById('full-plan-view').style.display='none'" style="width:100%; margin-top:8px;">Hide Plan Details</button>`;
-    
-    container.innerHTML = html;
 }
 
 // ========================================
@@ -3465,7 +3421,7 @@ function selectGoal(goal) {
     let html = '<div style="margin:15px 0;">';
     dayNames.forEach((name, idx) => {
         const type = appState.activePlan.schedule[idx];
-        const icon = {push:'💪',pull:'🏋️',legs:'🦵',cardio:'🚴',nimble:'🧘',rest:'😴'}[type];
+        const icon = {push:IC.push,pull:IC.pull,legs:IC.legs,cardio:IC.cardio,nimble:IC.nimble,rest:IC.rest}[type];
         html += `<div style="padding:8px; background:#2c2c2c; margin:5px 0; border-radius:6px;">
             ${icon} <strong>${name}:</strong> ${type}
         </div>`;
@@ -3507,8 +3463,8 @@ function updateTodaysBanner() {
     document.getElementById('today-date').textContent = 
         today.toLocaleDateString('en-US', {weekday:'long', month:'short', day:'numeric'});
     
-    const icon = {push:'💪',pull:'🏋️',legs:'🦵',cardio:'🚴',nimble:'🧘'}[type];
-    document.getElementById('today-workout').textContent = `${icon} ${type.toUpperCase()}`;
+    const icon = {push:IC.push,pull:IC.pull,legs:IC.legs,cardio:IC.cardio,nimble:IC.nimble}[type];
+    document.getElementById('today-workout').innerHTML = `${icon} ${type.toUpperCase()}`;
     
     banner.style.display = 'block';
 }
@@ -3517,6 +3473,52 @@ function startTodaysWorkout() {
     const dayIdx = new Date().getDay();
     const type = appState.activePlan.schedule[dayIdx];
     quickStartWorkout(type);
+}
+
+
+// ========================================
+// EXERCISE DETAIL VIEWER
+// ========================================
+function viewExerciseDetails(name) {
+    const ex = exercises.find(e => e.name === name);
+    if (!ex) return;
+    
+    document.getElementById('exercise-detail-name').textContent = ex.name;
+    
+    const content = document.getElementById('exercise-detail-content');
+    content.innerHTML = `
+        <div class="card" style="margin-bottom:12px">
+            <h4 style="color:var(--sec);margin-bottom:8px">Preparation</h4>
+            <p>${ex.guide.prep}</p>
+        </div>
+        <div class="card" style="margin-bottom:12px">
+            <h4 style="color:var(--sec);margin-bottom:8px">Execution</h4>
+            <p>${ex.guide.exec}</p>
+        </div>
+        <div class="card" style="margin-bottom:12px">
+            <h4 style="color:var(--primary);margin-bottom:8px">Tips</h4>
+            <ul style="padding-left:18px;margin:0">${ex.guide.tips.map(t => '<li style="margin-bottom:4px">'+t+'</li>').join('')}</ul>
+        </div>
+        <div class="card" style="margin-bottom:12px">
+            <h4 style="color:#00ff9d;margin-bottom:8px">Benefits</h4>
+            <ul style="padding-left:18px;margin:0">${ex.guide.benefits.map(b => '<li style="margin-bottom:4px">'+b+'</li>').join('')}</ul>
+        </div>
+        <div class="card" style="margin-bottom:12px">
+            <h4 style="color:#ff6b35;margin-bottom:8px">Muscles Targeted</h4>
+            <p>${ex.guide.muscles.join(', ')}</p>
+        </div>
+        <div style="margin-top:8px;color:#888;font-size:0.85em">
+            <strong>Category:</strong> ${ex.cat.join(', ')}<br>
+            <strong>Equipment:</strong> ${ex.equip}<br>
+            <strong>Type:</strong> ${ex.type}
+        </div>
+    `;
+    
+    document.getElementById('exercise-detail-modal').classList.add('active');
+}
+
+function closeExerciseDetail() {
+    document.getElementById('exercise-detail-modal').classList.remove('active');
 }
 
 // ========================================
@@ -3564,7 +3566,7 @@ function loadCardioHistory() {
         div.style.borderBottom = '1px solid #333';
         
         const date = new Date(session.date).toLocaleDateString();
-        const icon = {run:'🏃',bike:'🚴',swim:'🏊',walk:'🚶',row:'🚣'}[session.type];
+        const icon = {run:IC.run,bike:IC.bike,swim:IC.swim,walk:IC.walk,row:IC.row}[session.type];
         
         div.innerHTML = `
             <strong>${icon} ${session.type}</strong><br>
@@ -3585,9 +3587,9 @@ function renderEquipmentPresets() {
     if(!container) return;
     
     const presets = [
-        {key:'home', name:'🏠 Home Gym', desc:'Cables, Dumbbells, Bench'},
-        {key:'hotel', name:'🏨 Hotel/Travel', desc:'Bodyweight & Bands'},
-        {key:'gym', name:'💪 Full Gym', desc:'All Equipment'}
+        {key:'home', name:IC.home+' Home Gym', desc:'Cables, Dumbbells, Bench'},
+        {key:'hotel', name:IC.hotel+' Hotel/Travel', desc:'Bodyweight & Bands'},
+        {key:'gym', name:IC.push+' Full Gym', desc:'All Equipment'}
     ];
     
     container.innerHTML = '';
@@ -3689,7 +3691,7 @@ function exportImages() {
     URL.revokeObjectURL(url);
     
     speak(`Exported ${count} exercise images`);
-    alert(`✅ Exported ${count} exercise images!\n\nSave this file in your GitHub repo or safe location.`);
+    alert(`${IC.check} Exported ${count} exercise images!\n\nSave this file in your GitHub repo or safe location.`);
 }
 
 function importImages(event) {
@@ -3711,7 +3713,7 @@ function importImages(event) {
             });
             
             speak(`Imported ${count} exercise images`);
-            alert(`✅ Imported ${count} exercise images!\n\nYour images have been restored.`);
+            alert(`${IC.check} Imported ${count} exercise images!\n\nYour images have been restored.`);
             
             // Clear file input
             event.target.value = '';
@@ -4116,7 +4118,7 @@ function updateAiCoach() {
     if(adherenceRate >= 80) {
         html += `
             <div class="ai-coach-card success">
-                <h3>🎯 Excellent Progress!</h3>
+                <h3>${IC.target} Excellent Progress!</h3>
                 <p>Adherence: <strong>${adherenceRate.toFixed(0)}%</strong> (${workoutsThisWeek}/${plannedThisWeek} workouts)</p>
                 <p style="margin-top:10px;">You're crushing it! Your consistency is outstanding. Keep up this momentum!</p>
             </div>
@@ -4124,7 +4126,7 @@ function updateAiCoach() {
     } else if(adherenceRate >= 50) {
         html += `
             <div class="ai-coach-card">
-                <h3>💪 Good Work!</h3>
+                <h3>${IC.push} Good Work!</h3>
                 <p>Adherence: <strong>${adherenceRate.toFixed(0)}%</strong> (${workoutsThisWeek}/${plannedThisWeek} workouts)</p>
                 <p style="margin-top:10px;">You're making solid progress. Try to hit all planned workouts for maximum results!</p>
             </div>
@@ -4132,7 +4134,7 @@ function updateAiCoach() {
     } else if(plannedThisWeek > 0) {
         html += `
             <div class="ai-coach-card warning">
-                <h3>⚠️ Need More Consistency</h3>
+                <h3>${IC.warn} Need More Consistency</h3>
                 <p>Adherence: <strong>${adherenceRate.toFixed(0)}%</strong> (${workoutsThisWeek}/${plannedThisWeek} workouts)</p>
                 <p style="margin-top:10px;">You've missed several workouts this week. Remember: consistency beats intensity!</p>
             </div>
@@ -4143,7 +4145,7 @@ function updateAiCoach() {
     if(workoutsThisWeek >= 6 && consecutiveDays >= 6) {
         html += `
             <div class="ai-coach-card warning">
-                <h3>🛑 Recovery Check</h3>
+                <h3>${IC.stop} Recovery Check</h3>
                 <p>You've trained ${consecutiveDays} days in a row.</p>
                 <p style="margin-top:10px;">Consider taking a rest day soon to prevent overtraining and optimize recovery.</p>
             </div>
@@ -4154,7 +4156,7 @@ function updateAiCoach() {
     if(consecutiveDays >= 3) {
         html += `
             <div class="ai-coach-card success">
-                <h3>🔥 ${consecutiveDays} Day Streak!</h3>
+                <h3>${IC.fire} ${consecutiveDays} Day Streak!</h3>
                 <p>Amazing consistency! Remember to balance intensity with recovery.</p>
             </div>
         `;
@@ -4230,7 +4232,7 @@ function displayGarminFileList() {
         const fileItem = document.createElement('div');
         fileItem.className = 'file-item';
         fileItem.innerHTML = `
-            <span class="file-name">📄 ${file.name}</span>
+            <span class="file-name">${IC.doc} ${file.name}</span>
             <span class="file-size">${(file.size / 1024).toFixed(1)} KB</span>
         `;
         fileList.appendChild(fileItem);
@@ -4404,7 +4406,7 @@ If metrics show concerning patterns (sleep score <70, elevated RHR, low HRV, hig
     } catch (error) {
         console.error('Analysis failed:', error);
         alert(`Failed to analyze data:\n${error.message}\n\nCheck browser console (F12) for full details.`);
-        analyzeBtn.innerHTML = '🤖 Analyze with AI Coach';
+        analyzeBtn.innerHTML = IC.robot+' Analyze with AI Coach';
         analyzeBtn.disabled = false;
     }
 }
@@ -4479,7 +4481,7 @@ function displayGarminResults(analysis) {
     if (analysis.insights && analysis.insights.length > 0) {
         recDiv.innerHTML += `
             <div style="margin-top: 20px;">
-                <h4 style="color: #00d4ff; margin-bottom: 10px;">💡 Key Insights</h4>
+                <h4 style="color: #00d4ff; margin-bottom: 10px;">${IC.bulb} Key Insights</h4>
                 ${analysis.insights.map(insight => `
                     <p style="padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; margin: 5px 0;">
                         → ${insight}
@@ -4493,7 +4495,7 @@ function displayGarminResults(analysis) {
     if (analysis.warnings && analysis.warnings.length > 0) {
         recDiv.innerHTML += `
             <div style="margin-top: 20px;">
-                <h4 style="color: #CF6679; margin-bottom: 10px;">⚠️ Warnings</h4>
+                <h4 style="color: #CF6679; margin-bottom: 10px;">${IC.warn} Warnings</h4>
                 ${analysis.warnings.map(warning => `
                     <p style="padding: 10px; background: rgba(207,102,121,0.1); border-radius: 8px; margin: 5px 0; border-left: 3px solid #CF6679;">
                         ${warning}
@@ -4549,7 +4551,7 @@ function updateCloudSyncUI() {
     const lastSyncText = document.getElementById('last-sync-time');
     
     if (statusText) {
-        statusText.textContent = CLOUD_SYNC_ENABLED ? '✅ Connected' : '❌ Offline';
+        statusText.innerHTML = CLOUD_SYNC_ENABLED ? IC.check+' Connected' : IC.cross+' Offline';
         statusText.style.color = CLOUD_SYNC_ENABLED ? 'var(--success)' : 'var(--danger)';
     }
     if (deviceIdText) deviceIdText.textContent = USER_ID ? USER_ID.substr(0, 20) + '...' : 'Not set';
@@ -4565,10 +4567,10 @@ function updateGarminConnectionUI(connected, lastSync = null) {
     
     if (statusEl) {
         if (connected) {
-            statusEl.innerHTML = '✅ Connected';
+            statusEl.innerHTML = IC.check+' Connected';
             statusEl.style.color = 'var(--success)';
         } else {
-            statusEl.innerHTML = '❌ Not Connected';
+            statusEl.innerHTML = IC.cross+' Not Connected';
             statusEl.style.color = 'var(--danger)';
         }
     }
@@ -4614,11 +4616,11 @@ async function checkGarminConnection() {
 
 async function connectGarmin() {
     if (!CLOUD_SYNC_ENABLED || !USER_ID) {
-        showNotification('❌ Cloud sync must be enabled first', 'error');
+        showNotification(''+IC.cross+' Cloud sync must be enabled first', 'error');
         return;
     }
     try {
-        showNotification('🔄 Connecting to Garmin...', 'info');
+        showNotification(''+IC.refresh+' Connecting to Garmin...', 'info');
         // FIXED: Uses hyphen to match 'garmin-auth.js'
         const response = await fetch(`${BACKEND_URL}/api/garmin-auth?user_id=${USER_ID}`);
         const data = await response.json();
@@ -4631,31 +4633,31 @@ async function connectGarmin() {
         window.addEventListener('message', function onMessage(event) {
             if (event.data.type === 'garmin_connected') {
                 window.removeEventListener('message', onMessage);
-                showNotification('✅ Garmin connected successfully!', 'success');
+                showNotification(''+IC.check+' Garmin connected successfully!', 'success');
                 checkGarminConnection();
                 syncGarminNow();
             }
         });
     } catch (error) {
         console.error('Garmin connect error:', error);
-        showNotification(`❌ ${error.message}`, 'error');
+        showNotification(`${IC.cross} ${error.message}`, 'error');
     }
 }
 
 async function syncGarminNow() {
     if (!CLOUD_SYNC_ENABLED || !USER_ID) return;
     try {
-        showNotification('🔄 Syncing Garmin activities...', 'info');
+        showNotification(''+IC.refresh+' Syncing Garmin activities...', 'info');
         // FIXED: Uses hyphen to match 'garmin-sync.js'
         const response = await fetch(`${BACKEND_URL}/api/garmin-sync?user_id=${USER_ID}`);
         const data = await response.json();
         if (data.error) throw new Error(data.error);
-        showNotification(`✅ Synced ${data.activitiesCount} activities`, 'success');
+        showNotification(`${IC.check} Synced ${data.activitiesCount} activities`, 'success');
         updateGarminConnectionUI(true, new Date().toISOString());
         checkGarminFiles(); 
     } catch (error) {
         console.error('Sync error:', error);
-        showNotification(`❌ ${error.message}`, 'error');
+        showNotification(`${IC.cross} ${error.message}`, 'error');
     }
 }
 
@@ -4666,12 +4668,12 @@ async function disconnectGarmin() {
         const response = await fetch(`${BACKEND_URL}/api/garmin-disconnect?user_id=${USER_ID}`);
         const data = await response.json();
         if (data.success) {
-            showNotification('✅ Garmin disconnected', 'success');
+            showNotification(''+IC.check+' Garmin disconnected', 'success');
             updateGarminConnectionUI(false);
         }
     } catch (error) {
         console.error('Disconnect error:', error);
-        showNotification('❌ Failed to disconnect', 'error');
+        showNotification(''+IC.cross+' Failed to disconnect', 'error');
     }
 }
 
@@ -4681,7 +4683,7 @@ async function disconnectGarmin() {
 
 async function initSupabase() {
     try {
-        console.log('🔄 Initializing Supabase v51 (Backend Proxy)...');
+        console.log('🔄 Initializing Supabase v52 (Backend Proxy)...');
         let attempts = 0;
         while (typeof window.supabase?.createClient !== 'function' && attempts < 100) {
             await new Promise(res => setTimeout(res, 100));
@@ -4702,7 +4704,7 @@ async function initSupabase() {
         updateCloudSyncUI(); 
         await loadFromCloud();
         checkGarminConnection(); 
-        console.log('✅ Supabase initialized successfully! v51');
+        console.log('✅ Supabase initialized successfully! v52');
     } catch (error) {
         console.error('❌ Supabase init error:', error);
         CLOUD_SYNC_ENABLED = false;
@@ -4805,16 +4807,16 @@ async function loadFromCloud() {
 }
 
 async function syncNow() {
-    if (!CLOUD_SYNC_ENABLED) { showNotification('❌ Cloud sync not available', 'error'); return; }
-    showNotification('🔄 Syncing...', 'info');
+    if (!CLOUD_SYNC_ENABLED) { showNotification(''+IC.cross+' Cloud sync not available', 'error'); return; }
+    showNotification(''+IC.refresh+' Syncing...', 'info');
     try {
         const workouts = JSON.parse(localStorage.getItem('workouts') || '[]');
         for (const workout of workouts) { await saveWorkoutToCloud(workout); }
         const plan = JSON.parse(localStorage.getItem('training_plan') || 'null');
         if (plan) { await savePlanToCloud(plan); }
         await loadFromCloud();
-        showNotification('✅ Sync complete!', 'success');
-    } catch (error) { console.error('Sync error:', error); showNotification('❌ Sync failed', 'error'); }
+        showNotification(''+IC.check+' Sync complete!', 'success');
+    } catch (error) { console.error('Sync error:', error); showNotification(IC.cross+' Sync failed', 'error'); }
 }
 
 function showSyncLog() { alert(`Last Sync: ${LAST_SYNC_TIME ? new Date(LAST_SYNC_TIME).toLocaleString() : 'Never'}\nUser ID: ${USER_ID}\nStatus: ${CLOUD_SYNC_ENABLED ? 'Connected' : 'Offline'}`); }
@@ -4825,12 +4827,12 @@ async function checkGarminFiles() {
         const garminFiles = await loadGarminFromCloud();
         const lastCheck = localStorage.getItem('last_garmin_check');
         if (!lastCheck && garminFiles.length > 0) {
-            showNotification(`📊 ${garminFiles.length} Garmin file(s) available in cloud`, 'info');
+            showNotification(`${IC.chart} ${garminFiles.length} Garmin file(s) available in cloud`, 'info');
             localStorage.setItem('last_garmin_check', new Date().toISOString());
         } else if (lastCheck) {
             const newFiles = garminFiles.filter(f => new Date(f.uploaded_at) > new Date(lastCheck));
             if (newFiles.length > 0) {
-                showNotification(`🏃 ${newFiles.length} new Garmin file(s) detected!`, 'info');
+                showNotification(`${IC.run} ${newFiles.length} new Garmin file(s) detected!`, 'info');
                 localStorage.setItem('last_garmin_check', new Date().toISOString());
             }
         }
@@ -4844,200 +4846,47 @@ async function checkGarminFiles() {
 let aiWizardStep = 0;
 let userProfile = {};
 
-function startAIPlanWizard() {
-    wizardProfile = {};
-    wizardChatHistory = [];
-    wizardQuestionIndex = 0;
-    document.getElementById('ai-wizard-modal').classList.add('active');
-    document.getElementById('wizard-chat-messages').innerHTML = '';
-    document.getElementById('wizard-chips').innerHTML = '';
-    document.getElementById('wizard-actions').style.display = 'none';
-    document.getElementById('wizard-chat-input').value = '';
-    askWizardQuestion();
-}
-
-var wizardProfile = {};
-var wizardChatHistory = [];
-var wizardQuestionIndex = 0;
-
-var wizardQuestions = [
-    {
-        key: 'goal',
-        text: "Hey! Let's build your perfect training plan. 💪 What's your primary goal?",
-        chips: ['Build Strength', 'Build Muscle', 'Health & Longevity', 'Athletic Performance', 'Fat Loss', 'Flexibility & Mobility']
-    },
-    {
-        key: 'experience',
-        text: "Great choice! How would you describe your training experience?",
-        chips: ['Beginner (< 1 year)', 'Intermediate (1-3 years)', 'Advanced (3+ years)']
-    },
-    {
-        key: 'daysPerWeek',
-        text: "How many days per week can you realistically commit to training?",
-        chips: ['3 days', '4 days', '5 days', '6 days']
-    },
-    {
-        key: 'planDuration',
-        text: "How long do you want this plan to run?",
-        chips: ['1 week', '4 weeks', '8 weeks', '12 weeks', '16 weeks']
-    },
-    {
-        key: 'sessionLength',
-        text: "How long do you want each session to be?",
-        chips: ['30-40 mins', '45-60 mins', '60-90 mins']
-    },
-    {
-        key: 'equipment',
-        text: "What equipment do you have access to?",
-        chips: ['Full gym', 'Home gym (dumbbells + bench)', 'Bodyweight only', 'Torque F9 + dumbbells']
-    },
-    {
-        key: 'injuries',
-        text: "Any injuries, limitations, or areas you want to be careful with? (Type 'none' if all good)",
-        chips: ['None', 'Shoulder issues', 'Back pain', 'Knee problems']
-    },
-    {
-        key: 'preferences',
-        text: "Any preferences or things you want to include/avoid? For example: 'I love deadlifts', 'no running', 'include yoga'. Feel free to type anything or skip!",
-        chips: ['No preferences - surprise me!', 'Include cardio days', 'Prefer compound movements', 'Include mobility work']
-    }
-];
-
-function addWizardMessage(text, role) {
-    const container = document.getElementById('wizard-chat-messages');
-    const div = document.createElement('div');
-    div.style.cssText = `margin-bottom:12px; display:flex; ${role === 'user' ? 'justify-content:flex-end' : 'justify-content:flex-start'}`;
-    div.innerHTML = `<div style="max-width:85%; padding:10px 14px; border-radius:12px; ${role === 'user' ? 'background:var(--primary); color:#000;' : 'background:#2a2a2a; color:#fff;'} font-size:0.95em; line-height:1.4;">${text}</div>`;
-    container.appendChild(div);
-    container.scrollTop = container.scrollHeight;
-    wizardChatHistory.push({ role, text });
-}
-
-function showWizardChips(chips) {
-    const container = document.getElementById('wizard-chips');
-    if (!chips || chips.length === 0) { container.innerHTML = ''; return; }
-    container.innerHTML = '<div class="chip-container" style="padding:4px 0;">' + chips.map(c => `<span class="chip" onclick="selectWizardChip('${c.replace(/'/g, "\\'")}')" style="cursor:pointer; white-space:nowrap; font-size:0.8em; padding:6px 12px;">${c}</span>`).join('') + '</div>';
-}
-
-function selectWizardChip(value) {
-    const q = wizardQuestions[wizardQuestionIndex];
-    if (q) wizardProfile[q.key] = value;
-    addWizardMessage(value, 'user');
-    document.getElementById('wizard-chips').innerHTML = '';
-    wizardQuestionIndex++;
-    setTimeout(() => askWizardQuestion(), 400);
-}
-
-function sendWizardMessage() {
-    const input = document.getElementById('wizard-chat-input');
-    const text = input.value.trim();
-    if (!text) return;
-    input.value = '';
-    
-    const q = wizardQuestions[wizardQuestionIndex];
-    if (q) wizardProfile[q.key] = text;
-    
-    addWizardMessage(text, 'user');
-    document.getElementById('wizard-chips').innerHTML = '';
-    wizardQuestionIndex++;
-    setTimeout(() => askWizardQuestion(), 400);
-}
-
-function askWizardQuestion() {
-    if (wizardQuestionIndex < wizardQuestions.length) {
-        const q = wizardQuestions[wizardQuestionIndex];
-        addWizardMessage(q.text, 'assistant');
-        showWizardChips(q.chips);
-    } else {
-        // All questions asked - show summary and allow chat
-        const summary = `Here's what I've got:\n• Goal: ${wizardProfile.goal || 'Not set'}\n• Experience: ${wizardProfile.experience || 'Not set'}\n• Training days: ${wizardProfile.daysPerWeek || 'Not set'}\n• Plan duration: ${wizardProfile.planDuration || 'Not set'}\n• Session length: ${wizardProfile.sessionLength || 'Not set'}\n• Equipment: ${wizardProfile.equipment || 'Not set'}\n• Injuries: ${wizardProfile.injuries || 'None'}\n• Preferences: ${wizardProfile.preferences || 'None'}\n\nLook good? Hit "Generate My Plan" below, or type any changes/extra details you'd like to add!`.replace(/\n/g, '<br>');
-        addWizardMessage(summary, 'assistant');
-        document.getElementById('wizard-actions').style.display = 'block';
-        
-        // Override send to allow follow-up chat
-        document.getElementById('wizard-chat-input').placeholder = 'Add details, ask questions, or adjust anything...';
-        wizardQuestionIndex = 999; // past all questions
-    }
-}
-
-async function generateFromChat() {
-    const actionsDiv = document.getElementById('wizard-actions');
-    actionsDiv.innerHTML = '<div style="text-align:center; padding:15px;"><div class="loading" style="width:40px; height:40px; margin:0 auto 10px;"></div><p style="color:#888;">Generating your personalized plan...</p></div>';
-    
-    // Build a rich prompt from all gathered info
-    const extraMessages = wizardChatHistory.filter(m => m.role === 'user').map(m => m.text).join('. ');
-    
-    const prompt = `Generate a personalized training plan based on this profile:
-- Goal: ${wizardProfile.goal || 'general fitness'}
-- Experience: ${wizardProfile.experience || 'intermediate'}
-- Days per week: ${wizardProfile.daysPerWeek || '5'}
-- Plan duration: ${wizardProfile.planDuration || '8 weeks'}
-- Session length: ${wizardProfile.sessionLength || '45-60 mins'}
-- Equipment: ${wizardProfile.equipment || 'full gym'}
-- Injuries/limitations: ${wizardProfile.injuries || 'none'}
-- Preferences: ${wizardProfile.preferences || 'none'}
-- Additional context from conversation: ${extraMessages}
-
-Return ONLY valid JSON with these fields:
-{
-  "name": "Plan name",
-  "duration": number_of_weeks,
-  "phases": [{"name":"Phase name","weeks":"1-4","focus":"description"}],
-  "weekSchedule": {"monday":"push/pull/legs/cardio/rest/nimble","tuesday":"...","wednesday":"...","thursday":"...","friday":"...","saturday":"...","sunday":"..."},
-  "guidance": "Brief overview of the plan approach"
-}
-
-The plan MUST be exactly ${wizardProfile.planDuration || '8 weeks'} long. Split into appropriate phases.
-Use workout types: push, pull, legs, cardio, nimble, rest. Match the number of training days to ${wizardProfile.daysPerWeek || '5'}.`;
-
-    try {
-        const response = await fetch(`${BACKEND_URL}/api/drive`, {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action: 'gemini', system: 'You are an expert fitness coach who creates detailed, periodized training plans. Always return valid JSON only, no markdown formatting.', messages: [{ role: "user", content: prompt }] })
-        });
-        
-        if (!response.ok) {
-            throw new Error(`API returned ${response.status}: ${response.statusText}`);
-        }
-        
-        const result = await response.json();
-        
-        // Handle different response formats
-        let rawText = '';
-        if (result.content && Array.isArray(result.content)) {
-            rawText = result.content.map(c => c.text || '').join('');
-        } else if (result.content && typeof result.content === 'string') {
-            rawText = result.content;
-        } else if (result.text) {
-            rawText = result.text;
-        } else if (result.response) {
-            rawText = result.response;
-        } else {
-            rawText = JSON.stringify(result);
-        }
-        
-        // Clean and parse JSON
-        rawText = rawText.replace(/```json\n?/g, '').replace(/```/g, '').trim();
-        const plan = JSON.parse(rawText);
-        
-        localStorage.setItem('currentPlan', JSON.stringify(plan));
-        if (CLOUD_SYNC_ENABLED) { await savePlanToCloud(plan); }
-        
-        addWizardMessage(`✅ <strong>${plan.name}</strong> is ready!<br><br><strong>Duration:</strong> ${plan.duration} weeks<br>${plan.guidance}`, 'assistant');
-        actionsDiv.innerHTML = '<button class="btn btn-success" onclick="acceptPlan()" style="width:100%;">🎯 Start This Plan!</button><button class="btn btn-action" onclick="generateFromChat()" style="width:100%; margin-top:8px;">🔄 Regenerate</button>';
-    } catch (error) {
-        console.error('Plan generation error:', error);
-        addWizardMessage(`❌ Error: ${error.message}. Please try again.`, 'assistant');
-        actionsDiv.innerHTML = '<button class="btn btn-action" onclick="generateFromChat()" style="width:100%;">🔄 Try Again</button>';
-    }
-}
+function startAIPlanWizard() { aiWizardStep = 0; userProfile = {}; document.getElementById('ai-wizard-modal').classList.add('active'); renderWizardStep(); }
 
 function renderWizardStep() {
-    // Legacy compatibility - redirect to new chat wizard
-    askWizardQuestion();
+    const container = document.getElementById('wizard-content');
+    switch(aiWizardStep) {
+        case 0:
+            container.innerHTML = `<h3>What's your primary goal?</h3><div class="chip-container"><div class="chip" onclick="selectGoal('strength')">${IC.push} Build Strength</div><div class="chip" onclick="selectGoal('muscle')">${IC.push} Build Muscle</div><div class="chip" onclick="selectGoal('health')">${IC.target} Health & Longevity</div><div class="chip" onclick="selectGoal('performance')">${IC.fire} Athletic Performance</div></div>`;
+            break;
+        case 1:
+            container.innerHTML = `<h3>How many days per week can you train?</h3><input type="range" id="days-slider" min="3" max="6" value="5" oninput="document.getElementById('days-display').textContent = this.value"><div style="text-align:center; font-size:2em; margin:20px;"><span id="days-display">5</span> days/week</div><button class="btn btn-main" onclick="setDays()">Continue</button>`;
+            break;
+        case 2:
+            container.innerHTML = `<h3>Any injuries or concerns?</h3><textarea id="injuries" rows="4" placeholder="e.g., Previous shoulder injury, knee pain when squatting..."></textarea><button class="btn btn-main" onclick="setInjuries()">Continue</button>`;
+            break;
+        case 3:
+            container.innerHTML = `<h3>${IC.brain} Generating your personalized plan...</h3><div style="text-align:center; padding:40px;"><div class="loading" style="width:60px; height:60px; margin:20px auto;"></div><p>Analyzing profile with AI...</p></div>`;
+            generateAIPlan();
+            break;
+    }
 }
 
-function acceptPlan() { document.getElementById('ai-wizard-modal').classList.remove('active'); switchTab('plan'); renderPlanCalendar(); showNotification('🎯 New training plan activated!', 'success'); }
+function selectGoal(goal) { userProfile.goal = goal; aiWizardStep++; renderWizardStep(); }
+function setDays() { userProfile.daysPerWeek = parseInt(document.getElementById('days-slider').value); aiWizardStep++; renderWizardStep(); }
+function setInjuries() { userProfile.injuries = document.getElementById('injuries').value; aiWizardStep++; renderWizardStep(); }
+
+async function generateAIPlan() {
+    try {
+        const prompt = `Generate a ${userProfile.daysPerWeek}-day/week training plan for a 40+ male athlete. Goal: ${userProfile.goal}. Injuries: ${userProfile.injuries || 'None'}. Equipment: Torque F9, dumbbells, barbells. Return ONLY valid JSON with name, duration, phases, weekSchedule, and guidance.`;
+        const response = await fetch(`${BACKEND_URL}/api/drive`, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: 'gemini', system: 'Professional fitness trainer.', messages: [{ role: "user", content: prompt }] })
+        });
+        const result = await response.json();
+        const plan = JSON.parse(result.content[0].text.replace(/```json\n?/g, '').replace(/```/g, '').trim());
+        localStorage.setItem('currentPlan', JSON.stringify(plan));
+        if (CLOUD_SYNC_ENABLED) { await savePlanToCloud(plan); }
+        document.getElementById('wizard-content').innerHTML = `<h3>${IC.check} Plan Generated!</h3><div class="card"><h4>${plan.name}</h4><p><strong>Duration:</strong> ${plan.duration} weeks</p><p>${plan.guidance}</p></div><button class="btn btn-success" onclick="acceptPlan()">Start This Plan!</button>`;
+    } catch (error) { console.error('Plan generation error:', error); alert('Failed to generate plan.'); }
+}
+
+function acceptPlan() { document.getElementById('ai-wizard-modal').classList.remove('active'); switchTab('plan'); renderPlanCalendar(); showNotification(''+IC.target+' New training plan activated!', 'success'); }
 function closeAIWizard() { document.getElementById('ai-wizard-modal').classList.remove('active'); }
 
 // ==========================================================================
@@ -5077,7 +4926,7 @@ async function getAIDailyRecommendation(garminData) {
 function showDailyNotification(rec) {
     const div = document.createElement('div');
     div.className = 'daily-notification';
-    div.innerHTML = `<div class="notification-header"><strong>🤖 AI Daily Update</strong><button onclick="this.parentElement.parentElement.remove()">✕</button></div><div class="notification-body"><p><strong>Recovery:</strong> ${rec.recoveryScore}/100</p><p>${rec.reasoning}</p></div><div class="notification-actions"><button class="btn-small btn-success" onclick="acceptAdjustments(${JSON.stringify(rec).replace(/"/g, '&quot;')})">Accept</button></div>`;
+    div.innerHTML = `<div class="notification-header"><strong>${IC.robot} AI Daily Update</strong><button onclick="this.parentElement.parentElement.remove()">✕</button></div><div class="notification-body"><p><strong>Recovery:</strong> ${rec.recoveryScore}/100</p><p>${rec.reasoning}</p></div><div class="notification-actions"><button class="btn-small btn-success" onclick="acceptAdjustments(${JSON.stringify(rec).replace(/"/g, '&quot;')})">Accept</button></div>`;
     document.body.appendChild(div);
     setTimeout(() => { if (div.parentElement) div.remove(); }, 8000);
 }
@@ -5086,7 +4935,7 @@ function acceptAdjustments(rec) {
     const history = JSON.parse(localStorage.getItem('ai_adjustments') || '[]');
     history.unshift({ date: new Date().toISOString(), ...rec });
     localStorage.setItem('ai_adjustments', JSON.stringify(history.slice(0, 30)));
-    showNotification('✅ Adjustments applied', 'success');
+    showNotification(''+IC.check+' Adjustments applied', 'success');
 }
 
 function logAIDecision(decision) {
@@ -5102,13 +4951,13 @@ function logAIDecision(decision) {
 function exportAllData() {
     const data = { workouts: localStorage.getItem('completedWorkouts'), plan: localStorage.getItem('currentPlan'), exportDate: new Date().toISOString() };
     downloadBlob(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }), `nimble-shred-backup.json`);
-    showNotification('✅ Backup downloaded', 'success');
+    showNotification(''+IC.check+' Backup downloaded', 'success');
 }
 
 function exportWorkoutHistory() {
     const history = localStorage.getItem('completedWorkouts') || '[]';
     downloadBlob(new Blob([history], { type: 'application/json' }), `workout-history.json`);
-    showNotification('✅ History downloaded', 'success');
+    showNotification(''+IC.check+' History downloaded', 'success');
 }
 
 function downloadBlob(blob, filename) {
@@ -5479,7 +5328,7 @@ function renderChatMessages() {
         if (!emptyState) {
             container.innerHTML = `
                 <div class="chat-empty-state">
-                    <div class="emoji">💬</div>
+                    <div class="emoji"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
                     <h3>Chat with AI Coach</h3>
                     <p>Ask me anything about your training, exercises, or recovery!</p>
                 </div>
@@ -5499,7 +5348,7 @@ function renderChatMessages() {
         
         let contextBadge = '';
         if (msg.context && chatSettings.contextAware) {
-            contextBadge = `<div class="message-context">📍 ${msg.context}</div>`;
+            contextBadge = `<div class="message-context">${IC.pin} ${msg.context}</div>`;
         }
         
         const timestamp = new Date(msg.timestamp).toLocaleTimeString('en-US', {
@@ -5665,13 +5514,13 @@ function notifyUserOfAIUpdate(updateType, changes) {
 
 <!-- AI CHAT INTERFACE -->
 <button id="ai-chat-button" onclick="toggleChatPanel()" title="Chat with AI Coach">
-    🤖
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
 </button>
 
 <div id="ai-chat-panel">
     <div class="chat-header">
         <h3>
-            <span>🤖</span>
+            <span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></span>
             <span>AI Coach</span>
         </h3>
         <button class="chat-minimize" onclick="toggleChatPanel()" title="Minimize">−</button>
@@ -5679,19 +5528,19 @@ function notifyUserOfAIUpdate(updateType, changes) {
     
     <div class="chat-quick-actions" id="quick-actions">
         <button class="quick-action-btn" onclick="quickActionModifyWorkout()">
-            ⚡ Modify Workout
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Modify Workout
         </button>
         <button class="quick-action-btn" onclick="quickActionExplainChanges()">
-            📊 Explain Changes
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg> Explain Changes
         </button>
         <button class="quick-action-btn" onclick="quickActionAdjustPlan()">
-            📅 Adjust Plan
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg> Adjust Plan
         </button>
     </div>
     
     <div class="chat-messages" id="chat-messages">
         <div class="chat-empty-state">
-            <div class="emoji">💬</div>
+            <div class="emoji"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
             <h3>Chat with AI Coach</h3>
             <p>Ask me anything about your training, exercises, or recovery!</p>
         </div>
@@ -5705,7 +5554,7 @@ function notifyUserOfAIUpdate(updateType, changes) {
             rows="1"
         ></textarea>
         <button class="chat-send-btn" onclick="sendChatMessage()" title="Send message">
-            ➤
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
         </button>
     </div>
 </div>
