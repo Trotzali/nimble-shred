@@ -1551,12 +1551,15 @@
         </div>
         <div id="warmup-content">
             <div class="warmup-timer" id="warmup-timer">60</div>
+            <div id="warmup-gif-container" style="text-align:center; margin-bottom:10px; border-radius:12px; overflow:hidden; background:#000; display:none;">
+                <img id="warmup-gif" src="" alt="" style="max-width:100%; max-height:220px; object-fit:contain; border-radius:12px;">
+            </div>
             <div class="warmup-exercise" id="warmup-current-exercise">
                 <h3 id="warmup-exercise-name">Exercise Name</h3>
-                <p class="text-muted" id="warmup-exercise-desc">Instructions</p>
+                <p id="warmup-exercise-desc" style="color:#ccc; margin-top:8px; line-height:1.5;">Instructions</p>
             </div>
             <div style="text-align:center; margin-top:20px;">
-                <button class="btn btn-action" id="warmup-next-btn" onclick="nextWarmupExercise()">Next Exercise</button>
+                <button class="btn btn-action" id="warmup-next-btn" onclick="nextWarmupExercise()">Next Exercise →</button>
             </div>
             <div class="text-muted" style="text-align:center; margin-top:10px;">
                 Exercise <span id="warmup-progress">1/6</span>
@@ -2949,6 +2952,7 @@ function quickStartWorkout(type) {
     appState.currentWorkoutType = type;
     appState.currentWorkout = exercises;
     appState.currentSetIndex = {};
+    appState.exerciseDone = {};
     saveAppState();
     
     // Start warmup for push/pull/legs workouts
@@ -3010,6 +3014,7 @@ function filterExercisesByEquipment(exercises) {
 function startWorkout(exercises) {
     appState.currentWorkout = exercises;
     appState.currentSetIndex = {};
+    appState.exerciseDone = {};
     saveAppState();
     
     document.getElementById('workout-interface').style.display = 'block';
@@ -3026,84 +3031,170 @@ function renderWorkout(exercises) {
     const container = document.getElementById('workout-list');
     container.innerHTML = '';
     
+    // Track which exercises user has marked done (or has 1+ sets)
+    if (!appState.exerciseDone) appState.exerciseDone = {};
+    
+    // Find current exercise index (first not-done one)
+    let currentIdx = exercises.findIndex(ex => !appState.exerciseDone[ex.name]);
+    if (currentIdx === -1) currentIdx = exercises.length; // all done
+    
+    // Progress bar
+    const completedCount = exercises.filter(ex => appState.exerciseDone[ex.name]).length;
+    const progress = document.createElement('div');
+    progress.style.cssText = 'margin-bottom:15px;';
+    progress.innerHTML = `
+        <div style="display:flex; justify-content:space-between; font-size:0.85em; color:#888; margin-bottom:6px;">
+            <span>Exercise ${Math.min(currentIdx + 1, exercises.length)} of ${exercises.length}</span>
+            <span>${completedCount} complete</span>
+        </div>
+        <div style="background:#2a2a2a; border-radius:6px; height:6px; overflow:hidden;">
+            <div style="background:var(--sec); height:100%; width:${(completedCount / exercises.length) * 100}%; border-radius:6px; transition:width 0.3s;"></div>
+        </div>
+    `;
+    container.appendChild(progress);
+    
+    // Show completed exercises (collapsed)
     exercises.forEach((ex, idx) => {
-        const card = document.createElement('div');
-        card.className = 'card exercise-card';
+        if (!appState.exerciseDone[ex.name]) return;
+        if (idx >= currentIdx && currentIdx < exercises.length) return;
         
-        const progression = getProgression(ex.name);
-        const setsCompleted = appState.currentSetIndex[ex.name] || 0;
         const setData = getTodaysSetData(ex.name);
+        const mini = document.createElement('div');
+        mini.style.cssText = 'background:rgba(26,77,46,0.3); border:1px solid rgba(3,218,198,0.2); border-radius:8px; padding:10px 14px; margin-bottom:8px; font-size:0.85em; cursor:pointer;';
+        mini.onclick = function() { viewExerciseDetails(ex.name); };
+        const setsStr = setData.length > 0 ? setData.map(function(s) { return s.weight + '×' + s.reps; }).join(', ') : 'skipped';
+        mini.innerHTML = '<span style="color:var(--sec);">✓</span> <strong>' + ex.name + '</strong> <span style="color:#888;">— ' + setsStr + '</span>';
+        container.appendChild(mini);
+    });
+    
+    // Show current active exercise with full detail
+    if (currentIdx < exercises.length) {
+        var ex = exercises[currentIdx];
+        var idx = currentIdx;
+        var progression = getProgression(ex.name);
+        var setsCompleted = appState.currentSetIndex[ex.name] || 0;
+        var setData = getTodaysSetData(ex.name);
         
-        let html = `
-            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                <div>
-                    <h3 style="margin:0;">${ex.name}</h3>
-                    <div class="text-muted">${ex.cat.join(', ')} • ${ex.equip}</div>
-                </div>
-                <div style="text-align:right;">
-                    ${progression.suggest ? `<div class="progression-badge">${progression.suggest}</div>` : ''}
-                    <button class="btn-small btn-action" onclick="viewExerciseDetails('${ex.name.replace(/'/g,"\\'")}')">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-                    </button>
-                </div>
-            </div>
-        `;
+        var card = document.createElement('div');
+        card.className = 'card exercise-card';
+        card.style.cssText = 'border: 1px solid var(--sec); border-left: 4px solid var(--sec);';
+        
+        // GIF lookup
+        var media = getExerciseMedia(ex.name);
+        console.log('GIF lookup:', ex.name, media ? 'FOUND: ' + media.gif.substring(0,50) : 'NOT FOUND');
+        var gifHtml = '';
+        if (media && media.gif) {
+            gifHtml = '<div style="text-align:center; margin-bottom:12px; border-radius:10px; overflow:hidden; background:#000;">' +
+                '<img src="' + media.gif + '" alt="' + ex.name + '" style="max-width:100%; max-height:250px; object-fit:contain; border-radius:10px;" onerror="this.parentElement.style.display=\'none\'">' +
+                '</div>';
+        }
+        
+        // YouTube link
+        var ytHtml = '';
+        if (media && media.yt) {
+            ytHtml = '<a href="' + media.yt + '" target="_blank" rel="noopener" ' +
+                'style="display:inline-block; padding:5px 12px; margin-bottom:10px; background:rgba(255,0,0,0.1); border:1px solid rgba(255,0,0,0.3); border-radius:8px; color:#ff4444; text-decoration:none; font-size:0.8em;">' +
+                '▶ Watch Form Tutorial</a>';
+        }
+        
+        // Exercise description
+        var descHtml = '';
+        if (ex.guide) {
+            descHtml = '<div style="background:rgba(255,255,255,0.04); border-radius:8px; padding:10px 12px; margin-bottom:12px; font-size:0.85em; line-height:1.5; color:#bbb;">' +
+                '<strong style="color:var(--sec);">How to:</strong> ' + ex.guide.prep + ' ' + ex.guide.exec +
+                '</div>';
+        }
+        
+        var safeName = ex.name.replace(/'/g, "\\'");
+        
+        var html = '<div style="display:flex; justify-content:space-between; margin-bottom:10px;">' +
+            '<div>' +
+                '<h3 style="margin:0;">' + ex.name + '</h3>' +
+                '<div class="text-muted">' + ex.cat.join(', ') + ' • ' + ex.equip + '</div>' +
+            '</div>' +
+            '<div style="text-align:right;">' +
+                (progression.suggest ? '<div class="progression-badge">' + progression.suggest + '</div>' : '') +
+            '</div>' +
+        '</div>' +
+        gifHtml +
+        ytHtml +
+        descHtml;
         
         if(progression.lastWorkout) {
-            html += `<div style="background:#1a1a1a; padding:8px; border-radius:6px; margin-bottom:10px; font-size:0.85em;">
-                ${IC.chart} Last: ${progression.lastWorkout.weight} lbs × ${progression.lastWorkout.reps.join(',')} reps
-            </div>`;
+            html += '<div style="background:#1a1a1a; padding:8px; border-radius:6px; margin-bottom:10px; font-size:0.85em;">' +
+                IC.chart + ' Last: ' + progression.lastWorkout.weight + ' lbs × ' + progression.lastWorkout.reps.join(',') + ' reps' +
+            '</div>';
         }
         
         // Completed sets
-        for(let i = 0; i < setsCompleted; i++) {
-            const set = setData[i];
+        for(var i = 0; i < setsCompleted; i++) {
+            var set = setData[i];
             if(set) {
-                html += `<div class="set-completed">
-                    <span>${IC.check} Set ${i+1}: ${set.weight} lbs × ${set.reps} reps</span>
-                </div>`;
+                html += '<div class="set-completed">' +
+                    '<span>' + IC.check + ' Set ' + (i+1) + ': ' + set.weight + ' lbs × ' + set.reps + ' reps</span>' +
+                '</div>';
             }
         }
         
-        // Current set
-        if(setsCompleted < 3) {
-            const suggestedWeight = progression.suggestedWeight || 100;
-            html += `
-                <div class="set-active">
-                    <strong>Set ${setsCompleted + 1} of 3</strong>
-                    <div class="row" style="margin-top:10px;">
-                        <div style="flex:1;">
-                            <small class="text-muted">Weight (lbs)</small>
-                            <input type="number" id="weight-${idx}" value="${suggestedWeight}" step="5">
-                        </div>
-                        <div style="flex:1;">
-                            <small class="text-muted">Reps</small>
-                            <input type="number" id="reps-${idx}" value="10" step="1">
-                        </div>
-                    </div>
-                    <button class="btn btn-main" onclick="logSet('${ex.name.replace(/'/g,"\\'")}', ${idx})">
-                        ✓ Log Set
-                    </button>
-                </div>
-            `;
-        } else {
-            html += `<div style="text-align:center; padding:15px; background:#1a4d2e; border-radius:6px;">
-                '+IC.check+' Exercise Complete!
-            </div>`;
-        }
+        // Current set input
+        var suggestedWeight = progression.suggestedWeight || 100;
+        html += '<div class="set-active">' +
+            '<strong>Set ' + (setsCompleted + 1) + '</strong>' +
+            '<div class="row" style="margin-top:10px;">' +
+                '<div style="flex:1;">' +
+                    '<small class="text-muted">Weight (lbs)</small>' +
+                    '<input type="number" id="weight-' + idx + '" value="' + suggestedWeight + '" step="5">' +
+                '</div>' +
+                '<div style="flex:1;">' +
+                    '<small class="text-muted">Reps</small>' +
+                    '<input type="number" id="reps-' + idx + '" value="10" step="1">' +
+                '</div>' +
+            '</div>' +
+            '<button class="btn btn-main" onclick="logSet(\'' + safeName + '\', ' + idx + ')">' +
+                '✓ Log Set' +
+            '</button>' +
+            '<button class="btn btn-action" style="margin-top:8px;" onclick="skipExercise(\'' + safeName + '\')">' +
+                'Next Exercise →' +
+            '</button>' +
+        '</div>';
         
         card.innerHTML = html;
         container.appendChild(card);
-    });
+        
+        // Show upcoming exercises (dimmed list)
+        if (currentIdx + 1 < exercises.length) {
+            var upcoming = document.createElement('div');
+            upcoming.style.cssText = 'margin-top:12px; padding:10px; background:rgba(255,255,255,0.02); border-radius:8px;';
+            var upHtml = '<div style="font-size:0.8em; color:#666; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Up Next</div>';
+            for (var j = currentIdx + 1; j < exercises.length; j++) {
+                if (!appState.exerciseDone[exercises[j].name]) {
+                    upHtml += '<div style="padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.04); font-size:0.85em; color:#777;">' +
+                        (j + 1) + '. ' + exercises[j].name + ' <span style="color:#555;">• ' + exercises[j].cat.join(', ') + '</span>' +
+                    '</div>';
+                }
+            }
+            upcoming.innerHTML = upHtml;
+            container.appendChild(upcoming);
+        }
+    }
     
-    // Check if all complete
-    const allDone = exercises.every(ex => (appState.currentSetIndex[ex.name] || 0) >= 3);
+    // Finish button - always show once any set logged or any exercise done
+    var anyDone = Object.keys(appState.exerciseDone).length > 0 || Object.values(appState.currentSetIndex).some(function(v) { return v > 0; });
+    var allDone = currentIdx >= exercises.length;
+    
     if(allDone) {
-        const btn = document.createElement('button');
+        var btn = document.createElement('button');
         btn.className = 'btn btn-success';
-        btn.innerHTML = IC.party+' Workout Complete!';
+        btn.innerHTML = IC.party + ' Workout Complete!';
         btn.onclick = finishWorkout;
         container.appendChild(btn);
+    } else if(anyDone) {
+        var btn2 = document.createElement('button');
+        btn2.className = 'btn btn-action';
+        btn2.style.marginTop = '10px';
+        btn2.innerHTML = '✓ Finish Workout';
+        btn2.onclick = finishWorkout;
+        container.appendChild(btn2);
     }
 }
 
@@ -3126,6 +3217,15 @@ function logSet(exerciseName, idx) {
     saveAppState();
     renderWorkout(appState.currentWorkout);
     speak('Set logged!');
+}
+
+function skipExercise(exerciseName) {
+    if (!appState.exerciseDone) appState.exerciseDone = {};
+    appState.exerciseDone[exerciseName] = true;
+    saveAppState();
+    renderWorkout(appState.currentWorkout);
+    document.getElementById('workout-interface').scrollIntoView({behavior:'smooth'});
+    speak('Moving to next exercise.');
 }
 
 function saveSetToHistory(name, setData) {
@@ -4028,6 +4128,32 @@ function startTodaysWorkout() {
 // ========================================
 // EXERCISE DETAIL VIEWER
 // ========================================
+// Shared media lookup with alias support
+const mediaAliases = {
+    "Pull-ups": "Pull-up", "Push-ups": "Push-up",
+    "Romanian Deadlift (DB)": "Romanian Deadlift (Dumbbell)",
+    "V-Ups": "V-Up", "Farmers Walk": "Farmer's Walk",
+    "Single Leg Glute Bridge": "Single-Leg Glute Bridge",
+    "Single Leg RDL (BW)": "Single-Leg RDL",
+    "Cat-Cow": "Cat-Cow Stretch", "90/90 Hip Switch": "90/90 Hip Stretch",
+    "DB Shrugs": "Dumbbell Shrug", "Skull Crusher (DB)": "Skull Crusher",
+    "Good Morning (BW)": "Good Morning", "Hanging Leg Raise": "Leg Raise",
+    "DB Step Up": "Step-up", "L-Sit (Tuck)": "L-Sit",
+    // Warmup aliases
+    "Bodyweight Squats": "Bodyweight Squat", "Walking Lunges": "Walking Lunge",
+    "Glute Bridges": "Glute Bridge", "Cat-Cow Stretch": "Cat-Cow Stretch",
+    "Push-up Plus": "Push-up"
+};
+
+function getExerciseMedia(name) {
+    const key = mediaAliases[name] || name;
+    const media = exerciseMedia[key];
+    if (media) return media;
+    // Fallback to localStorage
+    const gif = localStorage.getItem('gif_' + name);
+    return gif ? { gif: gif, yt: null } : null;
+}
+
 function viewExerciseDetails(name) {
     const ex = window.allExercises.find(e => e.name === name);
     if (!ex) return;
@@ -4036,26 +4162,8 @@ function viewExerciseDetails(name) {
     
     const content = document.getElementById('exercise-detail-content');
     
-    // Look up media (GIF + YouTube) with alias fallback
-    const mediaAliases = {
-        "Pull-ups": "Pull-up",
-        "Push-ups": "Push-up",
-        "Romanian Deadlift (DB)": "Romanian Deadlift (Dumbbell)",
-        "V-Ups": "V-Up",
-        "Farmers Walk": "Farmer's Walk",
-        "Single Leg Glute Bridge": "Single-Leg Glute Bridge",
-        "Single Leg RDL (BW)": "Single-Leg RDL",
-        "Cat-Cow": "Cat-Cow Stretch",
-        "90/90 Hip Switch": "90/90 Hip Stretch",
-        "DB Shrugs": "Dumbbell Shrug",
-        "Skull Crusher (DB)": "Skull Crusher",
-        "Good Morning (BW)": "Good Morning",
-        "Hanging Leg Raise": "Leg Raise",
-        "DB Step Up": "Step-up",
-        "L-Sit (Tuck)": "L-Sit"
-    };
-    const mediaKey = mediaAliases[ex.name] || ex.name;
-    const media = exerciseMedia[mediaKey];
+    // Look up media (GIF + YouTube)
+    const media = getExerciseMedia(ex.name);
     const gifUrl = media ? media.gif : localStorage.getItem('gif_' + ex.name);
     const ytUrl = media ? media.yt : null;
     
@@ -4566,28 +4674,28 @@ function saveGpsRoute() {
 // ========================================
 const warmupSequences = {
     push: [
-        { name: 'Arm Circles', duration: 60, desc: 'Large circles forward and backward' },
-        { name: 'Shoulder CARs', duration: 60, desc: 'Controlled articular rotations' },
-        { name: 'Band Pull-Aparts', duration: 45, desc: 'Light resistance band' },
-        { name: 'Push-up Plus', duration: 45, desc: 'Scapular protraction focus' },
-        { name: 'Chest Openers', duration: 45, desc: 'Dynamic stretching' },
-        { name: 'Wrist Rolls', duration: 30, desc: 'Both directions' }
+        { name: 'Arm Circles', duration: 60, desc: 'Stand with arms extended to the sides. Make large circles forward for 30 seconds, then reverse direction. Keep core engaged and shoulders down. Gradually increase the size of the circles.' },
+        { name: 'Shoulder CARs', duration: 60, desc: 'Stand tall. Slowly raise one arm forward, overhead, behind you, and back down in the largest circle you can control. Move slowly — take 10 seconds per rotation. Do 3 each direction per arm.' },
+        { name: 'Band Pull-Aparts', duration: 45, desc: 'Hold a light resistance band at chest height with arms straight. Pull the band apart by squeezing your shoulder blades together until the band touches your chest. Slowly return. 15-20 reps.' },
+        { name: 'Push-up Plus', duration: 45, desc: 'Get into push-up position. Do a normal push-up, then at the top, push further so your upper back rounds and shoulder blades spread apart (protraction). This activates the serratus anterior. 8-10 reps.' },
+        { name: 'Chest Openers', duration: 45, desc: 'Stand in a doorway with arms at 90 degrees on the frame. Lean forward gently until you feel a stretch across your chest. Hold 5 seconds, release, repeat. Alternatively, clasp hands behind back and lift arms upward.' },
+        { name: 'Wrist Rolls', duration: 30, desc: 'Extend arms forward. Make slow circles with your wrists — 15 seconds clockwise, 15 seconds counter-clockwise. Then flex and extend wrists 10 times each. Essential before pressing movements.' }
     ],
     pull: [
-        { name: 'Dead Hangs', duration: 45, desc: 'Active shoulder engagement' },
-        { name: 'Scapular Shrugs', duration: 60, desc: 'On bar or rings' },
-        { name: 'Band Face Pulls', duration: 45, desc: 'Light resistance' },
-        { name: 'Cat-Cow Stretch', duration: 60, desc: 'Spine mobility' },
-        { name: 'Thoracic Rotations', duration: 45, desc: 'Both sides' },
-        { name: 'Wrist Flexion/Extension', duration: 30, desc: 'Gentle stretches' }
+        { name: 'Dead Hangs', duration: 45, desc: 'Grip a pull-up bar with palms facing away, shoulder-width apart. Hang with arms fully extended. Engage shoulders slightly (don\'t just dangle). Decompress your spine and open your chest. Hold for the full duration.' },
+        { name: 'Scapular Shrugs', duration: 60, desc: 'Hang from a pull-up bar. Without bending your elbows, shrug your shoulders down and back (retract scapulae), lifting your body slightly. Hold 2 seconds at the top, then relax. 10-12 reps. Builds scapular control.' },
+        { name: 'Band Face Pulls', duration: 45, desc: 'Attach a band at face height. Pull toward your face with elbows high, rotating hands outward at the end. Squeeze shoulder blades together. Pause 2 seconds at full contraction. 15 slow reps.' },
+        { name: 'Cat-Cow Stretch', duration: 60, desc: 'On hands and knees, alternate between arching your back (cow — belly drops, head up) and rounding your back (cat — belly pulls in, chin to chest). Move slowly with your breath. 10-12 cycles.' },
+        { name: 'Thoracic Rotations', duration: 45, desc: 'On hands and knees, place one hand behind your head. Rotate your upper body to point that elbow to the ceiling, then rotate down toward the opposite hand. 8 reps each side. Keep hips square.' },
+        { name: 'Wrist Flexion/Extension', duration: 30, desc: 'Extend one arm forward, palm down. Use the other hand to gently pull fingers back (extension stretch), hold 10 seconds. Then push fingers down (flexion stretch), hold 10 seconds. Switch hands.' }
     ],
     legs: [
-        { name: 'Leg Swings', duration: 60, desc: 'Front to back, side to side' },
-        { name: 'Hip CARs', duration: 60, desc: 'Controlled hip circles' },
-        { name: 'Bodyweight Squats', duration: 45, desc: 'Full range of motion' },
-        { name: 'Walking Lunges', duration: 45, desc: 'Dynamic stretching' },
-        { name: 'Ankle Rolls', duration: 30, desc: 'Both directions' },
-        { name: 'Glute Bridges', duration: 45, desc: 'Activation focus' }
+        { name: 'Leg Swings', duration: 60, desc: 'Hold a wall for balance. Swing one leg forward and backward like a pendulum, 15 swings. Then face the wall and swing side to side, 15 swings. Keep your core tight and standing leg slightly bent. Switch legs.' },
+        { name: 'Hip CARs', duration: 60, desc: 'Stand on one leg (hold something for balance). Lift your knee to 90 degrees, rotate it out to the side, then extend it behind you, and bring it back to start. Slow and controlled — the biggest circle you can make. 5 each direction per leg.' },
+        { name: 'Bodyweight Squats', duration: 45, desc: 'Feet shoulder-width apart, toes slightly out. Squat down as deep as you can with good form — chest up, knees tracking over toes, weight in mid-foot. Pause briefly at the bottom. 12-15 slow reps.' },
+        { name: 'Walking Lunges', duration: 45, desc: 'Step forward into a lunge — front knee at 90 degrees, back knee hovering above the ground. Push through the front heel to step the back foot forward into the next lunge. 8-10 per leg. Stay upright.' },
+        { name: 'Ankle Rolls', duration: 30, desc: 'Stand on one foot. Lift the other and slowly circle the ankle — 15 seconds clockwise, 15 seconds counter-clockwise. Switch feet. If balance is tricky, hold a wall. This prevents ankle sprains under load.' },
+        { name: 'Glute Bridges', duration: 45, desc: 'Lie on your back, knees bent, feet flat on the floor. Push through your heels to lift your hips until your body forms a straight line from shoulders to knees. Squeeze your glutes hard at the top for 2 seconds. 12-15 reps.' }
     ]
 };
 
@@ -4622,9 +4730,29 @@ function showWarmupExercise(index) {
     warmupTimeLeft = exercise.duration;
     
     document.getElementById('warmup-exercise-name').textContent = exercise.name;
-    document.getElementById('warmup-exercise-desc').textContent = exercise.desc;
     document.getElementById('warmup-timer').textContent = warmupTimeLeft;
     document.getElementById('warmup-progress').textContent = `${index + 1}/${sequence.length}`;
+    
+    // Show GIF if available
+    const media = getExerciseMedia(exercise.name);
+    const gifContainer = document.getElementById('warmup-gif-container');
+    const gifImg = document.getElementById('warmup-gif');
+    if (media && media.gif) {
+        gifImg.src = media.gif;
+        gifImg.alt = exercise.name;
+        gifImg.onerror = function() { gifContainer.style.display = 'none'; };
+        gifContainer.style.display = 'block';
+    } else {
+        gifContainer.style.display = 'none';
+    }
+    
+    // Show detailed description - check allExercises for full guide
+    const fullEx = window.allExercises ? window.allExercises.find(e => e.name === exercise.name) : null;
+    let descText = exercise.desc;
+    if (fullEx && fullEx.guide) {
+        descText = fullEx.guide.prep + ' ' + fullEx.guide.exec;
+    }
+    document.getElementById('warmup-exercise-desc').textContent = descText;
     
     speak(`${exercise.name}. ${exercise.duration} seconds`);
     
