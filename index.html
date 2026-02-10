@@ -510,6 +510,110 @@
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); 
         }
         
+        /* RPE RATING TAGS */
+        .rpe-tag {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #ccc;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .rpe-tag:hover { border-color: var(--sec); color: var(--sec); }
+        .rpe-tag.selected {
+            background: var(--sec);
+            color: #000;
+            border-color: var(--sec);
+            font-weight: bold;
+        }
+        
+        /* WORKOUT HISTORY */
+        .history-day {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        .history-day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .history-day-header:hover { background: rgba(255,255,255,0.05); }
+        .history-day-header .day-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .history-day-header .day-date {
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+        .history-day-header .day-meta {
+            font-size: 0.8em;
+            color: #888;
+        }
+        .history-day-header .day-rpe {
+            font-size: 0.8em;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+        .history-day-body {
+            display: none;
+            padding: 0 14px 14px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .history-day.expanded .history-day-body { display: block; }
+        .history-exercise {
+            margin-top: 10px;
+        }
+        .history-exercise-name {
+            font-weight: bold;
+            color: var(--sec);
+            font-size: 0.9em;
+            margin-bottom: 6px;
+        }
+        .history-set-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 0;
+            font-size: 0.85em;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .history-set-row:last-child { border-bottom: none; }
+        .history-set-row .set-num { color: #666; min-width: 50px; }
+        .history-set-row input {
+            width: 60px;
+            padding: 4px 6px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.9em;
+            text-align: center;
+        }
+        .history-set-row .set-unit { color: #888; font-size: 0.85em; }
+        .history-set-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85em;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .history-set-actions .btn-save { color: var(--sec); }
+        .history-set-actions .btn-del { color: #f5576c; }
+        .history-set-actions button:hover { background: rgba(255,255,255,0.1); }
+        
         /* UTILITIES */
         .hidden { display: none !important; }
         .text-center { text-align: center; }
@@ -869,7 +973,7 @@
 <div class="container active" id="view-coach">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
         <h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size: 0.75em; color: #666; font-family: monospace;">v52</span>
+        <span style="font-size: 0.75em; color: var(--sec); font-family: monospace;">v53</span>
     </div>
     
     <div class="card">
@@ -915,6 +1019,38 @@
     </div>
 </div>
 
+<!-- RPE RATING MODAL -->
+<div id="rpe-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; align-items:center; justify-content:center;">
+    <div style="background:var(--card); border-radius:16px; padding:30px 24px; max-width:380px; width:90%; text-align:center; box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+        <div style="font-size:2.5em; margin-bottom:8px;">💪</div>
+        <h2 style="margin-bottom:4px; color:var(--primary);">Workout Complete!</h2>
+        <p style="color:#888; font-size:0.9em; margin-bottom:20px;">How hard was that session?</p>
+        
+        <div style="font-size:3em; font-weight:bold; color:var(--sec); margin-bottom:4px;" id="rpe-value-display">5</div>
+        <div style="font-size:0.85em; color:#aaa; margin-bottom:16px;" id="rpe-label">Moderate</div>
+        
+        <input type="range" id="rpe-slider" min="1" max="10" value="5" 
+            oninput="updateRPEDisplay(this.value)"
+            style="width:100%; margin-bottom:8px; accent-color:var(--sec);">
+        <div style="display:flex; justify-content:space-between; font-size:0.75em; color:#666; margin-bottom:20px;">
+            <span>1 - Easy</span>
+            <span>10 - Max Effort</span>
+        </div>
+        
+        <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:20px;" id="rpe-tags-container">
+            <button class="rpe-tag" onclick="toggleRPETag(this)" data-tag="rushed">⏱ Rushed</button>
+            <button class="rpe-tag" onclick="toggleRPETag(this)" data-tag="focused">🎯 Focused</button>
+            <button class="rpe-tag" onclick="toggleRPETag(this)" data-tag="distracted">😵‍💫 Distracted</button>
+            <button class="rpe-tag" onclick="toggleRPETag(this)" data-tag="new-pb">🏆 New PB</button>
+            <button class="rpe-tag" onclick="toggleRPETag(this)" data-tag="pain">⚠️ Pain</button>
+            <button class="rpe-tag" onclick="toggleRPETag(this)" data-tag="great-pump">🔥 Great Pump</button>
+        </div>
+        
+        <button class="btn btn-main" onclick="submitRPE()" style="width:100%; padding:14px; font-size:1.1em;">Save & Finish</button>
+        <button onclick="skipRPE()" style="background:none; border:none; color:#666; margin-top:12px; cursor:pointer; font-size:0.85em; display:block; width:100%;">Skip</button>
+    </div>
+</div>
+
 <!-- PLAN PAGE -->
 <div class="container" id="view-plan">
     <h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg> Training Plan</h2>
@@ -941,9 +1077,18 @@
     </div>
     
     <div id="ai-coach-suggestions"></div>
+    
+    <!-- WORKOUT HISTORY -->
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h3>📋 Workout History</h3>
+            <button class="btn-small btn-danger" onclick="clearAllWorkoutHistory()" title="Delete all history">🗑 Clear All</button>
+        </div>
+        <div id="workout-history-list">
+            <p class="text-muted">No workouts logged yet.</p>
+        </div>
+    </div>
 </div>
-
-<!-- CARDIO PAGE -->
 <div class="container" id="view-cardio">
     <h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg> Cardio Tracking</h2>
     
@@ -2562,72 +2707,179 @@ let appState = {
 // ========================================
 // INITIALIZATION
 // ========================================
-// ========================================
-// PRE-LOADED EXERCISE IMAGES (50 exercises)
-// Generated: 2026-01-29
+// EXERCISE MEDIA DATABASE (158 exercises)
+// GIFs + YouTube tutorials from exercise_media.js
 // ========================================
 
-const preloadedImages = {
-    'gif_Arnold Press': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Arnold-Press.gif',
-    'gif_Barbell Curl': 'https://cdn.shopify.com/s/files/1/0618/9462/3460/files/cable-curls.gif?v=1741771141',
-    'gif_Barbell Row': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Bent-Over-Row.gif',
-    'gif_Bench Press': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Bench-Press.gif',
-    'gif_Bodyweight Squat': 'https://www.inspireusafoundation.org/file/2023/08/bodyweight-squat-example.png',
-    'gif_Bulgarian Split Squat': 'https://www.inspireusafoundation.org/file/2022/03/bulgarian-split-spuat.gif',
-    'gif_Cable Bicep Curl': 'https://cdn.shopify.com/s/files/1/0618/9462/3460/files/cable-curls.gif?v=1741771141',
-    'gif_Cable Chest Fly (High)': 'https://www.inspireusafoundation.org/wp-content/uploads/2023/08/high-cable-fly.gif',
-    'gif_Cable Chest Fly (Low)': 'https://cdn.shopify.com/s/files/1/0618/9462/3460/files/4324d0a44439cc85146e9db778f65f2a_cable_low_fly_gif___Google_Search.gif?v=1742448445',
-    'gif_Cable Chest Press': 'https://fitliferegime.com/wp-content/uploads/2023/07/Standing-Cable-Chest-Press.gif',
-    'gif_Cable Lateral Raise': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Lateral-Raise.gif',
-    'gif_Cable Overhead Press': 'https://www.inspireusafoundation.org/file/2022/04/military-press.gif',
-    'gif_Cable Pull-Through': 'https://www.inspireusafoundation.org/file/2023/07/cable-pull-through.gif',
-    'gif_Cable Rows': 'https://www.inspireusafoundation.org/file/2023/07/cable-wide-grip-row.gif',
-    'gif_Cable Squat': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/BARBELL-SQUAT.gif',
-    'gif_Chin-ups': 'https://www.inspireusafoundation.org/file/2022/09/chin-ups.gif',
-    'gif_Deadlift': 'https://www.inspireusafoundation.org/file/2022/02/barbell-deadlift-movement.gif',
-    'gif_Dips': 'https://fitnessprogramer.com/wp-content/uploads/2021/04/CHAIR-DIPS.gif',
-    'gif_Dumbbell Bench Press': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Press.gif',
-    'gif_Dumbbell Curl': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Curl.gif',
-    'gif_Dumbbell Fly': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Incline-dumbbell-Fly.gif',
-    'gif_Dumbbell Incline Press': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Incline-Dumbbell-Press.gif',
-    'gif_Dumbbell Lunge': 'https://fitnessprogramer.com/wp-content/uploads/2023/09/dumbbell-lunges.gif',
-    'gif_Dumbbell Press': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Press.gif',
-    'gif_Dumbbell Row': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Row.gif',
-    'gif_Dumbbell Shoulder Press': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Shoulder-Press.gif',
-    'gif_Face Pulls': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Face-Pull.gif',
-    'gif_Front Raise': 'https://www.inspireusafoundation.org/file/2022/01/cable-front-raise-movement.gif',
-    'gif_Glute Bridge': 'https://www.inspireusafoundation.org/file/2022/12/glute-bridge.gif',
-    'gif_Goblet Squat': 'https://fitnessprogramer.com/wp-content/uploads/2021/05/Cable-Squat.gif',
-    'gif_Hammer Curl': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Hammer-Curl.gif',
-    'gif_Incline Press': 'https://liftmanual.com/wp-content/uploads/2023/04/cable-incline-bench-press.webp',
-    'gif_Lat Pulldown (Standing)': 'https://ccuuubmtdurkmbeufybi.supabase.co/storage/v1/object/public/animations/0238.gif',
-    'gif_Lateral Raise': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Lateral-Raise.gif',
-    'gif_Leg Curl': 'https://liftmanual.com/wp-content/uploads/2023/04/cable-standing-leg-curl.gif',
-    'gif_Leg Extension': 'https://www.inspireusafoundation.org/file/2021/06/leg-extension-machine.gif',
-    'gif_Leg Press': 'https://fitnessprogramer.com/wp-content/uploads/2021/05/Cable-Squat.gif',
-    'gif_Lunges': 'https://fitnessprogramer.com/wp-content/uploads/2025/09/pendulum-lunge.gif',
-    'gif_Mountain Climbers': 'https://homeworkouts.org/wp-content/uploads/anim-mountain-climbers.gif',
-    'gif_Overhead Press': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Shoulder-Press.gif',
-    'gif_Planks': 'https://www.inspireusafoundation.org/file/2022/01/plank.gif',
-    'gif_Pull-ups': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Pull-up.gif',
-    'gif_Push-ups': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Push-Up.gif',
-    'gif_Romanian Deadlift': 'https://www.inspireusafoundation.org/file/2021/11/dumbbell-romanian-deadlift.gif',
-    'gif_Romanian Deadlift (DB)': 'https://www.inspireusafoundation.org/file/2021/11/dumbbell-romanian-deadlift.gif',
-    'gif_Seated Cable Row': 'https://www.inspireusafoundation.org/file/2022/08/cable-seated-row.gif',
-    'gif_Squat': 'https://fitnessprogramer.com/wp-content/uploads/2021/02/BARBELL-SQUAT.gif',
-    'gif_Straight Arm Pulldown': 'https://ccuuubmtdurkmbeufybi.supabase.co/storage/v1/object/public/animations/0238.gif',
-    'gif_Tricep Extension': 'https://fitnessvolt.com/wp-content/uploads/2023/09/v-bar-tricep-pushdown.gif',
-    'gif_Tricep Pushdown (Rope)': 'https://fitnessprogramer.com/wp-content/uploads/2021/06/Rope-Pushdown.gif'
+const exerciseMedia = {
+    "Cable Chest Press": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Standing-Cable-Chest-Press.gif", yt: "https://www.youtube.com/watch?v=Dz61Kd6YvYM"},
+    "Cable Chest Fly (High)": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/08/high-cable-fly.gif", yt: "https://www.youtube.com/watch?v=taI4XduLpTk"},
+    "Cable Chest Fly (Low)": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/08/low-cable-fly.gif", yt: "https://www.youtube.com/watch?v=RZwPosBv7p4"},
+    "Cable Chest Fly (Mid)": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Crossover.gif", yt: "https://www.youtube.com/watch?v=fIRtKk9EMIg"},
+    "Single Arm Cable Chest Press": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/single-arm-cable-chest-press.gif", yt: "https://www.youtube.com/watch?v=8iPEnn-CzS8"},
+    "Cable Crossover": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Crossover.gif", yt: "https://www.youtube.com/watch?v=taI4XduLpTk"},
+    "Cable Pullover (Bench)": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-pullover.gif", yt: "https://www.youtube.com/watch?v=K2nS3mLkFPw"},
+    "Lat Pulldown (Standing)": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Lat-Pulldown.gif", yt: "https://www.youtube.com/watch?v=CAwf7n6Luuc"},
+    "Seated Cable Row": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Seated-Cable-Row.gif", yt: "https://www.youtube.com/watch?v=xQNrFHEMhI4"},
+    "Face Pulls": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Face-Pull.gif", yt: "https://www.youtube.com/watch?v=rep-qVOkqgk"},
+    "Straight Arm Pulldown": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Straight-Arm-Lat-Pulldown.gif", yt: "https://www.youtube.com/watch?v=oCTLN8fwz_8"},
+    "Single Arm Cable Row": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/single-arm-cable-row.gif", yt: "https://www.youtube.com/watch?v=8YHqwXr5Vfs"},
+    "Cable Shrugs": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-shrug.gif", yt: "https://www.youtube.com/watch?v=g3D5YGZBVQM"},
+    "Cable Rear Delt Fly": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Rear-Delt-Cable-Raise.gif", yt: "https://www.youtube.com/watch?v=8x6gXCgjZzc"},
+    "High Row (Rope)": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-high-row.gif", yt: "https://www.youtube.com/watch?v=4lrPy2wqMzs"},
+    "Cable Overhead Press": {gif: "https://www.inspireusafoundation.org/file/2022/04/military-press.gif", yt: "https://www.youtube.com/watch?v=F3QY5vMz_6I"},
+    "Cable Lateral Raise": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Lateral-Raise.gif", yt: "https://www.youtube.com/watch?v=PPrzBWZDOhttps"},
+    "Cable Front Raise": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-front-raise.gif", yt: "https://www.youtube.com/watch?v=6SGWBT4jw6o"},
+    "Cable External Rotation": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-external-rotation.gif", yt: "https://www.youtube.com/watch?v=y8L2wS3KHn4"},
+    "Cable Internal Rotation": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-internal-rotation.gif", yt: "https://www.youtube.com/watch?v=rPd7DfbPkbc"},
+    "Cable Upright Row": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-upright-row.gif", yt: "https://www.youtube.com/watch?v=TU0hP7tdcwo"},
+    "Cable Y-Raise": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-y-raise.gif", yt: "https://www.youtube.com/watch?v=TU0hP7tdcwo"},
+    "Tricep Pushdown (Rope)": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Rope-Pushdown.gif", yt: "https://www.youtube.com/watch?v=2-LAMcpzODU"},
+    "Tricep Pushdown (Bar)": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/tricep-pushdown.gif", yt: "https://www.youtube.com/watch?v=2-LAMcpzODU"},
+    "Overhead Cable Extension": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/overhead-cable-tricep-extension.gif", yt: "https://www.youtube.com/watch?v=8K9KRTqdHgI"},
+    "Cable Bicep Curl": {gif: "https://cdn.shopify.com/s/files/1/0618/9462/3460/files/cable-curls.gif", yt: "https://www.youtube.com/watch?v=NFzTWp2qpiE"},
+    "Cable Hammer Curl": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-hammer-curl.gif", yt: "https://www.youtube.com/watch?v=TwD-YGVP4Bk"},
+    "Bayesian Curl": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/bayesian-curl.gif", yt: "https://www.youtube.com/watch?v=C_mGmjYp7VY"},
+    "Cable Kickback": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-kickback.gif", yt: "https://www.youtube.com/watch?v=MJJbLWHBk8U"},
+    "Reverse Grip Pushdown": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/reverse-grip-pushdown.gif", yt: "https://www.youtube.com/watch?v=qJINvrgLDW0"},
+    "Cable Squat": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/BARBELL-SQUAT.gif", yt: "https://www.youtube.com/watch?v=ultWZbUMPL8"},
+    "Cable Pull-Through": {gif: "https://www.inspireusafoundation.org/file/2023/07/cable-pull-through.gif", yt: "https://www.youtube.com/watch?v=FQzzkGU5hGA"},
+    "Cable RDL": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-rdl.gif", yt: "https://www.youtube.com/watch?v=XnVRWZPYgB4"},
+    "Cable Lunge": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-lunge.gif", yt: "https://www.youtube.com/watch?v=wrwwXE_x-pQ"},
+    "Cable Kickback (Glute)": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-glute-kickback.gif", yt: "https://www.youtube.com/watch?v=SJ9hTczMa4c"},
+    "Cable Calf Raise": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-calf-raise.gif", yt: "https://www.youtube.com/watch?v=JbyjNymZOt0"},
+    "Cable Abductor": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-hip-abduction.gif", yt: "https://www.youtube.com/watch?v=bU8yKk4vI3M"},
+    "Cable Adductor": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-hip-adduction.gif", yt: "https://www.youtube.com/watch?v=VqzWOt6T7iQ"},
+    "Cable Crunch": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Crunch.gif", yt: "https://www.youtube.com/watch?v=gYJ-rHQe45s"},
+    "Woodchopper (High to Low)": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-woodchop.gif", yt: "https://www.youtube.com/watch?v=pAplQXk3dkU"},
+    "Pallof Press": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/pallof-press.gif", yt: "https://www.youtube.com/watch?v=AH_QZLm_0-s"},
+    "Cable Side Bend": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-side-bend.gif", yt: "https://www.youtube.com/watch?v=fLhj_3vY2OY"},
+    "Woodchopper (Low to High)": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-woodchop-low-high.gif", yt: "https://www.youtube.com/watch?v=vPGH1wCybL0"},
+    "Dumbbell Bench Press": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Press.gif", yt: "https://www.youtube.com/watch?v=VmB1G1K7v94"},
+    "Dumbbell Incline Press": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Incline-Dumbbell-Press.gif", yt: "https://www.youtube.com/watch?v=8iPEnn-CzS8"},
+    "Dumbbell Fly": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Fly.gif", yt: "https://www.youtube.com/watch?v=eozdVDA78K0"},
+    "Dumbbell Shoulder Press": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Shoulder-Press.gif", yt: "https://www.youtube.com/watch?v=qEwKCR5JCog"},
+    "Arnold Press": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Arnold-Press.gif", yt: "https://www.youtube.com/watch?v=6Z15_WdXmVw"},
+    "Lateral Raise": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Lateral-Raise.gif", yt: "https://www.youtube.com/watch?v=3VcKaXpzqRo"},
+    "Front Raise": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Front-Raise.gif", yt: "https://www.youtube.com/watch?v=YslERjH_878"},
+    "Bent Over Reverse Fly": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Bent-Over-Lateral-Raise.gif", yt: "https://www.youtube.com/watch?v=EA7u4Q_8jQ0"},
+    "Dumbbell Row": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Bent-Over-Dumbbell-Row.gif", yt: "https://www.youtube.com/watch?v=roCP6wCXPqo"},
+    "Dumbbell Pullover": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/dumbbell-pullover.gif", yt: "https://www.youtube.com/watch?v=tTKxtYBLJpc"},
+    "Dumbbell Shrug": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Shrug.gif", yt: "https://www.youtube.com/watch?v=g6qbq4Lf1FI"},
+    "Dumbbell Curl": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Curl.gif", yt: "https://www.youtube.com/watch?v=ykJmrZ5v0Oo"},
+    "Hammer Curl": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Hammer-Curl.gif", yt: "https://www.youtube.com/watch?v=TwD-YGVP4Bk"},
+    "Concentration Curl": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Concentration-Curl.gif", yt: "https://www.youtube.com/watch?v=Jvj2wV8xMzs"},
+    "Tricep Kickback": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Triceps-Kickback.gif", yt: "https://www.youtube.com/watch?v=6SS6K3lAwZ8"},
+    "Overhead Tricep Extension": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Overhead-Triceps-Extension.gif", yt: "https://www.youtube.com/watch?v=YbX7Wd8jQ-Q"},
+    "Goblet Squat": {gif: "https://www.inspireusafoundation.org/file/2022/03/goblet-squat.gif", yt: "https://www.youtube.com/watch?v=MeIiIdhvXT4"},
+    "Dumbbell Lunge": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Lunge.gif", yt: "https://www.youtube.com/watch?v=QOVaHwm-Q6U"},
+    "Bulgarian Split Squat": {gif: "https://www.inspireusafoundation.org/file/2022/03/bulgarian-split-spuat.gif", yt: "https://www.youtube.com/watch?v=2C-uNgKwPLE"},
+    "Romanian Deadlift (Dumbbell)": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Romanian-Deadlift.gif", yt: "https://www.youtube.com/watch?v=K2gZFLtRaGk"},
+    "Dumbbell Calf Raise": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/dumbbell-calf-raise.gif", yt: "https://www.youtube.com/watch?v=gwLzBJYoWlI"},
+    "Bench Press": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Bench-Press.gif", yt: "https://www.youtube.com/watch?v=rT7DgCr-3pg"},
+    "Incline Bench Press": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Incline-Barbell-Bench-Press.gif", yt: "https://www.youtube.com/watch?v=SrqOu55lrYU"},
+    "Decline Bench Press": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Decline-Barbell-Bench-Press.gif", yt: "https://www.youtube.com/watch?v=LfyQBUKR8SE"},
+    "Barbell Row": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Bent-Over-Row.gif", yt: "https://www.youtube.com/watch?v=FWJR5Ve8bnQ"},
+    "Barbell Curl": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/barbell-curl.gif", yt: "https://www.youtube.com/watch?v=kwG2ipFRgfo"},
+    "Overhead Press": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/barbell-standing-military-press.gif", yt: "https://www.youtube.com/watch?v=2yjwXTZQDDI"},
+    "Barbell Squat": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/BARBELL-SQUAT.gif", yt: "https://www.youtube.com/watch?v=ultWZbUMPL8"},
+    "Deadlift": {gif: "https://www.inspireusafoundation.org/file/2022/02/barbell-deadlift-movement.gif", yt: "https://www.youtube.com/watch?v=op9kVnSso6Q"},
+    "Front Squat": {gif: "https://www.inspireusafoundation.org/file/2022/03/front-squat.gif", yt: "https://www.youtube.com/watch?v=Ev08r5VG4os"},
+    "Sumo Deadlift": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/sumo-deadlift.gif", yt: "https://www.youtube.com/watch?v=kDPbz-awu9o"},
+    "Romanian Deadlift (Barbell)": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/rdl.gif", yt: "https://www.youtube.com/watch?v=YX7FnRBgN7E"},
+    "Hip Thrust": {gif: "https://www.inspireusafoundation.org/file/2022/10/barbell-hip-thrust.gif", yt: "https://www.youtube.com/watch?v=SEdqd1n0cvg"},
+    "Good Morning": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Good-Morning.gif", yt: "https://www.youtube.com/watch?v=YA-h3n9L4YU"},
+    "Barbell Shrug": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/barbell-shrug.gif", yt: "https://www.youtube.com/watch?v=g6qbq4Lf1FI"},
+    "Upright Row": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Upright-Row.gif", yt: "https://www.youtube.com/watch?v=TU0hP7tdcwo"},
+    "Push-up": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Push-up.gif", yt: "https://www.youtube.com/watch?v=IODxDxX7oi4"},
+    "Pull-up": {gif: "https://www.inspireusafoundation.org/file/2022/09/pull-up.gif", yt: "https://www.youtube.com/watch?v=eGo4IYlbE5g"},
+    "Chin-ups": {gif: "https://www.inspireusafoundation.org/file/2022/09/chin-ups.gif", yt: "https://www.youtube.com/watch?v=L0qk3KxLtzw"},
+    "Dips": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/04/CHAIR-DIPS.gif", yt: "https://www.youtube.com/watch?v=2z8JmcrW-As"},
+    "Bodyweight Squat": {gif: "https://www.inspireusafoundation.org/file/2023/08/bodyweight-squat-example.png", yt: "https://www.youtube.com/watch?v=aclHkVaku9U"},
+    "Plank": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/plank.gif", yt: "https://www.youtube.com/watch?v=ASdvN_XEl_c"},
+    "Mountain Climbers": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/04/Mountain-Climbers.gif", yt: "https://www.youtube.com/watch?v=nmwgirgXLYM"},
+    "Burpees": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/04/Burpee.gif", yt: "https://www.youtube.com/watch?v=TU8QYVW0gDU"},
+    "Jump Squat": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/jump-squat.gif", yt: "https://www.youtube.com/watch?v=Azl5tkCzDcc"},
+    "Box Jump": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/box-jump.gif", yt: "https://www.youtube.com/watch?v=NBY9-kTuHEk"},
+    "Diamond Push-up": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/diamond-pushup.gif", yt: "https://www.youtube.com/watch?v=J0DnG1_S92I"},
+    "Pike Push-up": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/pike-pushup.gif", yt: "https://www.youtube.com/watch?v=x4YNjP4_8HQ"},
+    "Handstand Push-up": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/handstand-pushup.gif", yt: "https://www.youtube.com/watch?v=tQhrk6WMcKw"},
+    "Pistol Squat": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/pistol-squat.gif", yt: "https://www.youtube.com/watch?v=vq5-vdgJc0I"},
+    "Nordic Curl": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/nordic-curl.gif", yt: "https://www.youtube.com/watch?v=JF4vqtItQaU"},
+    "Leg Raise": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Hanging-Leg-Raise.gif", yt: "https://www.youtube.com/watch?v=Pr1ieGZ5atk"},
+    "Bicycle Crunch": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Bicycle-Crunch.gif", yt: "https://www.youtube.com/watch?v=Iwyvozckjak"},
+    "Russian Twist": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Russian-Twist.gif", yt: "https://www.youtube.com/watch?v=JyUqwkVpsi4"},
+    "Side Plank": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/side-plank.gif", yt: "https://www.youtube.com/watch?v=K2VljzCC16g"},
+    "Superman": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Superman-Exercise.gif", yt: "https://www.youtube.com/watch?v=z6PJMT2y8GQ"},
+    "Leg Press": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/LEG-PRESS.gif", yt: "https://www.youtube.com/watch?v=IZxyjW7MPJQ"},
+    "Leg Extension": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/LEG-EXTENSION.gif", yt: "https://www.youtube.com/watch?v=YyvSfEjZruM"},
+    "Leg Curl": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/LEG-CURL.gif", yt: "https://www.youtube.com/watch?v=1Tq3QdYUuHs"},
+    "Chest Press Machine": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/machine-chest-press.gif", yt: "https://www.youtube.com/watch?v=xUm0BiZCWlQ"},
+    "Pec Deck": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Pec-Deck-Fly.gif", yt: "https://www.youtube.com/watch?v=Z77JgouJdXE"},
+    "Lat Pulldown Machine": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Lat-Pulldown.gif", yt: "https://www.youtube.com/watch?v=CAwf7n6Luuc"},
+    "Seated Row Machine": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Seated-Cable-Row.gif", yt: "https://www.youtube.com/watch?v=UCXxvVItLoM"},
+    "Shoulder Press Machine": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/machine-shoulder-press.gif", yt: "https://www.youtube.com/watch?v=WvLMauqrnK8"},
+    "Leg Abductor Machine": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/hip-abduction-machine.gif", yt: "https://www.youtube.com/watch?v=bU8yKk4vI3M"},
+    "Leg Adductor Machine": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/hip-adduction-machine.gif", yt: "https://www.youtube.com/watch?v=VqzWOt6T7iQ"},
+    "Calf Raise Machine": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/seated-calf-raise.gif", yt: "https://www.youtube.com/watch?v=JbyjNymZOt0"},
+    "Hack Squat": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/hack-squat.gif", yt: "https://www.youtube.com/watch?v=0tn5K9NlCfo"},
+    "Smith Machine Squat": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/smith-machine-squat.gif", yt: "https://www.youtube.com/watch?v=PtrvHumw9X4"},
+    "Smith Machine Bench": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/smith-machine-bench.gif", yt: "https://www.youtube.com/watch?v=gRVjAtPip0Y"},
+    "Preacher Curl Machine": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Preacher-Curl.gif", yt: "https://www.youtube.com/watch?v=vnfBFTJz3Sg"},
+    "Kettlebell Swing": {gif: "https://www.inspireusafoundation.org/file/2022/03/kettlebell-swing.gif", yt: "https://www.youtube.com/watch?v=YSxHifyI6s8"},
+    "Kettlebell Goblet Squat": {gif: "https://www.inspireusafoundation.org/file/2022/03/goblet-squat.gif", yt: "https://www.youtube.com/watch?v=MeIiIdhvXT4"},
+    "Kettlebell Turkish Get-Up": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/turkish-getup.gif", yt: "https://www.youtube.com/watch?v=0bWRPC49-KI"},
+    "Kettlebell Snatch": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/kettlebell-snatch.gif", yt: "https://www.youtube.com/watch?v=rpM2eHr-QGU"},
+    "Kettlebell Clean and Press": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/kettlebell-clean-press.gif", yt: "https://www.youtube.com/watch?v=XT9n2VDXCGU"},
+    "Clean and Jerk": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/clean-jerk.gif", yt: "https://www.youtube.com/watch?v=PjY1rH4_MOA"},
+    "Snatch": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/snatch.gif", yt: "https://www.youtube.com/watch?v=9xQp2sldyts"},
+    "Power Clean": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/power-clean.gif", yt: "https://www.youtube.com/watch?v=KwYJTpQ_x5A"},
+    "Treadmill Run": {gif: "placeholder", yt: "https://www.youtube.com/watch?v=wCVSv7UxB2E"},
+    "Stationary Bike": {gif: "placeholder", yt: "https://www.youtube.com/watch?v=YlHBxUFFNWU"},
+    "Rowing Machine": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/rowing-machine.gif", yt: "https://www.youtube.com/watch?v=zQ82RYIFLN8"},
+    "Stair Climber": {gif: "placeholder", yt: "https://www.youtube.com/watch?v=fFMpYeqgY74"},
+    "Elliptical": {gif: "placeholder", yt: "https://www.youtube.com/watch?v=NelMs4KMhWU"},
+    "Battle Ropes": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/battle-ropes.gif", yt: "https://www.youtube.com/watch?v=sE_nX4t-bh4"},
+    "Sled Push": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/sled-push.gif", yt: "https://www.youtube.com/watch?v=lz0t3YxRBiE"},
+    "Farmer's Walk": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/farmers-walk.gif", yt: "https://www.youtube.com/watch?v=rt17lmnaLSM"},
+    "Sled Drag": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/sled-drag.gif", yt: "https://www.youtube.com/watch?v=pKq7LmlEFuw"},
+    "Cat-Cow Stretch": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cat-cow.gif", yt: "https://www.youtube.com/watch?v=kqnua4rHVVA"},
+    "Child's Pose": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/childs-pose.gif", yt: "https://www.youtube.com/watch?v=2MTKEnyBMw8"},
+    "Foam Roll": {gif: "placeholder", yt: "https://www.youtube.com/watch?v=oOHgG5jCZqM"},
+    "Couch Stretch": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/couch-stretch.gif", yt: "https://www.youtube.com/watch?v=pvlmwu1p9co"},
+    "90/90 Hip Stretch": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/90-90-stretch.gif", yt: "https://www.youtube.com/watch?v=2c9Qv2e-hPw"},
+    "Pigeon Pose": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/pigeon-pose.gif", yt: "https://www.youtube.com/watch?v=0_zQuLOhi8c"},
+    "Dead Hang": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/dead-hang.gif", yt: "https://www.youtube.com/watch?v=yN3JwzEhbBw"},
+    "Wall Sit": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/wall-sit.gif", yt: "https://www.youtube.com/watch?v=y-wV4Venusw"},
+    "Incline Dumbbell Fly": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/incline-dumbbell-fly.gif", yt: "https://www.youtube.com/watch?v=Z4f0J0TcqYQ"},
+    "Decline Dumbbell Press": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/decline-dumbbell-press.gif", yt: "https://www.youtube.com/watch?v=LfyQBUKR8SE"},
+    "Zottman Curl": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/zottman-curl.gif", yt: "https://www.youtube.com/watch?v=ZrpRBgswtHs"},
+    "Skull Crusher": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Lying-Triceps-Extension-Skull-Crusher.gif", yt: "https://www.youtube.com/watch?v=d_KZxkY_0cM"},
+    "Close-Grip Bench Press": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Close-Grip-Barbell-Bench-Press.gif", yt: "https://www.youtube.com/watch?v=nEF0bv2FW94"},
+    "Wide-Grip Pull-up": {gif: "https://www.inspireusafoundation.org/file/2022/09/wide-grip-pull-up.gif", yt: "https://www.youtube.com/watch?v=iywjqUo5nmU"},
+    "T-Bar Row": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/T-bar-Row.gif", yt: "https://www.youtube.com/watch?v=j3Igk5nyZE4"},
+    "Landmine Press": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/landmine-press.gif", yt: "https://www.youtube.com/watch?v=8iPEnn-CzS8"},
+    "Reverse Lunge": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/reverse-lunge.gif", yt: "https://www.youtube.com/watch?v=xXDH8P8yCaI"},
+    "Walking Lunge": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/walking-lunge.gif", yt: "https://www.youtube.com/watch?v=L8fvypPrzzs"},
+    "Step-up": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/step-up.gif", yt: "https://www.youtube.com/watch?v=dQqApCGd5Ss"},
+    "Single-Leg RDL": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/single-leg-rdl.gif", yt: "https://www.youtube.com/watch?v=2CJeqEHDXHU"},
+    "Glute Bridge": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Glute-Bridge.gif", yt: "https://www.youtube.com/watch?v=wPM8icPu6H8"},
+    "Single-Leg Glute Bridge": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/single-leg-glute-bridge.gif", yt: "https://www.youtube.com/watch?v=AVAXhy6pl7o"},
+    "Ab Wheel Rollout": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/ab-roller.gif", yt: "https://www.youtube.com/watch?v=EXm0JraD9bA"},
+    "Hollow Body Hold": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/hollow-body-hold.gif", yt: "https://www.youtube.com/watch?v=LlDNef_Ztsc"},
+    "V-Up": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/v-up.gif", yt: "https://www.youtube.com/watch?v=iP2fjvG0g3w"},
+    "Dragon Flag": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/dragon-flag.gif", yt: "https://www.youtube.com/watch?v=njKXkuhY7_0"},
+    "L-Sit": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/l-sit.gif", yt: "https://www.youtube.com/watch?v=7dK9k5l5H0g"}
 };
 
 function loadPreloadedImages() {
-    Object.keys(preloadedImages).forEach(key => {
-        if(!localStorage.getItem(key)) {
-            localStorage.setItem(key, preloadedImages[key]);
-            console.log('✅ Loaded: ' + key);
+    Object.entries(exerciseMedia).forEach(([name, data]) => {
+        const gifKey = 'gif_' + name;
+        if(!localStorage.getItem(gifKey)) {
+            localStorage.setItem(gifKey, data.gif);
         }
     });
-    console.log('✅ Pre-loaded 50 exercise images');
+    console.log('✅ Pre-loaded ' + Object.keys(exerciseMedia).length + ' exercise media entries');
 }
 
 window.onload = () => {
@@ -2681,7 +2933,7 @@ function switchTab(tab) {
         if(btn) btn.classList.add('active');
     }
     
-    if(tab === 'plan') renderPlanCalendar();
+    if(tab === 'plan') { renderPlanCalendar(); renderWorkoutHistory(); }
     if(tab === 'cardio') loadCardioHistory();
     if(tab === 'encyclopedia') renderEncyclopedia();
     if(tab === 'settings') updateSettingsUI();
@@ -2923,10 +3175,16 @@ function getProgression(name) {
 
 function endWorkout() {
     if(confirm('End workout early?')) {
+        window._lastWorkoutType = appState.currentWorkout?.type || 'unknown';
+        window._lastWorkoutDate = new Date().toISOString().split('T')[0];
+        window._endedEarly = true;
+        
         document.getElementById('workout-interface').style.display = 'none';
         appState.currentWorkout = null;
         appState.currentSetIndex = {};
         saveAppState();
+        
+        showRPEModal();
     }
 }
 
@@ -2934,13 +3192,17 @@ function finishWorkout() {
     const today = new Date().getDay();
     markDayCompleted(today);
     
+    // Store workout info for RPE saving
+    window._lastWorkoutType = appState.currentWorkout?.type || 'unknown';
+    window._lastWorkoutDate = getDateForDay(today);
+    window._endedEarly = false;
+    
     document.getElementById('workout-interface').style.display = 'none';
     appState.currentWorkout = null;
     appState.currentSetIndex = {};
     saveAppState();
     
-    alert('Workout saved! Great job! 💪');
-    speak('Workout complete! Great work!');
+    showRPEModal();
 }
 
 function markDayCompleted(dayIndex) {
@@ -2968,6 +3230,293 @@ function getDateForDay(dayIndex) {
     const target = new Date(today);
     target.setDate(today.getDate() + diff);
     return target.toISOString().split('T')[0];
+}
+
+// ========================================
+// SESSION RPE RATING SYSTEM
+// ========================================
+const RPE_LABELS = {
+    1: 'Very Light', 2: 'Light', 3: 'Light-Moderate',
+    4: 'Moderate', 5: 'Moderate', 6: 'Moderate-Hard',
+    7: 'Hard', 8: 'Very Hard', 9: 'Near Max', 10: 'Max Effort'
+};
+
+function showRPEModal() {
+    const modal = document.getElementById('rpe-modal');
+    modal.style.display = 'flex';
+    document.getElementById('rpe-slider').value = 5;
+    updateRPEDisplay(5);
+    // Reset tags
+    document.querySelectorAll('.rpe-tag').forEach(t => t.classList.remove('selected'));
+}
+
+function updateRPEDisplay(val) {
+    document.getElementById('rpe-value-display').textContent = val;
+    document.getElementById('rpe-label').textContent = RPE_LABELS[val] || 'Moderate';
+    
+    // Color gradient from green (easy) to red (max)
+    const hue = Math.round(120 - (val - 1) * (120 / 9)); // 120=green to 0=red
+    document.getElementById('rpe-value-display').style.color = `hsl(${hue}, 80%, 55%)`;
+}
+
+function toggleRPETag(btn) {
+    btn.classList.toggle('selected');
+}
+
+function submitRPE() {
+    const rpe = parseInt(document.getElementById('rpe-slider').value);
+    const tags = Array.from(document.querySelectorAll('.rpe-tag.selected')).map(t => t.dataset.tag);
+    
+    saveRPEData(rpe, tags);
+    
+    document.getElementById('rpe-modal').style.display = 'none';
+    speak('Workout complete! Great work!');
+    
+    // Send to AI coach chat as context
+    const tagStr = tags.length > 0 ? ` Tags: ${tags.join(', ')}.` : '';
+    const earlyStr = window._endedEarly ? ' (ended early)' : '';
+    addAIContextMessage(`Session RPE: ${rpe}/10 (${RPE_LABELS[rpe]})${earlyStr}.${tagStr}`);
+}
+
+function skipRPE() {
+    document.getElementById('rpe-modal').style.display = 'none';
+    speak('Workout complete! Great work!');
+}
+
+function saveRPEData(rpe, tags) {
+    const date = window._lastWorkoutDate || new Date().toISOString().split('T')[0];
+    let rpeHistory = JSON.parse(localStorage.getItem('rpeHistory')) || {};
+    
+    rpeHistory[date] = {
+        rpe: rpe,
+        label: RPE_LABELS[rpe],
+        tags: tags,
+        workoutType: window._lastWorkoutType || 'unknown',
+        endedEarly: window._endedEarly || false,
+        timestamp: new Date().toISOString()
+    };
+    
+    localStorage.setItem('rpeHistory', JSON.stringify(rpeHistory));
+}
+
+function addAIContextMessage(text) {
+    // Silently add context to chat history for AI coach awareness
+    try {
+        let chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
+        chatHistory.push({
+            role: 'system',
+            content: `[Auto-logged] ${text}`,
+            timestamp: new Date().toISOString()
+        });
+        localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+    } catch(e) {
+        console.log('RPE context save skipped:', e);
+    }
+}
+
+function getRPEHistory() {
+    return JSON.parse(localStorage.getItem('rpeHistory')) || {};
+}
+
+// ========================================
+// WORKOUT HISTORY VIEWER
+// ========================================
+function getWorkoutsByDate() {
+    const history = JSON.parse(localStorage.getItem('exerciseHistory')) || {};
+    const byDate = {};
+    
+    Object.entries(history).forEach(([exerciseName, sets]) => {
+        sets.forEach((set) => {
+            const date = set.sessionDate;
+            if (!date) return;
+            if (!byDate[date]) byDate[date] = {};
+            if (!byDate[date][exerciseName]) byDate[date][exerciseName] = [];
+            byDate[date][exerciseName].push(set);
+        });
+    });
+    
+    return byDate;
+}
+
+function renderWorkoutHistory() {
+    const container = document.getElementById('workout-history-list');
+    if (!container) return;
+    
+    const byDate = getWorkoutsByDate();
+    const rpeHistory = getRPEHistory();
+    const dates = Object.keys(byDate).sort().reverse();
+    
+    if (dates.length === 0) {
+        container.innerHTML = '<p class="text-muted">No workouts logged yet.</p>';
+        return;
+    }
+    
+    let html = '';
+    dates.forEach(date => {
+        const exercises = byDate[date];
+        const exerciseNames = Object.keys(exercises);
+        const totalSets = exerciseNames.reduce((sum, name) => sum + exercises[name].length, 0);
+        const rpe = rpeHistory[date];
+        
+        // Format date nicely
+        const d = new Date(date + 'T12:00:00');
+        const dayName = d.toLocaleDateString('en-AU', { weekday: 'short' });
+        const dateStr = d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+        
+        // RPE badge
+        let rpeBadge = '';
+        if (rpe) {
+            const hue = Math.round(120 - (rpe.rpe - 1) * (120 / 9));
+            rpeBadge = `<span class="day-rpe" style="background:hsla(${hue},80%,55%,0.2); color:hsl(${hue},80%,55%);">RPE ${rpe.rpe}</span>`;
+        }
+        
+        // Workout type
+        const workoutType = rpe?.workoutType && rpe.workoutType !== 'unknown' ? rpe.workoutType.charAt(0).toUpperCase() + rpe.workoutType.slice(1) : '';
+        const metaText = [workoutType, `${exerciseNames.length} exercises`, `${totalSets} sets`].filter(Boolean).join(' · ');
+        
+        html += `
+        <div class="history-day" id="history-${date}">
+            <div class="history-day-header" onclick="toggleHistoryDay('${date}')">
+                <div class="day-info">
+                    <span class="day-date">${dayName}, ${dateStr}</span>
+                    <span class="day-meta">${metaText}</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    ${rpeBadge}
+                    <span style="color:#666; font-size:0.9em;">▸</span>
+                </div>
+            </div>
+            <div class="history-day-body" id="history-body-${date}">
+                ${renderHistoryExercises(date, exercises)}
+                <div style="margin-top:12px; display:flex; gap:8px; justify-content:flex-end;">
+                    <button class="btn-small btn-danger" onclick="deleteWorkoutDay('${date}')" style="font-size:0.8em;">🗑 Delete Day</button>
+                </div>
+            </div>
+        </div>`;
+    });
+    
+    container.innerHTML = html;
+}
+
+function renderHistoryExercises(date, exercises) {
+    let html = '';
+    Object.entries(exercises).forEach(([name, sets]) => {
+        const safeName = name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        html += `<div class="history-exercise">
+            <div class="history-exercise-name">${name}</div>`;
+        sets.forEach((set, i) => {
+            const safeId = (date + '_' + name + '_' + i).replace(/[^a-zA-Z0-9]/g, '_');
+            html += `
+            <div class="history-set-row" id="row-${safeId}">
+                <span class="set-num">Set ${i + 1}</span>
+                <input type="number" id="hw-${safeId}" value="${set.weight}" step="0.5" title="Weight">
+                <span class="set-unit">kg</span>
+                <span style="color:#666;">×</span>
+                <input type="number" id="hr-${safeId}" value="${set.reps}" step="1" title="Reps">
+                <span class="set-unit">reps</span>
+                <div class="history-set-actions">
+                    <button class="btn-save" onclick="saveHistorySet('${safeName}', '${date}', ${i}, '${safeId}')" title="Save">✓</button>
+                    <button class="btn-del" onclick="deleteHistorySet('${safeName}', '${date}', ${i})" title="Delete">✕</button>
+                </div>
+            </div>`;
+        });
+        html += '</div>';
+    });
+    return html;
+}
+
+function toggleHistoryDay(date) {
+    const el = document.getElementById('history-' + date);
+    if (el) el.classList.toggle('expanded');
+}
+
+function saveHistorySet(exerciseName, date, setIndex, safeId) {
+    var weightInput = document.getElementById('hw-' + safeId);
+    var repsInput = document.getElementById('hr-' + safeId);
+    if (!weightInput || !repsInput) return;
+    
+    var newWeight = parseFloat(weightInput.value);
+    var newReps = parseInt(repsInput.value);
+    if (isNaN(newWeight) || isNaN(newReps)) {
+        showNotification('Enter valid weight and reps', 'error');
+        return;
+    }
+    
+    var history = JSON.parse(localStorage.getItem('exerciseHistory')) || {};
+    if (!history[exerciseName]) return;
+    
+    // Find sets for this date and update the right one
+    var dateSetCount = 0;
+    for (var i = 0; i < history[exerciseName].length; i++) {
+        if (history[exerciseName][i].sessionDate === date) {
+            if (dateSetCount === setIndex) {
+                history[exerciseName][i].weight = newWeight;
+                history[exerciseName][i].reps = newReps;
+                localStorage.setItem('exerciseHistory', JSON.stringify(history));
+                showNotification('Set updated', 'success');
+                return;
+            }
+            dateSetCount++;
+        }
+    }
+}
+
+function deleteHistorySet(exerciseName, date, setIndex) {
+    if (!confirm('Delete this set?')) return;
+    
+    var history = JSON.parse(localStorage.getItem('exerciseHistory')) || {};
+    if (!history[exerciseName]) return;
+    
+    var dateSetCount = 0;
+    for (var i = 0; i < history[exerciseName].length; i++) {
+        if (history[exerciseName][i].sessionDate === date) {
+            if (dateSetCount === setIndex) {
+                history[exerciseName].splice(i, 1);
+                if (history[exerciseName].length === 0) delete history[exerciseName];
+                localStorage.setItem('exerciseHistory', JSON.stringify(history));
+                renderWorkoutHistory();
+                showNotification('Set deleted', 'success');
+                return;
+            }
+            dateSetCount++;
+        }
+    }
+}
+
+function deleteWorkoutDay(date) {
+    if (!confirm('Delete all workout data for ' + date + '?')) return;
+    
+    var history = JSON.parse(localStorage.getItem('exerciseHistory')) || {};
+    Object.keys(history).forEach(function(name) {
+        history[name] = history[name].filter(function(s) { return s.sessionDate !== date; });
+        if (history[name].length === 0) delete history[name];
+    });
+    localStorage.setItem('exerciseHistory', JSON.stringify(history));
+    
+    var completed = JSON.parse(localStorage.getItem('completedWorkouts')) || {};
+    delete completed[date];
+    localStorage.setItem('completedWorkouts', JSON.stringify(completed));
+    
+    var rpe = JSON.parse(localStorage.getItem('rpeHistory')) || {};
+    delete rpe[date];
+    localStorage.setItem('rpeHistory', JSON.stringify(rpe));
+    
+    renderWorkoutHistory();
+    renderPlanCalendar();
+    showNotification('Workout day deleted', 'success');
+}
+
+function clearAllWorkoutHistory() {
+    if (!confirm('Delete ALL workout history? This cannot be undone.')) return;
+    if (!confirm('Are you sure? This removes all logged sets, completed days, and RPE ratings.')) return;
+    
+    localStorage.removeItem('exerciseHistory');
+    localStorage.removeItem('completedWorkouts');
+    localStorage.removeItem('rpeHistory');
+    
+    renderWorkoutHistory();
+    renderPlanCalendar();
+    showNotification('All workout history cleared', 'success');
 }
 
 // ========================================
@@ -3480,13 +4029,59 @@ function startTodaysWorkout() {
 // EXERCISE DETAIL VIEWER
 // ========================================
 function viewExerciseDetails(name) {
-    const ex = exercises.find(e => e.name === name);
+    const ex = window.allExercises.find(e => e.name === name);
     if (!ex) return;
     
     document.getElementById('exercise-detail-name').textContent = ex.name;
     
     const content = document.getElementById('exercise-detail-content');
+    
+    // Look up media (GIF + YouTube) with alias fallback
+    const mediaAliases = {
+        "Pull-ups": "Pull-up",
+        "Push-ups": "Push-up",
+        "Romanian Deadlift (DB)": "Romanian Deadlift (Dumbbell)",
+        "V-Ups": "V-Up",
+        "Farmers Walk": "Farmer's Walk",
+        "Single Leg Glute Bridge": "Single-Leg Glute Bridge",
+        "Single Leg RDL (BW)": "Single-Leg RDL",
+        "Cat-Cow": "Cat-Cow Stretch",
+        "90/90 Hip Switch": "90/90 Hip Stretch",
+        "DB Shrugs": "Dumbbell Shrug",
+        "Skull Crusher (DB)": "Skull Crusher",
+        "Good Morning (BW)": "Good Morning",
+        "Hanging Leg Raise": "Leg Raise",
+        "DB Step Up": "Step-up",
+        "L-Sit (Tuck)": "L-Sit"
+    };
+    const mediaKey = mediaAliases[ex.name] || ex.name;
+    const media = exerciseMedia[mediaKey];
+    const gifUrl = media ? media.gif : localStorage.getItem('gif_' + ex.name);
+    const ytUrl = media ? media.yt : null;
+    
+    let mediaHtml = '';
+    if (gifUrl) {
+        mediaHtml = `
+            <div class="gif-container" style="margin-bottom:12px; border-radius:12px; overflow:hidden; background:#000; text-align:center;">
+                <img src="${gifUrl}" alt="${ex.name}" style="max-width:100%; max-height:300px; object-fit:contain; border-radius:12px;"
+                    onerror="this.parentElement.style.display='none'">
+            </div>
+        `;
+    }
+    
+    let ytHtml = '';
+    if (ytUrl) {
+        ytHtml = `
+            <a href="${ytUrl}" target="_blank" rel="noopener" 
+               style="display:block; text-align:center; padding:10px; margin-bottom:12px; background:rgba(255,0,0,0.1); border:1px solid rgba(255,0,0,0.3); border-radius:10px; color:#ff4444; text-decoration:none; font-weight:bold; font-size:0.95em;">
+                ▶ Watch Form Tutorial on YouTube
+            </a>
+        `;
+    }
+    
     content.innerHTML = `
+        ${mediaHtml}
+        ${ytHtml}
         <div class="card" style="margin-bottom:12px">
             <h4 style="color:var(--sec);margin-bottom:8px">Preparation</h4>
             <p>${ex.guide.prep}</p>
@@ -4683,7 +5278,7 @@ async function disconnectGarmin() {
 
 async function initSupabase() {
     try {
-        console.log('🔄 Initializing Supabase v52 (Backend Proxy)...');
+        console.log('🔄 Initializing Supabase v53 (Backend Proxy)...');
         let attempts = 0;
         while (typeof window.supabase?.createClient !== 'function' && attempts < 100) {
             await new Promise(res => setTimeout(res, 100));
@@ -4704,7 +5299,7 @@ async function initSupabase() {
         updateCloudSyncUI(); 
         await loadFromCloud();
         checkGarminConnection(); 
-        console.log('✅ Supabase initialized successfully! v52');
+        console.log('✅ Supabase initialized successfully! v53');
     } catch (error) {
         console.error('❌ Supabase init error:', error);
         CLOUD_SYNC_ENABLED = false;
