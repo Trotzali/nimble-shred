@@ -973,7 +973,7 @@
 <div class="container active" id="view-coach">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
         <h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size: 0.75em; color: var(--sec); font-family: monospace;">v54</span>
+        <span style="font-size: 0.75em; color: var(--sec); font-family: monospace;">v55</span>
     </div>
     
     <div class="card">
@@ -1008,6 +1008,16 @@
         </div>
         <button class="btn btn-main" onclick="openCustomBuilder()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Custom Workout Builder</button>
         <button class="btn btn-action" onclick="generateRandomWorkout()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="8" cy="8" r="1" fill="currentColor"/><circle cx="16" cy="8" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="8" cy="16" r="1" fill="currentColor"/><circle cx="16" cy="16" r="1" fill="currentColor"/></svg> Random Workout</button>
+        
+        <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.08);">
+            <div style="font-size:0.85em; color:#888; margin-bottom:8px;">⏱ Short on time? Wedge Session:</div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn btn-small btn-action" onclick="startWedgeSession(10)" style="flex:1;">10 min</button>
+                <button class="btn btn-small btn-action" onclick="startWedgeSession(15)" style="flex:1;">15 min</button>
+                <button class="btn btn-small btn-action" onclick="startWedgeSession(20)" style="flex:1;">20 min</button>
+                <button class="btn btn-small btn-action" onclick="startWedgeSession(30)" style="flex:1;">30 min</button>
+            </div>
+        </div>
     </div>
     
     <div id="workout-interface" style="display:none;">
@@ -1082,6 +1092,11 @@
     <div class="card" id="weekly-briefing-card" style="display:none;">
         <h3>📊 Weekly Briefing</h3>
         <div id="weekly-briefing-content"></div>
+    </div>
+    
+    <!-- DELOAD DETECTIVE -->
+    <div class="card" id="deload-detective-card" style="display:none;">
+        <div id="deload-detective-content"></div>
     </div>
     
     <!-- WORKOUT HISTORY -->
@@ -1266,7 +1281,19 @@
     
     <div class="card">
         <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Equipment Available</h3>
+        
+        <div style="font-size:0.85em; color:#888; margin-bottom:10px;">Quick presets:</div>
         <div id="equipment-presets"></div>
+        
+        <div style="font-size:0.85em; color:#888; margin:12px 0 8px; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px;">Or select what you have:</div>
+        <div id="equipment-chips" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;"></div>
+        
+        <div style="font-size:0.85em; color:#888; margin:12px 0 8px; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px;">Saved locations:</div>
+        <div id="saved-equipment-profiles" style="margin-bottom:10px;"></div>
+        <div style="display:flex; gap:8px;">
+            <input type="text" id="profile-name-input" placeholder="e.g. Hotel, Mum's Garage" style="flex:1; padding:8px; font-size:0.85em;">
+            <button class="btn btn-small btn-action" onclick="saveEquipmentProfile()">Save</button>
+        </div>
     </div>
     
     <div class="card">
@@ -2942,7 +2969,7 @@ function switchTab(tab) {
         if(btn) btn.classList.add('active');
     }
     
-    if(tab === 'plan') { renderPlanCalendar(); renderWorkoutHistory(); renderWeeklyBriefing(); }
+    if(tab === 'plan') { renderPlanCalendar(); renderWorkoutHistory(); renderWeeklyBriefing(); renderDeloadDetective(); }
     if(tab === 'cardio') loadCardioHistory();
     if(tab === 'encyclopedia') renderEncyclopedia();
     if(tab === 'settings') updateSettingsUI();
@@ -2984,6 +3011,58 @@ function generateRandomWorkout() {
     quickStartWorkout(randomType);
 }
 
+function startWedgeSession(minutes) {
+    // ~4 mins per exercise (including rest): 10min=2, 15min=3, 20min=4, 30min=6
+    var exerciseCount = Math.max(2, Math.round(minutes / 5));
+    
+    // Pick workout type based on what's least recently trained
+    var completed = JSON.parse(localStorage.getItem('completedWorkouts')) || {};
+    var history = JSON.parse(localStorage.getItem('exerciseHistory')) || {};
+    var types = ['push', 'pull', 'legs'];
+    
+    // Find which muscle group was trained least recently
+    var lastTrained = {};
+    types.forEach(function(type) {
+        lastTrained[type] = '2000-01-01';
+    });
+    
+    Object.keys(history).forEach(function(exName) {
+        var ex = window.allExercises ? window.allExercises.find(function(e) { return e.name === exName; }) : null;
+        if (!ex) return;
+        var sets = history[exName];
+        if (sets.length === 0) return;
+        var lastDate = sets[sets.length - 1].sessionDate || '2000-01-01';
+        
+        if (ex.cat.some(function(c) { return ['Chest','Shoulders','Triceps'].indexOf(c) !== -1; })) {
+            if (lastDate > lastTrained.push) lastTrained.push = lastDate;
+        }
+        if (ex.cat.some(function(c) { return ['Back','Lats','Biceps'].indexOf(c) !== -1; })) {
+            if (lastDate > lastTrained.pull) lastTrained.pull = lastDate;
+        }
+        if (ex.cat.some(function(c) { return ['Legs','Quads','Hamstrings','Glutes'].indexOf(c) !== -1; })) {
+            if (lastDate > lastTrained.legs) lastTrained.legs = lastDate;
+        }
+    });
+    
+    // Sort by least recently trained
+    types.sort(function(a, b) { return lastTrained[a] < lastTrained[b] ? -1 : 1; });
+    var bestType = types[0];
+    
+    // Generate with fewer exercises, skip warmup
+    var exercises = generateWorkoutByType(bestType, exerciseCount);
+    
+    appState.currentWorkoutType = bestType;
+    appState.currentWorkout = exercises;
+    appState.currentSetIndex = {};
+    appState.exerciseDone = {};
+    saveAppState();
+    
+    // Skip warmup for wedge sessions — go straight to workout
+    startWorkout(exercises);
+    speak(minutes + ' minute wedge session! ' + exerciseCount + ' exercises, ' + bestType + ' focus. Go!');
+    showNotification('⏱ ' + minutes + 'min Wedge: ' + bestType.toUpperCase() + ' — ' + exerciseCount + ' exercises', 'success');
+}
+
 function generateWorkoutByType(type, count = 6) {
     let filtered = window.allExercises.filter(ex => {
         if(type === 'push') return ex.cat.some(c => ['Chest','Shoulders','Triceps'].includes(c));
@@ -3003,18 +3082,25 @@ function generateWorkoutByType(type, count = 6) {
 }
 
 function filterExercisesByEquipment(exercises) {
-    const presets = {
-        home: ['Cable', 'Dumbbell', 'Bodyweight', 'Bench', 'Bands'],
-        hotel: ['Bodyweight', 'Bands'],
+    // If custom equipment list is set, use it
+    if (appState.customEquipment && appState.customEquipment.length > 0) {
+        return exercises.filter(function(ex) {
+            return appState.customEquipment.indexOf(ex.equip) !== -1 || ex.equip === 'Bodyweight';
+        });
+    }
+    
+    var presets = {
+        home: ['Cable', 'Dumbbell', 'Bodyweight', 'Free Weight'],
+        hotel: ['Bodyweight'],
         gym: ['All']
     };
     
-    const available = presets[appState.equipment] || presets.gym;
-    if(available.includes('All')) return exercises;
+    var available = presets[appState.equipment] || presets.gym;
+    if (available.indexOf('All') !== -1) return exercises;
     
-    return exercises.filter(ex => 
-        available.includes(ex.equip) || ex.equip === 'Bodyweight'
-    );
+    return exercises.filter(function(ex) {
+        return available.indexOf(ex.equip) !== -1 || ex.equip === 'Bodyweight';
+    });
 }
 
 function startWorkout(exercises) {
@@ -3912,6 +3998,160 @@ function renderWeeklyBriefing() {
 }
 
 // ========================================
+// DELOAD DETECTIVE
+// ========================================
+function renderDeloadDetective() {
+    var card = document.getElementById('deload-detective-card');
+    var content = document.getElementById('deload-detective-content');
+    if (!card || !content) return;
+    
+    var history = JSON.parse(localStorage.getItem('exerciseHistory')) || {};
+    var completed = JSON.parse(localStorage.getItem('completedWorkouts')) || {};
+    var rpeHistory = JSON.parse(localStorage.getItem('rpeHistory')) || {};
+    
+    // Calculate weekly volumes for last 4 weeks
+    var now = new Date();
+    var weeklyData = [];
+    
+    for (var w = 0; w < 4; w++) {
+        var weekStart = new Date(now);
+        var dayOfWeek = weekStart.getDay();
+        var mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+        weekStart.setDate(weekStart.getDate() + mondayOffset - (w * 7));
+        weekStart.setHours(0, 0, 0, 0);
+        
+        var weekDates = [];
+        for (var d = 0; d < 7; d++) {
+            var wd = new Date(weekStart);
+            wd.setDate(weekStart.getDate() + d);
+            weekDates.push(wd.toISOString().split('T')[0]);
+        }
+        
+        var volume = 0;
+        var sessions = 0;
+        var totalRPE = 0;
+        var rpeCount = 0;
+        
+        weekDates.forEach(function(date) {
+            if (completed[date]) sessions++;
+            if (rpeHistory[date]) { totalRPE += rpeHistory[date].rpe; rpeCount++; }
+        });
+        
+        Object.keys(history).forEach(function(exName) {
+            history[exName].forEach(function(set) {
+                if (weekDates.indexOf(set.sessionDate) !== -1) {
+                    volume += set.weight * set.reps;
+                }
+            });
+        });
+        
+        weeklyData.push({
+            weekNum: w,
+            label: w === 0 ? 'This week' : w === 1 ? 'Last week' : w + ' weeks ago',
+            volume: volume,
+            sessions: sessions,
+            avgRPE: rpeCount > 0 ? (totalRPE / rpeCount).toFixed(1) : null
+        });
+    }
+    
+    // Need at least 2 weeks of data
+    var weeksWithData = weeklyData.filter(function(w) { return w.volume > 0; }).length;
+    if (weeksWithData < 2) {
+        card.style.display = 'none';
+        return;
+    }
+    
+    card.style.display = 'block';
+    
+    // Analyze trend
+    var thisWeek = weeklyData[0];
+    var recentWeeks = weeklyData.filter(function(w) { return w.volume > 0; });
+    var avgVolume = recentWeeks.reduce(function(sum, w) { return sum + w.volume; }, 0) / recentWeeks.length;
+    
+    // Volume is climbing for 3+ weeks?
+    var climbing = weeklyData[0].volume > 0 && weeklyData[1].volume > 0 && weeklyData[2].volume > 0 &&
+        weeklyData[0].volume >= weeklyData[1].volume && weeklyData[1].volume >= weeklyData[2].volume;
+    
+    // High RPE trend
+    var highRPE = recentWeeks.filter(function(w) { return w.avgRPE && parseFloat(w.avgRPE) >= 8; }).length >= 2;
+    
+    // Declining performance (volume dropped this week vs last)
+    var declining = thisWeek.volume > 0 && weeklyData[1].volume > 0 && thisWeek.volume < weeklyData[1].volume * 0.85;
+    
+    // Deload recommendation
+    var needsDeload = false;
+    var deloadReason = '';
+    var deloadUrgency = 'info';
+    
+    if (climbing && weeksWithData >= 3) {
+        needsDeload = true;
+        deloadReason = 'Volume has been climbing for 3+ weeks. A deload week helps tendons and CNS recover — especially important for 40+ athletes.';
+        deloadUrgency = 'warning';
+    }
+    if (highRPE) {
+        needsDeload = true;
+        deloadReason = 'Your RPE has averaged 8+ for multiple weeks. High sustained intensity increases injury risk. Consider backing off.';
+        deloadUrgency = 'warning';
+    }
+    if (declining && !needsDeload) {
+        deloadReason = 'Volume dropped this week. If unplanned, this could signal fatigue. Listen to your body.';
+        deloadUrgency = 'info';
+    }
+    
+    // Build HTML
+    var html = '';
+    
+    if (needsDeload) {
+        html += '<div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">' +
+            '<span style="font-size:1.8em;">🔍</span>' +
+            '<div>' +
+                '<strong style="color:#f5576c;">Deload Recommended</strong>' +
+                '<div style="font-size:0.85em; color:#aaa; margin-top:2px;">' + deloadReason + '</div>' +
+            '</div>' +
+        '</div>';
+        html += '<div style="background:rgba(245,87,108,0.1); border:1px solid rgba(245,87,108,0.2); border-radius:8px; padding:10px 12px; margin-bottom:12px; font-size:0.85em; color:#ccc;">' +
+            '<strong style="color:#f5576c;">Deload protocol:</strong> Same exercises, 60% weight, 50% volume. Focus on movement quality and mobility.' +
+        '</div>';
+    } else if (deloadReason) {
+        html += '<div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">' +
+            '<span style="font-size:1.8em;">🔍</span>' +
+            '<div>' +
+                '<strong style="color:var(--sec);">Deload Detective</strong>' +
+                '<div style="font-size:0.85em; color:#aaa; margin-top:2px;">' + deloadReason + '</div>' +
+            '</div>' +
+        '</div>';
+    } else {
+        html += '<div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">' +
+            '<span style="font-size:1.8em;">🔍</span>' +
+            '<div>' +
+                '<strong style="color:var(--sec);">Deload Detective</strong>' +
+                '<div style="font-size:0.85em; color:#aaa; margin-top:2px;">Training load looks healthy. Keep pushing!</div>' +
+            '</div>' +
+        '</div>';
+    }
+    
+    // Volume bar chart (last 4 weeks)
+    var maxVol = Math.max.apply(null, weeklyData.map(function(w) { return w.volume; }));
+    if (maxVol > 0) {
+        html += '<div style="margin-top:8px;">';
+        weeklyData.slice().reverse().forEach(function(w) {
+            var pct = maxVol > 0 ? Math.round((w.volume / maxVol) * 100) : 0;
+            var barColor = w.weekNum === 0 ? 'var(--sec)' : 'rgba(255,255,255,0.15)';
+            html += '<div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; font-size:0.8em;">' +
+                '<span style="min-width:75px; color:#888;">' + w.label + '</span>' +
+                '<div style="flex:1; background:rgba(255,255,255,0.05); border-radius:4px; height:16px; overflow:hidden;">' +
+                    '<div style="width:' + pct + '%; height:100%; background:' + barColor + '; border-radius:4px; transition:width 0.3s;"></div>' +
+                '</div>' +
+                '<span style="min-width:45px; text-align:right; color:#aaa;">' + (w.volume > 1000 ? Math.round(w.volume / 1000) + 'k' : w.volume) + '</span>' +
+            '</div>';
+        });
+        html += '</div>';
+    }
+    
+    content.innerHTML = html;
+}
+
+// ========================================
 // CUSTOM WORKOUT BUILDER
 // ========================================
 function openCustomBuilder() {
@@ -4578,40 +4818,158 @@ function loadCardioHistory() {
 // EQUIPMENT SETTINGS
 // ========================================
 function renderEquipmentPresets() {
-    const container = document.getElementById('equipment-presets');
-    if(!container) return;
+    var container = document.getElementById('equipment-presets');
+    if (!container) return;
     
-    const presets = [
-        {key:'home', name:IC.home+' Home Gym', desc:'Cables, Dumbbells, Bench'},
-        {key:'hotel', name:IC.hotel+' Hotel/Travel', desc:'Bodyweight & Bands'},
+    var presets = [
+        {key:'home', name:IC.home+' Home Gym', desc:'Cable, Dumbbells, Free Weights'},
+        {key:'hotel', name:IC.hotel+' Hotel/Travel', desc:'Bodyweight only'},
         {key:'gym', name:IC.push+' Full Gym', desc:'All Equipment'}
     ];
     
     container.innerHTML = '';
-    presets.forEach(preset => {
-        const div = document.createElement('div');
+    presets.forEach(function(preset) {
+        var div = document.createElement('div');
         div.className = 'preset-card';
         div.setAttribute('data-preset', preset.key);
-        if(appState.equipment === preset.key) div.classList.add('active');
+        if (appState.equipment === preset.key && (!appState.customEquipment || appState.customEquipment.length === 0)) {
+            div.classList.add('active');
+        }
         
-        div.innerHTML = `
-            <strong>${preset.name}</strong><br>
-            <small class="text-muted">${preset.desc}</small>
-        `;
-        
-        div.onclick = () => activatePreset(preset.key);
+        div.innerHTML = '<strong>' + preset.name + '</strong><br><small class="text-muted">' + preset.desc + '</small>';
+        div.onclick = function() { activatePreset(preset.key); };
         container.appendChild(div);
     });
+    
+    // Render equipment chips
+    renderEquipmentChips();
+    renderSavedProfiles();
+}
+
+function renderEquipmentChips() {
+    var container = document.getElementById('equipment-chips');
+    if (!container) return;
+    
+    var allEquipTypes = ['Bodyweight', 'Cable', 'Dumbbell', 'Free Weight'];
+    var selected = appState.customEquipment || [];
+    
+    container.innerHTML = '';
+    allEquipTypes.forEach(function(equip) {
+        var chip = document.createElement('button');
+        chip.className = 'rpe-tag' + (selected.indexOf(equip) !== -1 ? ' selected' : '');
+        chip.textContent = equip;
+        chip.onclick = function() { toggleEquipmentChip(equip); };
+        container.appendChild(chip);
+    });
+    
+    // Show exercise count for current selection
+    if (selected.length > 0) {
+        var count = window.allExercises ? window.allExercises.filter(function(ex) {
+            return selected.indexOf(ex.equip) !== -1 || ex.equip === 'Bodyweight';
+        }).length : 0;
+        var countEl = document.createElement('span');
+        countEl.style.cssText = 'font-size:0.8em; color:var(--sec); margin-left:4px;';
+        countEl.textContent = count + ' exercises available';
+        container.appendChild(countEl);
+    }
+}
+
+function toggleEquipmentChip(equip) {
+    if (!appState.customEquipment) appState.customEquipment = [];
+    
+    var idx = appState.customEquipment.indexOf(equip);
+    if (idx !== -1) {
+        appState.customEquipment.splice(idx, 1);
+    } else {
+        appState.customEquipment.push(equip);
+    }
+    
+    // Clear preset selection when using custom
+    if (appState.customEquipment.length > 0) {
+        appState.equipment = 'custom';
+        document.querySelectorAll('.preset-card').forEach(function(c) { c.classList.remove('active'); });
+    }
+    
+    saveAppState();
+    renderEquipmentChips();
 }
 
 function activatePreset(key) {
     appState.equipment = key;
+    appState.customEquipment = []; // Clear custom selection
     saveAppState();
     
-    document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
-    document.querySelector(`[data-preset="${key}"]`).classList.add('active');
+    document.querySelectorAll('.preset-card').forEach(function(c) { c.classList.remove('active'); });
+    var el = document.querySelector('[data-preset="' + key + '"]');
+    if (el) el.classList.add('active');
+    renderEquipmentChips();
+    speak('Switched to ' + key + ' equipment');
+}
+
+function renderSavedProfiles() {
+    var container = document.getElementById('saved-equipment-profiles');
+    if (!container) return;
     
-    speak(`Switched to ${key} equipment`);
+    var profiles = JSON.parse(localStorage.getItem('equipmentProfiles')) || {};
+    var keys = Object.keys(profiles);
+    
+    if (keys.length === 0) {
+        container.innerHTML = '<div style="font-size:0.8em; color:#555;">No saved locations yet</div>';
+        return;
+    }
+    
+    var html = '';
+    keys.forEach(function(name) {
+        var equipList = profiles[name].join(', ');
+        html += '<div style="display:flex; justify-content:space-between; align-items:center; padding:8px; background:rgba(255,255,255,0.04); border-radius:8px; margin-bottom:6px;">' +
+            '<div style="cursor:pointer; flex:1;" onclick="loadEquipmentProfile(\'' + name.replace(/'/g, "\\'") + '\')">' +
+                '<strong style="font-size:0.85em;">' + name + '</strong>' +
+                '<div style="font-size:0.75em; color:#888;">' + equipList + '</div>' +
+            '</div>' +
+            '<button onclick="deleteEquipmentProfile(\'' + name.replace(/'/g, "\\'") + '\')" style="background:none; border:none; color:#f5576c; cursor:pointer; padding:4px 8px;">✕</button>' +
+        '</div>';
+    });
+    container.innerHTML = html;
+}
+
+function saveEquipmentProfile() {
+    var nameInput = document.getElementById('profile-name-input');
+    var name = nameInput.value.trim();
+    if (!name) { showNotification('Enter a name for this profile', 'error'); return; }
+    
+    var equipment = appState.customEquipment || [];
+    if (equipment.length === 0) { showNotification('Select equipment first using the chips above', 'error'); return; }
+    
+    var profiles = JSON.parse(localStorage.getItem('equipmentProfiles')) || {};
+    profiles[name] = equipment.slice();
+    localStorage.setItem('equipmentProfiles', JSON.stringify(profiles));
+    
+    nameInput.value = '';
+    renderSavedProfiles();
+    showNotification('Saved: ' + name + ' (' + equipment.join(', ') + ')', 'success');
+}
+
+function loadEquipmentProfile(name) {
+    var profiles = JSON.parse(localStorage.getItem('equipmentProfiles')) || {};
+    if (!profiles[name]) return;
+    
+    appState.customEquipment = profiles[name].slice();
+    appState.equipment = 'custom';
+    saveAppState();
+    
+    document.querySelectorAll('.preset-card').forEach(function(c) { c.classList.remove('active'); });
+    renderEquipmentChips();
+    showNotification('Loaded: ' + name, 'success');
+    speak('Equipment set to ' + name);
+}
+
+function deleteEquipmentProfile(name) {
+    if (!confirm('Delete profile "' + name + '"?')) return;
+    var profiles = JSON.parse(localStorage.getItem('equipmentProfiles')) || {};
+    delete profiles[name];
+    localStorage.setItem('equipmentProfiles', JSON.stringify(profiles));
+    renderSavedProfiles();
+    showNotification('Profile deleted', 'success');
 }
 
 function updateSettingsUI() {
