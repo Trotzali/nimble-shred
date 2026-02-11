@@ -649,6 +649,33 @@
             background: rgba(3,218,198,0.12); color: var(--sec); 
         }
         
+        /* ASSESSMENT */
+        .assess-instruction {
+            background: linear-gradient(135deg, rgba(187,134,252,0.08), rgba(3,218,198,0.08));
+            border: 1px solid rgba(187,134,252,0.2);
+            border-radius: 10px; padding: 12px 14px;
+            margin-bottom: 12px; font-size: 0.85em; color: #ccc; line-height: 1.5;
+        }
+        .assess-instruction strong { color: var(--primary); }
+        .assess-pattern-badge {
+            display: inline-block; font-size: 0.7em; padding: 2px 8px;
+            border-radius: 8px; background: rgba(3,218,198,0.15);
+            color: var(--sec); margin-bottom: 6px;
+        }
+        .strength-profile-card {
+            background: linear-gradient(135deg, rgba(3,218,198,0.06), rgba(187,134,252,0.06));
+            border: 1px solid rgba(3,218,198,0.15); border-radius: 12px;
+            padding: 16px; margin: 12px 0;
+        }
+        .sp-bar-bg {
+            height: 8px; background: rgba(255,255,255,0.06);
+            border-radius: 4px; overflow: hidden; margin-top: 4px;
+        }
+        .sp-bar-fill {
+            height: 100%; border-radius: 4px;
+            background: linear-gradient(90deg, var(--sec), var(--primary));
+        }
+        
         /* REST TIMER */
         .rest-timer-bar {
             background: rgba(3,218,198,0.08);
@@ -1193,7 +1220,7 @@
         </div>
         
         <div style="text-align:center; margin-top:8px;">
-            <button class="btn" onclick="startConsultation('workout')" style="border-radius:10px; background:linear-gradient(135deg, rgba(3,218,198,0.2), rgba(187,134,252,0.2)); border:1px solid rgba(3,218,198,0.3); color:#fff;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> AI Consultation — Build Me a Workout</button>
+            <button class="btn" onclick="startConsultation()" style="border-radius:10px; background:linear-gradient(135deg, rgba(3,218,198,0.2), rgba(187,134,252,0.2)); border:1px solid rgba(3,218,198,0.3); color:#fff;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> AI Coach Consultation</button>
             <button class="btn btn-main" onclick="openCustomBuilder()" style="border-radius:10px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Custom Workout Builder</button>
             <button class="btn btn-action" onclick="generateRandomWorkout()" style="border-radius:10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="8" cy="8" r="1" fill="currentColor"/><circle cx="16" cy="8" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="8" cy="16" r="1" fill="currentColor"/><circle cx="16" cy="16" r="1" fill="currentColor"/></svg> Random Workout</button>
         </div>
@@ -1291,9 +1318,19 @@
     <div class="card" style="background: linear-gradient(135deg, rgba(187,134,252,0.1), rgba(3,218,198,0.1)); border: 2px solid var(--primary);">
         <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg> AI Coach Consultation</h3>
         <p style="margin-bottom: 15px; color: #888;">Chat with your AI coach to build a personalised training plan. Like a real PT session — tell me about your goals, schedule, injuries, and I'll build something that works for you.</p>
-        <button class="btn btn-main" onclick="startConsultation('plan')" style="border-radius:10px;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> Start Consultation
-        </button>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+            <button class="btn btn-main" onclick="startConsultation()" style="border-radius:10px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> Start Consultation
+            </button>
+            <button class="btn" onclick="startAssessmentDirect()" style="border-radius:10px; background:rgba(255,255,255,0.06); color:#aaa;">
+                💪 Redo Assessment
+            </button>
+        </div>
+    </div>
+    
+    <!-- PLAN OVERVIEW (shows when a plan exists) -->
+    <div class="card" id="plan-overview-card" style="display:none;">
+        <div id="plan-overview-content"></div>
     </div>
     
     <div class="card">
@@ -1457,7 +1494,7 @@
     
     <div class="card">
         <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg> AI Coach</h3>
-        <button class="btn btn-main" onclick="startConsultation('plan')" style="border-radius:10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> New AI Consultation</button>
+        <button class="btn btn-main" onclick="startConsultation()" style="border-radius:10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> New AI Consultation</button>
         
         <div style="margin-top: 15px;">
             <label>Chat History Duration:</label>
@@ -3214,7 +3251,7 @@ function switchTab(tab) {
         if(btn) btn.classList.add('active');
     }
     
-    if(tab === 'plan') { renderPlanCalendar(); renderWorkoutHistory(); renderWeeklyBriefing(); renderDeloadDetective(); renderMechanic(); }
+    if(tab === 'plan') { renderPlanOverview(); renderPlanCalendar(); renderWorkoutHistory(); renderWeeklyBriefing(); renderDeloadDetective(); renderMechanic(); }
     if(tab === 'cardio') loadCardioHistory();
     if(tab === 'garmin') renderRecoveryScorecard();
     if(tab === 'encyclopedia') renderEncyclopedia();
@@ -3787,7 +3824,18 @@ function getProgression(name) {
     var history = JSON.parse(localStorage.getItem('exerciseHistory')) || {};
     var allSets = history[name] || [];
     
-    if (allSets.length === 0) return { lastSession: null, suggest: null, suggestedWeight: 0, suggestedReps: 10, hint: null };
+    if (allSets.length === 0) {
+        // No history — check strength profile for estimated starting weight
+        var estimate = getEstimatedWeight(name);
+        if (estimate && estimate.weight > 0) {
+            return { 
+                lastSession: null, suggest: '📊 Starting weight from your assessment (' + estimate.source + ')',
+                suggestedWeight: estimate.weight, suggestedReps: estimate.reps || 10,
+                suggestType: 'info', hint: null 
+            };
+        }
+        return { lastSession: null, suggest: null, suggestedWeight: 0, suggestedReps: 10, hint: null };
+    }
     
     var today = new Date().toISOString().split('T')[0];
     
@@ -5191,6 +5239,103 @@ function searchEncyclopedia() {
 // ========================================
 // PLAN CALENDAR
 // ========================================
+function renderPlanOverview() {
+    var card = document.getElementById('plan-overview-card');
+    var content = document.getElementById('plan-overview-content');
+    if (!card || !content) return;
+    
+    var savedPlan = JSON.parse(localStorage.getItem('currentPlan')) || null;
+    var activePlan = appState.activePlan;
+    
+    if (!savedPlan && !activePlan) { card.style.display = 'none'; return; }
+    
+    card.style.display = 'block';
+    
+    var html = '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">' +
+        '<h3 style="margin:0;">📋 ' + (savedPlan && savedPlan.name ? savedPlan.name : activePlan.name || 'Current Plan') + '</h3>' +
+        '<span class="profile-tag">' + (savedPlan && savedPlan.duration ? savedPlan.duration + ' weeks' : '') + '</span>' +
+    '</div>';
+    
+    // Guidance
+    if (savedPlan && savedPlan.guidance) {
+        html += '<p style="font-size:0.85em; color:#aaa; margin-bottom:12px; line-height:1.5;">' + savedPlan.guidance + '</p>';
+    }
+    
+    // Phases
+    if (savedPlan && savedPlan.phases && savedPlan.phases.length > 0) {
+        html += '<div style="margin-bottom:12px;">';
+        savedPlan.phases.forEach(function(phase, i) {
+            var isCurrent = activePlan && activePlan.phase && activePlan.phase === phase.name;
+            var bg = isCurrent ? 'rgba(3,218,198,0.12)' : 'rgba(255,255,255,0.03)';
+            var border = isCurrent ? '1px solid rgba(3,218,198,0.3)' : '1px solid rgba(255,255,255,0.06)';
+            var dot = isCurrent ? '🟢' : '⚪';
+            html += '<div style="background:' + bg + '; border:' + border + '; border-radius:8px; padding:10px 12px; margin-bottom:6px;">' +
+                '<div style="font-size:0.85em; font-weight:600;">' + dot + ' ' + phase.name + (phase.weeks ? ' <span style="color:#888; font-weight:400;">(Weeks ' + phase.weeks + ')</span>' : '') + '</div>' +
+                (phase.focus ? '<div style="font-size:0.78em; color:#888; margin-top:2px;">' + phase.focus + '</div>' : '') +
+            '</div>';
+        });
+        html += '</div>';
+    }
+    
+    // Weekly schedule summary
+    var schedule = (savedPlan && savedPlan.weekSchedule) ? savedPlan.weekSchedule : (activePlan ? activePlan.schedule : null);
+    if (schedule) {
+        var dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        var typeColors = {push:'#FF6B6B', pull:'#4ECDC4', legs:'#95E1D3', cardio:'#3498db', nimble:'#9b59b6', rest:'#555'};
+        html += '<div style="display:flex; gap:4px; flex-wrap:wrap; justify-content:center;">';
+        dayNames.forEach(function(name, i) {
+            var type = schedule[i] || 'rest';
+            var col = typeColors[type] || '#555';
+            html += '<div style="text-align:center; flex:1; min-width:38px; padding:6px 2px; background:rgba(255,255,255,0.03); border-radius:6px; border-bottom:2px solid ' + col + ';">' +
+                '<div style="font-size:0.65em; color:#888;">' + name + '</div>' +
+                '<div style="font-size:0.72em; color:' + col + '; font-weight:600; text-transform:capitalize;">' + type + '</div>' +
+            '</div>';
+        });
+        html += '</div>';
+    }
+    
+    // Strength profile if exists
+    var sp = JSON.parse(localStorage.getItem('strengthProfile')) || {};
+    if (Object.keys(sp).length > 0) {
+        html += '<div style="margin-top:12px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.06);">' +
+            '<div style="font-size:0.75em; color:#555; margin-bottom:8px;">STRENGTH PROFILE (from assessment)</div>';
+        
+        var patternLabels = { h_push: 'Horizontal Push', v_push: 'Vertical Push', h_pull: 'Horizontal Pull', v_pull: 'Vertical Pull', squat: 'Squat', hinge: 'Hip Hinge' };
+        var maxWeight = 0;
+        Object.keys(sp).forEach(function(k) { if (sp[k].weight > maxWeight) maxWeight = sp[k].weight; });
+        
+        Object.keys(sp).forEach(function(pattern) {
+            var data = sp[pattern];
+            var pct = maxWeight > 0 ? Math.round((data.weight / maxWeight) * 100) : 0;
+            html += '<div style="margin-bottom:8px;">' +
+                '<div style="display:flex; justify-content:space-between; font-size:0.8em; margin-bottom:2px;">' +
+                    '<span style="color:#bbb;">' + (patternLabels[pattern] || pattern) + '</span>' +
+                    '<span style="color:var(--sec);">' + data.weight + (data.weight > 0 ? ' lbs' : '') + ' × ' + data.reps + '</span>' +
+                '</div>' +
+                '<div class="sp-bar-bg"><div class="sp-bar-fill" style="width:' + pct + '%"></div></div>' +
+            '</div>';
+        });
+        
+        html += '<div style="font-size:0.7em; color:#555; margin-top:4px;">Tested: ' + (sp[Object.keys(sp)[0]].date || 'Unknown') + '</div>';
+        html += '</div>';
+    }
+    
+    // Consultation profile if exists
+    var profile = JSON.parse(localStorage.getItem('consultProfile')) || null;
+    if (profile && Object.keys(profile).length > 0) {
+        html += '<div style="margin-top:12px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.06);">' +
+            '<div style="font-size:0.75em; color:#555; margin-bottom:6px;">CONSULTATION PROFILE</div>' +
+            '<div style="display:flex; flex-wrap:wrap; gap:4px;">';
+        if (profile.goal) html += '<span class="profile-tag">🎯 ' + profile.goal + '</span>';
+        if (profile.age) html += '<span class="profile-tag">🎂 ' + profile.age + '</span>';
+        if (profile.experience) html += '<span class="profile-tag">📊 ' + profile.experience + '</span>';
+        if (profile.injuries) html += '<span class="profile-tag">⚠️ ' + profile.injuries + '</span>';
+        html += '</div></div>';
+    }
+    
+    content.innerHTML = html;
+}
+
 function renderPlanCalendar() {
     const grid = document.getElementById('week-grid');
     if(!grid) return;
@@ -6956,7 +7101,7 @@ var consultMode = 'plan'; // 'plan' or 'workout'
 var consultFields = ['goal', 'days', 'age', 'experience', 'equipment', 'injuries', 'timePerSession', 'preferences'];
 
 function startConsultation(mode) {
-    consultMode = mode || 'plan';
+    consultMode = mode || 'undecided';
     consultHistory = [];
     consultProfile = {};
     
@@ -6972,24 +7117,19 @@ function startConsultation(mode) {
     var hasHistory = Object.keys(history).length > 0;
     var savedProfile = JSON.parse(localStorage.getItem('consultProfile')) || null;
     
-    // Send opening message based on context
     var opener;
     if (savedProfile && hasHistory) {
-        opener = "Welcome back! I've got your profile from last time. Want to update anything, or shall we build a new " + 
-            (mode === 'workout' ? 'workout' : 'plan') + " based on what I know?\n\nHere's what I have: " + 
+        opener = "Welcome back! I've got your profile from last time. Want to update anything, or shall we build something new?\n\nHere's what I have: " + 
             summariseProfile(savedProfile);
         consultProfile = savedProfile;
         updateProfileBar();
+        showConsultBubbles(['Build me a workout for today', 'Create a full training plan', 'Update my profile', 'Start fresh']);
     } else {
-        opener = "Hey! I'm your AI coach. Think of this as your first session with a personal trainer — I want to understand you before we build anything.\n\nLet's start simple: what are you looking to get out of your training?";
+        opener = "Hey! I'm your AI coach. Think of this as your first session with a personal trainer.\n\nFirst up — what are you after today?";
+        showConsultBubbles(['Just a workout for today', 'A full training plan', 'Not sure — help me decide']);
     }
     
     addConsultMsg('coach', opener);
-    
-    var bubbles = savedProfile ? 
-        ['Keep my current profile', 'Start fresh', 'Update a few things'] :
-        ['Build muscle', 'Get stronger', 'Lose fat', 'Stay healthy / longevity', 'Rehab an injury'];
-    showConsultBubbles(bubbles);
 }
 
 function closeConsultation() {
@@ -7092,6 +7232,10 @@ async function callConsultAI() {
                     consultProfile[key] = parsed.profile[key];
                 }
             });
+            // Update mode if AI determined it
+            if (parsed.profile.mode === 'workout' || parsed.profile.mode === 'plan') {
+                consultMode = parsed.profile.mode;
+            }
             localStorage.setItem('consultProfile', JSON.stringify(consultProfile));
             updateProfileBar();
             updateConsultProgress();
@@ -7180,11 +7324,38 @@ function updateProfileBar() {
 
 function showGenerateButton() {
     var container = document.getElementById('consult-messages');
-    var div = document.createElement('div');
-    div.style.cssText = 'align-self:center; margin:10px 0;';
-    div.innerHTML = '<button class="btn btn-main" onclick="generateFromConsultation()" style="border-radius:25px; padding:14px 30px; font-size:1em;">' +
-        '✨ Build My ' + (consultMode === 'workout' ? 'Workout' : 'Plan') + '</button>';
-    container.appendChild(div);
+    
+    // Check if user already has a strength profile
+    var existingProfile = JSON.parse(localStorage.getItem('strengthProfile')) || null;
+    var hasHistory = Object.keys(JSON.parse(localStorage.getItem('exerciseHistory')) || {}).length > 10;
+    
+    if (consultMode === 'workout') {
+        // For single workouts, just build it
+        var div = document.createElement('div');
+        div.style.cssText = 'align-self:center; margin:10px 0;';
+        div.innerHTML = '<button class="btn btn-main" onclick="generateFromConsultation()" style="border-radius:25px; padding:14px 30px; font-size:1em;">' +
+            '✨ Build My Workout</button>';
+        container.appendChild(div);
+    } else if (existingProfile || hasHistory) {
+        // Has data — skip assessment option
+        var div2 = document.createElement('div');
+        div2.style.cssText = 'align-self:center; margin:10px 0;';
+        div2.innerHTML = '<button class="btn btn-main" onclick="generateFromConsultation()" style="border-radius:25px; padding:14px 30px; font-size:1em;">' +
+            '✨ Build My Plan</button>';
+        container.appendChild(div2);
+    } else {
+        // New user — offer assessment
+        addConsultMsg('coach', 'One more thing before I build your plan. I can run a quick fitness assessment — about 6 exercises to find your working weights. This means every exercise in your plan starts at the right level from day one.\n\nIt takes about 15 minutes. Want to do it now, or skip straight to the plan?');
+        
+        var div3 = document.createElement('div');
+        div3.style.cssText = 'align-self:center; margin:10px 0; display:flex; flex-direction:column; gap:8px; width:100%;';
+        div3.innerHTML = '<button class="btn btn-main" onclick="startAssessment()" style="border-radius:25px; padding:14px 20px; font-size:0.95em;">' +
+            '💪 Do the Assessment (recommended)</button>' +
+            '<button class="btn" onclick="generateFromConsultation()" style="border-radius:25px; padding:12px 20px; font-size:0.85em; background:rgba(255,255,255,0.06); color:#aaa;">' +
+            'Skip — Build My Plan</button>';
+        container.appendChild(div3);
+    }
+    
     setTimeout(function() { container.scrollTop = container.scrollHeight; }, 50);
 }
 
@@ -7281,7 +7452,11 @@ function buildConsultSystemPrompt() {
     var hasData = workoutCount > 0;
     
     return 'You are a personal trainer doing an initial consultation with a new client through a chat app called Nimble Shred. ' +
-    'Your job is to understand the client so you can build them a perfect training ' + (consultMode === 'workout' ? 'workout' : 'plan') + '.\n\n' +
+    'Your job is to understand the client so you can build them a perfect training plan or workout.\n\n' +
+    
+    'CURRENT MODE: ' + consultMode + '\n' +
+    'If mode is "undecided", your FIRST priority is finding out whether they want a single workout for today or a full multi-week plan. ' +
+    'Once you know, update the "mode" field in PROFILE to either "workout" or "plan".\n\n' +
     
     'PERSONALITY: Friendly, knowledgeable, warm but professional. Like a good PT at a quality gym. ' +
     'Specialise in training for men 40+. You understand joint health, recovery needs, and realistic goal setting. ' +
@@ -7315,17 +7490,336 @@ function buildConsultSystemPrompt() {
     '[BUBBLES]Option 1|Option 2|Option 3|Option 4[/BUBBLES]\n' +
     'These are quick-tap answer suggestions shown as buttons. Keep them short (2-5 words each). 3-5 options. ' +
     'Make them relevant to what you just asked. Always include one that lets them type their own answer like "Something else" or "Let me explain".\n\n' +
-    '[PROFILE]{"goal":null,"days":null,"age":null,"experience":null,"equipment":null,"injuries":null,"timePerSession":null,"preferences":null,"ready":false}[/PROFILE]\n' +
-    'Update any field you\'ve learned from this conversation. Keep previous values. Set "ready" to true ONLY when you have at least goal, days, age, experience, and equipment filled in AND you\'ve offered to build the plan.\n\n' +
+    '[PROFILE]{"goal":null,"days":null,"age":null,"experience":null,"equipment":null,"injuries":null,"timePerSession":null,"preferences":null,"mode":null,"ready":false}[/PROFILE]\n' +
+    'Update any field you\'ve learned from this conversation. Keep previous values. Set "mode" to "workout" or "plan" once you know what they want. Set "ready" to true ONLY when you have at least goal, days, equipment filled in AND the mode is set AND you\'ve offered to build.\n\n' +
     
     'When you have enough info, say something like "I\'ve got a really good picture of where you\'re at. Ready for me to build your plan?" and set ready to true. ' +
     'Don\'t rush — if you only have 2-3 fields, keep asking. But don\'t over-ask if they seem keen to get going.';
 }
 
 // Keep backward compatibility — old function redirects to new
-function startAIPlanWizard() { startConsultation('plan'); }
+function startAIPlanWizard() { startConsultation(); }
 function closeAIWizard() { closeConsultation(); }
 function acceptPlan() { closeConsultation(); switchTab('plan'); renderPlanCalendar(); }
+
+// ==========================================================================
+// 4b. FITNESS ASSESSMENT (Phase 2 — Strength Profile Builder)
+// ==========================================================================
+
+// Movement patterns — each has test exercises per equipment type
+var assessmentExercises = {
+    cable: [
+        { name: 'Cable Chest Press', pattern: 'h_push', label: 'Chest Press', instruction: 'Start light. Add weight each set until the last 2-3 reps feel challenging but your form stays solid. Do 3 sets of 8-10 reps.' },
+        { name: 'Cable Overhead Press', pattern: 'v_push', label: 'Shoulder Press', instruction: 'Moderate weight. Press overhead with control. 3 sets of 8-10 reps. Stop if shoulders feel pinchy.' },
+        { name: 'Seated Cable Row', pattern: 'h_pull', label: 'Seated Row', instruction: 'Pull to your lower chest. Squeeze shoulder blades together. 3 sets of 10 reps.' },
+        { name: 'Lat Pulldown (Standing)', pattern: 'v_pull', label: 'Lat Pulldown', instruction: 'Wide grip, pull to upper chest. Control the negative. 3 sets of 10 reps.' },
+        { name: 'Cable Front Squat', pattern: 'squat', label: 'Cable Squat', instruction: 'Feet shoulder width. Squat to parallel or below. 3 sets of 10 reps.' },
+        { name: 'Cable Pull-Through', pattern: 'hinge', label: 'Pull-Through', instruction: 'Hinge at hips, push them back, then drive forward. Feel it in glutes and hamstrings. 3 sets of 12 reps.' }
+    ],
+    dumbbell: [
+        { name: 'Dumbbell Bench Press', pattern: 'h_push', label: 'DB Bench Press', instruction: 'Flat bench. Start light, build up over 3 sets of 8-10 reps until the last set is challenging.' },
+        { name: 'Dumbbell Shoulder Press', pattern: 'v_push', label: 'DB Shoulder Press', instruction: 'Seated or standing. 3 sets of 8-10 reps. Full range of motion.' },
+        { name: 'Dumbbell Row', pattern: 'h_pull', label: 'DB Row', instruction: 'One arm at a time on a bench. Pull to hip, squeeze lat. 3 sets of 10 each side.' },
+        { name: 'Goblet Squat', pattern: 'squat', label: 'Goblet Squat', instruction: 'Hold one dumbbell at your chest. Squat deep, elbows inside knees. 3 sets of 10.' },
+        { name: 'Romanian Deadlift (DB)', pattern: 'hinge', label: 'DB Romanian DL', instruction: 'Dumbbells in front of thighs. Hinge at hips, slight knee bend. Feel hamstring stretch. 3 sets of 10.' }
+    ],
+    bodyweight: [
+        { name: 'Push-ups', pattern: 'h_push', label: 'Push-ups', instruction: 'Do as many clean push-ups as you can in one set. Full range — chest to floor, lock out at top. Log reps with weight as 0.' },
+        { name: 'Pull-ups', pattern: 'v_pull', label: 'Pull-ups', instruction: 'Overhand grip. Do as many as you can with good form. If you can\'t do any, try a dead hang for time. Log reps with weight as 0.' },
+        { name: 'Inverted Row', pattern: 'h_pull', label: 'Inverted Row', instruction: 'Under a bar or table edge. Pull chest to bar. Do max clean reps. Log reps with weight as 0.' },
+        { name: 'Bodyweight Squat', pattern: 'squat', label: 'BW Squat', instruction: 'Full depth squats. Do 20 reps at bodyweight to test mobility and endurance. Log reps with weight as 0.' },
+        { name: 'Lunge (BW)', pattern: 'hinge', label: 'Walking Lunge', instruction: '10 each leg, controlled. Tests single-leg strength and balance. Log reps with weight as 0.' }
+    ]
+};
+
+// Strength ratios — percentage of the test exercise weight for related exercises
+var strengthRatios = {
+    h_push: {
+        'Cable Chest Press': 1.0, 'Single Arm Cable Chest Press': 0.55, 'Cable Crossover': 0.6,
+        'Cable Chest Fly (High)': 0.55, 'Cable Chest Fly (Low)': 0.55, 'Cable Chest Fly (Mid)': 0.55,
+        'Cable Pullover (Bench)': 0.6,
+        'Dumbbell Bench Press': 1.0, 'Dumbbell Incline Press': 0.85, 'Dumbbell Fly': 0.5,
+        'DB Floor Press': 0.9, 'Svend Press': 0.3,
+        'Push-ups': 1.0, 'Diamond Push-ups': 1.0, 'Decline Push-ups': 1.0, 'Wide Push-ups': 1.0,
+        'Tricep Pushdown (Rope)': 0.5, 'Tricep Pushdown (Bar)': 0.55, 'Overhead Cable Extension': 0.45,
+        'Cable Kickback': 0.3, 'Reverse Grip Pushdown': 0.45, 'Cable French Press': 0.4,
+        'Tricep Dips': 1.0, 'Bench Dips': 1.0, 'Close-Grip Push-ups': 1.0, 'Skull Crushers (DB)': 0.4,
+        'Dumbbell Kickback': 0.25, 'Overhead Tricep Extension (DB)': 0.35
+    },
+    v_push: {
+        'Cable Overhead Press': 1.0, 'Cable Lateral Raise': 0.4, 'Cable Front Raise': 0.4,
+        'Cable Upright Row': 0.7, 'Cable Y-Raise': 0.35,
+        'Dumbbell Shoulder Press': 1.0, 'Arnold Press': 0.9, 'Lateral Raise (DB)': 0.3,
+        'Front Raise (DB)': 0.35, 'Upright Row (DB)': 0.6,
+        'Pike Push-ups': 1.0, 'Handstand Push-ups': 1.0
+    },
+    h_pull: {
+        'Seated Cable Row': 1.0, 'Single Arm Cable Row': 0.55, 'Standing Cable Row': 0.9,
+        'Cable Row (Wide Grip)': 0.95, 'High Row (Rope)': 0.7, 'Face Pulls': 0.5,
+        'Cable Rear Delt Fly': 0.4, 'Cable Shrugs': 1.1,
+        'Dumbbell Row': 1.0, 'Renegade Row': 0.6, 'Dumbbell Shrug': 1.0, 'Dumbbell Pullover': 0.6,
+        'Inverted Row': 1.0, 'Superman': 1.0
+    },
+    v_pull: {
+        'Lat Pulldown (Standing)': 1.0, 'Straight Arm Pulldown': 0.6,
+        'Pull-ups': 1.0, 'Chin-ups': 1.0, 'Dead Hang': 1.0,
+        'Cable Bicep Curl': 0.45, 'Cable Hammer Curl': 0.45, 'Bayesian Curl': 0.4,
+        'Lying Cable Curl': 0.4, 'Cable Curl (Behind Back)': 0.4,
+        'Dumbbell Curl': 0.35, 'Hammer Curl': 0.35, 'Zottman Curl': 0.3, 'Concentration Curl': 0.3
+    },
+    squat: {
+        'Cable Squat': 1.0, 'Cable Front Squat': 1.0, 'Cable Zercher Squat': 0.9, 'Cable Lunge': 0.7,
+        'Goblet Squat': 1.0, 'Bulgarian Split Squat': 0.7, 'Dumbbell Lunge': 0.6, 'Sumo Squat (DB)': 0.9,
+        'Bodyweight Squat': 1.0, 'Lunge (BW)': 1.0, 'Pistol Squat': 1.0, 'Jump Squat': 0.7,
+        'Jumping Lunge': 0.6, 'ATG Split Squat': 0.65, 'Cossack Squat': 0.6, 'Curtsy Lunge': 0.6,
+        'Side Lunge': 0.6, 'Step-ups (DB)': 0.6, 'Wall Sit': 1.0
+    },
+    hinge: {
+        'Cable Pull-Through': 1.0, 'Romanian Deadlift (DB)': 1.0,
+        'Hip Thrust (BW)': 1.0, 'Glute Bridge (BW)': 1.0, 'Single Leg Deadlift (DB)': 0.5,
+        'Nordic Curl': 1.0, 'Good Mornings (DB)': 0.7, 'Jefferson Curl': 0.3,
+        'Cable External Rotation': 0.3, 'Cable Internal Rotation': 0.3,
+        'Cable Wrist Curl': 0.2, 'Cable Reverse Wrist Curl': 0.15
+    }
+};
+
+var assessmentInProgress = false;
+var assessmentExerciseList = [];
+
+function startAssessment() {
+    // Determine equipment from profile
+    var equip = (consultProfile.equipment || '').toLowerCase();
+    var assessKey = 'cable'; // default
+    if (equip.indexOf('dumbbell') !== -1 || equip.indexOf('db') !== -1) assessKey = 'dumbbell';
+    else if (equip.indexOf('bodyweight') !== -1 || equip.indexOf('body') !== -1 || equip.indexOf('none') !== -1) assessKey = 'bodyweight';
+    else if (equip.indexOf('cable') !== -1 || equip.indexOf('torque') !== -1 || equip.indexOf('gym') !== -1 || equip.indexOf('full') !== -1) assessKey = 'cable';
+    else if (equip.indexOf('dumbbell') !== -1) assessKey = 'dumbbell';
+    
+    assessmentExerciseList = assessmentExercises[assessKey];
+    assessmentInProgress = true;
+    
+    // Build workout exercises from assessment list, matching allExercises format
+    var exercises = [];
+    assessmentExerciseList.forEach(function(ae) {
+        var found = window.allExercises ? window.allExercises.find(function(e) { return e.name === ae.name; }) : null;
+        if (found) {
+            // Add assessment metadata
+            var ex = Object.assign({}, found);
+            ex._assessPattern = ae.pattern;
+            ex._assessInstruction = ae.instruction;
+            ex._assessLabel = ae.label;
+            exercises.push(ex);
+        }
+    });
+    
+    if (exercises.length === 0) {
+        addConsultMsg('coach', 'Couldn\'t find matching exercises for your equipment. Let me build your plan without the assessment.');
+        generateFromConsultation();
+        return;
+    }
+    
+    // Close consultation and start the assessment workout
+    closeConsultation();
+    
+    appState.currentWorkoutType = 'assessment';
+    appState.currentWorkout = exercises;
+    appState.currentSetIndex = {};
+    appState.exerciseDone = {};
+    saveAppState();
+    
+    // Start workout (no warmup for assessment — the exercises themselves are progressive)
+    startWorkout(exercises);
+    
+    // Show notification
+    showNotification('💪 Fitness Assessment started! Log your sets normally.', 'success');
+}
+
+// Override renderWorkout to inject assessment instructions
+var _originalRenderWorkout = null;
+
+function patchRenderWorkoutForAssessment() {
+    // Only patch once
+    if (_originalRenderWorkout) return;
+    
+    // We'll inject assessment info by hooking into the DOM after render
+    // Watch for assessment mode and add instruction cards
+    var origLogSet = window.logSet;
+    
+    // After each render, add assessment instructions if active
+    var _origRender = window.renderWorkout;
+    _originalRenderWorkout = _origRender;
+    
+    window.renderWorkout = function(exercises) {
+        _origRender(exercises);
+        
+        if (!assessmentInProgress) return;
+        
+        // Find the active exercise card and prepend assessment instruction
+        var container = document.getElementById('workout-interface');
+        if (!container) return;
+        
+        var card = container.querySelector('.exercise-card');
+        if (!card) return;
+        
+        // Find which exercise is active
+        var currentIdx = 0;
+        for (var i = 0; i < exercises.length; i++) {
+            if (!appState.exerciseDone[exercises[i].name]) { currentIdx = i; break; }
+            if (i === exercises.length - 1) currentIdx = exercises.length;
+        }
+        
+        if (currentIdx < exercises.length) {
+            var ae = assessmentExerciseList.find(function(a) { return a.name === exercises[currentIdx].name; });
+            if (ae) {
+                var instrDiv = document.createElement('div');
+                instrDiv.className = 'assess-instruction';
+                instrDiv.innerHTML = '<span class="assess-pattern-badge">' + getPatternLabel(ae.pattern) + '</span>' +
+                    '<div style="margin-top:6px;"><strong>Assessment:</strong> ' + ae.instruction + '</div>';
+                
+                // Insert at top of card
+                card.insertBefore(instrDiv, card.firstChild);
+            }
+        }
+        
+        // Add progress bar
+        var done = Object.keys(appState.exerciseDone).length;
+        var total = exercises.length;
+        var existingProgress = container.querySelector('.assess-progress-wrap');
+        if (existingProgress) existingProgress.remove();
+        
+        var progDiv = document.createElement('div');
+        progDiv.className = 'assess-progress-wrap';
+        progDiv.style.cssText = 'margin-bottom:12px;';
+        progDiv.innerHTML = '<div style="display:flex; justify-content:space-between; font-size:0.8em; color:#888; margin-bottom:4px;">' +
+            '<span>Fitness Assessment</span><span>' + done + '/' + total + ' exercises</span></div>' +
+            '<div class="sp-bar-bg"><div class="sp-bar-fill" style="width:' + Math.round((done / total) * 100) + '%"></div></div>';
+        container.insertBefore(progDiv, container.firstChild);
+    };
+}
+
+function getPatternLabel(pattern) {
+    var labels = {
+        h_push: '↔️ Horizontal Push', v_push: '⬆️ Vertical Push',
+        h_pull: '↔️ Horizontal Pull', v_pull: '⬇️ Vertical Pull',
+        squat: '🦵 Squat Pattern', hinge: '🔗 Hip Hinge'
+    };
+    return labels[pattern] || pattern;
+}
+
+// Hook into finishWorkout to detect assessment completion
+var _originalFinishWorkout = null;
+
+function patchFinishWorkoutForAssessment() {
+    if (_originalFinishWorkout) return;
+    
+    var origFinish = window.finishWorkout;
+    _originalFinishWorkout = origFinish;
+    
+    window.finishWorkout = function() {
+        if (assessmentInProgress) {
+            assessmentInProgress = false;
+            buildStrengthProfile();
+            // Don't call origFinish RPE modal — we handle completion ourselves
+            // But still save session data
+            var today = new Date().toISOString().split('T')[0];
+            var completed = JSON.parse(localStorage.getItem('completedWorkouts')) || {};
+            completed[today] = { type: 'assessment', date: today, rpe: 5 };
+            localStorage.setItem('completedWorkouts', JSON.stringify(completed));
+            
+            appState.currentWorkout = [];
+            appState.currentSetIndex = {};
+            appState.exerciseDone = {};
+            saveAppState();
+            
+            switchTab('plan');
+            showNotification('✅ Assessment complete! Strength profile built.', 'success');
+            
+            // Now auto-generate the plan
+            setTimeout(function() {
+                startConsultation();
+                setTimeout(function() {
+                    // Rehydrate profile
+                    var saved = JSON.parse(localStorage.getItem('consultProfile')) || {};
+                    consultProfile = saved;
+                    consultMode = 'plan';
+                    updateProfileBar();
+                    updateConsultProgress();
+                    addConsultMsg('coach', 'Assessment done! I\'ve built your strength profile — I now know your working weights across all movement patterns.\n\nReady to build your plan with these results baked in?');
+                    var div = document.createElement('div');
+                    div.style.cssText = 'align-self:center; margin:10px 0;';
+                    div.innerHTML = '<button class="btn btn-main" onclick="generateFromConsultation()" style="border-radius:25px; padding:14px 30px; font-size:1em;">✨ Build My Plan</button>';
+                    document.getElementById('consult-messages').appendChild(div);
+                }, 500);
+            }, 1000);
+            return;
+        }
+        
+        origFinish();
+    };
+}
+
+function buildStrengthProfile() {
+    var history = JSON.parse(localStorage.getItem('exerciseHistory')) || {};
+    var profile = {};
+    
+    assessmentExerciseList.forEach(function(ae) {
+        var sets = history[ae.name] || [];
+        if (sets.length === 0) return;
+        
+        // Get the heaviest successful set (most recent session)
+        var today = new Date().toISOString().split('T')[0];
+        var todaySets = sets.filter(function(s) { return s.sessionDate === today; });
+        if (todaySets.length === 0) todaySets = sets.slice(-3); // fallback to last 3 sets
+        
+        var maxWeight = Math.max.apply(null, todaySets.map(function(s) { return s.weight || 0; }));
+        var avgReps = Math.round(todaySets.reduce(function(sum, s) { return sum + s.reps; }, 0) / todaySets.length);
+        
+        profile[ae.pattern] = {
+            testExercise: ae.name,
+            weight: maxWeight,
+            reps: avgReps,
+            date: today,
+            equipType: ae.name.indexOf('Cable') !== -1 ? 'cable' : ae.name.indexOf('Dumbbell') !== -1 || ae.name.indexOf('DB') !== -1 || ae.name.indexOf('Goblet') !== -1 ? 'dumbbell' : 'bodyweight'
+        };
+    });
+    
+    localStorage.setItem('strengthProfile', JSON.stringify(profile));
+    console.log('Strength profile built:', profile);
+    return profile;
+}
+
+function getEstimatedWeight(exerciseName) {
+    var profile = JSON.parse(localStorage.getItem('strengthProfile')) || {};
+    if (Object.keys(profile).length === 0) return null;
+    
+    // Check each pattern's ratio table
+    var patterns = Object.keys(strengthRatios);
+    for (var i = 0; i < patterns.length; i++) {
+        var pattern = patterns[i];
+        var ratios = strengthRatios[pattern];
+        
+        if (ratios[exerciseName] !== undefined && profile[pattern]) {
+            var baseWeight = profile[pattern].weight;
+            var ratio = ratios[exerciseName];
+            var estimated = Math.round((baseWeight * ratio) * 2) / 2; // round to nearest 2.5
+            return { weight: estimated, reps: profile[pattern].reps, pattern: pattern, source: profile[pattern].testExercise };
+        }
+    }
+    
+    return null;
+}
+
+// Initialize assessment patches on load
+patchRenderWorkoutForAssessment();
+patchFinishWorkoutForAssessment();
+
+// Direct assessment (from Plan page button) — uses existing profile or defaults
+function startAssessmentDirect() {
+    var saved = JSON.parse(localStorage.getItem('consultProfile')) || {};
+    consultProfile = saved;
+    consultMode = 'plan';
+    startAssessment();
+}
 
 // ==========================================================================
 // 5. DAILY AI UPDATES (Elite Coach Recovery Logic)
