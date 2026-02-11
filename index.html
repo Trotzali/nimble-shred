@@ -529,6 +529,28 @@
             font-weight: bold;
         }
         
+        /* EQUIPMENT PRESETS */
+        .preset-card {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .preset-card:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--sec);
+        }
+        .preset-card.active {
+            background: rgba(3,218,198,0.15);
+            border-color: var(--sec);
+        }
+        .preset-card.active strong {
+            color: var(--sec);
+        }
+        
         /* WORKOUT HISTORY */
         .history-day {
             background: rgba(255,255,255,0.04);
@@ -999,6 +1021,15 @@
             </div>
         </div>
         
+        <div style="margin-bottom:12px;">
+            <div style="font-size:0.85em; color:#888; margin-bottom:6px;">Equipment for this session:</div>
+            <div id="session-gear-toggles" style="display:flex; gap:6px; flex-wrap:wrap;">
+                <button class="rpe-tag selected" onclick="setSessionGear(this,'gym')" data-session-gear="gym">🏋️ Full Gym</button>
+                <button class="rpe-tag" onclick="setSessionGear(this,'dumbbell')" data-session-gear="dumbbell">🔩 Dumbbells</button>
+                <button class="rpe-tag" onclick="setSessionGear(this,'bodyweight')" data-session-gear="bodyweight">🤸 No Equipment</button>
+            </div>
+        </div>
+        
         <div class="chip-container">
             <div class="chip" onclick="quickStartWorkout('push')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Push</div>
             <div class="chip" onclick="quickStartWorkout('pull')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M12 3v15"/><path d="m6 8 6-6 6 6"/><path d="M5 21h14"/></svg> Pull</div>
@@ -1011,6 +1042,11 @@
         
         <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.08);">
             <div style="font-size:0.85em; color:#888; margin-bottom:8px;">⏱ Short on time? Wedge Session:</div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;">
+                <button class="rpe-tag selected" onclick="setWedgeGear(this,'all')" data-wedge-gear="all">🏋️ Full Gym</button>
+                <button class="rpe-tag" onclick="setWedgeGear(this,'dumbbell')" data-wedge-gear="dumbbell">🔩 Dumbbells</button>
+                <button class="rpe-tag" onclick="setWedgeGear(this,'bodyweight')" data-wedge-gear="bodyweight">🤸 No Equipment</button>
+            </div>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
                 <button class="btn btn-small btn-action" onclick="startWedgeSession(10)" style="flex:1;">10 min</button>
                 <button class="btn btn-small btn-action" onclick="startWedgeSession(15)" style="flex:1;">15 min</button>
@@ -2732,7 +2768,8 @@ let appState = {
     currentWorkout: null,
     currentSetIndex: {},
     activePlan: null,
-    equipment: 'home',
+    equipment: 'gym',
+    customEquipment: [],
     voiceEnabled: true,
     voiceLevel: 'standard',
     selectedExercises: [],
@@ -2978,8 +3015,43 @@ function switchTab(tab) {
 // ========================================
 // WORKOUT GENERATION
 // ========================================
+var sessionGear = 'gym'; // default for main workouts
+
+function setSessionGear(btn, gear) {
+    sessionGear = gear;
+    // Update main workout toggles
+    document.querySelectorAll('[data-session-gear]').forEach(function(b) { b.classList.remove('selected'); });
+    document.querySelectorAll('[data-session-gear="' + gear + '"]').forEach(function(b) { b.classList.add('selected'); });
+    // Sync wedge toggles too
+    wedgeGear = gear;
+    document.querySelectorAll('[data-wedge-gear]').forEach(function(b) { b.classList.remove('selected'); });
+    document.querySelectorAll('[data-wedge-gear="' + gear + '"]').forEach(function(b) { b.classList.add('selected'); });
+}
+
+function applySessionGear(gear) {
+    if (gear === 'bodyweight') {
+        appState.equipment = 'custom';
+        appState.customEquipment = ['Bodyweight'];
+    } else if (gear === 'dumbbell') {
+        appState.equipment = 'custom';
+        appState.customEquipment = ['Bodyweight', 'Dumbbell'];
+    } else {
+        appState.equipment = 'gym';
+        appState.customEquipment = [];
+    }
+}
+
 function quickStartWorkout(type) {
-    const exercises = generateWorkoutByType(type, appState.exerciseCount);
+    // Temporarily apply session gear
+    var savedEquipment = appState.equipment;
+    var savedCustom = appState.customEquipment ? appState.customEquipment.slice() : null;
+    applySessionGear(sessionGear);
+    
+    var exercises = generateWorkoutByType(type, appState.exerciseCount);
+    
+    // Restore global settings
+    appState.equipment = savedEquipment;
+    appState.customEquipment = savedCustom;
     
     // Store workout type for warmup
     appState.currentWorkoutType = type;
@@ -3011,20 +3083,28 @@ function generateRandomWorkout() {
     quickStartWorkout(randomType);
 }
 
+var wedgeGear = 'all'; // default
+
+function setWedgeGear(btn, gear) {
+    wedgeGear = gear;
+    document.querySelectorAll('[data-wedge-gear]').forEach(function(b) { b.classList.remove('selected'); });
+    btn.classList.add('selected');
+}
+
 function startWedgeSession(minutes) {
-    // ~4 mins per exercise (including rest): 10min=2, 15min=3, 20min=4, 30min=6
     var exerciseCount = Math.max(2, Math.round(minutes / 5));
     
+    // Temporarily apply wedge gear
+    var savedEquipment = appState.equipment;
+    var savedCustom = appState.customEquipment ? appState.customEquipment.slice() : null;
+    applySessionGear(wedgeGear);
+    
     // Pick workout type based on what's least recently trained
-    var completed = JSON.parse(localStorage.getItem('completedWorkouts')) || {};
     var history = JSON.parse(localStorage.getItem('exerciseHistory')) || {};
     var types = ['push', 'pull', 'legs'];
     
-    // Find which muscle group was trained least recently
     var lastTrained = {};
-    types.forEach(function(type) {
-        lastTrained[type] = '2000-01-01';
-    });
+    types.forEach(function(type) { lastTrained[type] = '2000-01-01'; });
     
     Object.keys(history).forEach(function(exName) {
         var ex = window.allExercises ? window.allExercises.find(function(e) { return e.name === exName; }) : null;
@@ -3044,12 +3124,14 @@ function startWedgeSession(minutes) {
         }
     });
     
-    // Sort by least recently trained
     types.sort(function(a, b) { return lastTrained[a] < lastTrained[b] ? -1 : 1; });
     var bestType = types[0];
     
-    // Generate with fewer exercises, skip warmup
     var exercises = generateWorkoutByType(bestType, exerciseCount);
+    
+    // Restore global settings
+    appState.equipment = savedEquipment;
+    appState.customEquipment = savedCustom;
     
     appState.currentWorkoutType = bestType;
     appState.currentWorkout = exercises;
@@ -3057,10 +3139,11 @@ function startWedgeSession(minutes) {
     appState.exerciseDone = {};
     saveAppState();
     
-    // Skip warmup for wedge sessions — go straight to workout
     startWorkout(exercises);
-    speak(minutes + ' minute wedge session! ' + exerciseCount + ' exercises, ' + bestType + ' focus. Go!');
-    showNotification('⏱ ' + minutes + 'min Wedge: ' + bestType.toUpperCase() + ' — ' + exerciseCount + ' exercises', 'success');
+    
+    var gearLabel = wedgeGear === 'bodyweight' ? 'bodyweight only' : wedgeGear === 'dumbbell' ? 'dumbbells' : 'full gym';
+    speak(minutes + ' minute wedge session! ' + exerciseCount + ' exercises, ' + bestType + ' focus, ' + gearLabel + '. Go!');
+    showNotification('⏱ ' + minutes + 'min Wedge: ' + bestType.toUpperCase() + ' — ' + exerciseCount + ' exercises (' + gearLabel + ')', 'success');
 }
 
 function generateWorkoutByType(type, count = 6) {
