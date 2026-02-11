@@ -555,6 +555,100 @@
         .checkin-label { font-weight: 600; font-size: 0.9em; }
         .checkin-desc { font-size: 0.75em; color: #888; margin-top: 2px; }
         
+        /* COACH CONSULTATION */
+        #consult-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); z-index: 10001;
+            display: none; flex-direction: column;
+        }
+        #consult-modal.active { display: flex; }
+        .consult-header {
+            background: linear-gradient(135deg, rgba(3,218,198,0.15), rgba(187,134,252,0.1));
+            padding: 14px 16px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            flex-shrink: 0;
+        }
+        .consult-header h3 { font-size: 1em; font-weight: 700; }
+        .consult-header .close-btn {
+            background: none; border: none; color: #888; font-size: 1.5em;
+            cursor: pointer; padding: 4px 8px; line-height: 1;
+        }
+        .consult-progress {
+            display: flex; gap: 3px; padding: 0 16px 10px;
+            background: rgba(0,0,0,0.2); flex-shrink: 0;
+        }
+        .consult-progress-dot {
+            flex: 1; height: 3px; border-radius: 2px;
+            background: rgba(255,255,255,0.08);
+            transition: background 0.3s;
+        }
+        .consult-progress-dot.filled { background: var(--sec); }
+        .consult-progress-dot.active { background: var(--primary); }
+        .consult-messages {
+            flex: 1; overflow-y: auto; padding: 16px;
+            display: flex; flex-direction: column; gap: 12px;
+            scroll-behavior: smooth;
+        }
+        .consult-msg {
+            max-width: 85%; padding: 12px 16px; border-radius: 16px;
+            font-size: 0.9em; line-height: 1.45; animation: msgFadeIn 0.3s ease-out;
+        }
+        @keyframes msgFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .consult-msg.coach {
+            background: rgba(255,255,255,0.06); align-self: flex-start;
+            border-bottom-left-radius: 4px; color: #ddd;
+        }
+        .consult-msg.user {
+            background: var(--sec); color: #000; align-self: flex-end;
+            border-bottom-right-radius: 4px; font-weight: 500;
+        }
+        .consult-msg.typing {
+            background: rgba(255,255,255,0.04); align-self: flex-start;
+            border-bottom-left-radius: 4px; color: #888;
+        }
+        .consult-bubbles {
+            display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 16px;
+            justify-content: center; flex-shrink: 0;
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+        .consult-bubble {
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 20px; padding: 9px 16px; font-size: 0.85em;
+            color: #ccc; cursor: pointer; transition: all 0.2s;
+        }
+        .consult-bubble:hover { border-color: var(--sec); color: var(--sec); background: rgba(3,218,198,0.08); }
+        .consult-bubble:active { transform: scale(0.96); }
+        .consult-input-area {
+            display: flex; gap: 8px; padding: 10px 16px;
+            padding-bottom: max(10px, env(safe-area-inset-bottom));
+            background: rgba(0,0,0,0.3); flex-shrink: 0;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .consult-input {
+            flex: 1; padding: 10px 14px; background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
+            color: #fff; font-size: 0.9em; resize: none; outline: none;
+        }
+        .consult-input:focus { border-color: var(--sec); }
+        .consult-send {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--sec); border: none; color: #000;
+            font-size: 1.1em; cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+            transition: all 0.2s; flex-shrink: 0;
+        }
+        .consult-send:hover { transform: scale(1.05); }
+        .consult-send:active { transform: scale(0.95); }
+        .consult-profile-bar {
+            display: flex; gap: 6px; padding: 6px 16px; flex-wrap: wrap;
+            background: rgba(0,0,0,0.15); flex-shrink: 0;
+        }
+        .profile-tag {
+            font-size: 0.7em; padding: 3px 8px; border-radius: 10px;
+            background: rgba(3,218,198,0.12); color: var(--sec); 
+        }
+        
         /* REST TIMER */
         .rest-timer-bar {
             background: rgba(3,218,198,0.08);
@@ -1099,6 +1193,7 @@
         </div>
         
         <div style="text-align:center; margin-top:8px;">
+            <button class="btn" onclick="startConsultation('workout')" style="border-radius:10px; background:linear-gradient(135deg, rgba(3,218,198,0.2), rgba(187,134,252,0.2)); border:1px solid rgba(3,218,198,0.3); color:#fff;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> AI Consultation — Build Me a Workout</button>
             <button class="btn btn-main" onclick="openCustomBuilder()" style="border-radius:10px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Custom Workout Builder</button>
             <button class="btn btn-action" onclick="generateRandomWorkout()" style="border-radius:10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="8" cy="8" r="1" fill="currentColor"/><circle cx="16" cy="8" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="8" cy="16" r="1" fill="currentColor"/><circle cx="16" cy="16" r="1" fill="currentColor"/></svg> Random Workout</button>
         </div>
@@ -1194,10 +1289,10 @@
     <h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg> Training Plan</h2>
     
     <div class="card" style="background: linear-gradient(135deg, rgba(187,134,252,0.1), rgba(3,218,198,0.1)); border: 2px solid var(--primary);">
-        <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg> AI-Powered Planning</h3>
-        <p style="margin-bottom: 15px; color: #888;">Let AI create a personalized training plan based on your goals, schedule, and recovery data.</p>
-        <button class="btn btn-main" onclick="startAIPlanWizard()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> Generate AI Plan
+        <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg> AI Coach Consultation</h3>
+        <p style="margin-bottom: 15px; color: #888;">Chat with your AI coach to build a personalised training plan. Like a real PT session — tell me about your goals, schedule, injuries, and I'll build something that works for you.</p>
+        <button class="btn btn-main" onclick="startConsultation('plan')" style="border-radius:10px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> Start Consultation
         </button>
     </div>
     
@@ -1362,7 +1457,7 @@
     
     <div class="card">
         <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg> AI Coach</h3>
-        <button class="btn btn-main" onclick="startAIPlanWizard()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> Generate New AI Plan</button>
+        <button class="btn btn-main" onclick="startConsultation('plan')" style="border-radius:10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> New AI Consultation</button>
         
         <div style="margin-top: 15px;">
             <label>Chat History Duration:</label>
@@ -1587,13 +1682,20 @@
 </div>
 
 <!-- AI PLAN WIZARD MODAL -->
-<div class="modal-overlay" id="ai-wizard-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg> AI Plan Generator</h2>
-            <button class="modal-close" onclick="closeAIWizard()">✕</button>
-        </div>
-        <div id="wizard-content"></div>
+<!-- COACH CONSULTATION -->
+<div id="consult-modal">
+    <div class="consult-header">
+        <h3>🏋️ Coach Consultation</h3>
+        <button class="close-btn" onclick="closeConsultation()">✕</button>
+    </div>
+    <div class="consult-progress" id="consult-progress"></div>
+    <div class="consult-profile-bar" id="consult-profile-bar" style="display:none;"></div>
+    <div class="consult-messages" id="consult-messages"></div>
+    <div class="consult-bubbles" id="consult-bubbles"></div>
+    <div class="consult-input-area">
+        <input class="consult-input" id="consult-input" placeholder="Or type your answer here..." 
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendConsultMessage();}">
+        <button class="consult-send" onclick="sendConsultMessage()">➤</button>
     </div>
 </div>
 
@@ -6845,54 +6947,385 @@ async function checkGarminFiles() {
 }
 
 // ==========================================================================
-// 4. AI PLAN GENERATOR (Full Feature Preserved)
+// 4. COACH CONSULTATION (Replaces old 3-question wizard)
 // ==========================================================================
 
-let aiWizardStep = 0;
-let userProfile = {};
+var consultHistory = [];
+var consultProfile = {};
+var consultMode = 'plan'; // 'plan' or 'workout'
+var consultFields = ['goal', 'days', 'age', 'experience', 'equipment', 'injuries', 'timePerSession', 'preferences'];
 
-function startAIPlanWizard() { aiWizardStep = 0; userProfile = {}; document.getElementById('ai-wizard-modal').classList.add('active'); renderWizardStep(); }
+function startConsultation(mode) {
+    consultMode = mode || 'plan';
+    consultHistory = [];
+    consultProfile = {};
+    
+    document.getElementById('consult-modal').classList.add('active');
+    document.getElementById('consult-messages').innerHTML = '';
+    document.getElementById('consult-bubbles').innerHTML = '';
+    document.getElementById('consult-profile-bar').style.display = 'none';
+    document.getElementById('consult-input').value = '';
+    updateConsultProgress();
+    
+    // Check if returning user with existing data
+    var history = JSON.parse(localStorage.getItem('exerciseHistory')) || {};
+    var hasHistory = Object.keys(history).length > 0;
+    var savedProfile = JSON.parse(localStorage.getItem('consultProfile')) || null;
+    
+    // Send opening message based on context
+    var opener;
+    if (savedProfile && hasHistory) {
+        opener = "Welcome back! I've got your profile from last time. Want to update anything, or shall we build a new " + 
+            (mode === 'workout' ? 'workout' : 'plan') + " based on what I know?\n\nHere's what I have: " + 
+            summariseProfile(savedProfile);
+        consultProfile = savedProfile;
+        updateProfileBar();
+    } else {
+        opener = "Hey! I'm your AI coach. Think of this as your first session with a personal trainer — I want to understand you before we build anything.\n\nLet's start simple: what are you looking to get out of your training?";
+    }
+    
+    addConsultMsg('coach', opener);
+    
+    var bubbles = savedProfile ? 
+        ['Keep my current profile', 'Start fresh', 'Update a few things'] :
+        ['Build muscle', 'Get stronger', 'Lose fat', 'Stay healthy / longevity', 'Rehab an injury'];
+    showConsultBubbles(bubbles);
+}
 
-function renderWizardStep() {
-    const container = document.getElementById('wizard-content');
-    switch(aiWizardStep) {
-        case 0:
-            container.innerHTML = `<h3>What's your primary goal?</h3><div class="chip-container"><div class="chip" onclick="selectGoal('strength')">${IC.push} Build Strength</div><div class="chip" onclick="selectGoal('muscle')">${IC.push} Build Muscle</div><div class="chip" onclick="selectGoal('health')">${IC.target} Health & Longevity</div><div class="chip" onclick="selectGoal('performance')">${IC.fire} Athletic Performance</div></div>`;
-            break;
-        case 1:
-            container.innerHTML = `<h3>How many days per week can you train?</h3><input type="range" id="days-slider" min="3" max="6" value="5" oninput="document.getElementById('days-display').textContent = this.value"><div style="text-align:center; font-size:2em; margin:20px;"><span id="days-display">5</span> days/week</div><button class="btn btn-main" onclick="setDays()">Continue</button>`;
-            break;
-        case 2:
-            container.innerHTML = `<h3>Any injuries or concerns?</h3><textarea id="injuries" rows="4" placeholder="e.g., Previous shoulder injury, knee pain when squatting..."></textarea><button class="btn btn-main" onclick="setInjuries()">Continue</button>`;
-            break;
-        case 3:
-            container.innerHTML = `<h3>${IC.brain} Generating your personalized plan...</h3><div style="text-align:center; padding:40px;"><div class="loading" style="width:60px; height:60px; margin:20px auto;"></div><p>Analyzing profile with AI...</p></div>`;
-            generateAIPlan();
-            break;
+function closeConsultation() {
+    document.getElementById('consult-modal').classList.remove('active');
+}
+
+function summariseProfile(p) {
+    var parts = [];
+    if (p.goal) parts.push('Goal: ' + p.goal);
+    if (p.days) parts.push(p.days + ' days/week');
+    if (p.age) parts.push('Age: ' + p.age);
+    if (p.experience) parts.push(p.experience);
+    if (p.equipment) parts.push('Equipment: ' + p.equipment);
+    if (p.injuries) parts.push('Injuries: ' + p.injuries);
+    if (p.timePerSession) parts.push(p.timePerSession + ' per session');
+    return parts.join(' • ') || 'Nothing yet';
+}
+
+function addConsultMsg(role, text) {
+    var container = document.getElementById('consult-messages');
+    var div = document.createElement('div');
+    div.className = 'consult-msg ' + role;
+    div.textContent = text;
+    container.appendChild(div);
+    setTimeout(function() { container.scrollTop = container.scrollHeight; }, 50);
+}
+
+function showConsultBubbles(bubbles) {
+    var container = document.getElementById('consult-bubbles');
+    if (!bubbles || bubbles.length === 0) { container.innerHTML = ''; return; }
+    container.innerHTML = bubbles.map(function(b) {
+        return '<button class="consult-bubble" onclick="bubbleClick(\'' + b.replace(/'/g, "\\'") + '\')">' + b + '</button>';
+    }).join('');
+}
+
+function bubbleClick(text) {
+    document.getElementById('consult-bubbles').innerHTML = '';
+    sendConsultMessage(text);
+}
+
+function sendConsultMessage(text) {
+    var input = document.getElementById('consult-input');
+    var msg = text || input.value.trim();
+    if (!msg) return;
+    input.value = '';
+    
+    addConsultMsg('user', msg);
+    showConsultBubbles([]);
+    
+    // Add to history
+    consultHistory.push({ role: 'user', content: msg });
+    
+    // Show typing
+    var typing = document.createElement('div');
+    typing.className = 'consult-msg typing';
+    typing.id = 'consult-typing';
+    typing.textContent = 'Coach is thinking...';
+    document.getElementById('consult-messages').appendChild(typing);
+    
+    // Call AI
+    callConsultAI();
+}
+
+async function callConsultAI() {
+    var systemPrompt = buildConsultSystemPrompt();
+    var messages = consultHistory.map(function(m) { return { role: m.role, content: m.content }; });
+    
+    try {
+        var response = await fetch(BACKEND_URL + '/api/drive', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'gemini',
+                system: systemPrompt,
+                messages: messages
+            })
+        });
+        
+        if (!response.ok) throw new Error('API error: ' + response.status);
+        
+        var data = await response.json();
+        var rawText = data.content[0].text;
+        
+        // Remove typing indicator
+        var typingEl = document.getElementById('consult-typing');
+        if (typingEl) typingEl.remove();
+        
+        // Parse response: extract [BUBBLES] and [PROFILE] blocks
+        var parsed = parseConsultResponse(rawText);
+        
+        // Add coach message (cleaned text)
+        addConsultMsg('coach', parsed.text);
+        consultHistory.push({ role: 'assistant', content: parsed.text });
+        
+        // Update profile if AI returned data
+        if (parsed.profile) {
+            // Merge non-null values
+            Object.keys(parsed.profile).forEach(function(key) {
+                if (parsed.profile[key] !== null && parsed.profile[key] !== '' && key !== 'ready') {
+                    consultProfile[key] = parsed.profile[key];
+                }
+            });
+            localStorage.setItem('consultProfile', JSON.stringify(consultProfile));
+            updateProfileBar();
+            updateConsultProgress();
+        }
+        
+        // Show bubbles
+        if (parsed.bubbles && parsed.bubbles.length > 0) {
+            showConsultBubbles(parsed.bubbles);
+        }
+        
+        // If AI says ready, show generate button
+        if (parsed.profile && parsed.profile.ready === true) {
+            showGenerateButton();
+        }
+        
+    } catch (error) {
+        console.error('Consultation error:', error);
+        var typingEl2 = document.getElementById('consult-typing');
+        if (typingEl2) typingEl2.remove();
+        addConsultMsg('coach', 'Sorry, I had trouble connecting. Check your internet and try again.');
+        showConsultBubbles(['Try again']);
     }
 }
 
-function selectGoal(goal) { userProfile.goal = goal; aiWizardStep++; renderWizardStep(); }
-function setDays() { userProfile.daysPerWeek = parseInt(document.getElementById('days-slider').value); aiWizardStep++; renderWizardStep(); }
-function setInjuries() { userProfile.injuries = document.getElementById('injuries').value; aiWizardStep++; renderWizardStep(); }
-
-async function generateAIPlan() {
-    try {
-        const prompt = `Generate a ${userProfile.daysPerWeek}-day/week training plan for a 40+ male athlete. Goal: ${userProfile.goal}. Injuries: ${userProfile.injuries || 'None'}. Equipment: Torque F9, dumbbells, barbells. Return ONLY valid JSON with name, duration, phases, weekSchedule, and guidance.`;
-        const response = await fetch(`${BACKEND_URL}/api/drive`, {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action: 'gemini', system: 'Professional fitness trainer.', messages: [{ role: "user", content: prompt }] })
-        });
-        const result = await response.json();
-        const plan = JSON.parse(result.content[0].text.replace(/```json\n?/g, '').replace(/```/g, '').trim());
-        localStorage.setItem('currentPlan', JSON.stringify(plan));
-        if (CLOUD_SYNC_ENABLED) { await savePlanToCloud(plan); }
-        document.getElementById('wizard-content').innerHTML = `<h3>${IC.check} Plan Generated!</h3><div class="card"><h4>${plan.name}</h4><p><strong>Duration:</strong> ${plan.duration} weeks</p><p>${plan.guidance}</p></div><button class="btn btn-success" onclick="acceptPlan()">Start This Plan!</button>`;
-    } catch (error) { console.error('Plan generation error:', error); alert('Failed to generate plan.'); }
+function parseConsultResponse(raw) {
+    var text = raw;
+    var bubbles = null;
+    var profile = null;
+    
+    // Extract [BUBBLES]...[/BUBBLES]
+    var bubbleMatch = raw.match(/\[BUBBLES\](.*?)\[\/BUBBLES\]/s);
+    if (bubbleMatch) {
+        bubbles = bubbleMatch[1].split('|').map(function(b) { return b.trim(); }).filter(Boolean);
+        text = text.replace(bubbleMatch[0], '');
+    }
+    
+    // Extract [PROFILE]...[/PROFILE]
+    var profileMatch = raw.match(/\[PROFILE\](.*?)\[\/PROFILE\]/s);
+    if (profileMatch) {
+        try {
+            profile = JSON.parse(profileMatch[1].trim());
+        } catch(e) {
+            console.warn('Failed to parse profile JSON:', e);
+        }
+        text = text.replace(profileMatch[0], '');
+    }
+    
+    text = text.trim();
+    
+    return { text: text, bubbles: bubbles, profile: profile };
 }
 
-function acceptPlan() { document.getElementById('ai-wizard-modal').classList.remove('active'); switchTab('plan'); renderPlanCalendar(); showNotification(''+IC.target+' New training plan activated!', 'success'); }
-function closeAIWizard() { document.getElementById('ai-wizard-modal').classList.remove('active'); }
+function updateConsultProgress() {
+    var container = document.getElementById('consult-progress');
+    var filled = 0;
+    consultFields.forEach(function(f) { if (consultProfile[f]) filled++; });
+    
+    var html = '';
+    for (var i = 0; i < consultFields.length; i++) {
+        var cls = 'consult-progress-dot';
+        if (consultProfile[consultFields[i]]) cls += ' filled';
+        else if (i === filled) cls += ' active';
+        html += '<div class="' + cls + '"></div>';
+    }
+    container.innerHTML = html;
+}
+
+function updateProfileBar() {
+    var bar = document.getElementById('consult-profile-bar');
+    var tags = [];
+    if (consultProfile.goal) tags.push('🎯 ' + consultProfile.goal);
+    if (consultProfile.days) tags.push('📅 ' + consultProfile.days + 'd/wk');
+    if (consultProfile.age) tags.push('🎂 ' + consultProfile.age);
+    if (consultProfile.experience) tags.push('📊 ' + consultProfile.experience);
+    if (consultProfile.equipment) tags.push('🏋️ ' + consultProfile.equipment);
+    if (consultProfile.injuries) tags.push('⚠️ ' + consultProfile.injuries);
+    if (consultProfile.timePerSession) tags.push('⏱ ' + consultProfile.timePerSession);
+    
+    if (tags.length > 0) {
+        bar.style.display = 'flex';
+        bar.innerHTML = tags.map(function(t) { return '<span class="profile-tag">' + t + '</span>'; }).join('');
+    } else {
+        bar.style.display = 'none';
+    }
+}
+
+function showGenerateButton() {
+    var container = document.getElementById('consult-messages');
+    var div = document.createElement('div');
+    div.style.cssText = 'align-self:center; margin:10px 0;';
+    div.innerHTML = '<button class="btn btn-main" onclick="generateFromConsultation()" style="border-radius:25px; padding:14px 30px; font-size:1em;">' +
+        '✨ Build My ' + (consultMode === 'workout' ? 'Workout' : 'Plan') + '</button>';
+    container.appendChild(div);
+    setTimeout(function() { container.scrollTop = container.scrollHeight; }, 50);
+}
+
+async function generateFromConsultation() {
+    addConsultMsg('coach', 'Building your personalised ' + (consultMode === 'workout' ? 'workout' : 'training plan') + '... Give me a moment.');
+    
+    // Get equipment list
+    var equipmentList = [];
+    if (window.allExercises) {
+        var types = {};
+        window.allExercises.forEach(function(e) { if(e.equip) types[e.equip] = true; });
+        equipmentList = Object.keys(types);
+    }
+    
+    // Build the generation prompt with FULL context
+    var genPrompt = 'Based on our consultation, generate a training ' + (consultMode === 'workout' ? 'workout for today' : 'plan') + '.\n\n' +
+        'CLIENT PROFILE:\n' + JSON.stringify(consultProfile, null, 2) + '\n\n' +
+        'AVAILABLE EQUIPMENT TYPES: ' + equipmentList.join(', ') + '\n' +
+        'TOTAL EXERCISES IN DATABASE: ' + (window.allExercises ? window.allExercises.length : 164) + '\n\n';
+    
+    if (consultMode === 'plan') {
+        genPrompt += 'Return ONLY valid JSON with this structure:\n' +
+            '{"name":"Plan Name","duration":12,"guidance":"Brief overview of the plan philosophy",' +
+            '"weekSchedule":{"0":"rest","1":"push","2":"pull","3":"rest","4":"legs","5":"nimble","6":"cardio"},' +
+            '"phases":[{"name":"Foundation","weeks":"1-4","focus":"Movement quality and base building"},{"name":"Build","weeks":"5-8","focus":"Progressive overload"},{"name":"Peak","weeks":"9-12","focus":"Intensity and PRs"}]}\n\n' +
+            'Valid day types: push, pull, legs, cardio, nimble, rest.\n' +
+            'Consider injuries and experience. For 40+ athletes prioritise joint health, recovery days, and gradual progression.\n' +
+            'Respond with ONLY JSON, no markdown, no backticks.';
+    } else {
+        genPrompt += 'Return ONLY valid JSON with this structure:\n' +
+            '{"type":"push","exercises":["Exercise Name 1","Exercise Name 2"],"notes":"Brief session guidance"}\n' +
+            'Pick 4-6 exercises appropriate for the client profile. Use exact exercise names from the database if possible.\n' +
+            'Respond with ONLY JSON, no markdown, no backticks.';
+    }
+    
+    try {
+        var response = await fetch(BACKEND_URL + '/api/drive', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'gemini',
+                system: 'You are a professional fitness coach creating a training ' + (consultMode === 'workout' ? 'workout' : 'plan') + '. Return ONLY valid JSON. No markdown, no explanations, no backticks.',
+                messages: [{ role: 'user', content: genPrompt }]
+            })
+        });
+        
+        var data = await response.json();
+        var jsonText = data.content[0].text.replace(/```json\n?/g, '').replace(/```/g, '').trim();
+        var result = JSON.parse(jsonText);
+        
+        if (consultMode === 'plan') {
+            // Apply as training plan
+            appState.activePlan = {
+                name: result.name || (consultProfile.days + '-Day ' + (consultProfile.goal || 'Training') + ' Plan'),
+                frequency: parseInt(consultProfile.days) || 5,
+                schedule: result.weekSchedule || {0:'rest',1:'push',2:'pull',3:'rest',4:'legs',5:'nimble',6:'rest'},
+                week: 1,
+                phase: (result.phases && result.phases[0]) ? result.phases[0].name : 'Foundation'
+            };
+            saveAppState();
+            localStorage.setItem('currentPlan', JSON.stringify(result));
+            if (CLOUD_SYNC_ENABLED) { try { await savePlanToCloud(result); } catch(e) {} }
+            
+            addConsultMsg('coach', '✅ Your plan is ready!\n\n📋 ' + (result.name || 'Training Plan') + '\n⏱ ' + (result.duration || 12) + ' weeks\n\n' + (result.guidance || '') + '\n\nI\'ve loaded it into your calendar. Close this and check the Plan tab!');
+            
+            var doneDiv = document.createElement('div');
+            doneDiv.style.cssText = 'align-self:center; margin:10px 0;';
+            doneDiv.innerHTML = '<button class="btn btn-success" onclick="closeConsultation(); switchTab(\'plan\'); renderPlanCalendar();" style="border-radius:25px; padding:14px 30px;">View My Plan →</button>';
+            document.getElementById('consult-messages').appendChild(doneDiv);
+        } else {
+            // Start workout directly
+            addConsultMsg('coach', '✅ Workout ready! ' + (result.notes || '') + '\n\nStarting your session now...');
+            setTimeout(function() {
+                closeConsultation();
+                quickStartWorkout(result.type || 'full');
+            }, 2000);
+        }
+        
+    } catch (error) {
+        console.error('Generation error:', error);
+        addConsultMsg('coach', 'Had trouble generating. Let me try a simpler approach — closing this and using your profile to set up a standard plan.');
+        showConsultBubbles(['Try again', 'Close']);
+    }
+}
+
+function buildConsultSystemPrompt() {
+    var currentProfile = JSON.stringify(consultProfile);
+    var filled = consultFields.filter(function(f) { return consultProfile[f]; });
+    var missing = consultFields.filter(function(f) { return !consultProfile[f]; });
+    
+    // Check existing workout data
+    var history = JSON.parse(localStorage.getItem('exerciseHistory')) || {};
+    var workoutCount = Object.keys(JSON.parse(localStorage.getItem('completedWorkouts')) || {}).length;
+    var hasData = workoutCount > 0;
+    
+    return 'You are a personal trainer doing an initial consultation with a new client through a chat app called Nimble Shred. ' +
+    'Your job is to understand the client so you can build them a perfect training ' + (consultMode === 'workout' ? 'workout' : 'plan') + '.\n\n' +
+    
+    'PERSONALITY: Friendly, knowledgeable, warm but professional. Like a good PT at a quality gym. ' +
+    'Specialise in training for men 40+. You understand joint health, recovery needs, and realistic goal setting. ' +
+    'If someone says something unrealistic, gently push back and explain why.\n\n' +
+    
+    'CONVERSATION RULES:\n' +
+    '- Ask ONE topic at a time. Don\'t overwhelm with multiple questions.\n' +
+    '- Keep messages SHORT — 2-3 sentences max, like a real chat.\n' +
+    '- Listen to what they say and adapt. If they mention multiple things in one message, acknowledge all of them.\n' +
+    '- If they ramble, that\'s fine — extract the useful info and move on.\n' +
+    '- Be encouraging but honest. Don\'t just agree with everything.\n' +
+    '- Use natural language, not clinical terms. "Dodgy knee" is fine.\n\n' +
+    
+    'INFORMATION TO COLLECT (ask naturally, not as a checklist):\n' +
+    '- goal: What they want to achieve (muscle, strength, fat loss, health, rehab)\n' +
+    '- days: How many days per week they can train (be realistic, push back on 6-7 for 40+)\n' +
+    '- age: Their age or age bracket\n' +
+    '- experience: Training background (beginner, used to train, intermediate, advanced)\n' +
+    '- equipment: What they have access to (full gym, home gym, dumbbells only, bodyweight)\n' +
+    '- injuries: Any injuries, pain points, or movement limitations\n' +
+    '- timePerSession: How long per session (30min, 45min, 60min, 90min)\n' +
+    '- preferences: Anything else — exercises they love/hate, split preferences, etc.\n\n' +
+    
+    'CURRENT PROFILE STATE: ' + currentProfile + '\n' +
+    'FIELDS COLLECTED: ' + (filled.length > 0 ? filled.join(', ') : 'None yet') + '\n' +
+    'FIELDS STILL NEEDED: ' + (missing.length > 0 ? missing.join(', ') : 'ALL COLLECTED') + '\n' +
+    (hasData ? 'NOTE: User has ' + workoutCount + ' completed workouts in the app already, so they are not brand new.\n' : '') +
+    '\n' +
+    
+    'RESPONSE FORMAT — you MUST include these blocks at the end of EVERY response:\n\n' +
+    '[BUBBLES]Option 1|Option 2|Option 3|Option 4[/BUBBLES]\n' +
+    'These are quick-tap answer suggestions shown as buttons. Keep them short (2-5 words each). 3-5 options. ' +
+    'Make them relevant to what you just asked. Always include one that lets them type their own answer like "Something else" or "Let me explain".\n\n' +
+    '[PROFILE]{"goal":null,"days":null,"age":null,"experience":null,"equipment":null,"injuries":null,"timePerSession":null,"preferences":null,"ready":false}[/PROFILE]\n' +
+    'Update any field you\'ve learned from this conversation. Keep previous values. Set "ready" to true ONLY when you have at least goal, days, age, experience, and equipment filled in AND you\'ve offered to build the plan.\n\n' +
+    
+    'When you have enough info, say something like "I\'ve got a really good picture of where you\'re at. Ready for me to build your plan?" and set ready to true. ' +
+    'Don\'t rush — if you only have 2-3 fields, keep asking. But don\'t over-ask if they seem keen to get going.';
+}
+
+// Keep backward compatibility — old function redirects to new
+function startAIPlanWizard() { startConsultation('plan'); }
+function closeAIWizard() { closeConsultation(); }
+function acceptPlan() { closeConsultation(); switchTab('plan'); renderPlanCalendar(); }
 
 // ==========================================================================
 // 5. DAILY AI UPDATES (Elite Coach Recovery Logic)
@@ -7297,7 +7730,7 @@ IMPORTANT LIMITATIONS - be honest about these:
 - You CANNOT create, save, or start workouts. You can only suggest exercises and plans in text.
 - You CANNOT modify the user's training plan or settings.
 - You CANNOT access or read the user's workout history directly.
-- If someone asks you to create a workout, suggest exercises in text and tell them to use the Quick Start buttons or Custom Workout Builder on the Coach page.
+- If someone asks you to create a workout or plan, tell them to use the "AI Consultation" button on the Coach page (for workouts) or "Start Consultation" on the Plan page (for full plans). The consultation gives them a proper guided experience.
 
 Be concise, friendly, and action-oriented. Keep responses under 150 words unless asked for detailed explanations.
 Focus on 40+ athlete concerns: joint health, recovery, progressive overload, injury prevention.`;
