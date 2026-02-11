@@ -973,7 +973,7 @@
 <div class="container active" id="view-coach">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
         <h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size: 0.75em; color: var(--sec); font-family: monospace;">v53</span>
+        <span style="font-size: 0.75em; color: var(--sec); font-family: monospace;">v54</span>
     </div>
     
     <div class="card">
@@ -1077,6 +1077,12 @@
     </div>
     
     <div id="ai-coach-suggestions"></div>
+    
+    <!-- WEEKLY BRIEFING -->
+    <div class="card" id="weekly-briefing-card" style="display:none;">
+        <h3>📊 Weekly Briefing</h3>
+        <div id="weekly-briefing-content"></div>
+    </div>
     
     <!-- WORKOUT HISTORY -->
     <div class="card">
@@ -2936,7 +2942,7 @@ function switchTab(tab) {
         if(btn) btn.classList.add('active');
     }
     
-    if(tab === 'plan') { renderPlanCalendar(); renderWorkoutHistory(); }
+    if(tab === 'plan') { renderPlanCalendar(); renderWorkoutHistory(); renderWeeklyBriefing(); }
     if(tab === 'cardio') loadCardioHistory();
     if(tab === 'encyclopedia') renderEncyclopedia();
     if(tab === 'settings') updateSettingsUI();
@@ -3081,7 +3087,6 @@ function renderWorkout(exercises) {
         
         // GIF lookup
         var media = getExerciseMedia(ex.name);
-        console.log('GIF lookup:', ex.name, media ? 'FOUND: ' + media.gif.substring(0,50) : 'NOT FOUND');
         var gifHtml = '';
         if (media && media.gif) {
             gifHtml = '<div style="text-align:center; margin-bottom:12px; border-radius:10px; overflow:hidden; background:#000;">' +
@@ -3113,16 +3118,55 @@ function renderWorkout(exercises) {
                 '<div class="text-muted">' + ex.cat.join(', ') + ' • ' + ex.equip + '</div>' +
             '</div>' +
             '<div style="text-align:right;">' +
-                (progression.suggest ? '<div class="progression-badge">' + progression.suggest + '</div>' : '') +
+                (progression.suggest && progression.suggestType === 'success' ? '<div class="progression-badge" style="background:rgba(3,218,198,0.2);color:#03dac6;">↑ UP</div>' : '') +
+                (progression.suggest && progression.suggestType === 'warning' ? '<div class="progression-badge" style="background:rgba(245,87,108,0.2);color:#f5576c;">⚠</div>' : '') +
             '</div>' +
         '</div>' +
         gifHtml +
         ytHtml +
         descHtml;
         
-        if(progression.lastWorkout) {
-            html += '<div style="background:#1a1a1a; padding:8px; border-radius:6px; margin-bottom:10px; font-size:0.85em;">' +
-                IC.chart + ' Last: ' + progression.lastWorkout.weight + ' lbs × ' + progression.lastWorkout.reps.join(',') + ' reps' +
+        if(progression.lastSession) {
+            // SESSION REPLAY — show last session detail
+            var ls = progression.lastSession;
+            var dateObj = new Date(ls.date + 'T12:00:00');
+            var dateLabel = dateObj.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' });
+            
+            html += '<div style="background:#1a1a2e; border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:10px 12px; margin-bottom:10px;">' +
+                '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">' +
+                    '<span style="font-size:0.8em; color:#888;">Last Session — ' + dateLabel + '</span>' +
+                    '<span style="font-size:0.8em; color:#666;">Vol: ' + ls.totalVol + '</span>' +
+                '</div>';
+            
+            ls.sets.forEach(function(s, i) {
+                html += '<div style="display:flex; gap:8px; padding:3px 0; font-size:0.85em; color:#aaa;">' +
+                    '<span style="color:#666; min-width:40px;">Set ' + (i+1) + '</span>' +
+                    '<span>' + s.weight + ' × ' + s.reps + '</span>' +
+                '</div>';
+            });
+            
+            // Volume comparison with previous session
+            if (progression.prevSession) {
+                var volDiff = ls.totalVol - progression.prevSession.totalVol;
+                var volPct = progression.prevSession.totalVol > 0 ? Math.round((volDiff / progression.prevSession.totalVol) * 100) : 0;
+                var volColor = volDiff > 0 ? '#03dac6' : volDiff < 0 ? '#f5576c' : '#888';
+                var volArrow = volDiff > 0 ? '↑' : volDiff < 0 ? '↓' : '→';
+                html += '<div style="margin-top:6px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.06); font-size:0.8em; color:' + volColor + ';">' +
+                    volArrow + ' ' + (volDiff > 0 ? '+' : '') + volDiff + ' volume (' + (volPct > 0 ? '+' : '') + volPct + '%) vs previous' +
+                '</div>';
+            }
+            
+            html += '</div>';
+        }
+        
+        // SMART SPOTTER hint badge
+        if (progression.suggest) {
+            var badgeBg = progression.suggestType === 'success' ? 'rgba(3,218,198,0.15)' : 
+                          progression.suggestType === 'warning' ? 'rgba(245,87,108,0.15)' : 'rgba(255,255,255,0.08)';
+            var badgeColor = progression.suggestType === 'success' ? '#03dac6' : 
+                             progression.suggestType === 'warning' ? '#f5576c' : '#ccc';
+            html += '<div style="background:' + badgeBg + '; border:1px solid ' + badgeColor + '33; border-radius:8px; padding:8px 12px; margin-bottom:10px; font-size:0.85em; color:' + badgeColor + ';">' +
+                '🎯 ' + progression.suggest +
             '</div>';
         }
         
@@ -3136,18 +3180,19 @@ function renderWorkout(exercises) {
             }
         }
         
-        // Current set input
-        var suggestedWeight = progression.suggestedWeight || 100;
+        // Current set input — Smart Spotter prefills weight and reps
+        var suggestedWeight = progression.suggestedWeight || 0;
+        var suggestedReps = progression.suggestedReps || 10;
         html += '<div class="set-active">' +
             '<strong>Set ' + (setsCompleted + 1) + '</strong>' +
             '<div class="row" style="margin-top:10px;">' +
                 '<div style="flex:1;">' +
                     '<small class="text-muted">Weight (lbs)</small>' +
-                    '<input type="number" id="weight-' + idx + '" value="' + suggestedWeight + '" step="5">' +
+                    '<input type="number" id="weight-' + idx + '" value="' + suggestedWeight + '" step="2.5">' +
                 '</div>' +
                 '<div style="flex:1;">' +
                     '<small class="text-muted">Reps</small>' +
-                    '<input type="number" id="reps-' + idx + '" value="10" step="1">' +
+                    '<input type="number" id="reps-' + idx + '" value="' + suggestedReps + '" step="1">' +
                 '</div>' +
             '</div>' +
             '<button class="btn btn-main" onclick="logSet(\'' + safeName + '\', ' + idx + ')">' +
@@ -3243,33 +3288,109 @@ function getTodaysSetData(name) {
 }
 
 function getProgression(name) {
-    const history = JSON.parse(localStorage.getItem('exerciseHistory')) || {};
-    const exerciseHistory = history[name] || [];
+    var history = JSON.parse(localStorage.getItem('exerciseHistory')) || {};
+    var allSets = history[name] || [];
     
-    if(exerciseHistory.length < 3) return {lastWorkout:null, suggest:null, suggestedWeight:100};
+    if (allSets.length === 0) return { lastSession: null, suggest: null, suggestedWeight: 0, suggestedReps: 10, hint: null };
     
-    const today = new Date().toISOString().split('T')[0];
-    const past = exerciseHistory.filter(s => s.sessionDate !== today);
+    var today = new Date().toISOString().split('T')[0];
     
-    if(past.length < 3) return {lastWorkout:null, suggest:null, suggestedWeight:100};
+    // Group sets by session date
+    var sessions = {};
+    allSets.forEach(function(s) {
+        if (!s.sessionDate) return;
+        if (!sessions[s.sessionDate]) sessions[s.sessionDate] = [];
+        sessions[s.sessionDate].push(s);
+    });
     
-    // Get last 3 sets
-    const lastSession = past.slice(-3);
-    const avgWeight = lastSession.reduce((sum,s) => sum + s.weight, 0) / 3;
-    const avgReps = lastSession.reduce((sum,s) => sum + s.reps, 0) / 3;
+    // Get sorted past session dates (exclude today)
+    var pastDates = Object.keys(sessions).filter(function(d) { return d !== today; }).sort();
     
-    let suggested = avgWeight;
-    let hint = null;
+    if (pastDates.length === 0) return { lastSession: null, suggest: null, suggestedWeight: 0, suggestedReps: 10, hint: null };
     
-    if(avgReps >= 10) {
-        suggested = avgWeight + 5;
-        hint = '+5 lbs';
+    // Last session data
+    var lastDate = pastDates[pastDates.length - 1];
+    var lastSets = sessions[lastDate];
+    var lastMaxWeight = Math.max.apply(null, lastSets.map(function(s) { return s.weight; }));
+    var lastAvgReps = Math.round(lastSets.reduce(function(sum, s) { return sum + s.reps; }, 0) / lastSets.length);
+    var lastTotalVol = lastSets.reduce(function(sum, s) { return sum + (s.weight * s.reps); }, 0);
+    
+    // Previous session (for comparison)
+    var prevSession = null;
+    if (pastDates.length >= 2) {
+        var prevDate = pastDates[pastDates.length - 2];
+        var prevSets = sessions[prevDate];
+        prevSession = {
+            date: prevDate,
+            sets: prevSets,
+            maxWeight: Math.max.apply(null, prevSets.map(function(s) { return s.weight; })),
+            totalVol: prevSets.reduce(function(sum, s) { return sum + (s.weight * s.reps); }, 0)
+        };
+    }
+    
+    // Smart Spotter logic
+    var suggested = lastMaxWeight;
+    var suggestedReps = 10;
+    var hint = null;
+    var hintType = 'info'; // info, success, warning
+    
+    // Check if all sets hit target reps (8+)
+    var allHitTarget = lastSets.every(function(s) { return s.reps >= 8; });
+    var allHitHigh = lastSets.every(function(s) { return s.reps >= 12; });
+    var anyFailed = lastSets.some(function(s) { return s.reps < 6; });
+    
+    if (allHitHigh) {
+        // Crushed it — bump weight
+        suggested = lastMaxWeight + 2.5;
+        suggestedReps = 8;
+        hint = '↑ +2.5 — you hit 12+ reps last time';
+        hintType = 'success';
+    } else if (allHitTarget) {
+        // Solid — same weight, push reps up
+        suggested = lastMaxWeight;
+        suggestedReps = lastAvgReps + 1;
+        hint = '→ Same weight, push for ' + suggestedReps + ' reps';
+        hintType = 'info';
+    } else if (anyFailed) {
+        // Struggled — drop slightly
+        suggested = Math.round((lastMaxWeight * 0.9) * 2) / 2; // round to 0.5
+        suggestedReps = 8;
+        hint = '↓ Deload — you hit <6 reps last time';
+        hintType = 'warning';
+    } else {
+        // Mixed — repeat
+        suggested = lastMaxWeight;
+        suggestedReps = 10;
+        hint = '→ Repeat — build consistency';
+        hintType = 'info';
+    }
+    
+    // Stall detection — same weight for 3+ sessions
+    if (pastDates.length >= 3) {
+        var last3Weights = pastDates.slice(-3).map(function(d) {
+            return Math.max.apply(null, sessions[d].map(function(s) { return s.weight; }));
+        });
+        if (last3Weights[0] === last3Weights[1] && last3Weights[1] === last3Weights[2]) {
+            hint = '⚠ Stalled at ' + last3Weights[0] + ' for 3 sessions — try drop set or new rep range';
+            hintType = 'warning';
+        }
     }
     
     return {
-        lastWorkout: {weight: avgWeight, reps: lastSession.map(s => s.reps)},
+        lastSession: {
+            date: lastDate,
+            sets: lastSets,
+            maxWeight: lastMaxWeight,
+            avgReps: lastAvgReps,
+            totalVol: lastTotalVol
+        },
+        prevSession: prevSession,
         suggest: hint,
-        suggestedWeight: Math.round(suggested)
+        suggestType: hintType,
+        suggestedWeight: Math.round(suggested * 2) / 2, // round to nearest 0.5
+        suggestedReps: suggestedReps,
+        // Legacy compat
+        lastWorkout: { weight: lastMaxWeight, reps: lastSets.map(function(s) { return s.reps; }) }
     };
 }
 
@@ -3617,6 +3738,177 @@ function clearAllWorkoutHistory() {
     renderWorkoutHistory();
     renderPlanCalendar();
     showNotification('All workout history cleared', 'success');
+}
+
+// ========================================
+// WEEKLY BRIEFING
+// ========================================
+function renderWeeklyBriefing() {
+    var card = document.getElementById('weekly-briefing-card');
+    var content = document.getElementById('weekly-briefing-content');
+    if (!card || !content) return;
+    
+    var history = JSON.parse(localStorage.getItem('exerciseHistory')) || {};
+    var completed = JSON.parse(localStorage.getItem('completedWorkouts')) || {};
+    var rpeHistory = JSON.parse(localStorage.getItem('rpeHistory')) || {};
+    
+    // Get this week's date range (Mon-Sun)
+    var now = new Date();
+    var dayOfWeek = now.getDay();
+    var mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    var monday = new Date(now);
+    monday.setDate(now.getDate() + mondayOffset);
+    monday.setHours(0, 0, 0, 0);
+    
+    var sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    
+    // Collect this week's data
+    var weekDates = [];
+    for (var i = 0; i < 7; i++) {
+        var d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        weekDates.push(d.toISOString().split('T')[0]);
+    }
+    
+    // Sessions this week
+    var sessionsThisWeek = weekDates.filter(function(d) { return completed[d]; }).length;
+    
+    // Planned sessions from active plan
+    var plannedSessions = 0;
+    if (appState.activePlan && appState.activePlan.schedule) {
+        var sched = appState.activePlan.schedule;
+        for (var key in sched) {
+            if (sched[key] !== 'rest') plannedSessions++;
+        }
+    }
+    
+    // Total volume this week
+    var weekVolume = 0;
+    var weekSets = 0;
+    var exerciseVolumes = {};
+    var weekExercises = {};
+    
+    Object.keys(history).forEach(function(exName) {
+        history[exName].forEach(function(set) {
+            if (weekDates.indexOf(set.sessionDate) !== -1) {
+                var vol = set.weight * set.reps;
+                weekVolume += vol;
+                weekSets++;
+                weekExercises[exName] = true;
+                if (!exerciseVolumes[exName]) exerciseVolumes[exName] = { thisWeek: 0, lastWeek: 0 };
+                exerciseVolumes[exName].thisWeek += vol;
+            }
+        });
+    });
+    
+    // Last week's volume for comparison
+    var lastWeekDates = [];
+    for (var j = 0; j < 7; j++) {
+        var lwd = new Date(monday);
+        lwd.setDate(monday.getDate() - 7 + j);
+        lastWeekDates.push(lwd.toISOString().split('T')[0]);
+    }
+    
+    var lastWeekVolume = 0;
+    var lastWeekSessions = lastWeekDates.filter(function(d) { return completed[d]; }).length;
+    
+    Object.keys(history).forEach(function(exName) {
+        history[exName].forEach(function(set) {
+            if (lastWeekDates.indexOf(set.sessionDate) !== -1) {
+                lastWeekVolume += set.weight * set.reps;
+                if (!exerciseVolumes[exName]) exerciseVolumes[exName] = { thisWeek: 0, lastWeek: 0 };
+                exerciseVolumes[exName].lastWeek += set.weight * set.reps;
+            }
+        });
+    });
+    
+    // Average RPE this week
+    var weekRPEs = weekDates.map(function(d) { return rpeHistory[d]; }).filter(Boolean);
+    var avgRPE = weekRPEs.length > 0 ? (weekRPEs.reduce(function(sum, r) { return sum + r.rpe; }, 0) / weekRPEs.length).toFixed(1) : null;
+    
+    // Find PRs this week (exercises where thisWeek volume > lastWeek)
+    var progressions = [];
+    var stalls = [];
+    Object.keys(exerciseVolumes).forEach(function(name) {
+        var ev = exerciseVolumes[name];
+        if (ev.lastWeek > 0 && ev.thisWeek > 0) {
+            var pct = Math.round(((ev.thisWeek - ev.lastWeek) / ev.lastWeek) * 100);
+            if (pct > 5) progressions.push({ name: name, pct: pct });
+            else if (pct < -10) stalls.push({ name: name, pct: pct });
+        }
+    });
+    progressions.sort(function(a, b) { return b.pct - a.pct; });
+    
+    // No data? Hide
+    if (sessionsThisWeek === 0 && lastWeekSessions === 0) {
+        card.style.display = 'none';
+        return;
+    }
+    
+    card.style.display = 'block';
+    
+    // Build HTML
+    var html = '';
+    
+    // Sessions row
+    var sessionColor = plannedSessions > 0 && sessionsThisWeek >= plannedSessions ? '#03dac6' : sessionsThisWeek > 0 ? '#f0c674' : '#f5576c';
+    html += '<div style="display:flex; gap:10px; margin-bottom:12px; flex-wrap:wrap;">';
+    html += '<div style="flex:1; min-width:100px; background:rgba(255,255,255,0.04); border-radius:8px; padding:10px; text-align:center;">' +
+        '<div style="font-size:1.8em; font-weight:bold; color:' + sessionColor + ';">' + sessionsThisWeek + (plannedSessions > 0 ? '/' + plannedSessions : '') + '</div>' +
+        '<div style="font-size:0.75em; color:#888;">Sessions</div>' +
+    '</div>';
+    
+    // Volume
+    var volDiff = lastWeekVolume > 0 ? Math.round(((weekVolume - lastWeekVolume) / lastWeekVolume) * 100) : 0;
+    var volColor = volDiff > 0 ? '#03dac6' : volDiff < 0 ? '#f5576c' : '#888';
+    html += '<div style="flex:1; min-width:100px; background:rgba(255,255,255,0.04); border-radius:8px; padding:10px; text-align:center;">' +
+        '<div style="font-size:1.8em; font-weight:bold; color:var(--sec);">' + (weekVolume > 1000 ? Math.round(weekVolume / 1000) + 'k' : weekVolume) + '</div>' +
+        '<div style="font-size:0.75em; color:#888;">Volume' + (lastWeekVolume > 0 ? ' <span style="color:' + volColor + ';">' + (volDiff > 0 ? '+' : '') + volDiff + '%</span>' : '') + '</div>' +
+    '</div>';
+    
+    // RPE
+    if (avgRPE) {
+        var rpeHue = Math.round(120 - (avgRPE - 1) * (120 / 9));
+        html += '<div style="flex:1; min-width:100px; background:rgba(255,255,255,0.04); border-radius:8px; padding:10px; text-align:center;">' +
+            '<div style="font-size:1.8em; font-weight:bold; color:hsl(' + rpeHue + ',80%,55%);">' + avgRPE + '</div>' +
+            '<div style="font-size:0.75em; color:#888;">Avg RPE</div>' +
+        '</div>';
+    }
+    
+    // Sets
+    html += '<div style="flex:1; min-width:100px; background:rgba(255,255,255,0.04); border-radius:8px; padding:10px; text-align:center;">' +
+        '<div style="font-size:1.8em; font-weight:bold; color:var(--primary);">' + weekSets + '</div>' +
+        '<div style="font-size:0.75em; color:#888;">Total Sets</div>' +
+    '</div>';
+    html += '</div>';
+    
+    // Progressions
+    if (progressions.length > 0) {
+        html += '<div style="margin-bottom:8px;">';
+        progressions.slice(0, 3).forEach(function(p) {
+            html += '<div style="font-size:0.85em; padding:4px 0; color:#03dac6;">↑ ' + p.name + ' <span style="color:#888;">+' + p.pct + '% volume</span></div>';
+        });
+        html += '</div>';
+    }
+    
+    // Stalls
+    if (stalls.length > 0) {
+        html += '<div style="margin-bottom:8px;">';
+        stalls.slice(0, 2).forEach(function(s) {
+            html += '<div style="font-size:0.85em; padding:4px 0; color:#f5576c;">↓ ' + s.name + ' <span style="color:#888;">' + s.pct + '% volume</span></div>';
+        });
+        html += '</div>';
+    }
+    
+    // Last week comparison
+    if (lastWeekSessions > 0) {
+        html += '<div style="font-size:0.8em; color:#666; border-top:1px solid rgba(255,255,255,0.06); padding-top:8px; margin-top:4px;">' +
+            'Last week: ' + lastWeekSessions + ' sessions, ' + (lastWeekVolume > 1000 ? Math.round(lastWeekVolume / 1000) + 'k' : lastWeekVolume) + ' volume' +
+        '</div>';
+    }
+    
+    content.innerHTML = html;
 }
 
 // ========================================
@@ -4791,8 +5083,10 @@ function completeWarmup() {
 }
 
 function continueToWorkout() {
-    // The workout is already loaded, just make sure it's visible
+    // The workout is already loaded, just make sure it's visible and scrolled to
     document.getElementById('workout-interface').style.display = 'block';
+    document.getElementById('workout-interface').scrollIntoView({behavior:'smooth'});
+    speak('Let\'s go! First exercise ready.');
 }
 
 // ========================================
