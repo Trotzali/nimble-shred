@@ -1177,7 +1177,7 @@
 <div class="container active" id="view-coach">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec);">v64</span>
+        <span style="font-size:1.3em; color: var(--sec);">v65</span>
     </div>
     
     <div class="card">
@@ -4009,15 +4009,17 @@ function markDayCompleted(dayIndex) {
     completed[date] = true;
     localStorage.setItem('completedWorkouts', JSON.stringify(completed));
     
-    // Auto-save to cloud
+    // Auto-save to cloud — currentWorkout is an ARRAY of exercises; the type
+    // lives in appState.currentWorkoutType (H-05: was always 'unknown'/[])
     const workout = {
         date: date,
-        type: appState.currentWorkout?.type || 'unknown',
-        exercises: appState.currentWorkout?.exercises || [],
+        type: (appState.currentWorkout && appState.currentWorkoutType) ? appState.currentWorkoutType : 'unknown',
+        exercises: (appState.currentWorkout || []).map(function(e) { return e.name; }),
         duration: 0, // Could be calculated
         notes: ''
     };
     saveWorkoutToCloud(workout);
+    saveHistoryToCloud(); // push per-set logs + completed days (H-05)
     
     renderPlanCalendar();
 }
@@ -7077,20 +7079,76 @@ async function loadGarminFromCloud() {
     } catch (error) { console.error('Error loading Garmin files:', error); return []; }
 }
 
+// H-05: per-set exercise history + completed days, stored as one snapshot blob
+// per user in user_settings.settings (upsert on user_id — schema verified).
+async function saveHistoryToCloud() {
+    if (!CLOUD_SYNC_ENABLED || !supabaseClient) return false;
+    try {
+        const payload = {
+            exerciseHistory: JSON.parse(localStorage.getItem('exerciseHistory') || '{}'),
+            completedWorkouts: JSON.parse(localStorage.getItem('completedWorkouts') || '{}'),
+            savedAt: new Date().toISOString()
+        };
+        const { error } = await supabaseClient.from('user_settings').upsert(
+            { user_id: USER_ID, settings: payload, updated_at: new Date().toISOString() },
+            { onConflict: 'user_id' }
+        );
+        if (error) throw error;
+        LAST_SYNC_TIME = new Date().toISOString();
+        updateCloudSyncUI();
+        console.log('✅ Exercise history synced to cloud');
+        return true;
+    } catch (error) { console.error('Error saving history to cloud:', error); return false; }
+}
+
+async function loadHistoryFromCloud() {
+    if (!CLOUD_SYNC_ENABLED || !supabaseClient) return null;
+    try {
+        const { data, error } = await supabaseClient.from('user_settings').select('settings').eq('user_id', USER_ID).maybeSingle();
+        if (error && error.code !== 'PGRST116') throw error;
+        return data?.settings || null;
+    } catch (error) { console.error('Error loading history from cloud:', error); return null; }
+}
+
 async function loadFromCloud() {
     if (!CLOUD_SYNC_ENABLED) return;
     try {
         console.log('📥 Loading data from cloud...');
-        const cloudWorkouts = await loadWorkoutsFromCloud();
-        const localWorkouts = JSON.parse(localStorage.getItem('workouts') || '[]');
-        const workoutMap = new Map();
-        localWorkouts.forEach(w => workoutMap.set(w.date, w));
-        cloudWorkouts.forEach(w => workoutMap.set(w.date, w));
-        localStorage.setItem('workouts', JSON.stringify(Array.from(workoutMap.values())));
-        
+        // H-05: restore into the keys the app actually reads.
+        // Set history: snapshot blob; adopt the cloud copy only when it holds
+        // MORE sets than local (fresh install / second device), never clobber
+        // a device that is ahead locally.
+        const cloudBlob = await loadHistoryFromCloud();
+        if (cloudBlob && cloudBlob.exerciseHistory) {
+            const countSets = function(h) { return Object.keys(h).reduce(function(n, k) { return n + (h[k] || []).length; }, 0); };
+            const localHistory = JSON.parse(localStorage.getItem('exerciseHistory') || '{}');
+            const localSets = countSets(localHistory);
+            const cloudSets = countSets(cloudBlob.exerciseHistory);
+            if (cloudSets > localSets) {
+                localStorage.setItem('exerciseHistory', JSON.stringify(cloudBlob.exerciseHistory));
+                if (cloudBlob.completedWorkouts) localStorage.setItem('completedWorkouts', JSON.stringify(cloudBlob.completedWorkouts));
+                console.log('📥 Restored ' + cloudSets + ' sets from cloud (local had ' + localSets + ')');
+            }
+        }
+
+        // Plan: restore into currentPlan + appState.activePlan (the keys the
+        // Plan Overview and calendar read) — only when no local plan exists.
         const cloudPlan = await loadPlanFromCloud();
-        if (cloudPlan) localStorage.setItem('training_plan', JSON.stringify(cloudPlan));
-        
+        if (cloudPlan && cloudPlan.weekSchedule && !localStorage.getItem('currentPlan')) {
+            localStorage.setItem('currentPlan', JSON.stringify(cloudPlan));
+            appState.activePlan = {
+                name: cloudPlan.name || 'Training Plan',
+                frequency: Object.keys(cloudPlan.weekSchedule).filter(function(k) { return cloudPlan.weekSchedule[k] !== 'rest'; }).length,
+                schedule: cloudPlan.weekSchedule,
+                week: 1,
+                phase: (cloudPlan.phases && cloudPlan.phases[0]) ? cloudPlan.phases[0].name : 'Foundation'
+            };
+            saveAppState();
+            renderPlanCalendar();
+            updateTodaysBanner();
+            console.log('📥 Restored training plan from cloud');
+        }
+
         LAST_SYNC_TIME = new Date().toISOString();
         updateCloudSyncUI();
         console.log('✅ Cloud data loaded successfully');
@@ -7101,9 +7159,10 @@ async function syncNow() {
     if (!CLOUD_SYNC_ENABLED) { showNotification(''+IC.cross+' Cloud sync not available', 'error'); return; }
     showNotification(''+IC.refresh+' Syncing...', 'info');
     try {
-        const workouts = JSON.parse(localStorage.getItem('workouts') || '[]');
-        for (const workout of workouts) { await saveWorkoutToCloud(workout); }
-        const plan = JSON.parse(localStorage.getItem('training_plan') || 'null');
+        // H-05: push the data the app actually uses (per-day workout records
+        // are already pushed live by saveWorkoutToCloud at completion)
+        await saveHistoryToCloud();
+        const plan = JSON.parse(localStorage.getItem('currentPlan') || 'null');
         if (plan) { await savePlanToCloud(plan); }
         await loadFromCloud();
         showNotification(''+IC.check+' Sync complete!', 'success');
