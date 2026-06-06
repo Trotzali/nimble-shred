@@ -4,6 +4,24 @@
 
 ---
 
+## FLAGSHIP (post-cleanup): Pain-Aware Training + Rehab/Prehab Assistant
+
+Conversational injury/soreness assistant for 40+. MODIFIES TRAINING AND TRIAGES — NEVER DIAGNOSES, NEVER NAMES CONDITIONS.
+
+- Structured intake: location, timing (during/after/night), aggravating movement, severity 0–10, duration.
+- Red-flag gate FIRST: numbness/tingling, radiating pain, night pain, sudden swelling, can't bear weight, pain after a fall → STOP, refer to a professional.
+- If clear: swap the aggravating lift for a mechanical alternative from the DB, reduce load, offer region-specific prehab/mobility.
+- Log issues → trend detection for recurring sore spots.
+- System prompt constrains Gemini: not a doctor, no diagnosis, movement + referral only.
+- **Substrate:** exercise metadata (mechanical alternatives, joint-load profile, contraindication tags, rehab/prehab category) — shared with pain-swap, joint-stress, ramped-warmup.
+- **Phases:** (1) intake + red-flag gate + swap, (2) persistent injury tracking, (3) dedicated rehab routines reusing the Wedge engine.
+
+**Sequencing:** slots after analytics consolidation + the exercise-metadata pass.
+
+**Existing hooks to build on:** Check-In "Pain" path + Age-Proof multipliers, RPE "joint pain" tag (already logged per session), The Mechanic's pattern detection (trend substrate), Wedge engine (phase 3), consultation chat UI + `[BUBBLES]`/`[PROFILE]` parse pattern (structured intake), Gemini system-prompt constraint pattern from v56 chat fix.
+
+---
+
 ## Active roadmap
 
 ### Near-term (next to build)
