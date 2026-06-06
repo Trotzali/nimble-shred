@@ -1177,7 +1177,7 @@
 <div class="container active" id="view-coach">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec);">v63</span>
+        <span style="font-size:1.3em; color: var(--sec);">v64</span>
     </div>
     
     <div class="card">
@@ -1580,7 +1580,18 @@
         </select>
         <button class="btn btn-action" onclick="testVoice()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Test Voice</button>
     </div>
-    
+
+    <div class="card">
+        <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg> Weight Unit</h3>
+        <div class="gear-row">
+            <button class="rpe-tag selected" data-weight-unit="kg" onclick="setWeightUnit('kg')">kg</button>
+            <button class="rpe-tag" data-weight-unit="lbs" onclick="setWeightUnit('lbs')">lbs</button>
+        </div>
+        <p class="text-muted" style="margin-top:10px; font-size:0.8em;">
+            Display label only — switching does <strong>not</strong> convert saved numbers (40 stays 40). New sets are logged in the unit shown.
+        </p>
+    </div>
+
     <div class="card">
         <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Backup Exercise Images</h3>
         <p class="text-muted" style="margin-bottom:10px;">
@@ -3017,6 +3028,7 @@ let appState = {
     customEquipment: [],
     voiceEnabled: true,
     voiceLevel: 'standard',
+    weightUnit: 'kg',
     selectedExercises: [],
     exerciseCount: 6,
     builderFilter: 'all'
@@ -3224,6 +3236,23 @@ function loadAppState() {
 
 function saveAppState() {
     localStorage.setItem('nimbleState_v45', JSON.stringify(appState));
+}
+
+// Weight unit preference — LABEL ONLY, stored numbers are never converted (H-01)
+function getWeightUnit() {
+    return appState.weightUnit === 'lbs' ? 'lbs' : 'kg';
+}
+
+function setWeightUnit(unit) {
+    appState.weightUnit = unit === 'lbs' ? 'lbs' : 'kg';
+    saveAppState();
+    document.querySelectorAll('[data-weight-unit]').forEach(function(b) {
+        b.classList.toggle('selected', b.getAttribute('data-weight-unit') === appState.weightUnit);
+    });
+    // Re-label an active workout card (skip mid-rest so the timer isn't disturbed)
+    if (appState.currentWorkout && appState.currentWorkout.length && !document.getElementById('active-rest-timer')) {
+        renderWorkout(appState.currentWorkout);
+    }
 }
 
 function createDefaultPlan() {
@@ -3700,7 +3729,7 @@ function renderWorkout(exercises) {
             var set = setData[i];
             if(set) {
                 html += '<div class="set-completed">' +
-                    '<span>' + IC.check + ' Set ' + (i+1) + ': ' + set.weight + ' lbs × ' + set.reps + ' reps</span>' +
+                    '<span>' + IC.check + ' Set ' + (i+1) + ': ' + set.weight + ' ' + getWeightUnit() + ' × ' + set.reps + ' reps</span>' +
                 '</div>';
             }
         }
@@ -3718,7 +3747,7 @@ function renderWorkout(exercises) {
             '<strong>Set ' + (setsCompleted + 1) + '</strong>' +
             '<div class="row" style="margin-top:10px;">' +
                 '<div style="flex:1;">' +
-                    '<small class="text-muted">Weight (lbs)</small>' +
+                    '<small class="text-muted">Weight (' + getWeightUnit() + ')</small>' +
                     '<input type="number" id="weight-' + idx + '" value="' + suggestedWeight + '" step="2.5">' +
                 '</div>' +
                 '<div style="flex:1;">' +
@@ -4179,7 +4208,7 @@ function renderHistoryExercises(date, exercises) {
             <div class="history-set-row" id="row-${safeId}">
                 <span class="set-num">Set ${i + 1}</span>
                 <input type="number" id="hw-${safeId}" value="${set.weight}" step="0.5" title="Weight">
-                <span class="set-unit">kg</span>
+                <span class="set-unit">${getWeightUnit()}</span>
                 <span style="color:#666;">×</span>
                 <input type="number" id="hr-${safeId}" value="${set.reps}" step="1" title="Reps">
                 <span class="set-unit">reps</span>
@@ -5314,7 +5343,7 @@ function renderPlanOverview() {
             html += '<div style="margin-bottom:8px;">' +
                 '<div style="display:flex; justify-content:space-between; font-size:0.8em; margin-bottom:2px;">' +
                     '<span style="color:#bbb;">' + (patternLabels[pattern] || pattern) + '</span>' +
-                    '<span style="color:var(--sec);">' + data.weight + (data.weight > 0 ? ' lbs' : '') + ' × ' + data.reps + '</span>' +
+                    '<span style="color:var(--sec);">' + data.weight + (data.weight > 0 ? ' ' + getWeightUnit() : '') + ' × ' + data.reps + '</span>' +
                 '</div>' +
                 '<div class="sp-bar-bg"><div class="sp-bar-fill" style="width:' + pct + '%"></div></div>' +
             '</div>';
@@ -5847,6 +5876,11 @@ function updateSettingsUI() {
         document.getElementById('exercise-count-slider').value = count;
         document.getElementById('exercise-count-display').textContent = count;
     }
+
+    // Weight unit toggle state
+    document.querySelectorAll('[data-weight-unit]').forEach(function(b) {
+        b.classList.toggle('selected', b.getAttribute('data-weight-unit') === getWeightUnit());
+    });
 }
 
 // ========================================
