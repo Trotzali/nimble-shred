@@ -1177,7 +1177,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec);">v73</span>
+        <span style="font-size:1.3em; color: var(--sec);">v74</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -3694,8 +3694,9 @@ function renderWorkout(exercises) {
                 '<div class="text-muted">' + ex.cat.join(', ') + ' • ' + ex.equip + '</div>' +
             '</div>' +
             '<div style="text-align:right;">' +
-                (progression.suggest && progression.suggestType === 'success' ? '<div class="progression-badge" style="background:rgba(3,218,198,0.2);color:#03dac6;">↑ UP</div>' : '') +
-                (progression.suggest && progression.suggestType === 'warning' ? '<div class="progression-badge" style="background:rgba(245,87,108,0.2);color:#f5576c;">⚠</div>' : '') +
+                // weight-progression flags only apply to weight_reps; title makes the icon legible (v74)
+                (logMode === 'weight_reps' && progression.suggest && progression.suggestType === 'success' ? '<div class="progression-badge" title="' + progression.suggest + '" style="background:rgba(3,218,198,0.2);color:#03dac6;">↑ UP</div>' : '') +
+                (logMode === 'weight_reps' && progression.suggest && progression.suggestType === 'warning' ? '<div class="progression-badge" title="' + progression.suggest + '" style="background:rgba(245,87,108,0.2);color:#f5576c;">⚠</div>' : '') +
             '</div>' +
         '</div>' +
         gifHtml +
@@ -3707,11 +3708,21 @@ function renderWorkout(exercises) {
             var ls = progression.lastSession;
             var dateObj = new Date(ls.date + 'T12:00:00');
             var dateLabel = dateObj.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' });
-            
+
+            // Mode-aware session total (#5/v74): weight×reps volume is only meaningful for weight_reps
+            var sessTotalLabel;
+            if (logMode === 'time') {
+                sessTotalLabel = 'Total: ' + ls.sets.reduce(function(a, s) { return a + (s.seconds || 0); }, 0) + 's';
+            } else if (logMode === 'reps') {
+                sessTotalLabel = 'Total: ' + ls.sets.reduce(function(a, s) { return a + (s.reps || 0); }, 0) + ' reps';
+            } else {
+                sessTotalLabel = 'Vol: ' + ls.totalVol;
+            }
+
             html += '<div style="background:#1a1a2e; border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:10px 12px; margin-bottom:10px;">' +
                 '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">' +
                     '<span style="font-size:0.8em; color:#888;">Last Session — ' + dateLabel + '</span>' +
-                    '<span style="font-size:0.8em; color:#666;">Vol: ' + ls.totalVol + '</span>' +
+                    '<span style="font-size:0.8em; color:#666;">' + sessTotalLabel + '</span>' +
                 '</div>';
             
             ls.sets.forEach(function(s, i) {
@@ -3721,8 +3732,8 @@ function renderWorkout(exercises) {
                 '</div>';
             });
             
-            // Volume comparison with previous session
-            if (progression.prevSession) {
+            // Volume comparison with previous session (weight×reps only — meaningless for reps/time, v74)
+            if (logMode === 'weight_reps' && progression.prevSession) {
                 var volDiff = ls.totalVol - progression.prevSession.totalVol;
                 var volPct = progression.prevSession.totalVol > 0 ? Math.round((volDiff / progression.prevSession.totalVol) * 100) : 0;
                 var volColor = volDiff > 0 ? '#03dac6' : volDiff < 0 ? '#f5576c' : '#888';
