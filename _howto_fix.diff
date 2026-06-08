@@ -1,0 +1,34 @@
+--- index.html
++++ index.fixed.html
+@@ -3648,7 +3648,7 @@
+         var descHtml = '';
+         if (ex.guide) {
+             descHtml = '<div style="background:rgba(255,255,255,0.04); border-radius:8px; padding:10px 12px; margin-bottom:12px; font-size:0.85em; line-height:1.5; color:#bbb;">' +
+-                '<strong style="color:var(--sec);">How to:</strong> ' + ex.guide.prep + ' ' + ex.guide.exec +
++                '<strong style="color:var(--sec);">How to:</strong> ' + ex.guide.prep.join(' ') + ' ' + ex.guide.exec.join(' ') +
+                 '</div>';
+         }
+         
+@@ -5618,11 +5618,11 @@
+         ${ytHtml}
+         <div class="card" style="margin-bottom:12px">
+             <h4 style="color:var(--sec);margin-bottom:8px">Preparation</h4>
+-            <p>${ex.guide.prep}</p>
++            <p>${ex.guide.prep.join(' ')}</p>
+         </div>
+         <div class="card" style="margin-bottom:12px">
+             <h4 style="color:var(--sec);margin-bottom:8px">Execution</h4>
+-            <p>${ex.guide.exec}</p>
++            <p>${ex.guide.exec.join(' ')}</p>
+         </div>
+         <div class="card" style="margin-bottom:12px">
+             <h4 style="color:var(--primary);margin-bottom:8px">Tips</h4>
+@@ -6317,7 +6317,7 @@
+     const fullEx = window.allExercises ? window.allExercises.find(e => e.name === exercise.name) : null;
+     let descText = exercise.desc;
+     if (fullEx && fullEx.guide) {
+-        descText = fullEx.guide.prep + ' ' + fullEx.guide.exec;
++        descText = fullEx.guide.prep.join(' ') + ' ' + fullEx.guide.exec.join(' ');
+     }
+     document.getElementById('warmup-exercise-desc').textContent = descText;
+     
