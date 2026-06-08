@@ -1177,7 +1177,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec);">v68</span>
+        <span style="font-size:1.3em; color: var(--sec);">v69</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -1323,7 +1323,7 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> Start Consultation
             </button>
             <button class="btn" onclick="startAssessmentDirect()" style="border-radius:10px; background:rgba(255,255,255,0.06); color:#aaa;">
-                💪 Redo Assessment
+                💪 Fitness Assessment
             </button>
         </div>
     </div>
@@ -1772,12 +1772,6 @@
         <div class="modal-header">
             <h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Custom Workout Builder</h2>
             <button class="modal-close" onclick="closeCustomBuilder()">✕</button>
-        </div>
-        
-        <div style="margin-bottom: 15px;">
-            <label>Number of Exercises: <span id="builder-count-display">6</span></label>
-            <input type="range" id="exercise-count-slider" min="3" max="10" value="6" 
-                   oninput="updateExerciseCount(this.value)">
         </div>
         
         <div style="margin-bottom: 15px;">
@@ -3058,7 +3052,7 @@ const exerciseMedia = {
     "Cable Rear Delt Fly": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Rear-Delt-Cable-Raise.gif", yt: "https://www.youtube.com/watch?v=8x6gXCgjZzc"},
     "High Row (Rope)": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-high-row.gif", yt: "https://www.youtube.com/watch?v=4lrPy2wqMzs"},
     "Cable Overhead Press": {gif: "https://www.inspireusafoundation.org/file/2022/04/military-press.gif", yt: "https://www.youtube.com/watch?v=F3QY5vMz_6I"},
-    "Cable Lateral Raise": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Lateral-Raise.gif", yt: "https://www.youtube.com/watch?v=PPrzBWZDOhttps"},
+    "Cable Lateral Raise": {gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Lateral-Raise.gif", yt: "https://www.youtube.com/watch?v=qitQHqNZbeM"}, // #14-A replaced dead v=PPrzBWZDOhttps paste error; oEmbed-200 verified, RE-CHECK content liveness
     "Cable Front Raise": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-front-raise.gif", yt: "https://www.youtube.com/watch?v=6SGWBT4jw6o"},
     "Cable External Rotation": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-external-rotation.gif", yt: "https://www.youtube.com/watch?v=y8L2wS3KHn4"},
     "Cable Internal Rotation": {gif: "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/cable-internal-rotation.gif", yt: "https://www.youtube.com/watch?v=rPd7DfbPkbc"},
@@ -3640,13 +3634,11 @@ function renderWorkout(exercises) {
                 '</div>';
         }
         
-        // YouTube link
-        var ytHtml = '';
-        if (media && media.yt) {
-            ytHtml = '<a href="' + media.yt + '" target="_blank" rel="noopener" ' +
-                'style="display:inline-block; padding:5px 12px; margin-bottom:10px; background:rgba(255,0,0,0.1); border:1px solid rgba(255,0,0,0.3); border-radius:8px; color:#ff4444; text-decoration:none; font-size:0.8em;">' +
-                '▶ Watch Form Tutorial</a>';
-        }
+        // YouTube link — curated video if present, else a YouTube search so every exercise has a working link (#14-B4)
+        var ytLink = (media && media.yt) ? media.yt : 'https://www.youtube.com/results?search_query=' + encodeURIComponent(ex.name + ' exercise form');
+        var ytHtml = '<a href="' + ytLink + '" target="_blank" rel="noopener" ' +
+            'style="display:inline-block; padding:5px 12px; margin-bottom:10px; background:rgba(255,0,0,0.1); border:1px solid rgba(255,0,0,0.3); border-radius:8px; color:#ff4444; text-decoration:none; font-size:0.8em;">' +
+            '▶ Watch Form Tutorial</a>';
         
         // Exercise description
         var descHtml = '';
@@ -4973,13 +4965,7 @@ function closeCustomBuilder() {
     document.getElementById('custom-builder-modal').classList.remove('active');
 }
 
-function updateExerciseCount(value) {
-    appState.exerciseCount = parseInt(value);
-    document.getElementById('exercise-count-display').textContent = value;
-    const builderEl = document.getElementById('builder-count-display');
-    if (builderEl) builderEl.textContent = value;
-    saveAppState();
-}
+// (updateExerciseCount defined once above; duplicate removed in v69 — #16 cleanup)
 
 function searchBuilderExercises() {
     renderBuilderExerciseList();
@@ -5132,14 +5118,15 @@ function toggleExerciseSelection(exercise) {
     if(index > -1) {
         appState.selectedExercises.splice(index, 1);
     } else {
-        if(appState.selectedExercises.length < appState.exerciseCount) {
+        // Hand-pick mode has no auto-pick cap (#16); a generous sanity bound only
+        if(appState.selectedExercises.length < 20) {
             appState.selectedExercises.push(exercise);
         } else {
-            alert(`Maximum ${appState.exerciseCount} exercises selected`);
+            alert('Maximum 20 exercises selected');
             return;
         }
     }
-    
+
     renderBuilderExerciseList();
     updateSelectedCount();
 }
@@ -5614,15 +5601,14 @@ function viewExerciseDetails(name) {
         `;
     }
     
-    let ytHtml = '';
-    if (ytUrl) {
-        ytHtml = `
-            <a href="${ytUrl}" target="_blank" rel="noopener" 
+    // Curated video if present, else a YouTube search so every exercise has a working link (#14-B4)
+    const ytLink = ytUrl || ('https://www.youtube.com/results?search_query=' + encodeURIComponent(ex.name + ' exercise form'));
+    let ytHtml = `
+            <a href="${ytLink}" target="_blank" rel="noopener"
                style="display:block; text-align:center; padding:10px; margin-bottom:12px; background:rgba(255,0,0,0.1); border:1px solid rgba(255,0,0,0.3); border-radius:10px; color:#ff4444; text-decoration:none; font-weight:bold; font-size:0.95em;">
                 ▶ Watch Form Tutorial on YouTube
             </a>
         `;
-    }
     
     content.innerHTML = `
         ${mediaHtml}
