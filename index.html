@@ -1177,7 +1177,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec);">v70</span>
+        <span style="font-size:1.3em; color: var(--sec);">v71</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -3025,7 +3025,8 @@ let appState = {
     weightUnit: 'kg',
     selectedExercises: [],
     exerciseCount: 6,
-    builderFilter: 'all'
+    builderFilter: 'all',
+    recentPicks: {} // per-type rolling history of last 1-2 sessions' picks (Smart Picker P1)
 };
 
 // ========================================
@@ -3524,10 +3525,43 @@ function generateWorkoutByType(type, count = 6) {
     
     // Apply equipment filter
     filtered = filterExercisesByEquipment(filtered);
-    
-    // Shuffle and take count
-    filtered.sort(() => 0.5 - Math.random());
-    return filtered.slice(0, count);
+
+    // Smart Picker Phase 1: exclude recently-picked exercises for this type, then an
+    // unbiased Fisher-Yates shuffle, then take N. Pool-agnostic, no metadata reads.
+    var recent = getRecentNames(type);
+    var pool = filtered.filter(function(e) { return recent.indexOf(e.name) === -1; });
+    if (pool.length < count) pool = filtered.slice(); // not enough fresh -> full pool; never under-fill
+    fisherYates(pool);
+    var picks = pool.slice(0, count);
+    rememberPicks(type, picks.map(function(e) { return e.name; }));
+    return picks;
+}
+
+// --- Smart Picker Phase 1 helpers (recent-exclusion + unbiased shuffle) ---
+var RECENT_WINDOW = 2; // sessions remembered per type
+
+// Unbiased shuffle, replaces the old biased sort(() => 0.5 - Math.random())
+function fisherYates(a) {
+    for (var i = a.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+}
+
+// Union of names picked across the last <=RECENT_WINDOW sessions for this type
+function getRecentNames(type) {
+    var hist = (appState.recentPicks && appState.recentPicks[type]) || [];
+    return hist.reduce(function(acc, names) { return acc.concat(names); }, []);
+}
+
+// Record this session's picks (newest-first, capped at RECENT_WINDOW); persists via saveAppState
+function rememberPicks(type, names) {
+    if (!appState.recentPicks) appState.recentPicks = {};
+    var hist = appState.recentPicks[type] || [];
+    hist.unshift(names.slice());
+    appState.recentPicks[type] = hist.slice(0, RECENT_WINDOW);
+    saveAppState();
 }
 
 function filterExercisesByEquipment(exercises) {
