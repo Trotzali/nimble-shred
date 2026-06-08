@@ -1,1758 +1,2605 @@
 // ============================================================================
-// NIMBLE SHRED — EXERCISE METADATA SUBSTRATE (v1.1.0)
+// NIMBLE SHRED — EXERCISE METADATA SUBSTRATE (v1.4.0)
 // ============================================================================
-// Standalone data layer for pain-aware exercise swapping, prehab/rehab
-// programming, set-logging UX, and training-bucket / equipment filtering.
-// NOT yet loaded by index.html — prep substrate for a future feature. Keyed by
-// the EXACT exercise name as it appears in window.allExercises (index.html v60,
-// 163 exercises).
+// Standalone data layer for pain-aware exercise swapping ("train around a
+// niggle"), prehab/rehab programming, set-logging UX, training-bucket /
+// equipment filtering, and SELECTION-ENGINE programming. NOT yet loaded by
+// index.html — prep substrate.
+//
+// COVERAGE: 177 entries = the 163 canonical exercises in window.allExercises
+// (index.html v60) + 14 staged Cardio/HIIT moves (cardio-hiit-exercises.js,
+// not yet in window.allExercises — see self-check "staged" note).
+//
+// v1.4.0 — SELECTION-ENGINE FIELDS. Adds movementPattern, laterality, compound
+// so a workout builder can balance push/pull, pick unilateral correctives, and
+// distinguish compound from isolation work. jointLoad/strainScore/aggravates and
+// all other fields are unchanged from v1.3.0 (the dense 9-joint pass).
 //
 // SCHEMA — window.exerciseMeta[exerciseName] = {
 //
-//   alternatives: string[]
-//       Exercises with the same (or closely related) movement pattern that
-//       impose LOWER or differently-distributed joint stress — candidates
-//       for a pain-driven swap. Every name is guaranteed to exist in the
-//       canonical 163-exercise list. An empty array means the exercise is
-//       already the lowest-stress option for its pattern in the database.
-//
-//   jointLoad: { shoulder, elbow, wrist, lowBack, hip, knee, ankle }
-//       Mechanical stress this exercise places on each joint/region:
-//       0 = none, 1 = low, 2 = moderate, 3 = high.
-//       Derived from the movement pattern, loading position, and target
-//       muscles documented in the exercise's index.html entry.
-//
-//   strainScore: number (0-10)
-//       Overall systemic strain, DERIVED from jointLoad:
-//       strainScore = min(10, sum of all seven jointLoad values).
-//
-//   aggravates: string[]
-//       Joint keys this exercise is likely to irritate when already sore.
-//       DERIVED from jointLoad: every joint with load >= 2.
-//
+//   alternatives: string[]        lower / differently-loaded swaps; all resolve.
+//   jointLoad: { neck, shoulder, elbow, wrist, tSpine, lowBack, hip, knee, ankle }
+//                                 0 = spared .. 3 = primary high load (dense, all 9).
+//   strainScore: number (0-10)    DERIVED = min(10, sum of jointLoad).
+//   aggravates: string[]          DERIVED = joints with load >= 2, in key order.
 //   rehabCategory: string | null
-//       null for main training lifts. Otherwise tags the drill's
-//       prep/rehab role. Vocabulary:
-//         "shoulder-prehab"  - rotator cuff / scapular health
-//         "hip-prehab"       - glute med / abductor strength
-//         "adductor-prehab"  - groin strength & resilience
-//         "knee-prehab"      - knee-over-toes strengthening
-//         "ankle-prehab"     - tibialis / lower-leg strengthening
-//         "wrist-prehab"     - wrist / forearm conditioning
-//         "hip-mobility"     - hip range-of-motion drills
-//         "spine-mobility"   - spinal range-of-motion drills
-//         "core-stability"   - motor-control / anti-movement drills
-//         "movement-prep"    - locomotion & animal-flow warmup drills
-//
-//   ── T3 ADDITIONS (v1.1.0) ────────────────────────────────────────────────
-//
-//   logMode: "weight_reps" | "reps" | "time" | "distance"   (how a set is logged)
-//       "weight_reps"  loaded rep work (cable / dumbbell / free-weight lifts).
-//       "reps"         bodyweight rep movements (push-ups, squats, jumps,
-//                      mobility reps).
-//       "time"         isometric holds, loaded/grip carries, travelling
-//                      locomotion (bear crawl, crab walk, skips), and
-//                      sustained-cardio / agility drills done for duration.
-//       "distance"     reserved (sprint / sled / run-for-distance). No v60
-//                      exercise uses it — travelling locomotion is logged by
-//                      time per the convention above.
-//       Derived from the exercise's movement + equipment in index.html.
-//
-//   bucket: "strength" | "power" | "resilience"   (training-stimulus class)
-//       "strength"    loaded strength, muscle-build, calisthenic strength,
-//                     nimble strength, and steady-state conditioning.
-//       "power"       plyometric / ballistic work (type "Plyo" plus the
-//                     jump/bound/hop moves: Jump Squat, Jumping Lunge,
-//                     Box Jump, Skater Hops).
-//       "resilience"  mobility drills (type "Mobility") and anything carrying
-//                     a rehabCategory (prehab). Prehab wins over strength for
-//                     dual-purpose nimble moves (e.g. Tibialis Raise,
-//                     Dead Hang, Copenhagen Plank, Powell Raise).
-//       Priority: (Mobility OR rehabCategory) -> resilience; else Plyo/jump
-//       -> power; else -> strength.
-//
+//   logMode: "weight_reps" | "reps" | "time" | "distance"
+//   bucket: "strength" | "power" | "resilience" | "cardio"
 //   equipmentNorm: "bodyweight" | "dumbbell" | "cable" | "gym/machines"
-//       Normalised equipment that reconciles the two in-app filter vocabularies:
-//         Builder     cables / dumbbells / barbells / bodyweight
-//         Quick Start full gym / dumbbells / bodyweight
-//       Cross-walk:
-//         "bodyweight"   <- Bodyweight   (Builder "bodyweight" / QS "bodyweight")
-//         "dumbbell"     <- Dumbbell     (Builder "dumbbells"  / QS "dumbbells")
-//         "cable"        <- Cable        (Builder "cables", part of QS "full gym")
-//         "gym/machines" <- Free Weight  (Builder "barbells" + plates/fixed
-//                                          machines, the gym-only slice of QS
-//                                          "full gym")
-//       Quick Start "full gym" = { cable, gym/machines }.
+//   musclesTargeted: string[]     fixed 24-muscle vocabulary.
 //
-// The three T3 fields are independent of the original five and can be read,
-// edited, or dropped without affecting pain-swap logic.
+//   ── v1.4.0 SELECTION-ENGINE ADDITIONS ────────────────────────────────────
 //
-// GENERATED from the canonical exercise database in index.html (v60).
-// All 163 exercises covered; all alternative names validated to resolve.
+//   movementPattern: single PRIMARY value from a fixed 14-pattern enum:
+//       push-horizontal, push-vertical, pull-horizontal, pull-vertical, squat,
+//       hinge, lunge, carry, rotation, anti-rotation, anti-extension,
+//       locomotion, isolation, mobility.
+//       The big lifting patterns (push/pull/squat/hinge/lunge/carry) drive
+//       strength/power selection; single-joint accessories are "isolation";
+//       core moves split into rotation / anti-rotation / anti-extension;
+//       resilience & cardio fall to mobility / locomotion / isolation as fits.
+//       One value only — the dominant pattern, not every pattern present.
+//
+//   laterality: "bilateral" | "unilateral" | "alternating".
+//       bilateral = both limbs load together; unilateral = one side per set;
+//       alternating = sides swap within the set.
+//
+//   compound: boolean — DERIVED, true when >= 2 of the 9 joints carry
+//       jointLoad >= 1. Computed strictly from the numbers (so e.g. a curl that
+//       also lightly loads the wrist reads compound=true by this mechanical
+//       definition — it is NOT a movementPattern judgement).
+//
+// GENERATED from exercise-metadata.js v1.3.0 (+ this pass). All alternatives
+// resolve; every entry carries a complete 9-joint score and all three new
+// selection fields.
 // ============================================================================
 
 window.exerciseMeta = {
     "Cable Chest Press": {
         alternatives: ["DB Floor Press", "Incline Push-up"],
-        jointLoad: { shoulder: 2, elbow: 1, wrist: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 2, elbow: 1, wrist: 1, tSpine: 0, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
         strainScore: 5,
         aggravates: ["shoulder"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["chest", "triceps", "frontDelts"],
+        movementPattern: "push-horizontal",
+        laterality: "bilateral",
+        compound: true
     },
     "Cable Chest Fly (High)": {
         alternatives: ["Cable Chest Fly (Mid)", "Svend Press"],
-        jointLoad: { shoulder: 2, elbow: 1, wrist: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 2, elbow: 1, wrist: 1, tSpine: 0, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
         strainScore: 5,
         aggravates: ["shoulder"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["chest", "frontDelts"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Cable Chest Fly (Low)": {
         alternatives: ["Cable Chest Fly (Mid)", "Svend Press"],
-        jointLoad: { shoulder: 2, elbow: 1, wrist: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 2, elbow: 1, wrist: 1, tSpine: 0, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
         strainScore: 5,
         aggravates: ["shoulder"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["chest", "frontDelts"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Cable Chest Fly (Mid)": {
         alternatives: ["Svend Press"],
-        jointLoad: { shoulder: 2, elbow: 1, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 2, elbow: 1, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 4,
         aggravates: ["shoulder"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["chest"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Single Arm Cable Chest Press": {
         alternatives: ["Cable Chest Press", "DB Floor Press"],
-        jointLoad: { shoulder: 2, elbow: 1, wrist: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 2, elbow: 1, wrist: 1, tSpine: 0, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
         strainScore: 5,
         aggravates: ["shoulder"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["chest", "obliques", "triceps"],
+        movementPattern: "push-horizontal",
+        laterality: "unilateral",
+        compound: true
     },
     "Cable Crossover": {
         alternatives: ["Cable Chest Fly (Mid)", "Svend Press"],
-        jointLoad: { shoulder: 2, elbow: 1, wrist: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 2, elbow: 1, wrist: 1, tSpine: 0, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
         strainScore: 5,
         aggravates: ["shoulder"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["chest"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Cable Pullover (Bench)": {
         alternatives: ["Straight Arm Pulldown"],
-        jointLoad: { shoulder: 2, elbow: 1, wrist: 0, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 4,
+        jointLoad: { neck: 0, shoulder: 2, elbow: 1, wrist: 0, tSpine: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 5,
         aggravates: ["shoulder"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["serratus", "lats", "chest"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Lat Pulldown (Standing)": {
         alternatives: ["Straight Arm Pulldown", "Seated Cable Row"],
-        jointLoad: { shoulder: 1, elbow: 1, wrist: 1, lowBack: 0, hip: 0, knee: 1, ankle: 0 },
-        strainScore: 4,
+        jointLoad: { neck: 0, shoulder: 1, elbow: 1, wrist: 1, tSpine: 1, lowBack: 0, hip: 0, knee: 1, ankle: 0 },
+        strainScore: 5,
         aggravates: [],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["lats", "biceps"],
+        movementPattern: "pull-vertical",
+        laterality: "bilateral",
+        compound: true
     },
     "Seated Cable Row": {
         alternatives: ["Single Arm Cable Row", "Inverted Row"],
-        jointLoad: { shoulder: 1, elbow: 1, wrist: 1, lowBack: 2, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 5,
+        jointLoad: { neck: 0, shoulder: 1, elbow: 1, wrist: 1, tSpine: 1, lowBack: 2, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 6,
         aggravates: ["lowBack"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["rhomboids", "traps", "lats"],
+        movementPattern: "pull-horizontal",
+        laterality: "bilateral",
+        compound: true
     },
     "Face Pulls": {
         alternatives: ["Cable Rear Delt Fly", "Wall Slides"],
-        jointLoad: { shoulder: 1, elbow: 1, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 3,
+        jointLoad: { neck: 1, shoulder: 1, elbow: 1, wrist: 1, tSpine: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 5,
         aggravates: [],
         rehabCategory: "shoulder-prehab",
         logMode: "weight_reps",
         bucket: "resilience",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["rearDelts", "rotatorCuff"],
+        movementPattern: "pull-horizontal",
+        laterality: "bilateral",
+        compound: true
     },
     "Straight Arm Pulldown": {
         alternatives: ["Lat Pulldown (Standing)"],
-        jointLoad: { shoulder: 2, elbow: 0, wrist: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 4,
+        jointLoad: { neck: 0, shoulder: 2, elbow: 0, wrist: 1, tSpine: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 5,
         aggravates: ["shoulder"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["lats"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Single Arm Cable Row": {
         alternatives: ["Inverted Row", "Seated Cable Row"],
-        jointLoad: { shoulder: 1, elbow: 1, wrist: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 1, elbow: 1, wrist: 1, tSpine: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 5,
+        aggravates: [],
+        rehabCategory: null,
+        logMode: "weight_reps",
+        bucket: "strength",
+        equipmentNorm: "cable",
+        musclesTargeted: ["lats", "obliques"],
+        movementPattern: "pull-horizontal",
+        laterality: "unilateral",
+        compound: true
+    },
+    "Cable Shrugs": {
+        alternatives: ["DB Shrugs"],
+        jointLoad: { neck: 1, shoulder: 1, elbow: 0, wrist: 1, tSpine: 0, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
         strainScore: 4,
         aggravates: [],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["traps"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
-    "Cable Shrugs": {
-        alternatives: ["DB Shrugs"],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+    "Cable Rear Delt Fly": {
+        alternatives: ["Face Pulls", "Powell Raise"],
+        jointLoad: { neck: 0, shoulder: 1, elbow: 0, wrist: 1, tSpine: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 3,
         aggravates: [],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
-    },
-    "Cable Rear Delt Fly": {
-        alternatives: ["Face Pulls", "Powell Raise"],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 2,
-        aggravates: [],
-        rehabCategory: null,
-        logMode: "weight_reps",
-        bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["rearDelts"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "High Row (Rope)": {
         alternatives: ["Face Pulls", "Seated Cable Row"],
-        jointLoad: { shoulder: 1, elbow: 1, wrist: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 4,
+        jointLoad: { neck: 0, shoulder: 1, elbow: 1, wrist: 1, tSpine: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 5,
         aggravates: [],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["rhomboids", "rearDelts"],
+        movementPattern: "pull-horizontal",
+        laterality: "bilateral",
+        compound: true
     },
     "Cable Overhead Press": {
         alternatives: ["Dumbbell Shoulder Press", "Cable Front Raise"],
-        jointLoad: { shoulder: 3, elbow: 1, wrist: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 6,
+        jointLoad: { neck: 0, shoulder: 3, elbow: 1, wrist: 1, tSpine: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 7,
         aggravates: ["shoulder"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["frontDelts", "triceps"],
+        movementPattern: "push-vertical",
+        laterality: "bilateral",
+        compound: true
     },
     "Cable Lateral Raise": {
         alternatives: ["Lateral Raise"],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 1, elbow: 0, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 2,
         aggravates: [],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["sideDelts"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Cable Front Raise": {
         alternatives: ["Front Raise"],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 1, elbow: 0, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 2,
         aggravates: [],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["frontDelts"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Cable External Rotation": {
         alternatives: ["Face Pulls", "Wall Slides"],
-        jointLoad: { shoulder: 1, elbow: 1, wrist: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 1, elbow: 1, wrist: 0, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 2,
         aggravates: [],
         rehabCategory: "shoulder-prehab",
         logMode: "weight_reps",
         bucket: "resilience",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["rotatorCuff"],
+        movementPattern: "isolation",
+        laterality: "unilateral",
+        compound: true
     },
     "Cable Internal Rotation": {
         alternatives: ["Cable External Rotation", "Face Pulls"],
-        jointLoad: { shoulder: 1, elbow: 1, wrist: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 1, elbow: 1, wrist: 0, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 2,
         aggravates: [],
         rehabCategory: "shoulder-prehab",
         logMode: "weight_reps",
         bucket: "resilience",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["rotatorCuff"],
+        movementPattern: "isolation",
+        laterality: "unilateral",
+        compound: true
     },
     "Cable Upright Row": {
         alternatives: ["Cable Lateral Raise", "Lateral Raise"],
-        jointLoad: { shoulder: 2, elbow: 1, wrist: 2, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 6,
+        jointLoad: { neck: 1, shoulder: 2, elbow: 1, wrist: 2, tSpine: 0, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 7,
         aggravates: ["shoulder", "wrist"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["sideDelts", "traps"],
+        movementPattern: "pull-vertical",
+        laterality: "bilateral",
+        compound: true
     },
     "Cable Y-Raise": {
         alternatives: ["Wall Slides", "Face Pulls"],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 2,
+        jointLoad: { neck: 0, shoulder: 1, elbow: 0, wrist: 1, tSpine: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 3,
         aggravates: [],
         rehabCategory: "shoulder-prehab",
         logMode: "weight_reps",
         bucket: "resilience",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["traps", "sideDelts"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Tricep Pushdown (Rope)": {
         alternatives: ["Cable Kickback"],
-        jointLoad: { shoulder: 0, elbow: 1, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 1, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 2,
         aggravates: [],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["triceps"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Tricep Pushdown (Bar)": {
         alternatives: ["Tricep Pushdown (Rope)", "Cable Kickback"],
-        jointLoad: { shoulder: 0, elbow: 1, wrist: 2, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 1, wrist: 2, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 3,
         aggravates: ["wrist"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["triceps"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Overhead Cable Extension": {
         alternatives: ["Tricep Pushdown (Rope)", "Cable Kickback"],
-        jointLoad: { shoulder: 2, elbow: 2, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 2, elbow: 2, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 5,
         aggravates: ["shoulder", "elbow"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["triceps"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Cable Bicep Curl": {
         alternatives: ["Cable Hammer Curl"],
-        jointLoad: { shoulder: 0, elbow: 1, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 1, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 2,
         aggravates: [],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["biceps"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Cable Hammer Curl": {
         alternatives: ["Hammer Curl"],
-        jointLoad: { shoulder: 0, elbow: 1, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 1, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 2,
         aggravates: [],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["biceps", "forearms"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Bayesian Curl": {
         alternatives: ["Cable Bicep Curl", "Cable Hammer Curl"],
-        jointLoad: { shoulder: 1, elbow: 2, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 1, elbow: 2, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 4,
         aggravates: ["elbow"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["biceps"],
+        movementPattern: "isolation",
+        laterality: "unilateral",
+        compound: true
     },
     "Cable Kickback": {
         alternatives: ["Tricep Pushdown (Rope)"],
-        jointLoad: { shoulder: 1, elbow: 1, wrist: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 1, elbow: 1, wrist: 0, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 2,
         aggravates: [],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["triceps"],
+        movementPattern: "isolation",
+        laterality: "unilateral",
+        compound: true
     },
     "Reverse Grip Pushdown": {
         alternatives: ["Tricep Pushdown (Rope)"],
-        jointLoad: { shoulder: 0, elbow: 1, wrist: 2, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 1, wrist: 2, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 3,
         aggravates: ["wrist"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["triceps"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Cable Squat": {
         alternatives: ["Bodyweight Squat", "Glute Bridge"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 1, hip: 1, knee: 2, ankle: 1 },
-        strainScore: 5,
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 1, lowBack: 1, hip: 1, knee: 2, ankle: 1 },
+        strainScore: 6,
         aggravates: ["knee"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["quads", "glutes"],
+        movementPattern: "squat",
+        laterality: "bilateral",
+        compound: true
     },
     "Cable Pull-Through": {
         alternatives: ["Glute Bridge", "Cable Kickback (Glute)"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 2, hip: 2, knee: 1, ankle: 0 },
-        strainScore: 5,
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 1, lowBack: 2, hip: 2, knee: 1, ankle: 0 },
+        strainScore: 6,
         aggravates: ["lowBack", "hip"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["glutes", "hamstrings"],
+        movementPattern: "hinge",
+        laterality: "bilateral",
+        compound: true
     },
     "Cable RDL": {
         alternatives: ["Cable Pull-Through", "Glute Bridge"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 2, hip: 2, knee: 1, ankle: 0 },
-        strainScore: 5,
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 1, lowBack: 2, hip: 2, knee: 1, ankle: 0 },
+        strainScore: 6,
         aggravates: ["lowBack", "hip"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["hamstrings"],
+        movementPattern: "hinge",
+        laterality: "bilateral",
+        compound: true
     },
     "Cable Lunge": {
         alternatives: ["Lunge (BW)", "DB Step Up"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 1, hip: 1, knee: 2, ankle: 1 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 1, hip: 1, knee: 2, ankle: 1 },
         strainScore: 5,
         aggravates: ["knee"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["quads", "glutes"],
+        movementPattern: "lunge",
+        laterality: "alternating",
+        compound: true
     },
     "Cable Kickback (Glute)": {
         alternatives: ["Glute Bridge", "Cable Donkey Kick"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 1, hip: 1, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 1, hip: 1, knee: 0, ankle: 0 },
         strainScore: 2,
         aggravates: [],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["glutes"],
+        movementPattern: "hinge",
+        laterality: "unilateral",
+        compound: true
     },
     "Cable Calf Raise": {
         alternatives: ["Calf Raise (BW)", "Seated Calf Raise"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 0, knee: 0, ankle: 2 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 2 },
         strainScore: 2,
         aggravates: ["ankle"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["calves"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: false
     },
     "Cable Abductor": {
         alternatives: ["Cable Hip Abduction (Standing)", "Side Plank"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 1, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 1, knee: 0, ankle: 0 },
         strainScore: 1,
         aggravates: [],
         rehabCategory: "hip-prehab",
         logMode: "weight_reps",
         bucket: "resilience",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["abductors"],
+        movementPattern: "isolation",
+        laterality: "unilateral",
+        compound: false
     },
     "Cable Adductor": {
         alternatives: ["Cable Hip Adduction (Standing)"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 1, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 1, knee: 0, ankle: 0 },
         strainScore: 1,
         aggravates: [],
         rehabCategory: "adductor-prehab",
         logMode: "weight_reps",
         bucket: "resilience",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["adductors"],
+        movementPattern: "isolation",
+        laterality: "unilateral",
+        compound: false
     },
     "Cable Crunch": {
         alternatives: ["Reverse Crunch", "Dead Bug"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 1, hip: 0, knee: 1, ankle: 0 },
-        strainScore: 2,
+        jointLoad: { neck: 1, shoulder: 0, elbow: 0, wrist: 0, tSpine: 1, lowBack: 1, hip: 0, knee: 1, ankle: 0 },
+        strainScore: 4,
         aggravates: [],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["abs"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Woodchopper (High to Low)": {
         alternatives: ["Pallof Press"],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 0, lowBack: 2, hip: 1, knee: 0, ankle: 0 },
-        strainScore: 4,
-        aggravates: ["lowBack"],
+        jointLoad: { neck: 0, shoulder: 1, elbow: 0, wrist: 0, tSpine: 2, lowBack: 2, hip: 1, knee: 0, ankle: 0 },
+        strainScore: 6,
+        aggravates: ["tSpine", "lowBack"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "resilience",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["obliques"],
+        movementPattern: "rotation",
+        laterality: "unilateral",
+        compound: true
     },
     "Pallof Press": {
         alternatives: ["Dead Bug", "Bird Dog"],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 0, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 2,
+        jointLoad: { neck: 0, shoulder: 1, elbow: 0, wrist: 0, tSpine: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 3,
         aggravates: [],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["abs"],
+        movementPattern: "anti-rotation",
+        laterality: "unilateral",
+        compound: true
     },
     "Cable Side Bend": {
         alternatives: ["Side Plank", "Pallof Press"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 2, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 2,
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 1, lowBack: 2, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 3,
         aggravates: ["lowBack"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "resilience",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["obliques"],
+        movementPattern: "rotation",
+        laterality: "unilateral",
+        compound: true
     },
     "Woodchopper (Low to High)": {
         alternatives: ["Pallof Press"],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 0, lowBack: 2, hip: 1, knee: 0, ankle: 0 },
-        strainScore: 4,
-        aggravates: ["lowBack"],
+        jointLoad: { neck: 0, shoulder: 1, elbow: 0, wrist: 0, tSpine: 2, lowBack: 2, hip: 1, knee: 0, ankle: 0 },
+        strainScore: 6,
+        aggravates: ["tSpine", "lowBack"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "resilience",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["obliques"],
+        movementPattern: "rotation",
+        laterality: "unilateral",
+        compound: true
     },
     "Dumbbell Bench Press": {
         alternatives: ["DB Floor Press", "Push-ups"],
-        jointLoad: { shoulder: 2, elbow: 1, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 2, elbow: 1, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 4,
         aggravates: ["shoulder"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "dumbbell"
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["chest", "triceps", "frontDelts"],
+        movementPattern: "push-horizontal",
+        laterality: "bilateral",
+        compound: true
     },
     "Dumbbell Incline Press": {
         alternatives: ["DB Floor Press", "Decline Push-up"],
-        jointLoad: { shoulder: 2, elbow: 1, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 2, elbow: 1, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 4,
         aggravates: ["shoulder"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "dumbbell"
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["chest", "frontDelts"],
+        movementPattern: "push-horizontal",
+        laterality: "bilateral",
+        compound: true
     },
     "Dumbbell Fly": {
         alternatives: ["Cable Chest Fly (Mid)", "Svend Press"],
-        jointLoad: { shoulder: 2, elbow: 1, wrist: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 2, elbow: 1, wrist: 0, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 3,
         aggravates: ["shoulder"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "dumbbell"
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["chest"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Dumbbell Shoulder Press": {
         alternatives: ["Front Raise", "Lateral Raise"],
-        jointLoad: { shoulder: 2, elbow: 1, wrist: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 2, elbow: 1, wrist: 1, tSpine: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 6,
+        aggravates: ["shoulder"],
+        rehabCategory: null,
+        logMode: "weight_reps",
+        bucket: "strength",
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["frontDelts", "sideDelts", "rearDelts", "triceps"],
+        movementPattern: "push-vertical",
+        laterality: "bilateral",
+        compound: true
+    },
+    "Arnold Press": {
+        alternatives: ["Dumbbell Shoulder Press", "Front Raise"],
+        jointLoad: { neck: 0, shoulder: 3, elbow: 1, wrist: 1, tSpine: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 7,
+        aggravates: ["shoulder"],
+        rehabCategory: null,
+        logMode: "weight_reps",
+        bucket: "strength",
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["frontDelts", "sideDelts", "rearDelts"],
+        movementPattern: "push-vertical",
+        laterality: "bilateral",
+        compound: true
+    },
+    "Lateral Raise": {
+        alternatives: ["Cable Lateral Raise"],
+        jointLoad: { neck: 0, shoulder: 1, elbow: 0, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 2,
+        aggravates: [],
+        rehabCategory: null,
+        logMode: "weight_reps",
+        bucket: "strength",
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["sideDelts"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
+    },
+    "Front Raise": {
+        alternatives: ["Cable Front Raise"],
+        jointLoad: { neck: 0, shoulder: 1, elbow: 0, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 2,
+        aggravates: [],
+        rehabCategory: null,
+        logMode: "weight_reps",
+        bucket: "strength",
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["frontDelts"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
+    },
+    "Dumbbell Row": {
+        alternatives: ["Seated Cable Row", "Inverted Row"],
+        jointLoad: { neck: 0, shoulder: 1, elbow: 1, wrist: 1, tSpine: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 5,
+        aggravates: [],
+        rehabCategory: null,
+        logMode: "weight_reps",
+        bucket: "strength",
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["lats", "rhomboids", "biceps"],
+        movementPattern: "pull-horizontal",
+        laterality: "unilateral",
+        compound: true
+    },
+    "Dumbbell Pullover": {
+        alternatives: ["Straight Arm Pulldown"],
+        jointLoad: { neck: 0, shoulder: 2, elbow: 1, wrist: 0, tSpine: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
         strainScore: 5,
         aggravates: ["shoulder"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "dumbbell"
-    },
-    "Arnold Press": {
-        alternatives: ["Dumbbell Shoulder Press", "Front Raise"],
-        jointLoad: { shoulder: 3, elbow: 1, wrist: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 6,
-        aggravates: ["shoulder"],
-        rehabCategory: null,
-        logMode: "weight_reps",
-        bucket: "strength",
-        equipmentNorm: "dumbbell"
-    },
-    "Lateral Raise": {
-        alternatives: ["Cable Lateral Raise"],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 2,
-        aggravates: [],
-        rehabCategory: null,
-        logMode: "weight_reps",
-        bucket: "strength",
-        equipmentNorm: "dumbbell"
-    },
-    "Front Raise": {
-        alternatives: ["Cable Front Raise"],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 2,
-        aggravates: [],
-        rehabCategory: null,
-        logMode: "weight_reps",
-        bucket: "strength",
-        equipmentNorm: "dumbbell"
-    },
-    "Dumbbell Row": {
-        alternatives: ["Seated Cable Row", "Inverted Row"],
-        jointLoad: { shoulder: 1, elbow: 1, wrist: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 4,
-        aggravates: [],
-        rehabCategory: null,
-        logMode: "weight_reps",
-        bucket: "strength",
-        equipmentNorm: "dumbbell"
-    },
-    "Dumbbell Pullover": {
-        alternatives: ["Straight Arm Pulldown"],
-        jointLoad: { shoulder: 2, elbow: 1, wrist: 0, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 4,
-        aggravates: ["shoulder"],
-        rehabCategory: null,
-        logMode: "weight_reps",
-        bucket: "strength",
-        equipmentNorm: "dumbbell"
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["lats", "serratus"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Goblet Squat": {
         alternatives: ["Bodyweight Squat", "Cable Squat"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 1, hip: 2, knee: 2, ankle: 1 },
-        strainScore: 6,
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 1, lowBack: 1, hip: 2, knee: 2, ankle: 1 },
+        strainScore: 7,
         aggravates: ["hip", "knee"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "dumbbell"
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["quads", "glutes", "abs"],
+        movementPattern: "squat",
+        laterality: "bilateral",
+        compound: true
     },
     "Dumbbell Lunge": {
         alternatives: ["Lunge (BW)", "DB Step Up"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 1, hip: 1, knee: 2, ankle: 1 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 1, hip: 1, knee: 2, ankle: 1 },
         strainScore: 5,
         aggravates: ["knee"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "dumbbell"
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["quads", "glutes", "hamstrings"],
+        movementPattern: "lunge",
+        laterality: "alternating",
+        compound: true
     },
     "Bulgarian Split Squat": {
         alternatives: ["DB Step Up", "Lunge (BW)"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 1, hip: 2, knee: 2, ankle: 1 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 1, hip: 2, knee: 2, ankle: 1 },
         strainScore: 6,
         aggravates: ["hip", "knee"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "dumbbell"
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["glutes", "quads"],
+        movementPattern: "lunge",
+        laterality: "unilateral",
+        compound: true
     },
     "Romanian Deadlift (DB)": {
         alternatives: ["Cable Pull-Through", "Glute Bridge"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 3, hip: 2, knee: 1, ankle: 0 },
-        strainScore: 6,
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 1, lowBack: 3, hip: 2, knee: 1, ankle: 0 },
+        strainScore: 7,
         aggravates: ["lowBack", "hip"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "dumbbell"
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["hamstrings", "glutes", "lowerBack"],
+        movementPattern: "hinge",
+        laterality: "bilateral",
+        compound: true
     },
     "Dumbbell Curl": {
         alternatives: ["Hammer Curl"],
-        jointLoad: { shoulder: 0, elbow: 1, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 1, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 2,
         aggravates: [],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "dumbbell"
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["biceps"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Hammer Curl": {
         alternatives: ["Cable Hammer Curl"],
-        jointLoad: { shoulder: 0, elbow: 1, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 1, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 2,
         aggravates: [],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "dumbbell"
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["biceps", "forearms"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Tricep Kickback": {
         alternatives: ["Cable Kickback", "Tricep Pushdown (Rope)"],
-        jointLoad: { shoulder: 1, elbow: 1, wrist: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 1, elbow: 1, wrist: 0, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 2,
         aggravates: [],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "dumbbell"
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["triceps"],
+        movementPattern: "isolation",
+        laterality: "unilateral",
+        compound: true
     },
     "Skull Crusher (DB)": {
         alternatives: ["Tricep Pushdown (Rope)", "Cable Kickback"],
-        jointLoad: { shoulder: 1, elbow: 2, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 1, elbow: 2, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 4,
         aggravates: ["elbow"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "dumbbell"
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["triceps"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Farmers Walk": {
         alternatives: ["Plank", "DB Shrugs"],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 1, lowBack: 1, hip: 1, knee: 1, ankle: 1 },
-        strainScore: 6,
+        jointLoad: { neck: 1, shoulder: 1, elbow: 0, wrist: 1, tSpine: 1, lowBack: 1, hip: 1, knee: 1, ankle: 1 },
+        strainScore: 8,
         aggravates: [],
         rehabCategory: null,
         logMode: "time",
         bucket: "strength",
-        equipmentNorm: "dumbbell"
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["abs", "forearms", "traps"],
+        movementPattern: "carry",
+        laterality: "bilateral",
+        compound: true
     },
     "Zottman Curl": {
         alternatives: ["Hammer Curl", "Dumbbell Curl"],
-        jointLoad: { shoulder: 0, elbow: 2, wrist: 2, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 2, wrist: 2, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 4,
         aggravates: ["elbow", "wrist"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "dumbbell"
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["biceps", "forearms"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Concentration Curl": {
         alternatives: ["Dumbbell Curl", "Cable Bicep Curl"],
-        jointLoad: { shoulder: 0, elbow: 1, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 1, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 2,
         aggravates: [],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "dumbbell"
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["biceps"],
+        movementPattern: "isolation",
+        laterality: "unilateral",
+        compound: true
     },
     "DB Floor Press": {
         alternatives: ["Svend Press", "Incline Push-up"],
-        jointLoad: { shoulder: 1, elbow: 1, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 1, elbow: 1, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 3,
         aggravates: [],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "dumbbell"
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["triceps", "chest"],
+        movementPattern: "push-horizontal",
+        laterality: "bilateral",
+        compound: true
     },
     "Renegade Row": {
         alternatives: ["Dumbbell Row", "Bird Dog"],
-        jointLoad: { shoulder: 2, elbow: 1, wrist: 2, lowBack: 2, hip: 1, knee: 0, ankle: 0 },
-        strainScore: 8,
+        jointLoad: { neck: 0, shoulder: 2, elbow: 1, wrist: 2, tSpine: 1, lowBack: 2, hip: 1, knee: 0, ankle: 0 },
+        strainScore: 9,
         aggravates: ["shoulder", "wrist", "lowBack"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "dumbbell"
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["lats", "abs", "obliques"],
+        movementPattern: "pull-horizontal",
+        laterality: "alternating",
+        compound: true
     },
     "DB Step Up": {
         alternatives: ["Lunge (BW)", "Glute Bridge"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 1, knee: 2, ankle: 1 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 1, knee: 2, ankle: 1 },
         strainScore: 4,
         aggravates: ["knee"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "dumbbell"
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["glutes", "quads"],
+        movementPattern: "lunge",
+        laterality: "alternating",
+        compound: true
     },
     "DB Shrugs": {
         alternatives: ["Cable Shrugs"],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 3,
+        jointLoad: { neck: 1, shoulder: 1, elbow: 0, wrist: 1, tSpine: 0, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 4,
         aggravates: [],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "dumbbell"
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["traps"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Seated Calf Raise": {
         alternatives: ["Calf Raise (BW)", "Cable Calf Raise"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 0, knee: 1, ankle: 2 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 0, knee: 1, ankle: 2 },
         strainScore: 3,
         aggravates: ["ankle"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "dumbbell"
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["calves"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Push-ups": {
         alternatives: ["Incline Push-up", "DB Floor Press"],
-        jointLoad: { shoulder: 2, elbow: 1, wrist: 2, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 2, elbow: 1, wrist: 2, tSpine: 0, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
         strainScore: 6,
         aggravates: ["shoulder", "wrist"],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["chest", "triceps", "abs"],
+        movementPattern: "push-horizontal",
+        laterality: "bilateral",
+        compound: true
     },
     "Pull-ups": {
         alternatives: ["Lat Pulldown (Standing)", "Inverted Row"],
-        jointLoad: { shoulder: 2, elbow: 2, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 5,
-        aggravates: ["shoulder", "elbow"],
-        rehabCategory: null,
-        logMode: "reps",
-        bucket: "strength",
-        equipmentNorm: "bodyweight"
-    },
-    "Chin-ups": {
-        alternatives: ["Lat Pulldown (Standing)", "Inverted Row"],
-        jointLoad: { shoulder: 2, elbow: 2, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 5,
-        aggravates: ["shoulder", "elbow"],
-        rehabCategory: null,
-        logMode: "reps",
-        bucket: "strength",
-        equipmentNorm: "bodyweight"
-    },
-    "Dips": {
-        alternatives: ["Close Grip Push-up", "Push-ups"],
-        jointLoad: { shoulder: 3, elbow: 2, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 2, elbow: 2, wrist: 1, tSpine: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 6,
         aggravates: ["shoulder", "elbow"],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["lats", "biceps"],
+        movementPattern: "pull-vertical",
+        laterality: "bilateral",
+        compound: true
+    },
+    "Chin-ups": {
+        alternatives: ["Lat Pulldown (Standing)", "Inverted Row"],
+        jointLoad: { neck: 0, shoulder: 2, elbow: 2, wrist: 1, tSpine: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 6,
+        aggravates: ["shoulder", "elbow"],
+        rehabCategory: null,
+        logMode: "reps",
+        bucket: "strength",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["biceps", "lats"],
+        movementPattern: "pull-vertical",
+        laterality: "bilateral",
+        compound: true
+    },
+    "Dips": {
+        alternatives: ["Close Grip Push-up", "Push-ups"],
+        jointLoad: { neck: 0, shoulder: 3, elbow: 2, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 6,
+        aggravates: ["shoulder", "elbow"],
+        rehabCategory: null,
+        logMode: "reps",
+        bucket: "strength",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["chest", "triceps"],
+        movementPattern: "push-vertical",
+        laterality: "bilateral",
+        compound: true
     },
     "Bodyweight Squat": {
         alternatives: ["Glute Bridge"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 1, knee: 1, ankle: 1 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 1, knee: 1, ankle: 1 },
         strainScore: 3,
         aggravates: [],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["quads", "glutes"],
+        movementPattern: "squat",
+        laterality: "bilateral",
+        compound: true
     },
     "Lunge (BW)": {
         alternatives: ["Bodyweight Squat", "Glute Bridge"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 1, knee: 1, ankle: 1 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 1, knee: 1, ankle: 1 },
         strainScore: 3,
         aggravates: [],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["quads", "glutes", "hamstrings"],
+        movementPattern: "lunge",
+        laterality: "alternating",
+        compound: true
     },
     "Glute Bridge": {
         alternatives: ["Cable Kickback (Glute)"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 1, knee: 1, ankle: 0 },
-        strainScore: 2,
+        jointLoad: { neck: 1, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 1, knee: 1, ankle: 0 },
+        strainScore: 3,
         aggravates: [],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["glutes"],
+        movementPattern: "hinge",
+        laterality: "bilateral",
+        compound: true
     },
     "Plank": {
         alternatives: ["Dead Bug", "Bird Dog"],
-        jointLoad: { shoulder: 1, elbow: 1, wrist: 0, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 1, elbow: 1, wrist: 0, tSpine: 0, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
         strainScore: 3,
         aggravates: [],
         rehabCategory: null,
         logMode: "time",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["abs"],
+        movementPattern: "anti-extension",
+        laterality: "bilateral",
+        compound: true
     },
     "Side Plank": {
         alternatives: ["Pallof Press"],
-        jointLoad: { shoulder: 2, elbow: 1, wrist: 0, lowBack: 1, hip: 1, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 2, elbow: 1, wrist: 0, tSpine: 0, lowBack: 1, hip: 1, knee: 0, ankle: 0 },
         strainScore: 5,
         aggravates: ["shoulder"],
         rehabCategory: null,
         logMode: "time",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["obliques", "lowerBack"],
+        movementPattern: "anti-rotation",
+        laterality: "unilateral",
+        compound: true
     },
     "Mountain Climbers": {
         alternatives: ["Dead Bug", "High Knees"],
-        jointLoad: { shoulder: 2, elbow: 0, wrist: 2, lowBack: 1, hip: 2, knee: 1, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 2, elbow: 0, wrist: 2, tSpine: 0, lowBack: 1, hip: 2, knee: 1, ankle: 0 },
         strainScore: 8,
         aggravates: ["shoulder", "wrist", "hip"],
         rehabCategory: null,
         logMode: "time",
-        bucket: "strength",
-        equipmentNorm: "bodyweight"
+        bucket: "cardio",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["abs", "hipFlexors", "frontDelts"],
+        movementPattern: "locomotion",
+        laterality: "alternating",
+        compound: true
     },
     "Burpees": {
         alternatives: ["Jumping Jacks", "Mountain Climbers"],
-        jointLoad: { shoulder: 2, elbow: 1, wrist: 2, lowBack: 2, hip: 2, knee: 2, ankle: 2 },
+        jointLoad: { neck: 0, shoulder: 2, elbow: 1, wrist: 2, tSpine: 0, lowBack: 2, hip: 2, knee: 2, ankle: 2 },
         strainScore: 10,
         aggravates: ["shoulder", "wrist", "lowBack", "hip", "knee", "ankle"],
         rehabCategory: null,
         logMode: "reps",
-        bucket: "strength",
-        equipmentNorm: "bodyweight"
+        bucket: "cardio",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["chest", "frontDelts", "triceps", "quads", "glutes", "abs"],
+        movementPattern: "locomotion",
+        laterality: "bilateral",
+        compound: true
     },
     "Hanging Leg Raise": {
         alternatives: ["Reverse Crunch", "Dead Bug"],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 1, lowBack: 1, hip: 2, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 1, elbow: 0, wrist: 1, tSpine: 0, lowBack: 1, hip: 2, knee: 0, ankle: 0 },
         strainScore: 5,
         aggravates: ["hip"],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["abs", "hipFlexors"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Pike Push-up": {
         alternatives: ["Dumbbell Shoulder Press", "Push-ups"],
-        jointLoad: { shoulder: 3, elbow: 1, wrist: 2, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 6,
+        jointLoad: { neck: 1, shoulder: 3, elbow: 1, wrist: 2, tSpine: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 8,
         aggravates: ["shoulder", "wrist"],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["frontDelts", "sideDelts", "rearDelts", "triceps"],
+        movementPattern: "push-vertical",
+        laterality: "bilateral",
+        compound: true
     },
     "Pistol Squat": {
         alternatives: ["Bulgarian Split Squat", "DB Step Up"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 1, hip: 2, knee: 3, ankle: 2 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 1, hip: 2, knee: 3, ankle: 2 },
         strainScore: 8,
         aggravates: ["hip", "knee", "ankle"],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["quads", "glutes"],
+        movementPattern: "squat",
+        laterality: "unilateral",
+        compound: true
     },
     "Nordic Curl": {
         alternatives: ["Single Leg RDL (BW)", "Glute Bridge"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 1, knee: 2, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 1, knee: 2, ankle: 0 },
         strainScore: 3,
         aggravates: ["knee"],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["hamstrings"],
+        movementPattern: "hinge",
+        laterality: "bilateral",
+        compound: true
     },
     "Inverted Row": {
         alternatives: ["Seated Cable Row"],
-        jointLoad: { shoulder: 1, elbow: 1, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 3,
+        jointLoad: { neck: 0, shoulder: 1, elbow: 1, wrist: 1, tSpine: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 4,
         aggravates: [],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["lats", "rhomboids"],
+        movementPattern: "pull-horizontal",
+        laterality: "bilateral",
+        compound: true
     },
     "Handstand Hold": {
         alternatives: ["Pike Push-up", "Dumbbell Shoulder Press"],
-        jointLoad: { shoulder: 3, elbow: 1, wrist: 3, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 8,
-        aggravates: ["shoulder", "wrist"],
+        jointLoad: { neck: 2, shoulder: 3, elbow: 1, wrist: 3, tSpine: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 10,
+        aggravates: ["neck", "shoulder", "wrist"],
         rehabCategory: null,
         logMode: "time",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["frontDelts", "sideDelts", "rearDelts", "triceps"],
+        movementPattern: "push-vertical",
+        laterality: "bilateral",
+        compound: true
     },
     "Calf Raise (BW)": {
         alternatives: ["Seated Calf Raise"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 0, knee: 0, ankle: 1 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 1 },
         strainScore: 1,
         aggravates: [],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["calves"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: false
     },
     "Cat-Cow": {
         alternatives: ["Thoracic Extension"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 2,
-        aggravates: [],
+        jointLoad: { neck: 1, shoulder: 0, elbow: 0, wrist: 1, tSpine: 2, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 5,
+        aggravates: ["tSpine"],
         rehabCategory: "spine-mobility",
         logMode: "reps",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["lowerBack"],
+        movementPattern: "mobility",
+        laterality: "bilateral",
+        compound: true
     },
     "Dead Bug": {
         alternatives: ["Bird Dog"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 1, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 1, knee: 0, ankle: 0 },
         strainScore: 1,
         aggravates: [],
         rehabCategory: "core-stability",
         logMode: "reps",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["abs", "hipFlexors"],
+        movementPattern: "anti-extension",
+        laterality: "alternating",
+        compound: false
     },
     "Thoracic Extension": {
         alternatives: ["Cat-Cow"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 0,
-        aggravates: [],
+        jointLoad: { neck: 1, shoulder: 0, elbow: 0, wrist: 0, tSpine: 3, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 4,
+        aggravates: ["tSpine"],
         rehabCategory: "spine-mobility",
         logMode: "reps",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["lowerBack"],
+        movementPattern: "mobility",
+        laterality: "bilateral",
+        compound: true
     },
     "World's Greatest Stretch": {
         alternatives: ["90/90 Hip Switch", "Cat-Cow"],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 0, lowBack: 1, hip: 1, knee: 1, ankle: 1 },
-        strainScore: 5,
+        jointLoad: { neck: 0, shoulder: 1, elbow: 0, wrist: 0, tSpine: 1, lowBack: 1, hip: 1, knee: 1, ankle: 1 },
+        strainScore: 6,
         aggravates: [],
         rehabCategory: "hip-mobility",
         logMode: "reps",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["hipFlexors", "glutes", "hamstrings", "lowerBack"],
+        movementPattern: "mobility",
+        laterality: "alternating",
+        compound: true
     },
     "90/90 Hip Switch": {
         alternatives: [],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 1, knee: 1, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 1, knee: 1, ankle: 0 },
         strainScore: 2,
         aggravates: [],
         rehabCategory: "hip-mobility",
         logMode: "reps",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["glutes"],
+        movementPattern: "mobility",
+        laterality: "alternating",
+        compound: true
     },
     "Shoulder Dislocates": {
         alternatives: ["Wall Slides"],
-        jointLoad: { shoulder: 2, elbow: 0, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 2, elbow: 0, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 3,
         aggravates: ["shoulder"],
         rehabCategory: "shoulder-prehab",
         logMode: "reps",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["frontDelts", "rearDelts", "rotatorCuff", "chest"],
+        movementPattern: "mobility",
+        laterality: "bilateral",
+        compound: true
     },
     "Wall Slides": {
         alternatives: [],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 1, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 1,
         aggravates: [],
         rehabCategory: "shoulder-prehab",
         logMode: "reps",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["traps", "rotatorCuff"],
+        movementPattern: "mobility",
+        laterality: "bilateral",
+        compound: false
     },
     "Deep Squat Hold": {
         alternatives: ["90/90 Hip Switch", "Bodyweight Squat"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 2, knee: 2, ankle: 2 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 2, knee: 2, ankle: 2 },
         strainScore: 6,
         aggravates: ["hip", "knee", "ankle"],
         rehabCategory: "hip-mobility",
         logMode: "time",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["glutes", "hipFlexors", "adductors", "calves"],
+        movementPattern: "mobility",
+        laterality: "bilateral",
+        compound: true
     },
     "Couch Stretch": {
         alternatives: ["90/90 Hip Switch", "World's Greatest Stretch"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 2, knee: 2, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 2, knee: 2, ankle: 0 },
         strainScore: 4,
         aggravates: ["hip", "knee"],
         rehabCategory: "hip-mobility",
         logMode: "time",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["hipFlexors", "quads"],
+        movementPattern: "mobility",
+        laterality: "unilateral",
+        compound: true
     },
     "Bird Dog": {
         alternatives: ["Dead Bug"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 1, lowBack: 0, hip: 0, knee: 1, ankle: 0 },
-        strainScore: 2,
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 1, tSpine: 1, lowBack: 0, hip: 0, knee: 1, ankle: 0 },
+        strainScore: 3,
         aggravates: [],
         rehabCategory: "core-stability",
         logMode: "reps",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["abs", "glutes", "lowerBack"],
+        movementPattern: "anti-rotation",
+        laterality: "alternating",
+        compound: true
     },
     "Cable Front Squat": {
         alternatives: ["Cable Squat", "Goblet Squat"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 1, hip: 2, knee: 2, ankle: 1 },
-        strainScore: 6,
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 1, lowBack: 1, hip: 2, knee: 2, ankle: 1 },
+        strainScore: 7,
         aggravates: ["hip", "knee"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["quads", "abs"],
+        movementPattern: "squat",
+        laterality: "bilateral",
+        compound: true
     },
     "Cable Zercher Squat": {
         alternatives: ["Cable Front Squat", "Goblet Squat"],
-        jointLoad: { shoulder: 0, elbow: 1, wrist: 0, lowBack: 2, hip: 2, knee: 2, ankle: 1 },
-        strainScore: 8,
-        aggravates: ["lowBack", "hip", "knee"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 1, wrist: 0, tSpine: 2, lowBack: 2, hip: 2, knee: 2, ankle: 1 },
+        strainScore: 10,
+        aggravates: ["tSpine", "lowBack", "hip", "knee"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["quads", "rhomboids", "traps"],
+        movementPattern: "squat",
+        laterality: "bilateral",
+        compound: true
     },
     "Cable Donkey Kick": {
         alternatives: ["Cable Kickback (Glute)", "Glute Bridge"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 1, lowBack: 0, hip: 1, knee: 1, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 1, tSpine: 0, lowBack: 0, hip: 1, knee: 1, ankle: 0 },
         strainScore: 3,
         aggravates: [],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["glutes"],
+        movementPattern: "hinge",
+        laterality: "unilateral",
+        compound: true
     },
     "Standing Cable Row": {
         alternatives: ["Seated Cable Row", "Single Arm Cable Row"],
-        jointLoad: { shoulder: 1, elbow: 1, wrist: 1, lowBack: 2, hip: 1, knee: 1, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 1, elbow: 1, wrist: 1, tSpine: 0, lowBack: 2, hip: 1, knee: 1, ankle: 0 },
         strainScore: 7,
         aggravates: ["lowBack"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["lats", "quads", "glutes", "abs"],
+        movementPattern: "pull-horizontal",
+        laterality: "bilateral",
+        compound: true
     },
     "Lying Cable Curl": {
         alternatives: ["Cable Hammer Curl"],
-        jointLoad: { shoulder: 0, elbow: 1, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 1, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 2,
         aggravates: [],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["biceps"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Cable French Press": {
         alternatives: ["Tricep Pushdown (Rope)", "Cable Kickback"],
-        jointLoad: { shoulder: 2, elbow: 2, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 2, elbow: 2, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 5,
         aggravates: ["shoulder", "elbow"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["triceps"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Cable Hip Abduction (Standing)": {
         alternatives: ["Cable Abductor"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 1, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 1, knee: 0, ankle: 0 },
         strainScore: 1,
         aggravates: [],
         rehabCategory: "hip-prehab",
         logMode: "weight_reps",
         bucket: "resilience",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["abductors"],
+        movementPattern: "isolation",
+        laterality: "unilateral",
+        compound: false
     },
     "Cable Hip Adduction (Standing)": {
         alternatives: ["Cable Adductor"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 1, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 1, knee: 0, ankle: 0 },
         strainScore: 1,
         aggravates: [],
         rehabCategory: "adductor-prehab",
         logMode: "weight_reps",
         bucket: "resilience",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["adductors"],
+        movementPattern: "isolation",
+        laterality: "unilateral",
+        compound: false
     },
     "Cable Wrist Curl": {
         alternatives: ["Wrist Rocks"],
-        jointLoad: { shoulder: 0, elbow: 1, wrist: 2, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 1, wrist: 2, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 3,
         aggravates: ["wrist"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["forearms"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Cable Reverse Wrist Curl": {
         alternatives: ["Wrist Rocks"],
-        jointLoad: { shoulder: 0, elbow: 1, wrist: 2, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 1, wrist: 2, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 3,
         aggravates: ["wrist"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["forearms"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Russian Twist": {
         alternatives: ["Pallof Press", "Side Plank"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 2, hip: 1, knee: 0, ankle: 0 },
-        strainScore: 3,
-        aggravates: ["lowBack"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 2, lowBack: 2, hip: 1, knee: 0, ankle: 0 },
+        strainScore: 5,
+        aggravates: ["tSpine", "lowBack"],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["obliques"],
+        movementPattern: "rotation",
+        laterality: "alternating",
+        compound: true
     },
     "Bicycle Crunch": {
         alternatives: ["Dead Bug"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 1, hip: 1, knee: 0, ankle: 0 },
-        strainScore: 2,
+        jointLoad: { neck: 1, shoulder: 0, elbow: 0, wrist: 0, tSpine: 1, lowBack: 1, hip: 1, knee: 0, ankle: 0 },
+        strainScore: 4,
         aggravates: [],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["abs", "obliques"],
+        movementPattern: "rotation",
+        laterality: "alternating",
+        compound: true
     },
     "Flutter Kicks": {
         alternatives: ["Dead Bug", "Reverse Crunch"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 2, hip: 2, knee: 0, ankle: 0 },
-        strainScore: 4,
+        jointLoad: { neck: 1, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 2, hip: 2, knee: 0, ankle: 0 },
+        strainScore: 5,
         aggravates: ["lowBack", "hip"],
         rehabCategory: null,
         logMode: "time",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["abs"],
+        movementPattern: "isolation",
+        laterality: "alternating",
+        compound: true
     },
     "V-Ups": {
         alternatives: ["Reverse Crunch", "Dead Bug"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 2, hip: 2, knee: 0, ankle: 0 },
-        strainScore: 4,
+        jointLoad: { neck: 1, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 2, hip: 2, knee: 0, ankle: 0 },
+        strainScore: 5,
         aggravates: ["lowBack", "hip"],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["abs"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Reverse Crunch": {
         alternatives: ["Dead Bug"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 1, hip: 1, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 1, hip: 1, knee: 0, ankle: 0 },
         strainScore: 2,
         aggravates: [],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["abs"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Plank Jack": {
         alternatives: ["Plank", "Jumping Jacks"],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 2, lowBack: 1, hip: 1, knee: 0, ankle: 1 },
+        jointLoad: { neck: 0, shoulder: 1, elbow: 0, wrist: 2, tSpine: 0, lowBack: 1, hip: 1, knee: 0, ankle: 1 },
         strainScore: 6,
         aggravates: ["wrist"],
         rehabCategory: null,
         logMode: "time",
-        bucket: "strength",
-        equipmentNorm: "bodyweight"
+        bucket: "cardio",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["abs", "frontDelts", "abductors"],
+        movementPattern: "locomotion",
+        laterality: "alternating",
+        compound: true
     },
     "Toe Touch": {
         alternatives: ["Reverse Crunch", "Dead Bug"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 1, hip: 1, knee: 0, ankle: 0 },
-        strainScore: 2,
+        jointLoad: { neck: 1, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 1, hip: 1, knee: 0, ankle: 0 },
+        strainScore: 3,
         aggravates: [],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["abs"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Diamond Push-up": {
         alternatives: ["Close Grip Push-up", "Push-ups"],
-        jointLoad: { shoulder: 2, elbow: 2, wrist: 2, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 2, elbow: 2, wrist: 2, tSpine: 0, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
         strainScore: 7,
         aggravates: ["shoulder", "elbow", "wrist"],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["triceps", "chest"],
+        movementPattern: "push-horizontal",
+        laterality: "bilateral",
+        compound: true
     },
     "Wide Grip Push-up": {
         alternatives: ["Push-ups", "Incline Push-up"],
-        jointLoad: { shoulder: 2, elbow: 1, wrist: 2, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 2, elbow: 1, wrist: 2, tSpine: 0, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
         strainScore: 6,
         aggravates: ["shoulder", "wrist"],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["chest"],
+        movementPattern: "push-horizontal",
+        laterality: "bilateral",
+        compound: true
     },
     "Decline Push-up": {
         alternatives: ["Push-ups", "Incline Push-up"],
-        jointLoad: { shoulder: 2, elbow: 1, wrist: 2, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 2, elbow: 1, wrist: 2, tSpine: 0, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
         strainScore: 6,
         aggravates: ["shoulder", "wrist"],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["chest"],
+        movementPattern: "push-horizontal",
+        laterality: "bilateral",
+        compound: true
     },
     "Incline Push-up": {
         alternatives: ["DB Floor Press"],
-        jointLoad: { shoulder: 1, elbow: 1, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 1, elbow: 1, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 3,
         aggravates: [],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["chest"],
+        movementPattern: "push-horizontal",
+        laterality: "bilateral",
+        compound: true
     },
     "Scapular Push-up": {
         alternatives: ["Wall Slides"],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 2,
+        jointLoad: { neck: 0, shoulder: 1, elbow: 0, wrist: 1, tSpine: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 3,
         aggravates: [],
         rehabCategory: "shoulder-prehab",
         logMode: "reps",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["serratus"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Sumo Squat (DB)": {
         alternatives: ["Goblet Squat", "Bodyweight Squat"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 1, hip: 2, knee: 2, ankle: 1 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 1, hip: 2, knee: 2, ankle: 1 },
         strainScore: 6,
         aggravates: ["hip", "knee"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "dumbbell"
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["adductors", "quads"],
+        movementPattern: "squat",
+        laterality: "bilateral",
+        compound: true
     },
     "Curtsy Lunge": {
         alternatives: ["Lunge (BW)"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 2, knee: 2, ankle: 1 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 2, knee: 2, ankle: 1 },
         strainScore: 5,
         aggravates: ["hip", "knee"],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["glutes"],
+        movementPattern: "lunge",
+        laterality: "alternating",
+        compound: true
     },
     "Side Lunge": {
         alternatives: ["Sumo Squat (DB)", "Lunge (BW)"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 2, knee: 2, ankle: 1 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 2, knee: 2, ankle: 1 },
         strainScore: 5,
         aggravates: ["hip", "knee"],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["adductors", "quads"],
+        movementPattern: "lunge",
+        laterality: "alternating",
+        compound: true
     },
     "Single Leg Glute Bridge": {
         alternatives: ["Glute Bridge"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 1, hip: 1, knee: 1, ankle: 0 },
-        strainScore: 3,
+        jointLoad: { neck: 1, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 1, hip: 1, knee: 1, ankle: 0 },
+        strainScore: 4,
         aggravates: [],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["glutes"],
+        movementPattern: "hinge",
+        laterality: "unilateral",
+        compound: true
     },
     "Good Morning (BW)": {
         alternatives: ["Glute Bridge", "Cable Pull-Through"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 2, hip: 2, knee: 0, ankle: 0 },
-        strainScore: 4,
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 1, lowBack: 2, hip: 2, knee: 0, ankle: 0 },
+        strainScore: 5,
         aggravates: ["lowBack", "hip"],
         rehabCategory: "hip-mobility",
         logMode: "reps",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["hamstrings", "lowerBack"],
+        movementPattern: "hinge",
+        laterality: "bilateral",
+        compound: true
     },
     "Jumping Jacks": {
         alternatives: [],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 0, lowBack: 0, hip: 1, knee: 1, ankle: 1 },
+        jointLoad: { neck: 0, shoulder: 1, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 1, knee: 1, ankle: 1 },
         strainScore: 4,
         aggravates: [],
         rehabCategory: null,
         logMode: "time",
-        bucket: "strength",
-        equipmentNorm: "bodyweight"
+        bucket: "cardio",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["sideDelts", "glutes", "abductors", "calves"],
+        movementPattern: "locomotion",
+        laterality: "alternating",
+        compound: true
     },
     "High Knees": {
         alternatives: ["Jumping Jacks"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 2, knee: 1, ankle: 2 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 2, knee: 1, ankle: 2 },
         strainScore: 5,
         aggravates: ["hip", "ankle"],
         rehabCategory: null,
         logMode: "time",
-        bucket: "strength",
-        equipmentNorm: "bodyweight"
+        bucket: "cardio",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["hipFlexors", "quads", "calves"],
+        movementPattern: "locomotion",
+        laterality: "alternating",
+        compound: true
     },
     "Jump Squat": {
         alternatives: ["Bodyweight Squat", "Box Jump"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 1, hip: 2, knee: 3, ankle: 2 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 1, hip: 2, knee: 3, ankle: 2 },
         strainScore: 8,
         aggravates: ["hip", "knee", "ankle"],
         rehabCategory: null,
         logMode: "reps",
         bucket: "power",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["quads", "glutes", "calves"],
+        movementPattern: "squat",
+        laterality: "bilateral",
+        compound: true
     },
     "Skater Hops": {
         alternatives: ["Side Lunge", "Jumping Jacks"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 2, knee: 2, ankle: 2 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 2, knee: 2, ankle: 2 },
         strainScore: 6,
         aggravates: ["hip", "knee", "ankle"],
         rehabCategory: null,
         logMode: "reps",
         bucket: "power",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["glutes", "abductors", "quads", "calves"],
+        movementPattern: "locomotion",
+        laterality: "alternating",
+        compound: true
     },
     "Jumping Lunge": {
         alternatives: ["Lunge (BW)"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 2, knee: 3, ankle: 2 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 2, knee: 3, ankle: 2 },
         strainScore: 7,
         aggravates: ["hip", "knee", "ankle"],
         rehabCategory: null,
         logMode: "reps",
         bucket: "power",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["quads", "glutes", "hamstrings", "calves"],
+        movementPattern: "lunge",
+        laterality: "alternating",
+        compound: true
     },
     "Box Jump": {
         alternatives: ["DB Step Up", "Bodyweight Squat"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 2, knee: 2, ankle: 2 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 2, knee: 2, ankle: 2 },
         strainScore: 6,
         aggravates: ["hip", "knee", "ankle"],
         rehabCategory: null,
         logMode: "reps",
         bucket: "power",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["quads", "glutes", "calves"],
+        movementPattern: "squat",
+        laterality: "bilateral",
+        compound: true
     },
     "Superman": {
         alternatives: ["Bird Dog"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 2, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 2,
-        aggravates: ["lowBack"],
+        jointLoad: { neck: 1, shoulder: 0, elbow: 0, wrist: 0, tSpine: 2, lowBack: 2, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 5,
+        aggravates: ["tSpine", "lowBack"],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["lowerBack", "glutes"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Swimmers": {
         alternatives: ["Bird Dog"],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 0, lowBack: 2, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 3,
-        aggravates: ["lowBack"],
+        jointLoad: { neck: 1, shoulder: 1, elbow: 0, wrist: 0, tSpine: 2, lowBack: 2, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 6,
+        aggravates: ["tSpine", "lowBack"],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["lowerBack"],
+        movementPattern: "isolation",
+        laterality: "alternating",
+        compound: true
     },
     "Bench Dip": {
         alternatives: ["Close Grip Push-up", "Tricep Pushdown (Rope)"],
-        jointLoad: { shoulder: 3, elbow: 2, wrist: 2, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 3, elbow: 2, wrist: 2, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 7,
         aggravates: ["shoulder", "elbow", "wrist"],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["triceps"],
+        movementPattern: "push-vertical",
+        laterality: "bilateral",
+        compound: true
     },
     "Close Grip Push-up": {
         alternatives: ["Tricep Pushdown (Rope)", "Incline Push-up"],
-        jointLoad: { shoulder: 1, elbow: 2, wrist: 2, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 1, elbow: 2, wrist: 2, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 5,
         aggravates: ["elbow", "wrist"],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["triceps"],
+        movementPattern: "push-horizontal",
+        laterality: "bilateral",
+        compound: true
     },
     "Plate Pinch": {
         alternatives: ["Farmers Walk", "Dead Hang"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 1,
         aggravates: [],
         rehabCategory: null,
         logMode: "time",
         bucket: "strength",
-        equipmentNorm: "gym/machines"
+        equipmentNorm: "gym/machines",
+        musclesTargeted: ["forearms"],
+        movementPattern: "carry",
+        laterality: "bilateral",
+        compound: false
     },
     "Svend Press": {
         alternatives: [],
-        jointLoad: { shoulder: 1, elbow: 1, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 1, elbow: 1, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 3,
         aggravates: [],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "gym/machines"
+        equipmentNorm: "gym/machines",
+        musclesTargeted: ["chest"],
+        movementPattern: "push-horizontal",
+        laterality: "bilateral",
+        compound: true
     },
     "Cable Curl (Behind Back)": {
         alternatives: ["Cable Bicep Curl"],
-        jointLoad: { shoulder: 1, elbow: 2, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 1, elbow: 2, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 4,
         aggravates: ["elbow"],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["biceps"],
+        movementPattern: "isolation",
+        laterality: "unilateral",
+        compound: true
     },
     "Cable Row (Wide Grip)": {
         alternatives: ["Face Pulls", "Seated Cable Row"],
-        jointLoad: { shoulder: 1, elbow: 1, wrist: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 4,
+        jointLoad: { neck: 0, shoulder: 1, elbow: 1, wrist: 1, tSpine: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 5,
         aggravates: [],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["rearDelts", "rhomboids"],
+        movementPattern: "pull-horizontal",
+        laterality: "bilateral",
+        compound: true
     },
     "Standing Cable Crunch": {
         alternatives: ["Reverse Crunch", "Dead Bug"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
-        strainScore: 1,
+        jointLoad: { neck: 1, shoulder: 0, elbow: 0, wrist: 0, tSpine: 1, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 3,
         aggravates: [],
         rehabCategory: null,
         logMode: "weight_reps",
         bucket: "strength",
-        equipmentNorm: "cable"
+        equipmentNorm: "cable",
+        musclesTargeted: ["abs"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Bear Crawl": {
         alternatives: ["Bird Dog", "Dead Bug"],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 2, lowBack: 0, hip: 1, knee: 1, ankle: 0 },
-        strainScore: 5,
+        jointLoad: { neck: 1, shoulder: 1, elbow: 0, wrist: 2, tSpine: 0, lowBack: 0, hip: 1, knee: 1, ankle: 0 },
+        strainScore: 6,
         aggravates: ["wrist"],
         rehabCategory: "movement-prep",
         logMode: "time",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["abs", "frontDelts", "quads", "serratus"],
+        movementPattern: "locomotion",
+        laterality: "alternating",
+        compound: true
     },
     "Crab Walk": {
         alternatives: ["Glute Bridge"],
-        jointLoad: { shoulder: 2, elbow: 1, wrist: 2, lowBack: 0, hip: 1, knee: 0, ankle: 0 },
-        strainScore: 6,
+        jointLoad: { neck: 1, shoulder: 2, elbow: 1, wrist: 2, tSpine: 0, lowBack: 0, hip: 1, knee: 0, ankle: 0 },
+        strainScore: 7,
         aggravates: ["shoulder", "wrist"],
         rehabCategory: "movement-prep",
         logMode: "time",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["triceps", "glutes", "rearDelts", "hamstrings"],
+        movementPattern: "locomotion",
+        laterality: "alternating",
+        compound: true
     },
     "Kick Through": {
         alternatives: ["Bear Crawl"],
-        jointLoad: { shoulder: 2, elbow: 0, wrist: 2, lowBack: 0, hip: 1, knee: 1, ankle: 0 },
-        strainScore: 6,
+        jointLoad: { neck: 1, shoulder: 2, elbow: 0, wrist: 2, tSpine: 0, lowBack: 0, hip: 1, knee: 1, ankle: 0 },
+        strainScore: 7,
         aggravates: ["shoulder", "wrist"],
         rehabCategory: "movement-prep",
         logMode: "time",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["abs", "obliques", "hipFlexors", "frontDelts"],
+        movementPattern: "locomotion",
+        laterality: "alternating",
+        compound: true
     },
     "Beast Reach": {
         alternatives: ["Cat-Cow", "Bear Crawl"],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 2, lowBack: 0, hip: 1, knee: 1, ankle: 1 },
-        strainScore: 6,
-        aggravates: ["wrist"],
+        jointLoad: { neck: 1, shoulder: 1, elbow: 0, wrist: 2, tSpine: 2, lowBack: 0, hip: 1, knee: 1, ankle: 1 },
+        strainScore: 9,
+        aggravates: ["wrist", "tSpine"],
         rehabCategory: "movement-prep",
         logMode: "reps",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["lowerBack", "abs", "frontDelts"],
+        movementPattern: "locomotion",
+        laterality: "alternating",
+        compound: true
     },
     "Duck Walk": {
         alternatives: ["Deep Squat Hold", "Bodyweight Squat"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 2, knee: 3, ankle: 2 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 2, knee: 3, ankle: 2 },
         strainScore: 7,
         aggravates: ["hip", "knee", "ankle"],
         rehabCategory: "movement-prep",
         logMode: "time",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["quads", "glutes", "calves"],
+        movementPattern: "locomotion",
+        laterality: "alternating",
+        compound: true
     },
     "Tibialis Raise": {
         alternatives: [],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 0, knee: 0, ankle: 1 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 1 },
         strainScore: 1,
         aggravates: [],
         rehabCategory: "ankle-prehab",
         logMode: "reps",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["tibialis"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: false
     },
     "ATG Split Squat": {
         alternatives: ["Lunge (BW)", "Couch Stretch"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 2, knee: 3, ankle: 2 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 2, knee: 3, ankle: 2 },
         strainScore: 7,
         aggravates: ["hip", "knee", "ankle"],
         rehabCategory: "knee-prehab",
         logMode: "reps",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["quads", "hipFlexors"],
+        movementPattern: "lunge",
+        laterality: "unilateral",
+        compound: true
     },
     "Lu Raise": {
         alternatives: ["Lateral Raise", "Wall Slides"],
-        jointLoad: { shoulder: 2, elbow: 0, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 2, elbow: 0, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 3,
         aggravates: ["shoulder"],
         rehabCategory: "shoulder-prehab",
         logMode: "weight_reps",
         bucket: "resilience",
-        equipmentNorm: "dumbbell"
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["sideDelts", "traps"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
     },
     "Powell Raise": {
         alternatives: ["Cable Rear Delt Fly", "Face Pulls"],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 1, elbow: 0, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 2,
         aggravates: [],
         rehabCategory: "shoulder-prehab",
         logMode: "weight_reps",
         bucket: "resilience",
-        equipmentNorm: "dumbbell"
+        equipmentNorm: "dumbbell",
+        musclesTargeted: ["rearDelts", "rhomboids"],
+        movementPattern: "isolation",
+        laterality: "unilateral",
+        compound: true
     },
     "Wrist Rocks": {
         alternatives: [],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 2, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 2, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 2,
         aggravates: ["wrist"],
         rehabCategory: "wrist-prehab",
         logMode: "reps",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["forearms"],
+        movementPattern: "mobility",
+        laterality: "bilateral",
+        compound: false
     },
     "Dead Hang": {
         alternatives: [],
-        jointLoad: { shoulder: 2, elbow: 1, wrist: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 2, elbow: 1, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
         strainScore: 4,
         aggravates: ["shoulder"],
         rehabCategory: "shoulder-prehab",
         logMode: "time",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["lats", "forearms"],
+        movementPattern: "mobility",
+        laterality: "bilateral",
+        compound: true
     },
     "Cossack Squat": {
         alternatives: ["Side Lunge", "90/90 Hip Switch"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 2, knee: 2, ankle: 2 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 2, knee: 2, ankle: 2 },
         strainScore: 6,
         aggravates: ["hip", "knee", "ankle"],
         rehabCategory: "hip-mobility",
         logMode: "reps",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["adductors", "quads"],
+        movementPattern: "lunge",
+        laterality: "alternating",
+        compound: true
     },
     "Jefferson Curl": {
         alternatives: ["Cat-Cow"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 2, hip: 1, knee: 0, ankle: 0 },
-        strainScore: 3,
-        aggravates: ["lowBack"],
+        jointLoad: { neck: 1, shoulder: 0, elbow: 0, wrist: 0, tSpine: 3, lowBack: 2, hip: 1, knee: 0, ankle: 0 },
+        strainScore: 7,
+        aggravates: ["tSpine", "lowBack"],
         rehabCategory: "spine-mobility",
         logMode: "reps",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["lowerBack", "hamstrings"],
+        movementPattern: "mobility",
+        laterality: "bilateral",
+        compound: true
     },
     "Scorpion Stretch": {
         alternatives: ["Cat-Cow", "90/90 Hip Switch"],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 0, lowBack: 2, hip: 1, knee: 0, ankle: 0 },
-        strainScore: 4,
-        aggravates: ["lowBack"],
+        jointLoad: { neck: 1, shoulder: 1, elbow: 0, wrist: 0, tSpine: 2, lowBack: 2, hip: 1, knee: 0, ankle: 0 },
+        strainScore: 7,
+        aggravates: ["tSpine", "lowBack"],
         rehabCategory: "spine-mobility",
         logMode: "reps",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["glutes", "hipFlexors", "lowerBack"],
+        movementPattern: "mobility",
+        laterality: "alternating",
+        compound: true
     },
     "Inchworm": {
         alternatives: ["Cat-Cow", "World's Greatest Stretch"],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 2, lowBack: 1, hip: 1, knee: 0, ankle: 0 },
-        strainScore: 5,
+        jointLoad: { neck: 0, shoulder: 1, elbow: 0, wrist: 2, tSpine: 1, lowBack: 1, hip: 1, knee: 0, ankle: 0 },
+        strainScore: 6,
         aggravates: ["wrist"],
         rehabCategory: "movement-prep",
         logMode: "reps",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["hamstrings", "frontDelts", "abs", "serratus"],
+        movementPattern: "locomotion",
+        laterality: "bilateral",
+        compound: true
     },
     "Thoracic Bridge": {
         alternatives: ["Thoracic Extension", "Cat-Cow"],
-        jointLoad: { shoulder: 2, elbow: 0, wrist: 2, lowBack: 1, hip: 1, knee: 0, ankle: 0 },
-        strainScore: 6,
-        aggravates: ["shoulder", "wrist"],
+        jointLoad: { neck: 2, shoulder: 2, elbow: 0, wrist: 2, tSpine: 3, lowBack: 1, hip: 1, knee: 0, ankle: 0 },
+        strainScore: 10,
+        aggravates: ["neck", "shoulder", "wrist", "tSpine"],
         rehabCategory: "spine-mobility",
         logMode: "reps",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["lowerBack", "glutes", "frontDelts"],
+        movementPattern: "mobility",
+        laterality: "alternating",
+        compound: true
     },
     "Single Leg RDL (BW)": {
         alternatives: ["Good Morning (BW)", "Glute Bridge"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 1, hip: 2, knee: 1, ankle: 1 },
-        strainScore: 5,
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 1, lowBack: 1, hip: 2, knee: 1, ankle: 1 },
+        strainScore: 6,
         aggravates: ["hip"],
         rehabCategory: null,
         logMode: "reps",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["hamstrings", "glutes"],
+        movementPattern: "hinge",
+        laterality: "unilateral",
+        compound: true
     },
     "Lateral Bounds": {
         alternatives: ["Side Lunge"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 2, knee: 2, ankle: 2 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 2, knee: 2, ankle: 2 },
         strainScore: 6,
         aggravates: ["hip", "knee", "ankle"],
         rehabCategory: null,
         logMode: "reps",
         bucket: "power",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["glutes", "abductors", "quads", "calves"],
+        movementPattern: "locomotion",
+        laterality: "alternating",
+        compound: true
     },
     "Dot Drill": {
         alternatives: ["Jumping Jacks", "High Knees"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 0, knee: 1, ankle: 2 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 0, knee: 1, ankle: 2 },
         strainScore: 3,
         aggravates: ["ankle"],
         rehabCategory: null,
         logMode: "time",
         bucket: "power",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["calves", "quads", "tibialis"],
+        movementPattern: "locomotion",
+        laterality: "alternating",
+        compound: true
     },
     "Tuck Jumps": {
         alternatives: ["Jump Squat", "Box Jump"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 1, hip: 2, knee: 3, ankle: 2 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 1, hip: 2, knee: 3, ankle: 2 },
         strainScore: 8,
         aggravates: ["hip", "knee", "ankle"],
         rehabCategory: null,
         logMode: "reps",
         bucket: "power",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["quads", "hipFlexors", "calves", "abs"],
+        movementPattern: "squat",
+        laterality: "bilateral",
+        compound: true
     },
     "A-Skips": {
         alternatives: ["High Knees", "Jumping Jacks"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 1, knee: 1, ankle: 2 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 1, knee: 1, ankle: 2 },
         strainScore: 4,
         aggravates: ["ankle"],
         rehabCategory: null,
         logMode: "time",
         bucket: "power",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["hipFlexors", "quads", "calves"],
+        movementPattern: "locomotion",
+        laterality: "alternating",
+        compound: true
     },
     "Horse Stance Hold": {
         alternatives: ["Deep Squat Hold", "Bodyweight Squat"],
-        jointLoad: { shoulder: 0, elbow: 0, wrist: 0, lowBack: 0, hip: 2, knee: 2, ankle: 1 },
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 2, knee: 2, ankle: 1 },
         strainScore: 5,
         aggravates: ["hip", "knee"],
         rehabCategory: null,
         logMode: "time",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["quads", "adductors"],
+        movementPattern: "squat",
+        laterality: "bilateral",
+        compound: true
     },
     "Reverse Plank": {
         alternatives: ["Glute Bridge"],
-        jointLoad: { shoulder: 2, elbow: 0, wrist: 2, lowBack: 1, hip: 1, knee: 0, ankle: 0 },
-        strainScore: 6,
+        jointLoad: { neck: 1, shoulder: 2, elbow: 0, wrist: 2, tSpine: 0, lowBack: 1, hip: 1, knee: 0, ankle: 0 },
+        strainScore: 7,
         aggravates: ["shoulder", "wrist"],
         rehabCategory: null,
         logMode: "time",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["lowerBack", "glutes"],
+        movementPattern: "anti-extension",
+        laterality: "bilateral",
+        compound: true
     },
     "Copenhagen Plank": {
         alternatives: ["Side Plank", "Cable Adductor"],
-        jointLoad: { shoulder: 1, elbow: 0, wrist: 0, lowBack: 1, hip: 2, knee: 1, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 1, elbow: 0, wrist: 0, tSpine: 0, lowBack: 1, hip: 2, knee: 1, ankle: 0 },
         strainScore: 5,
         aggravates: ["hip"],
         rehabCategory: "adductor-prehab",
         logMode: "time",
         bucket: "resilience",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["adductors"],
+        movementPattern: "anti-rotation",
+        laterality: "unilateral",
+        compound: true
     },
     "L-Sit (Tuck)": {
         alternatives: ["Reverse Crunch", "Hanging Leg Raise"],
-        jointLoad: { shoulder: 2, elbow: 1, wrist: 2, lowBack: 1, hip: 2, knee: 0, ankle: 0 },
+        jointLoad: { neck: 0, shoulder: 2, elbow: 1, wrist: 2, tSpine: 0, lowBack: 1, hip: 2, knee: 0, ankle: 0 },
         strainScore: 8,
         aggravates: ["shoulder", "wrist", "hip"],
         rehabCategory: null,
         logMode: "time",
         bucket: "strength",
-        equipmentNorm: "bodyweight"
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["abs", "hipFlexors"],
+        movementPattern: "anti-extension",
+        laterality: "bilateral",
+        compound: true
+    },
+    "March in Place": {
+        alternatives: ["Step Touch", "Shadow Boxing"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 1, knee: 1, ankle: 1 },
+        strainScore: 3,
+        aggravates: [],
+        rehabCategory: null,
+        logMode: "time",
+        bucket: "cardio",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["hipFlexors", "quads", "calves"],
+        movementPattern: "locomotion",
+        laterality: "alternating",
+        compound: true
+    },
+    "Step Touch": {
+        alternatives: ["March in Place", "Lateral Shuffle"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 1, knee: 1, ankle: 1 },
+        strainScore: 3,
+        aggravates: [],
+        rehabCategory: null,
+        logMode: "time",
+        bucket: "cardio",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["glutes", "quads", "abductors", "calves"],
+        movementPattern: "locomotion",
+        laterality: "alternating",
+        compound: true
+    },
+    "Lateral Shuffle": {
+        alternatives: ["Step Touch", "Fast Feet Shuffle"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 1, knee: 1, ankle: 2 },
+        strainScore: 4,
+        aggravates: ["ankle"],
+        rehabCategory: null,
+        logMode: "time",
+        bucket: "cardio",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["abductors", "glutes", "quads", "calves"],
+        movementPattern: "locomotion",
+        laterality: "alternating",
+        compound: true
+    },
+    "Standing Knee-to-Elbow": {
+        alternatives: ["March in Place", "Standing Oblique Twist"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 1, lowBack: 1, hip: 1, knee: 0, ankle: 0 },
+        strainScore: 3,
+        aggravates: [],
+        rehabCategory: null,
+        logMode: "time",
+        bucket: "cardio",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["abs", "obliques", "hipFlexors"],
+        movementPattern: "rotation",
+        laterality: "alternating",
+        compound: true
+    },
+    "Shadow Boxing": {
+        alternatives: ["March in Place", "Step Touch"],
+        jointLoad: { neck: 0, shoulder: 1, elbow: 1, wrist: 1, tSpine: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 4,
+        aggravates: [],
+        rehabCategory: null,
+        logMode: "time",
+        bucket: "cardio",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["frontDelts", "sideDelts", "rearDelts", "triceps", "obliques"],
+        movementPattern: "rotation",
+        laterality: "alternating",
+        compound: true
+    },
+    "Squat to Calf Raise": {
+        alternatives: ["Bodyweight Squat", "March in Place"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 1, knee: 1, ankle: 2 },
+        strainScore: 4,
+        aggravates: ["ankle"],
+        rehabCategory: null,
+        logMode: "time",
+        bucket: "cardio",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["quads", "glutes", "calves"],
+        movementPattern: "squat",
+        laterality: "bilateral",
+        compound: true
+    },
+    "Fast Feet Shuffle": {
+        alternatives: ["March in Place", "Step Touch"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 0, knee: 1, ankle: 2 },
+        strainScore: 3,
+        aggravates: ["ankle"],
+        rehabCategory: null,
+        logMode: "time",
+        bucket: "cardio",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["calves", "quads", "tibialis"],
+        movementPattern: "locomotion",
+        laterality: "alternating",
+        compound: true
+    },
+    "Slow Mountain Climber": {
+        alternatives: ["March in Place", "Reverse Lunge to Knee Drive"],
+        jointLoad: { neck: 0, shoulder: 2, elbow: 1, wrist: 2, tSpine: 0, lowBack: 1, hip: 1, knee: 0, ankle: 0 },
+        strainScore: 7,
+        aggravates: ["shoulder", "wrist"],
+        rehabCategory: null,
+        logMode: "time",
+        bucket: "cardio",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["abs", "hipFlexors", "frontDelts", "chest"],
+        movementPattern: "locomotion",
+        laterality: "alternating",
+        compound: true
+    },
+    "Reverse Lunge to Knee Drive": {
+        alternatives: ["March in Place", "Step Touch"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 1, hip: 1, knee: 2, ankle: 1 },
+        strainScore: 5,
+        aggravates: ["knee"],
+        rehabCategory: null,
+        logMode: "reps",
+        bucket: "cardio",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["quads", "glutes", "hipFlexors", "hamstrings"],
+        movementPattern: "lunge",
+        laterality: "alternating",
+        compound: true
+    },
+    "Standing Oblique Twist": {
+        alternatives: ["Standing Knee-to-Elbow", "March in Place"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 2, lowBack: 2, hip: 1, knee: 0, ankle: 0 },
+        strainScore: 5,
+        aggravates: ["tSpine", "lowBack"],
+        rehabCategory: null,
+        logMode: "time",
+        bucket: "cardio",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["obliques", "abs"],
+        movementPattern: "rotation",
+        laterality: "alternating",
+        compound: true
+    },
+    "Low Step-Up (Fast)": {
+        alternatives: ["March in Place", "Step Touch"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 1, knee: 2, ankle: 1 },
+        strainScore: 4,
+        aggravates: ["knee"],
+        rehabCategory: null,
+        logMode: "time",
+        bucket: "cardio",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["quads", "glutes", "calves"],
+        movementPattern: "lunge",
+        laterality: "alternating",
+        compound: true
+    },
+    "No-Jump Burpee": {
+        alternatives: ["Squat to Calf Raise", "March in Place"],
+        jointLoad: { neck: 0, shoulder: 2, elbow: 1, wrist: 2, tSpine: 0, lowBack: 1, hip: 1, knee: 1, ankle: 0 },
+        strainScore: 8,
+        aggravates: ["shoulder", "wrist"],
+        rehabCategory: null,
+        logMode: "reps",
+        bucket: "cardio",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["chest", "frontDelts", "triceps", "quads", "abs"],
+        movementPattern: "locomotion",
+        laterality: "bilateral",
+        compound: true
+    },
+    "Pop Squat": {
+        alternatives: ["Squat to Calf Raise", "Bodyweight Squat"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 1, hip: 2, knee: 2, ankle: 2 },
+        strainScore: 7,
+        aggravates: ["hip", "knee", "ankle"],
+        rehabCategory: null,
+        logMode: "reps",
+        bucket: "power",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["quads", "glutes", "adductors", "calves"],
+        movementPattern: "squat",
+        laterality: "bilateral",
+        compound: true
+    },
+    "Pogo Hops": {
+        alternatives: ["Fast Feet Shuffle", "Calf Raise (BW)"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 1, knee: 2, ankle: 3 },
+        strainScore: 6,
+        aggravates: ["knee", "ankle"],
+        rehabCategory: null,
+        logMode: "reps",
+        bucket: "power",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["calves", "quads", "tibialis"],
+        movementPattern: "locomotion",
+        laterality: "bilateral",
+        compound: true
     }
 };
 
 // ---------------------------------------------------------------------------
-// Self-check (runs only if the app's exercise list is present). Logs loudly
-// on any divergence between this file and window.allExercises, and on any
-// out-of-vocabulary logMode / bucket / equipmentNorm value.
+// Self-check (runs only if the app's exercise list is present). Logs loudly on:
+//  - app exercises with no metadata,
+//  - INCOMPLETE/inconsistent 9-joint scores (strainScore/aggravates drift),
+//  - out-of-vocabulary field values (logMode/bucket/equipmentNorm/muscle/
+//    movementPattern/laterality),
+//  - compound not matching the derived rule (>=2 joints with load >=1),
+//  - unresolvable alternatives.
+// Staged entries (metadata ahead of the app) are reported as info, not errors.
 // ---------------------------------------------------------------------------
 (function () {
     if (typeof window === 'undefined' || !window.allExercises || !window.allExercises.length) return;
     try {
-        var names = window.allExercises.map(function (e) { return e.name; });
-        var missing = names.filter(function (n) { return !window.exerciseMeta[n]; });
-        var orphans = Object.keys(window.exerciseMeta).filter(function (n) { return names.indexOf(n) === -1; });
-        var badAlts = [];
-        var badEnums = [];
+        var JOINTS = ['neck', 'shoulder', 'elbow', 'wrist', 'tSpine', 'lowBack', 'hip', 'knee', 'ankle'];
         var LOG = ['weight_reps', 'reps', 'time', 'distance'];
-        var BUCK = ['strength', 'power', 'resilience'];
+        var BUCK = ['strength', 'power', 'resilience', 'cardio'];
         var EQ = ['bodyweight', 'dumbbell', 'cable', 'gym/machines'];
-        Object.keys(window.exerciseMeta).forEach(function (n) {
+        var MV = ['neck', 'traps', 'frontDelts', 'sideDelts', 'rearDelts', 'rotatorCuff', 'chest', 'serratus',
+            'lats', 'rhomboids', 'lowerBack', 'biceps', 'triceps', 'forearms', 'abs', 'obliques', 'hipFlexors',
+            'glutes', 'quads', 'hamstrings', 'adductors', 'abductors', 'calves', 'tibialis'];
+        var PAT = ['push-horizontal', 'push-vertical', 'pull-horizontal', 'pull-vertical', 'squat', 'hinge',
+            'lunge', 'carry', 'rotation', 'anti-rotation', 'anti-extension', 'locomotion', 'isolation', 'mobility'];
+        var LAT = ['bilateral', 'unilateral', 'alternating'];
+        var names = window.allExercises.map(function (e) { return e.name; });
+        var metaKeys = Object.keys(window.exerciseMeta);
+        var known = {};
+        names.concat(metaKeys).forEach(function (n) { known[n] = true; });
+
+        var missing = names.filter(function (n) { return !window.exerciseMeta[n]; });
+        var staged = metaKeys.filter(function (n) { return names.indexOf(n) === -1; });
+        var incomplete = [], badEnums = [], badAlts = [];
+
+        metaKeys.forEach(function (n) {
             var m = window.exerciseMeta[n];
-            m.alternatives.forEach(function (a) {
-                if (names.indexOf(a) === -1) badAlts.push(n + ' -> ' + a);
+            var jl = m.jointLoad || {};
+            var sum = 0, ok = true, involved = 0;
+            JOINTS.forEach(function (j) {
+                var v = jl[j];
+                if (typeof v !== 'number' || v < 0 || v > 3 || (v | 0) !== v) ok = false;
+                else { sum += v; if (v >= 1) involved++; }
             });
+            if (!ok || Object.keys(jl).length !== JOINTS.length) {
+                incomplete.push(n + ' (jointLoad not a complete 9-joint 0-3 score)');
+            } else {
+                if (m.strainScore !== Math.min(10, sum)) incomplete.push(n + ' (strainScore != min(10,sum))');
+                var aggr = JOINTS.filter(function (j) { return jl[j] >= 2; });
+                if ((m.aggravates || []).join() !== aggr.join()) incomplete.push(n + ' (aggravates != joints>=2)');
+                if (m.compound !== (involved >= 2)) incomplete.push(n + ' (compound != (>=2 joints loaded): is ' + m.compound + ')');
+            }
             if (LOG.indexOf(m.logMode) === -1) badEnums.push(n + ' logMode=' + m.logMode);
             if (BUCK.indexOf(m.bucket) === -1) badEnums.push(n + ' bucket=' + m.bucket);
             if (EQ.indexOf(m.equipmentNorm) === -1) badEnums.push(n + ' equipmentNorm=' + m.equipmentNorm);
+            if (PAT.indexOf(m.movementPattern) === -1) badEnums.push(n + ' movementPattern=' + m.movementPattern);
+            if (LAT.indexOf(m.laterality) === -1) badEnums.push(n + ' laterality=' + m.laterality);
+            if (typeof m.compound !== 'boolean') badEnums.push(n + ' compound not boolean');
+            if (!m.musclesTargeted || !m.musclesTargeted.length) badEnums.push(n + ' musclesTargeted empty');
+            else m.musclesTargeted.forEach(function (x) { if (MV.indexOf(x) === -1) badEnums.push(n + ' muscle=' + x); });
+            (m.alternatives || []).forEach(function (a) { if (!known[a]) badAlts.push(n + ' -> ' + a); });
         });
+
         if (missing.length) console.error('[exerciseMeta] Exercises with no metadata:', missing);
-        if (orphans.length) console.error('[exerciseMeta] Metadata for unknown exercises:', orphans);
-        if (badAlts.length) console.error('[exerciseMeta] Unresolvable alternatives:', badAlts);
+        if (incomplete.length) console.error('[exerciseMeta] INCOMPLETE/inconsistent derived fields:', incomplete);
         if (badEnums.length) console.error('[exerciseMeta] Out-of-vocabulary field values:', badEnums);
+        if (badAlts.length) console.error('[exerciseMeta] Unresolvable alternatives:', badAlts);
+        if (staged.length) console.info('[exerciseMeta] Staged entries (metadata ahead of app, expected):', staged);
     } catch (err) {
         console.error('[exerciseMeta] self-check failed:', err);
     }
