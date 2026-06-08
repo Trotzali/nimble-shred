@@ -1177,7 +1177,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec);">v74</span>
+        <span style="font-size:1.3em; color: var(--sec);">v75</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -3529,13 +3529,9 @@ function generateWorkoutByType(type, count = 6) {
     // Apply equipment filter
     filtered = filterExercisesByEquipment(filtered);
 
-    // Smart Picker Phase 1: exclude recently-picked exercises for this type, then an
-    // unbiased Fisher-Yates shuffle, then take N. Pool-agnostic, no metadata reads.
-    var recent = getRecentNames(type);
-    var pool = filtered.filter(function(e) { return recent.indexOf(e.name) === -1; });
-    if (pool.length < count) pool = filtered.slice(); // not enough fresh -> full pool; never under-fill
-    fisherYates(pool);
-    var picks = pool.slice(0, count);
+    // Smart Picker: recent-exclusion (Phase 1) + scored greedy build (Phase 2), one choke point.
+    // On total metadata load-failure smartSelect collapses to pure Phase-1 Fisher-Yates (v71).
+    var picks = smartSelect(filtered, count, type, { niggle: getNiggleJoints() });
     rememberPicks(type, picks.map(function(e) { return e.name; }));
     return picks;
 }
@@ -3565,6 +3561,125 @@ function rememberPicks(type, names) {
     hist.unshift(names.slice());
     appState.recentPicks[type] = hist.slice(0, RECENT_WINDOW);
     saveAppState();
+}
+
+// ── Smart Picker Phase 2: scored, slot-by-slot greedy build over the focus pool ──
+// Reuses the v72 metadata accessors; on total load-failure every term no-ops and the
+// build collapses to pure Phase-1 Fisher-Yates (zero regression / exact v71 behaviour).
+
+// Phase-2 metadata accessors (read-only; safe default on miss)
+function getMuscles(name) {
+    var m = getExerciseMeta(name);
+    return (m && Array.isArray(m.musclesTargeted)) ? m.musclesTargeted : [];
+}
+function getJointLoad(name) {
+    var m = getExerciseMeta(name);
+    return (m && m.jointLoad) || {};
+}
+// Joint-respect hooks — wired but inert until a niggle UI / hammered-joint history exists (§7)
+function getNiggleJoints() { return appState.niggleJoints || []; }   // explicit pain flags (hard, never relaxed)
+function recentlyHammeredJoints(type) { return []; }                 // soft de-prioritisation (relaxable) — stub
+
+// Patterns that carry no SPAN information (they dominate the mobility/nimble pool) — treated as neutral
+var NONSPAN_PATTERNS = { isolation: 1, mobility: 1, locomotion: 1 };
+
+// Additive score for a candidate at a given slot (higher = better fit for this slot)
+function scoreCandidate(c, slot, acc, flagged, w, N) {
+    var s = 0;
+    // SPAN movement patterns — reward a new pattern, penalise a repeat; non-spanning patterns are neutral
+    var pat = getMovementPattern(c.name);
+    if (pat && !NONSPAN_PATTERNS[pat]) {
+        s += acc.usedPatterns[pat] ? -w.pat : w.pat;
+    }
+    // BALANCE muscles — penalise stacking already-worked muscles
+    var muscles = getMuscles(c.name);
+    var stack = 0;
+    for (var i = 0; i < muscles.length; i++) stack += (acc.muscleLoad[muscles[i]] || 0);
+    s -= w.mus * stack;
+    // RESPECT joints — penalise load on flagged joints
+    if (flagged.length) {
+        var jl = getJointLoad(c.name);
+        var jsum = 0;
+        for (var k = 0; k < flagged.length; k++) jsum += (jl[flagged[k]] || 0);
+        s -= w.jnt * jsum;
+    }
+    // COMPOUND lead — compounds score higher in early slots, decaying to 0 by mid-workout
+    if (getCompound(c.name)) {
+        s += w.cmp * Math.max(0, 1 - slot / Math.ceil(N / 2));
+    }
+    return s;
+}
+
+function smartSelect(focusPool, N, type, opts) {
+    opts = opts || {};
+    var niggle = opts.niggle || [];
+
+    // Total metadata load-failure -> pure Phase-1 Fisher-Yates (exact v71 behaviour)
+    if (typeof window === 'undefined' || !window.exerciseMeta) {
+        var recent0 = getRecentNames(type);
+        var p1 = focusPool.filter(function(e) { return recent0.indexOf(e.name) === -1; });
+        if (p1.length < N) p1 = focusPool.slice();
+        fisherYates(p1);
+        return p1.slice(0, N);
+    }
+
+    // Bucket-aware emphasis: force types lead on pattern SPAN; mobility leads on muscle BALANCE
+    var resilience = (type === 'nimble');
+    var w = { pat: resilience ? 5 : 7, mus: resilience ? 4 : 2, jnt: 4, cmp: 3 };
+
+    // Joint flags (§7): explicit niggle (hard) + recently-hammered (soft, inert stub)
+    var flagged = niggle.concat(recentlyHammeredJoints(type));
+
+    // Hard safety — exclude exercises loading an explicit-niggle joint >= 2; NEVER relaxed (§5.6)
+    function niggleSafe(e) {
+        if (!niggle.length) return true;
+        var jl = getJointLoad(e.name);
+        for (var i = 0; i < niggle.length; i++) { if ((jl[niggle[i]] || 0) >= 2) return false; }
+        return true;
+    }
+    var safePool = focusPool.filter(niggleSafe);
+
+    // Candidate pool with recent-exclusion relaxation (steps 1-2) to guarantee fill where possible
+    var hist = (appState.recentPicks && appState.recentPicks[type]) || [];
+    var recentFull = hist.reduce(function(a, n) { return a.concat(n); }, []);
+    var recentLast = hist[0] || [];
+    var cand = safePool.filter(function(e) { return recentFull.indexOf(e.name) === -1; }); // window 2
+    if (cand.length < N) cand = safePool.filter(function(e) { return recentLast.indexOf(e.name) === -1; }); // window 1
+    if (cand.length < N) cand = safePool.slice(); // drop recent entirely
+
+    fisherYates(cand); // tie-break entropy (Phase 1 shuffle retained)
+
+    // Greedy slot-by-slot scored build (SPAN/BALANCE soft terms never block fill; ties -> shuffle order)
+    var selected = [];
+    var taken = {};
+    var acc = { usedPatterns: {}, muscleLoad: {} };
+    while (selected.length < N && selected.length < cand.length) {
+        var slot = selected.length;
+        var best = null, bestScore = -Infinity;
+        for (var ci = 0; ci < cand.length; ci++) {
+            var c = cand[ci];
+            if (taken[c.name]) continue;
+            var sc = scoreCandidate(c, slot, acc, flagged, w, N);
+            if (sc > bestScore) { bestScore = sc; best = c; }
+        }
+        if (!best) break;
+        selected.push(best);
+        taken[best.name] = true;
+        var bpat = getMovementPattern(best.name);
+        if (bpat) acc.usedPatterns[bpat] = true;
+        var bms = getMuscles(best.name);
+        for (var mi = 0; mi < bms.length; mi++) acc.muscleLoad[bms[mi]] = (acc.muscleLoad[bms[mi]] || 0) + 1;
+    }
+
+    // §5.7 final fill — top up from the niggle-safe pool if still short; never under-fill
+    if (selected.length < N) {
+        var rest = safePool.filter(function(e) { return !taken[e.name]; });
+        fisherYates(rest);
+        for (var ri = 0; ri < rest.length && selected.length < N; ri++) {
+            selected.push(rest[ri]); taken[rest[ri].name] = true;
+        }
+    }
+    return selected;
 }
 
 function filterExercisesByEquipment(exercises) {
