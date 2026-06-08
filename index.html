@@ -1177,7 +1177,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec);">v72</span>
+        <span style="font-size:1.3em; color: var(--sec);">v73</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -3645,7 +3645,7 @@ function renderWorkout(exercises) {
         const mini = document.createElement('div');
         mini.style.cssText = 'background:rgba(26,77,46,0.3); border:1px solid rgba(3,218,198,0.2); border-radius:8px; padding:10px 14px; margin-bottom:8px; font-size:0.85em; cursor:pointer;';
         mini.onclick = function() { viewExerciseDetails(ex.name); };
-        const setsStr = setData.length > 0 ? setData.map(function(s) { return s.weight + '×' + s.reps; }).join(', ') : 'skipped';
+        const setsStr = setData.length > 0 ? setData.map(function(s) { return formatSetLine(s, ex.name); }).join(', ') : 'skipped';
         mini.innerHTML = '<span style="color:var(--sec);">✓</span> <strong>' + ex.name + '</strong> <span style="color:#888;">— ' + setsStr + '</span>';
         container.appendChild(mini);
     });
@@ -3657,7 +3657,8 @@ function renderWorkout(exercises) {
         var progression = getProgression(ex.name);
         var setsCompleted = appState.currentSetIndex[ex.name] || 0;
         var setData = getTodaysSetData(ex.name);
-        
+        var logMode = getLogMode(ex.name); // weight_reps | reps | time (#5)
+
         var card = document.createElement('div');
         card.className = 'card exercise-card';
         card.style.cssText = 'border: 1px solid var(--sec); border-left: 4px solid var(--sec);';
@@ -3716,7 +3717,7 @@ function renderWorkout(exercises) {
             ls.sets.forEach(function(s, i) {
                 html += '<div style="display:flex; gap:8px; padding:3px 0; font-size:0.85em; color:#aaa;">' +
                     '<span style="color:#666; min-width:40px;">Set ' + (i+1) + '</span>' +
-                    '<span>' + s.weight + ' × ' + s.reps + '</span>' +
+                    '<span>' + formatSetLine(s, ex.name) + '</span>' +
                 '</div>';
             });
             
@@ -3746,8 +3747,8 @@ function renderWorkout(exercises) {
             '</div>';
         }
         
-        // SMART SPOTTER hint badge
-        if (progression.suggest) {
+        // SMART SPOTTER hint badge — weight-progression logic only applies to weight_reps (#5)
+        if (progression.suggest && logMode === 'weight_reps') {
             var badgeBg = progression.suggestType === 'success' ? 'rgba(3,218,198,0.15)' : 
                           progression.suggestType === 'warning' ? 'rgba(245,87,108,0.15)' : 'rgba(255,255,255,0.08)';
             var badgeColor = progression.suggestType === 'success' ? '#03dac6' : 
@@ -3762,7 +3763,7 @@ function renderWorkout(exercises) {
             var set = setData[i];
             if(set) {
                 html += '<div class="set-completed">' +
-                    '<span>' + IC.check + ' Set ' + (i+1) + ': ' + set.weight + ' ' + getWeightUnit() + ' × ' + set.reps + ' reps</span>' +
+                    '<span>' + IC.check + ' Set ' + (i+1) + ': ' + formatSetLine(set, ex.name) + '</span>' +
                 '</div>';
             }
         }
@@ -3771,23 +3772,46 @@ function renderWorkout(exercises) {
         var checkInWeightMult = (checkInConfig[sessionCheckIn] || checkInConfig.skip).weightMult;
         var suggestedWeight = Math.round(((progression.suggestedWeight || 0) * checkInWeightMult) * 2) / 2; // round to nearest 2.5
         var suggestedReps = progression.suggestedReps || 10;
+        var suggestedSeconds = 30; // sensible default for a timed hold
         var lastSetToday = setData.length > 0 ? setData[setData.length - 1] : null;
         if (lastSetToday) {
             suggestedWeight = lastSetToday.weight;
-            suggestedReps = lastSetToday.reps;
+            if (lastSetToday.reps) suggestedReps = lastSetToday.reps;
+            if (lastSetToday.seconds) suggestedSeconds = lastSetToday.seconds;
         }
+
+        // Input fields branch by logMode (#5): weight_reps = Weight+Reps; reps = Reps only; time = Duration only
+        var inputsHtml;
+        if (logMode === 'time') {
+            inputsHtml = '<div class="row" style="margin-top:10px;">' +
+                    '<div style="flex:1;">' +
+                        '<small class="text-muted">Duration (seconds)</small>' +
+                        '<input type="number" id="seconds-' + idx + '" value="' + suggestedSeconds + '" step="5" min="0">' +
+                    '</div>' +
+                '</div>';
+        } else if (logMode === 'reps') {
+            inputsHtml = '<div class="row" style="margin-top:10px;">' +
+                    '<div style="flex:1;">' +
+                        '<small class="text-muted">Reps</small>' +
+                        '<input type="number" id="reps-' + idx + '" value="' + suggestedReps + '" step="1">' +
+                    '</div>' +
+                '</div>';
+        } else {
+            inputsHtml = '<div class="row" style="margin-top:10px;">' +
+                    '<div style="flex:1;">' +
+                        '<small class="text-muted">Weight (' + getWeightUnit() + ')</small>' +
+                        '<input type="number" id="weight-' + idx + '" value="' + suggestedWeight + '" step="2.5">' +
+                    '</div>' +
+                    '<div style="flex:1;">' +
+                        '<small class="text-muted">Reps</small>' +
+                        '<input type="number" id="reps-' + idx + '" value="' + suggestedReps + '" step="1">' +
+                    '</div>' +
+                '</div>';
+        }
+
         html += '<div class="set-active">' +
             '<strong>Set ' + (setsCompleted + 1) + '</strong>' +
-            '<div class="row" style="margin-top:10px;">' +
-                '<div style="flex:1;">' +
-                    '<small class="text-muted">Weight (' + getWeightUnit() + ')</small>' +
-                    '<input type="number" id="weight-' + idx + '" value="' + suggestedWeight + '" step="2.5">' +
-                '</div>' +
-                '<div style="flex:1;">' +
-                    '<small class="text-muted">Reps</small>' +
-                    '<input type="number" id="reps-' + idx + '" value="' + suggestedReps + '" step="1">' +
-                '</div>' +
-            '</div>' +
+            inputsHtml +
             '<button class="btn btn-main" onclick="logSet(\'' + safeName + '\', ' + idx + ')">' +
                 '✓ Log Set' +
             '</button>' +
@@ -3837,16 +3861,26 @@ function renderWorkout(exercises) {
 }
 
 function logSet(exerciseName, idx) {
-    const weight = parseFloat(document.getElementById(`weight-${idx}`).value);
-    const reps = parseInt(document.getElementById(`reps-${idx}`).value);
-    
-    if(isNaN(weight) || !reps) {
-        alert('Enter a weight (0 = bodyweight) and reps');
-        return;
+    const mode = getLogMode(exerciseName);
+    let record;
+    if (mode === 'time') {
+        const seconds = parseInt(document.getElementById(`seconds-${idx}`).value);
+        if (!seconds) { alert('Enter a duration in seconds'); return; }
+        // keep weight/reps numeric (0) so volume math never yields NaN (history compat)
+        record = { weight: 0, reps: 0, seconds: seconds, mode: 'time', date: new Date().toISOString() };
+    } else if (mode === 'reps') {
+        const reps = parseInt(document.getElementById(`reps-${idx}`).value);
+        if (!reps) { alert('Enter reps'); return; }
+        record = { weight: 0, reps: reps, mode: 'reps', date: new Date().toISOString() };
+    } else {
+        const weight = parseFloat(document.getElementById(`weight-${idx}`).value);
+        const reps = parseInt(document.getElementById(`reps-${idx}`).value);
+        if (isNaN(weight) || !reps) { alert('Enter a weight (0 = bodyweight) and reps'); return; }
+        record = { weight: weight, reps: reps, mode: 'weight_reps', date: new Date().toISOString() };
     }
-    
-    // Save to history
-    saveSetToHistory(exerciseName, {weight, reps, date: new Date().toISOString()});
+
+    // Save to history (additive record; saveSetToHistory spreads arbitrary keys)
+    saveSetToHistory(exerciseName, record);
     
     // Increment counter
     if(!appState.currentSetIndex[exerciseName]) appState.currentSetIndex[exerciseName] = 0;
@@ -4246,14 +4280,25 @@ function renderHistoryExercises(date, exercises) {
             <div class="history-exercise-name">${name}</div>`;
         sets.forEach((set, i) => {
             const safeId = (date + '_' + name + '_' + i).replace(/[^a-zA-Z0-9]/g, '_');
-            html += `
-            <div class="history-set-row" id="row-${safeId}">
-                <span class="set-num">Set ${i + 1}</span>
-                <input type="number" id="hw-${safeId}" value="${set.weight}" step="0.5" title="Weight">
+            const mode = set.mode || getLogMode(name);
+            let fieldsHtml;
+            if (mode === 'time') {
+                fieldsHtml = `<input type="number" id="hs-${safeId}" value="${set.seconds || 0}" step="5" min="0" title="Duration">
+                <span class="set-unit">sec</span>`;
+            } else if (mode === 'reps') {
+                fieldsHtml = `<input type="number" id="hr-${safeId}" value="${set.reps}" step="1" title="Reps">
+                <span class="set-unit">reps</span>`;
+            } else {
+                fieldsHtml = `<input type="number" id="hw-${safeId}" value="${set.weight}" step="0.5" title="Weight">
                 <span class="set-unit">${getWeightUnit()}</span>
                 <span style="color:#666;">×</span>
                 <input type="number" id="hr-${safeId}" value="${set.reps}" step="1" title="Reps">
-                <span class="set-unit">reps</span>
+                <span class="set-unit">reps</span>`;
+            }
+            html += `
+            <div class="history-set-row" id="row-${safeId}">
+                <span class="set-num">Set ${i + 1}</span>
+                ${fieldsHtml}
                 <div class="history-set-actions">
                     <button class="btn-save" onclick="saveHistorySet('${safeName}', '${date}', ${i}, '${safeId}')" title="Save">✓</button>
                     <button class="btn-del" onclick="deleteHistorySet('${safeName}', '${date}', ${i})" title="Delete">✕</button>
@@ -4271,27 +4316,37 @@ function toggleHistoryDay(date) {
 }
 
 function saveHistorySet(exerciseName, date, setIndex, safeId) {
-    var weightInput = document.getElementById('hw-' + safeId);
-    var repsInput = document.getElementById('hr-' + safeId);
-    if (!weightInput || !repsInput) return;
-    
-    var newWeight = parseFloat(weightInput.value);
-    var newReps = parseInt(repsInput.value);
-    if (isNaN(newWeight) || isNaN(newReps)) {
-        showNotification('Enter valid weight and reps', 'error');
-        return;
-    }
-    
     var history = JSON.parse(localStorage.getItem('exerciseHistory')) || {};
     if (!history[exerciseName]) return;
-    
-    // Find sets for this date and update the right one
+
+    // Find the target set for this date, then read inputs by its mode (#5)
     var dateSetCount = 0;
     for (var i = 0; i < history[exerciseName].length; i++) {
         if (history[exerciseName][i].sessionDate === date) {
             if (dateSetCount === setIndex) {
-                history[exerciseName][i].weight = newWeight;
-                history[exerciseName][i].reps = newReps;
+                var set = history[exerciseName][i];
+                var mode = set.mode || getLogMode(exerciseName);
+                if (mode === 'time') {
+                    var sEl = document.getElementById('hs-' + safeId);
+                    if (!sEl) return;
+                    var newSeconds = parseInt(sEl.value);
+                    if (isNaN(newSeconds)) { showNotification('Enter a valid duration', 'error'); return; }
+                    set.seconds = newSeconds; set.weight = 0; set.reps = 0;
+                } else if (mode === 'reps') {
+                    var rEl = document.getElementById('hr-' + safeId);
+                    if (!rEl) return;
+                    var newRepsOnly = parseInt(rEl.value);
+                    if (isNaN(newRepsOnly)) { showNotification('Enter valid reps', 'error'); return; }
+                    set.reps = newRepsOnly; set.weight = 0;
+                } else {
+                    var wEl = document.getElementById('hw-' + safeId);
+                    var rEl2 = document.getElementById('hr-' + safeId);
+                    if (!wEl || !rEl2) return;
+                    var newWeight = parseFloat(wEl.value);
+                    var newReps = parseInt(rEl2.value);
+                    if (isNaN(newWeight) || isNaN(newReps)) { showNotification('Enter valid weight and reps', 'error'); return; }
+                    set.weight = newWeight; set.reps = newReps;
+                }
                 localStorage.setItem('exerciseHistory', JSON.stringify(history));
                 showNotification('Set updated', 'success');
                 return;
@@ -5641,7 +5696,9 @@ function getEquipmentNorm(name) {     // equipment axis
 }
 function getLogMode(name) {           // #5 set-logging
     var m = getExerciseMeta(name);
-    return (m && m.logMode) || 'weight_reps';        // default: current logging UI
+    var mode = m && m.logMode;
+    // reps/time are the live modes; unknown/missing/reserved 'distance' -> weight_reps (today's UI)
+    return (mode === 'reps' || mode === 'time') ? mode : 'weight_reps';
 }
 function getAlternatives(name) {      // niggle / pain-swap
     var m = getExerciseMeta(name);
@@ -5662,6 +5719,14 @@ function getLaterality(name) {        // 'bilateral' | 'unilateral' | 'alternati
 function getCompound(name) {          // boolean (reads stored value; never recomputes)
     var m = getExerciseMeta(name);
     return (m && typeof m.compound === 'boolean') ? m.compound : false;
+}
+
+// Format a stored set for display, by the mode recorded on the set (fallback to lookup)
+function formatSetLine(set, name) {
+    var mode = (set && set.mode) || getLogMode(name);
+    if (mode === 'time') return (set.seconds || 0) + 's';
+    if (mode === 'reps') return (set.reps || 0) + ' reps';
+    return set.weight + ' ' + getWeightUnit() + ' × ' + set.reps + ' reps'; // weight_reps
 }
 
 function viewExerciseDetails(name) {
