@@ -1177,10 +1177,10 @@
 <div class="container active" id="view-coach">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec);">v66</span>
+        <span style="font-size:1.3em; color: var(--sec);">v67</span>
     </div>
     
-    <div class="card">
+    <div class="card" id="quickstart-panel">
         <h3 style="text-align:center; margin-bottom:16px;">Quick Start</h3>
         
         <div style="margin-bottom: 20px;">
@@ -3565,6 +3565,8 @@ function startWorkout(exercises) {
     saveAppState();
 
     switchTab('coach'); // workout UI lives inside #view-coach (C-03)
+    var qsPanel = document.getElementById('quickstart-panel'); // hide setup while a session is live (#11)
+    if (qsPanel) qsPanel.style.display = 'none';
     document.getElementById('workout-interface').style.display = 'block';
     document.getElementById('workout-interface').scrollIntoView({behavior:'smooth'});
 
@@ -3976,12 +3978,14 @@ function endWorkout() {
         window._lastWorkoutType = appState.currentWorkout?.type || 'unknown';
         window._lastWorkoutDate = new Date().toISOString().split('T')[0];
         window._endedEarly = true;
-        
+
         document.getElementById('workout-interface').style.display = 'none';
+        var qsPanel = document.getElementById('quickstart-panel'); // restore setup panel (#11)
+        if (qsPanel) qsPanel.style.display = '';
         appState.currentWorkout = null;
         appState.currentSetIndex = {};
         saveAppState();
-        
+
         showRPEModal();
     }
 }
@@ -3996,10 +4000,12 @@ function finishWorkout() {
     window._endedEarly = false;
     
     document.getElementById('workout-interface').style.display = 'none';
+    var qsPanel = document.getElementById('quickstart-panel'); // restore setup panel (#11)
+    if (qsPanel) qsPanel.style.display = '';
     appState.currentWorkout = null;
     appState.currentSetIndex = {};
     saveAppState();
-    
+
     showRPEModal();
 }
 
@@ -6360,6 +6366,8 @@ function completeWarmup() {
 function continueToWorkout() {
     // The workout is already loaded, just make sure it's visible and scrolled to
     switchTab('coach'); // workout UI lives inside #view-coach (C-03)
+    var qsPanel = document.getElementById('quickstart-panel'); // hide setup while a session is live (#11, warmup path)
+    if (qsPanel) qsPanel.style.display = 'none';
     document.getElementById('workout-interface').style.display = 'block';
     document.getElementById('workout-interface').scrollIntoView({behavior:'smooth'});
     speak('Let\'s go! First exercise ready.');
