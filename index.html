@@ -31,12 +31,20 @@
     var LAST_SYNC_TIME = null;
     </script>
     <style>
-        :root { 
-            --bg: #121212; --card: #1e1e1e; --primary: #BB86FC; --sec: #03DAC6; 
-            --text: #fff; --gold: #FFD700; --danger: #CF6679; --warn: #FF9800; 
-            --success: #00C853; --push-color: #FF6B6B; --pull-color: #4ECDC4; 
-            --legs-color: #95E1D3; --cardio-color: #3498db; --nimble-color: #9b59b6; 
+        :root {
+            --bg: #121212; --card: #1e1e1e; --primary: #8A8F98; --sec: #03DAC6;
+            --text: #fff; --gold: #FFD700; --danger: #CF6679; --warn: #FF9800;
+            --success: #00C853; --push-color: #FF6B6B; --pull-color: #4ECDC4;
+            --legs-color: #95E1D3; --cardio-color: #3498db; --nimble-color: #9b59b6;
             --rest-color: #555;
+            /* P1: --primary neutralised from Material Purple 200 (#BB86FC) to desaturated slate — kills the AI palette tell; accent stays teal (--sec) */
+            /* FLAG 2 groundwork (inert): additive token aliases to existing live equivalents; no consumers yet, zero behaviour change */
+            --accent: var(--sec);
+            --surface: var(--card);
+            --border: rgba(255,255,255,0.04);
+            --text-muted: #888;
+            --radius: 14px;
+            --shadow: 0 2px 12px rgba(0,0,0,0.3);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
@@ -194,7 +202,7 @@
             transform: translateX(5px);
         }
         .exercise-list-item.selected { 
-            background: rgba(187,134,252,0.2); 
+            background: rgba(138,143,152,0.2); 
             border-left-color: var(--primary); 
         }
         
@@ -563,7 +571,7 @@
         }
         #consult-modal.active { display: flex; }
         .consult-header {
-            background: linear-gradient(135deg, rgba(3,218,198,0.15), rgba(187,134,252,0.1));
+            background: linear-gradient(135deg, rgba(3,218,198,0.15), rgba(138,143,152,0.1));
             padding: 14px 16px;
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid rgba(255,255,255,0.06);
@@ -651,8 +659,8 @@
         
         /* ASSESSMENT */
         .assess-instruction {
-            background: linear-gradient(135deg, rgba(187,134,252,0.08), rgba(3,218,198,0.08));
-            border: 1px solid rgba(187,134,252,0.2);
+            background: linear-gradient(135deg, rgba(138,143,152,0.08), rgba(3,218,198,0.08));
+            border: 1px solid rgba(138,143,152,0.2);
             border-radius: 10px; padding: 12px 14px;
             margin-bottom: 12px; font-size: 0.85em; color: #ccc; line-height: 1.5;
         }
@@ -663,7 +671,7 @@
             color: var(--sec); margin-bottom: 6px;
         }
         .strength-profile-card {
-            background: linear-gradient(135deg, rgba(3,218,198,0.06), rgba(187,134,252,0.06));
+            background: linear-gradient(135deg, rgba(3,218,198,0.06), rgba(138,143,152,0.06));
             border: 1px solid rgba(3,218,198,0.15); border-radius: 12px;
             padding: 16px; margin: 12px 0;
         }
@@ -1177,7 +1185,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec);">v75</span>
+        <span style="font-size:1.3em; color: var(--sec);">v76</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -1220,7 +1228,7 @@
         </div>
         
         <div style="text-align:center; margin-top:8px;">
-            <button class="btn" onclick="startConsultation()" style="border-radius:10px; background:linear-gradient(135deg, rgba(3,218,198,0.2), rgba(187,134,252,0.2)); border:1px solid rgba(3,218,198,0.3); color:#fff;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> AI Coach Consultation</button>
+            <button class="btn" onclick="startConsultation()" style="border-radius:10px; background:linear-gradient(135deg, rgba(3,218,198,0.2), rgba(138,143,152,0.2)); border:1px solid rgba(3,218,198,0.3); color:#fff;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> AI Coach Consultation</button>
             <button class="btn btn-main" onclick="openCustomBuilder()" style="border-radius:10px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Custom Workout Builder</button>
             <button class="btn btn-action" onclick="generateRandomWorkout()" style="border-radius:10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="8" cy="8" r="1" fill="currentColor"/><circle cx="16" cy="8" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="8" cy="16" r="1" fill="currentColor"/><circle cx="16" cy="16" r="1" fill="currentColor"/></svg> Random Workout</button>
         </div>
@@ -1315,7 +1323,7 @@
 <div class="container" id="view-plan">
     <h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg> Training Plan</h2>
     
-    <div class="card" style="background: linear-gradient(135deg, rgba(187,134,252,0.1), rgba(3,218,198,0.1)); border: 2px solid var(--primary);">
+    <div class="card" style="background: linear-gradient(135deg, rgba(138,143,152,0.1), rgba(3,218,198,0.1)); border: 2px solid var(--primary);">
         <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg> AI Coach Consultation</h3>
         <p style="margin-bottom: 15px; color: #888;">Chat with your AI coach to build a personalised training plan. Like a real PT session — tell me about your goals, schedule, injuries, and I'll build something that works for you.</p>
         <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
@@ -1442,7 +1450,7 @@
                     Automatically sync your Garmin activities, heart rate, and training data
                 </p>
                 
-                <div style="background: rgba(187, 134, 252, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <div style="background: rgba(138, 143, 152, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                         <span style="font-weight: bold;">Status:</span>
                         <span id="garmin-connection-status" style="font-weight: bold;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg> Not Connected</span>
@@ -5465,7 +5473,7 @@ function renderEncyclopedia() {
     
     // Show count
     const totalEl = document.createElement('div');
-    totalEl.style.cssText = 'padding: 10px; background: rgba(187,134,252,0.1); border-radius: 8px; margin-bottom: 15px; text-align: center; color: #BB86FC; font-weight: bold;';
+    totalEl.style.cssText = 'padding: 10px; background: rgba(138,143,152,0.1); border-radius: 8px; margin-bottom: 15px; text-align: center; color: #8A8F98; font-weight: bold;';
     totalEl.innerHTML = `${IC.book} ${exercises.length} exercises found`;
     container.appendChild(totalEl);
     
