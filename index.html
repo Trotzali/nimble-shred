@@ -1185,7 +1185,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec);">v79</span>
+        <span style="font-size:1.3em; color: var(--sec);">v80</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -1224,9 +1224,16 @@
             <div class="chip" data-qs-type="pull" onclick="setQsType(this,'pull')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M12 3v15"/><path d="m6 8 6-6 6 6"/><path d="M5 21h14"/></svg> Pull</div>
             <div class="chip" data-qs-type="legs" onclick="setQsType(this,'legs')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M15 4v4l-2 4-1 4-2 5"/><path d="M9 4v4l2 4 1 4 2 5"/><path d="M8 21h3"/><path d="M13 21h3"/></svg> Legs</div>
             <div class="chip" data-qs-type="full" onclick="setQsType(this,'full')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> Full</div>
-            <div class="chip" data-qs-type="nimble" onclick="setQsType(this,'nimble')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><circle cx="12" cy="4" r="2"/><path d="M8 20h8"/><path d="M12 8v5"/><path d="M7 14c0 0 2-1 5-1s5 1 5 1"/><path d="M5 17c0 0 3-2 7-2s7 2 7 2"/></svg> Mobility</div>
         </div>
-        
+
+        <div class="section-label" style="margin-top:16px;">Focus <span style="color:#666;font-size:0.8em;">(optional)</span></div>
+        <div class="chip-container" id="qs-focus-chips">
+            <div class="chip" data-qs-focus="strength" onclick="setQsFocus(this,'strength')">Strength</div>
+            <div class="chip" data-qs-focus="power" onclick="setQsFocus(this,'power')">Power</div>
+            <div class="chip" data-qs-focus="resilience" onclick="setQsFocus(this,'resilience')">Resilience</div>
+            <div class="chip" data-qs-focus="cardio" onclick="setQsFocus(this,'cardio')">Cardio</div>
+        </div>
+
         <button class="btn btn-main" style="margin-top:14px;" onclick="startConfiguredWorkout()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><polygon points="5 3 19 12 5 21 5 3"/></svg> Start Workout</button>
 
         <div style="text-align:center; margin-top:8px;">
@@ -3040,7 +3047,8 @@ let appState = {
     exerciseCount: 6,
     builderFilter: 'all',
     recentPicks: {}, // per-type rolling history of last 1-2 sessions' picks (Smart Picker P1)
-    qsType: null // Quick Start selected workout type (B-1 decouple); null -> engine default 'full'
+    qsType: null, // Quick Start selected workout type (B-1 decouple); null -> engine default 'full'
+    qsFocus: null // Quick Start selected focus bucket (B-2); null -> no bucket filter
 };
 
 // ========================================
@@ -3427,17 +3435,32 @@ function setQsType(btn, type) {
     saveAppState();
 }
 
-// Reflect the persisted qsType selection on load
+// B-2: Focus chips SELECT only (bucket axis, orthogonal to Type)
+function setQsFocus(btn, focus) {
+    var same = appState.qsFocus === focus;
+    appState.qsFocus = same ? null : focus; // tapping the selected chip deselects
+    document.querySelectorAll('[data-qs-focus]').forEach(function(b) { b.classList.remove('active'); });
+    if (!same) btn.classList.add('active');
+    saveAppState();
+}
+
+// Reflect the persisted qsType/qsFocus selections on load
 function applyQsTypeSelection() {
+    if (appState.qsType === 'nimble') appState.qsType = null; // Mobility type chip retired in B-2 (Resilience focus covers it)
     document.querySelectorAll('[data-qs-type]').forEach(function(b) {
         b.classList.toggle('active', b.getAttribute('data-qs-type') === appState.qsType);
+    });
+    document.querySelectorAll('[data-qs-focus]').forEach(function(b) {
+        b.classList.toggle('active', b.getAttribute('data-qs-focus') === appState.qsFocus);
     });
 }
 
 // B-1: the one explicit Start — fires check-in once, then generates from the current
 // selections (type + equipment gear + count). Nothing selected -> 'full' (full-body build).
 function startConfiguredWorkout() {
-    quickStartWorkout(appState.qsType || 'full');
+    showCheckIn(function() {
+        _executeQuickStart(appState.qsType || 'full', appState.qsFocus || null);
+    });
 }
 
 function quickStartWorkout(type) {
@@ -3447,13 +3470,13 @@ function quickStartWorkout(type) {
     });
 }
 
-function _executeQuickStart(type) {
+function _executeQuickStart(type, focus) {
     // Temporarily apply session gear
     var savedEquipment = appState.equipment;
     var savedCustom = appState.customEquipment ? appState.customEquipment.slice() : null;
     applySessionGear(sessionGear);
-    
-    var exercises = generateWorkoutByType(type, appState.exerciseCount);
+
+    var exercises = generateWorkoutByType(type, appState.exerciseCount, focus);
     
     // Restore global settings
     appState.equipment = savedEquipment;
@@ -3550,18 +3573,31 @@ function _executeWedgeSession(minutes) {
     showNotification('⏱ ' + minutes + 'min Wedge: ' + bestType.toUpperCase() + ' — ' + exerciseCount + ' exercises (' + gearLabel + ')', 'success');
 }
 
-function generateWorkoutByType(type, count = 6) {
+function generateWorkoutByType(type, count = 6, focus) {
     let filtered = window.allExercises.filter(ex => {
         if(type === 'push') return ex.cat.some(c => ['Chest','Shoulders','Triceps'].includes(c));
         if(type === 'pull') return ex.cat.some(c => ['Back','Lats','Biceps'].includes(c));
         if(type === 'legs') return ex.cat.some(c => ['Legs','Quads','Hamstrings','Glutes'].includes(c));
-        if(type === 'nimble') return getBucket(ex.name) === 'resilience'; // "Mobility" chip -> resilience bucket (v77)
+        if(type === 'nimble') return getBucket(ex.name) === 'resilience'; // internal token kept for plan-today (v77/B-2)
         if(type === 'full') return true;
         return true;
     });
-    
+
     // Apply equipment filter
     filtered = filterExercisesByEquipment(filtered);
+
+    // B-2: Focus = bucket axis, intersected with Type. Thin/empty-intersection guard:
+    // empty -> fall back to focus-only (equipment-filtered); still empty -> drop focus.
+    // Never start an empty session.
+    if (focus) {
+        var withFocus = filtered.filter(function(e) { return getBucket(e.name) === focus; });
+        if (withFocus.length === 0) {
+            withFocus = filterExercisesByEquipment(
+                window.allExercises.filter(function(e) { return getBucket(e.name) === focus; })
+            );
+        }
+        if (withFocus.length > 0) filtered = withFocus;
+    }
 
     // Smart Picker: recent-exclusion (Phase 1) + scored greedy build (Phase 2), one choke point.
     // On total metadata load-failure smartSelect collapses to pure Phase-1 Fisher-Yates (v71).
