@@ -1185,7 +1185,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec);">v89</span>
+        <span style="font-size:1.3em; color: var(--sec);">v90</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -1270,7 +1270,7 @@
             <div style="font-size:1.3em; font-weight:700; margin-bottom:4px;">How are you feeling?</div>
             <div style="font-size:0.82em; color:#888;">This adjusts your warmup, weights, and rest periods</div>
         </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div id="checkin-feelings" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
             <div class="checkin-option" onclick="processCheckIn('fresh')">
                 <div class="checkin-emoji">💪</div>
                 <div class="checkin-label">Fresh</div>
@@ -1292,7 +1292,28 @@
                 <div class="checkin-desc">Joint or sharp pain</div>
             </div>
         </div>
-        <button class="btn" style="background:rgba(255,255,255,0.06); color:#888; margin-top:14px; font-size:0.85em;" onclick="processCheckIn('skip')">Skip check-in</button>
+        <button id="checkin-skip-btn" class="btn" style="background:rgba(255,255,255,0.06); color:#888; margin-top:14px; font-size:0.85em;" onclick="processCheckIn('skip')">Skip check-in</button>
+
+        <!-- B7: niggle capture step (revealed when "Something Hurts" is tapped) -->
+        <div id="checkin-niggle-step" style="display:none;">
+            <div style="text-align:center; margin:4px 0 12px;">
+                <div style="font-weight:700; margin-bottom:4px;">What hurts? (tap any)</div>
+                <div style="font-size:0.78em; color:#888;">I'll exclude exercises that load these joints</div>
+            </div>
+            <div id="niggle-joint-chips" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;">
+                <button class="rpe-tag" data-niggle="neck" onclick="toggleNiggleChip(this)">Neck</button>
+                <button class="rpe-tag" data-niggle="shoulder" onclick="toggleNiggleChip(this)">Shoulder</button>
+                <button class="rpe-tag" data-niggle="elbow" onclick="toggleNiggleChip(this)">Elbow</button>
+                <button class="rpe-tag" data-niggle="wrist" onclick="toggleNiggleChip(this)">Wrist</button>
+                <button class="rpe-tag" data-niggle="tSpine" onclick="toggleNiggleChip(this)">Upper back</button>
+                <button class="rpe-tag" data-niggle="lowBack" onclick="toggleNiggleChip(this)">Lower back</button>
+                <button class="rpe-tag" data-niggle="hip" onclick="toggleNiggleChip(this)">Hip</button>
+                <button class="rpe-tag" data-niggle="knee" onclick="toggleNiggleChip(this)">Knee</button>
+                <button class="rpe-tag" data-niggle="ankle" onclick="toggleNiggleChip(this)">Ankle</button>
+            </div>
+            <button class="btn btn-main" style="margin-top:14px;" onclick="confirmNiggles(true)">Start — work around it →</button>
+            <button class="btn" style="background:rgba(255,255,255,0.06); color:#888; margin-top:8px; font-size:0.85em;" onclick="confirmNiggles(false)">Just go easy</button>
+        </div>
     </div>
 </div>
 
@@ -3083,7 +3104,9 @@ let appState = {
     builderFilter: 'all',
     recentPicks: {}, // per-type rolling history of last 1-2 sessions' picks (Smart Picker P1)
     qsType: null, // Quick Start selected workout type (B-1 decouple); null -> engine default 'full'
-    qsFocus: null // Quick Start selected focus bucket (B-2); null -> no bucket filter
+    qsFocus: null, // Quick Start selected focus bucket (B-2); null -> no bucket filter
+    niggleJoints: [], // B7: raw jointLoad keys flagged at check-in; read live by niggleSafe
+    niggleSetAt: null // B7: ISO date the flags were set (3-day load-time expiry backstop)
 };
 
 // ========================================
@@ -3273,6 +3296,12 @@ window.onload = () => {
     renderEncyclopedia();
     updateSettingsUI();
     applyQsTypeSelection();
+    // B7 clear path 3 (backstop): flags older than 3 days expire on load
+    if (appState.niggleSetAt && (Date.now() - new Date(appState.niggleSetAt).getTime()) > 3 * 24 * 3600 * 1000) {
+        appState.niggleJoints = [];
+        appState.niggleSetAt = null;
+        saveAppState();
+    }
 };
 
 function loadAppState() {
@@ -3358,23 +3387,77 @@ var checkInConfig = {
 function showCheckIn(callback) {
     sessionCheckIn = 'skip';
     window._checkInCallback = callback;
+    // B7: reset to step 1 (feelings) every open
+    var feelings = document.getElementById('checkin-feelings');
+    var skipBtn = document.getElementById('checkin-skip-btn');
+    var niggleStep = document.getElementById('checkin-niggle-step');
+    if (feelings) feelings.style.display = 'grid';
+    if (skipBtn) skipBtn.style.display = '';
+    if (niggleStep) niggleStep.style.display = 'none';
+    document.querySelectorAll('[data-niggle]').forEach(function(b) { b.classList.remove('selected'); });
     var modal = document.getElementById('checkin-modal');
     modal.style.display = 'flex';
 }
 
 function processCheckIn(feeling) {
     sessionCheckIn = feeling;
+
+    if (feeling === 'pain') {
+        // B7: reveal the joint picker instead of closing; the callback runs on confirm
+        var feelings = document.getElementById('checkin-feelings');
+        var skipBtn = document.getElementById('checkin-skip-btn');
+        var niggleStep = document.getElementById('checkin-niggle-step');
+        if (feelings) feelings.style.display = 'none';
+        if (skipBtn) skipBtn.style.display = 'none';
+        if (niggleStep) niggleStep.style.display = 'block';
+        // still-sore convenience: pre-tick last flags if set within 48h (user still confirms)
+        if (appState.niggleSetAt && (Date.now() - new Date(appState.niggleSetAt).getTime()) < 48 * 3600 * 1000) {
+            (appState.niggleJoints || []).forEach(function(j) {
+                var chip = document.querySelector('[data-niggle="' + j + '"]');
+                if (chip) chip.classList.add('selected');
+            });
+        }
+        return;
+    }
+
+    // B7 clear path 1: any non-pain feeling (incl. skip) resets the flags
+    appState.niggleJoints = [];
+    appState.niggleSetAt = null;
+    saveAppState();
+
     document.getElementById('checkin-modal').style.display = 'none';
-    
-    var config = checkInConfig[feeling] || checkInConfig.skip;
-    
+
     // Voice feedback
     if (feeling === 'fresh') speak('Great! Full intensity today. Let\'s crush it.');
     else if (feeling === 'normal') speak('Solid. Standard session with a little extra warmup.');
     else if (feeling === 'tired') speak('Got it. Lighter weights, longer rest. Quality over quantity.');
-    else if (feeling === 'pain') speak('Understood. We\'ll go easy. Focus on movement quality. Skip anything that hurts.');
-    
+
     // Execute the stored callback
+    if (window._checkInCallback) {
+        window._checkInCallback();
+        window._checkInCallback = null;
+    }
+}
+
+// B7: joint-chip toggle + confirm
+function toggleNiggleChip(btn) {
+    btn.classList.toggle('selected');
+}
+
+function confirmNiggles(workAround) {
+    var joints = [];
+    if (workAround) {
+        document.querySelectorAll('[data-niggle].selected').forEach(function(b) {
+            joints.push(b.getAttribute('data-niggle'));
+        });
+    }
+    appState.niggleJoints = joints; // [] for "Just go easy" / nothing selected -> generic pain nudge only
+    appState.niggleSetAt = joints.length ? new Date().toISOString() : null;
+    saveAppState();
+
+    document.getElementById('checkin-modal').style.display = 'none';
+    speak('Understood. We\'ll go easy. Focus on movement quality. Skip anything that hurts.');
+
     if (window._checkInCallback) {
         window._checkInCallback();
         window._checkInCallback = null;
@@ -3515,11 +3598,14 @@ function _executeQuickStart(type, focus) {
     applySessionGear(sessionGear);
 
     var exercises = generateWorkoutByType(type, appState.exerciseCount, focus);
-    
+
     // Restore global settings
     appState.equipment = savedEquipment;
     appState.customEquipment = savedCustom;
-    
+
+    // B7.5: empty niggle-safe pool -> blocked (alert already shown); do not start
+    if (!exercises || exercises.length === 0) { saveAppState(); return; }
+
     // Store workout type for warmup
     appState.currentWorkoutType = type;
     appState.currentWorkout = exercises;
@@ -3595,11 +3681,14 @@ function _executeWedgeSession(minutes) {
     var bestType = types[0];
     
     var exercises = generateWorkoutByType(bestType, exerciseCount);
-    
+
     // Restore global settings
     appState.equipment = savedEquipment;
     appState.customEquipment = savedCustom;
-    
+
+    // B7.5: empty niggle-safe pool -> blocked (alert already shown); do not start
+    if (!exercises || exercises.length === 0) { saveAppState(); return; }
+
     appState.currentWorkoutType = bestType;
     appState.currentWorkout = exercises;
     appState.currentSetIndex = {};
@@ -3643,6 +3732,16 @@ function generateWorkoutByType(type, count = 6, focus) {
     // Smart Picker: recent-exclusion (Phase 1) + scored greedy build (Phase 2), one choke point.
     // On total metadata load-failure smartSelect collapses to pure Phase-1 Fisher-Yates (v71).
     var picks = smartSelect(filtered, count, type, { niggle: getNiggleJoints() });
+
+    // B7.5 thin-pool guard: niggleSafe is a HARD exclusion — warn on short fill, block on empty.
+    if (getNiggleJoints().length > 0 && picks.length < count) {
+        if (picks.length === 0) {
+            alert('Every matching exercise loads a flagged joint. Deselect a joint at the check-in, or try the Resilience focus (low-load mobility).');
+        } else {
+            showNotification('Working around: ' + appState.niggleJoints.join(', ') + ' — only ' + picks.length + ' suitable exercise' + (picks.length === 1 ? '' : 's') + ' found. Consider resting or flagging fewer joints.', 'info');
+        }
+    }
+
     rememberPicks(type, picks.map(function(e) { return e.name; }));
     return picks;
 }
@@ -4287,6 +4386,7 @@ function endWorkout() {
         updateTodaysBanner(); // restore hero banner — ended early, today not done -> shows "Start Workout" (#6)
         appState.currentWorkout = null;
         appState.currentSetIndex = {};
+        appState.niggleJoints = []; appState.niggleSetAt = null; // B7 clear path 2: session over
         saveAppState();
 
         showRPEModal();
@@ -4308,6 +4408,7 @@ function finishWorkout() {
     updateTodaysBanner(); // restore hero banner after session; today now completed -> reflects completion, not "Start Workout" (#6)
     appState.currentWorkout = null;
     appState.currentSetIndex = {};
+    appState.niggleJoints = []; appState.niggleSetAt = null; // B7 clear path 2: session over
     saveAppState();
 
     showRPEModal();
