@@ -1185,7 +1185,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec);">v87</span>
+        <span style="font-size:1.3em; color: var(--sec);">v88</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -1214,6 +1214,7 @@
         <div class="section-label">Equipment</div>
         <div class="gear-row" id="session-gear-toggles">
             <button class="rpe-tag selected" onclick="setSessionGear(this,'gym')" data-session-gear="gym">🏋️ Full Gym</button>
+            <button class="rpe-tag" onclick="setSessionGear(this,'cable')" data-session-gear="cable">🔌 Cables</button>
             <button class="rpe-tag" onclick="setSessionGear(this,'dumbbell')" data-session-gear="dumbbell">🔩 Dumbbells</button>
             <button class="rpe-tag" onclick="setSessionGear(this,'bodyweight')" data-session-gear="bodyweight">🤸 Bodyweight</button>
         </div>
@@ -1647,7 +1648,7 @@
         <div class="chip-container">
             <div class="chip" onclick="filterEncyclopedia('Cable')">Cables</div>
             <div class="chip" onclick="filterEncyclopedia('Dumbbell')">Dumbbells</div>
-            <div class="chip" onclick="filterEncyclopedia('Barbell')">Barbells</div>
+            <div class="chip" onclick="filterEncyclopedia('Free Weight')">Free Weights</div>
             <div class="chip" onclick="filterEncyclopedia('Bodyweight')">Bodyweight</div>
         </div>
         
@@ -1812,7 +1813,7 @@
             <div class="chip-container">
                 <div class="chip" onclick="filterBuilder('Cable')">Cables</div>
                 <div class="chip" onclick="filterBuilder('Dumbbell')">Dumbbells</div>
-                <div class="chip" onclick="filterBuilder('Barbell')">Barbells</div>
+                <div class="chip" onclick="filterBuilder('Free Weight')">Free Weights</div>
                 <div class="chip" onclick="filterBuilder('Bodyweight')">Bodyweight</div>
             </div>
             
@@ -3456,6 +3457,9 @@ function applySessionGear(gear) {
     } else if (gear === 'dumbbell') {
         appState.equipment = 'custom';
         appState.customEquipment = ['Bodyweight', 'Dumbbell'];
+    } else if (gear === 'cable') {
+        appState.equipment = 'custom';
+        appState.customEquipment = ['Bodyweight', 'Cable']; // B-3: cable + bodyweight pool
     } else {
         appState.equipment = 'gym';
         appState.customEquipment = [];
@@ -5368,7 +5372,7 @@ function renderBuilderExerciseList() {
 
     // 1. Define Filter Groups
     const muscles = ['Chest', 'Back', 'Legs', 'Shoulders', 'Arms'];
-    const equipment = ['Cable', 'Dumbbell', 'Barbell', 'Bodyweight'];
+    const equipment = ['Cable', 'Dumbbell', 'Free Weight', 'Bodyweight']; // real equip values (Barbell matched 0 — B-3)
     const styles = ['Strength', 'Power', 'Resilience', 'Cardio']; // focus buckets (getBucket, v77)
 
     // 2. Sort active filters into buckets
@@ -5541,7 +5545,7 @@ function renderEncyclopedia() {
 
     // 1. Define Filter Groups
     const muscles = ['Chest', 'Back', 'Legs', 'Shoulders', 'Arms'];
-    const equipment = ['Cable', 'Dumbbell', 'Barbell', 'Bodyweight'];
+    const equipment = ['Cable', 'Dumbbell', 'Free Weight', 'Bodyweight']; // real equip values (Barbell matched 0 — B-3)
     const styles = ['Strength', 'Power', 'Resilience', 'Cardio']; // focus buckets (getBucket, v77)
 
     // 2. Sort active filters
