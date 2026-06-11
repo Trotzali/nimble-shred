@@ -1185,7 +1185,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec);">v80</span>
+        <span style="font-size:1.3em; color: var(--sec);">v81</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -3489,8 +3489,8 @@ function _executeQuickStart(type, focus) {
     appState.exerciseDone = {};
     saveAppState();
     
-    // Start warmup for push/pull/legs workouts
-    if(['push', 'pull', 'legs'].includes(type.toLowerCase())) {
+    // Start warmup for push/pull/legs/full workouts (mobility/resilience skips; wedge skips by design)
+    if(['push', 'pull', 'legs', 'full'].includes(type.toLowerCase())) {
         startWarmup(type);
         renderWorkout(exercises);
     } else {
@@ -6594,6 +6594,16 @@ const warmupSequences = {
         { name: 'Bodyweight Squats', duration: 45, desc: 'Feet shoulder-width apart, toes slightly out. Squat down as deep as you can with good form — chest up, knees tracking over toes, weight in mid-foot. Pause briefly at the bottom. 12-15 slow reps.' },
         { name: 'Walking Lunges', duration: 45, desc: 'Step forward into a lunge — front knee at 90 degrees, back knee hovering above the ground. Push through the front heel to step the back foot forward into the next lunge. 8-10 per leg. Stay upright.' },
         { name: 'Ankle Rolls', duration: 30, desc: 'Stand on one foot. Lift the other and slowly circle the ankle — 15 seconds clockwise, 15 seconds counter-clockwise. Switch feet. If balance is tricky, hold a wall. This prevents ankle sprains under load.' },
+        { name: 'Glute Bridges', duration: 45, desc: 'Lie on your back, knees bent, feet flat on the floor. Push through your heels to lift your hips until your body forms a straight line from shoulders to knees. Squeeze your glutes hard at the top for 2 seconds. 12-15 reps.' }
+    ],
+    // Full-body warmup (v81) — composed verbatim from the PPL sequences above so a
+    // Full session warms shoulders, hips, legs and spine before mixed work.
+    full: [
+        { name: 'Arm Circles', duration: 60, desc: 'Stand with arms extended to the sides. Make large circles forward for 30 seconds, then reverse direction. Keep core engaged and shoulders down. Gradually increase the size of the circles.' },
+        { name: 'Shoulder CARs', duration: 60, desc: 'Stand tall. Slowly raise one arm forward, overhead, behind you, and back down in the largest circle you can control. Move slowly — take 10 seconds per rotation. Do 3 each direction per arm.' },
+        { name: 'Cat-Cow Stretch', duration: 60, desc: 'On hands and knees, alternate between arching your back (cow — belly drops, head up) and rounding your back (cat — belly pulls in, chin to chest). Move slowly with your breath. 10-12 cycles.' },
+        { name: 'Leg Swings', duration: 60, desc: 'Hold a wall for balance. Swing one leg forward and backward like a pendulum, 15 swings. Then face the wall and swing side to side, 15 swings. Keep your core tight and standing leg slightly bent. Switch legs.' },
+        { name: 'Bodyweight Squats', duration: 45, desc: 'Feet shoulder-width apart, toes slightly out. Squat down as deep as you can with good form — chest up, knees tracking over toes, weight in mid-foot. Pause briefly at the bottom. 12-15 slow reps.' },
         { name: 'Glute Bridges', duration: 45, desc: 'Lie on your back, knees bent, feet flat on the floor. Push through your heels to lift your hips until your body forms a straight line from shoulders to knees. Squeeze your glutes hard at the top for 2 seconds. 12-15 reps.' }
     ]
 };
