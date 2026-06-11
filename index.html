@@ -1182,11 +1182,11 @@
         <div style="font-size: 1.1em; margin-bottom: 15px;">
             Planned: <span id="today-workout"></span>
         </div>
-        <button class="btn btn-main" onclick="startTodaysWorkout()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><polygon points="5 3 19 12 5 21 5 3"/></svg> Start Workout</button>
+        <button class="btn btn-main" id="today-start-btn" onclick="startTodaysWorkout()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><polygon points="5 3 19 12 5 21 5 3"/></svg> Start Today's Plan</button>
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec);">v92</span>
+        <span style="font-size:1.3em; color: var(--sec);">v93</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -1237,7 +1237,7 @@
             <div class="chip" data-qs-focus="cardio" onclick="setQsFocus(this,'cardio')">Cardio</div>
         </div>
 
-        <button class="btn btn-main" style="margin-top:14px;" onclick="startConfiguredWorkout()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><polygon points="5 3 19 12 5 21 5 3"/></svg> Start Workout</button>
+        <button class="btn btn-main" style="margin-top:14px;" onclick="startConfiguredWorkout()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><polygon points="5 3 19 12 5 21 5 3"/></svg> Start Quick Workout</button>
 
         <div style="text-align:center; margin-top:8px;">
             <button class="btn" onclick="startConsultation()" style="border-radius:10px; background:linear-gradient(135deg, rgba(3,218,198,0.2), rgba(138,143,152,0.2)); border:1px solid rgba(3,218,198,0.3); color:#fff;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> AI Coach Consultation</button>
@@ -6010,15 +6010,21 @@ function typeLabel(token, short) {
     return short ? l.slice(0, 4) : l;
 }
 
+// Single shared post-accept render — every plan-landing path calls this, so the
+// hero banner and Plan-tab cards can never drift (hero-banner diag).
+function refreshPlanViews() {
+    renderPlanCalendar();
+    renderPlanOverview();
+    updateTodaysBanner();
+}
+
 function acceptPlan() {
     saveAppState();
     // Single source of truth: an accepted generator plan supersedes any stale AI
     // consultation plan, so the overview/header card reflects what was just accepted.
     localStorage.removeItem('currentPlan');
     closePlanGenerator();
-    renderPlanCalendar();
-    renderPlanOverview();
-    updateTodaysBanner();
+    refreshPlanViews();
     speak('Plan activated!');
 }
 
@@ -6050,7 +6056,11 @@ function updateTodaysBanner() {
     
     const icon = {push:IC.push,pull:IC.pull,legs:IC.legs,full:IC.fire,cardio:IC.cardio,nimble:IC.nimble}[type] || IC.fire;
     document.getElementById('today-workout').innerHTML = `${icon} ${typeLabel(type).toUpperCase()}`;
-    
+
+    // Disambiguated label: this button starts the PLAN's session for today (vs Quick Start below)
+    const startBtn = document.getElementById('today-start-btn');
+    if (startBtn) startBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><polygon points="5 3 19 12 5 21 5 3"/></svg> Start Today\'s Plan: ' + typeLabel(type).toUpperCase();
+
     banner.style.display = 'block';
 }
 
@@ -8101,15 +8111,14 @@ async function generateFromConsultation() {
             };
             saveAppState();
             localStorage.setItem('currentPlan', JSON.stringify(result));
-            renderPlanOverview();
-            renderPlanCalendar();
+            refreshPlanViews(); // banner + Plan-tab cards refresh immediately (hero-banner diag)
             if (CLOUD_SYNC_ENABLED) { try { await savePlanToCloud(result); } catch(e) {} }
             
             addConsultMsg('coach', '✅ Your plan is ready!\n\n📋 ' + (result.name || 'Training Plan') + '\n⏱ ' + (result.duration || 12) + ' weeks\n\n' + (result.guidance || '') + '\n\nI\'ve loaded it into your calendar. Close this and check the Plan tab!');
             
             var doneDiv = document.createElement('div');
             doneDiv.style.cssText = 'align-self:center; margin:10px 0;';
-            doneDiv.innerHTML = '<button class="btn btn-success" onclick="closeConsultation(); switchTab(\'plan\'); renderPlanCalendar();" style="border-radius:25px; padding:14px 30px;">View My Plan →</button>';
+            doneDiv.innerHTML = '<button class="btn btn-success" onclick="closeConsultation(); switchTab(\'plan\'); refreshPlanViews();" style="border-radius:25px; padding:14px 30px;">View My Plan →</button>';
             document.getElementById('consult-messages').appendChild(doneDiv);
         } else {
             // Start workout directly
