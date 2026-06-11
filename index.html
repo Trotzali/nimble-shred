@@ -1185,7 +1185,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec);">v77</span>
+        <span style="font-size:1.3em; color: var(--sec);">v78</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -5548,12 +5548,12 @@ function renderPlanOverview() {
     var schedule = (savedPlan && savedPlan.weekSchedule) ? savedPlan.weekSchedule : (activePlan ? activePlan.schedule : null);
     if (schedule) {
         var dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        var typeColors = {push:'#FF6B6B', pull:'#4ECDC4', legs:'#95E1D3', cardio:'#3498db', nimble:'#9b59b6', rest:'#555'};
+        var typeColors = {push:'#FF6B6B', pull:'#4ECDC4', legs:'#95E1D3', cardio:'#3498db', nimble:'#5BB98B', rest:'#555'};
         html += '<div style="display:flex; gap:4px; flex-wrap:wrap; justify-content:center;">';
         dayNames.forEach(function(name, i) {
             var type = schedule[i] || 'rest';
             var col = typeColors[type] || '#555';
-            html += '<div style="text-align:center; flex:1; min-width:38px; padding:6px 2px; background:rgba(255,255,255,0.03); border-radius:6px; border-bottom:2px solid ' + col + ';">' +
+            html += '<div onclick="editDay(' + i + ')" style="cursor:pointer; text-align:center; flex:1; min-width:38px; padding:6px 2px; background:rgba(255,255,255,0.03); border-radius:6px; border-bottom:2px solid ' + col + ';">' +
                 '<div style="font-size:0.65em; color:#888;">' + name + '</div>' +
                 '<div style="font-size:0.72em; color:' + col + '; font-weight:600; text-transform:capitalize;">' + type + '</div>' +
             '</div>';
@@ -5641,6 +5641,7 @@ function editDay(idx) {
     plan.schedule[idx] = types[(current + 1) % types.length];
     saveAppState();
     renderPlanCalendar();
+    renderPlanOverview(); // keep the overview strip in sync when a day is edited from either surface (#9)
 }
 
 function isDayCompleted(idx) {
@@ -5674,6 +5675,7 @@ let planData = {};
 
 function openPlanGenerator() {
     planData = {};
+    document.querySelectorAll('#plan-generator-modal .chip').forEach(function(c) { c.classList.remove('active'); }); // clear stale highlights (#10c)
     document.getElementById('plan-generator-modal').classList.add('active');
     showGenStep(1);
 }
@@ -5691,14 +5693,16 @@ function showGenStep(step) {
 
 function selectFrequency(days) {
     planData.frequency = days;
+    document.querySelectorAll('#generator-step-1 .chip').forEach(function(c) { c.classList.remove('active'); }); // single-select (#10a)
     event.target.classList.add('active');
     setTimeout(() => showGenStep(2), 300);
 }
 
 function selectGoal(goal) {
     planData.goal = goal;
+    document.querySelectorAll('#generator-step-2 .chip').forEach(function(c) { c.classList.remove('active'); }); // single-select (#10b)
     event.target.classList.add('active');
-    
+
     // Generate plan based on holistic focus
     const schedules = {
         3: {0:'rest',1:'push',2:'rest',3:'pull',4:'rest',5:'legs',6:'rest'},
@@ -5747,6 +5751,8 @@ function acceptPlan() {
 }
 
 function regeneratePlan() {
+    planData = {};
+    document.querySelectorAll('#plan-generator-modal .chip').forEach(function(c) { c.classList.remove('active'); }); // reset prior picks (#10c)
     showGenStep(1);
 }
 
@@ -7890,7 +7896,8 @@ function buildConsultSystemPrompt() {
 // Keep backward compatibility — old function redirects to new
 function startAIPlanWizard() { startConsultation(); }
 function closeAIWizard() { closeConsultation(); }
-function acceptPlan() { closeConsultation(); switchTab('plan'); renderPlanCalendar(); }
+// (removed duplicate acceptPlan shim here — H-04 #10d: it overrode the real generator handler;
+//  the consultation "View My Plan" path closes itself inline, so nothing needs this stub.)
 
 // ==========================================================================
 // 4b. FITNESS ASSESSMENT (Phase 2 — Strength Profile Builder)
