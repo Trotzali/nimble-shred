@@ -1185,7 +1185,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec);">v90</span>
+        <span style="font-size:1.3em; color: var(--sec);">v91</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -1922,6 +1922,19 @@
                 Exercise <span id="warmup-progress">1/6</span>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- DAY EDITOR (Plan v2 Phase 2) -->
+<div class="modal-overlay" id="day-editor-modal">
+    <div class="modal-content" style="max-width:380px;">
+        <div class="modal-header">
+            <h2 id="day-editor-title">Day</h2>
+            <button class="modal-close" onclick="closeDayEditor()">✕</button>
+        </div>
+        <div id="day-editor-status" class="text-muted" style="margin-bottom:12px;"></div>
+        <div class="chip-container" id="day-editor-types"></div>
+        <button class="btn btn-main" id="day-editor-start" style="display:none; margin-top:14px;" onclick="closeDayEditor(); startTodaysWorkout();"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><polygon points="5 3 19 12 5 21 5 3"/></svg> Start this workout</button>
     </div>
 </div>
 
@@ -5821,7 +5834,7 @@ function renderPlanCalendar() {
         bubble.className = `day-bubble workout-type-${type}`;
         bubble.onclick = () => editDay(idx);
         
-        const icon = {push:IC.push,pull:IC.pull,legs:IC.legs,cardio:IC.cardio,nimble:IC.nimble,rest:IC.rest}[type] || IC.fire;
+        const icon = {push:IC.push,pull:IC.pull,legs:IC.legs,full:IC.fire,cardio:IC.cardio,nimble:IC.nimble,rest:IC.rest}[type] || IC.fire;
         const completed = isDayCompleted(idx);
         
         bubble.innerHTML = `
@@ -5838,14 +5851,46 @@ function renderPlanCalendar() {
     updateAiCoach(); // Update AI coach suggestions
 }
 
-function editDay(idx) {
-    const plan = appState.activePlan;
-    const types = ['rest','push','pull','legs','full','cardio','nimble'];
-    const current = types.indexOf(plan.schedule[idx]);
-    plan.schedule[idx] = types[(current + 1) % types.length];
+// Plan v2 Phase 2: tapping a pill/bubble opens the day editor instead of blind-cycling.
+// Shared handler — both surfaces (overview pills + calendar bubbles) already call editDay(idx).
+function editDay(idx) { openDayEditor(idx); }
+
+var _dayEditorIdx = null;
+function openDayEditor(idx) {
+    _dayEditorIdx = idx;
+    document.getElementById('day-editor-modal').classList.add('active');
+    renderDayEditor();
+}
+
+function renderDayEditor() {
+    var idx = _dayEditorIdx;
+    if (idx === null) return;
+    var dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    var type = appState.activePlan.schedule[idx] || 'rest';
+    var isToday = idx === new Date().getDay();
+    var done = isDayCompleted(idx);
+    document.getElementById('day-editor-title').textContent = dayNames[idx] + (isToday ? ' — Today' : '');
+    document.getElementById('day-editor-status').textContent =
+        done ? 'Completed ✓' : (type === 'rest' ? 'Rest day' : 'Scheduled: ' + typeLabel(type));
+    var tokens = ['rest','push','pull','legs','full','cardio','nimble'];
+    document.getElementById('day-editor-types').innerHTML = tokens.map(function(t) {
+        return '<div class="chip' + (t === type ? ' active' : '') + '" onclick="setDayType(' + idx + ', \'' + t + '\')">' + typeLabel(t) + '</div>';
+    }).join('');
+    var startBtn = document.getElementById('day-editor-start');
+    startBtn.style.display = (isToday && type !== 'rest' && !done) ? 'block' : 'none';
+}
+
+function setDayType(idx, token) {
+    appState.activePlan.schedule[idx] = token;
     saveAppState();
     renderPlanCalendar();
-    renderPlanOverview(); // keep the overview strip in sync when a day is edited from either surface (#9)
+    renderPlanOverview();
+    updateTodaysBanner();
+    renderDayEditor(); // sheet stays open with updated status; user closes explicitly
+}
+
+function closeDayEditor() {
+    document.getElementById('day-editor-modal').classList.remove('active');
 }
 
 function isDayCompleted(idx) {
