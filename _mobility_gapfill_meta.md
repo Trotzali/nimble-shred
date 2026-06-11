@@ -21,7 +21,7 @@ compound:        boolean         // DERIVED — see rule below
   `horizontalPush · verticalPush · horizontalPull · verticalPull · squat · hinge · lunge · carry · rotation · antiRotation · core · isometric · locomotion · plyometric · mobility`
   Per the brief, the gap-fill moves are **mostly `mobility`**; the **CARs / forearm-rotation drills are `rotation`** (controlled articular rotation).
 - **`laterality`** — `bilateral` (one midline structure / both limbs together), `unilateral` (one side at a time), `alternating` (sides trade rhythmically).
-- **`compound` — DERIVED, never hand-set:** `compound = (count of joints with jointLoad ≥ 2) ≥ 2`. i.e. *true* when two or more joints are meaningfully loaded; *false* for single-joint isolation/mobility. All 7 gap-fill moves are single-joint → **`compound: false`** (each loads exactly one joint at ≥2). The self-check should re-derive this alongside `strainScore`/`aggravates`.
+- **`compound` — DERIVED, never hand-set. CANONICAL RULE (T3's, enforced by the self-check):** `compound = (count of joints with jointLoad ≥ 1) ≥ 2`. i.e. *true* when the move loads two or more joints at all (any non-zero), *false* only when a single joint is involved. *(This supersedes an earlier draft of this pack that used `≥ 2 joints at load ≥ 2`; recomputed to the canonical rule so the rows pass T3's self-check at integration.)* Under the canonical rule **3 of the 7 are `true`** (Forearm Pronation-Supination, Elbow CARs, Terminal Knee Extension — each touches a second joint at load 1) and **4 are `false`** (the single-joint neck moves + the ankle move). The self-check re-derives this alongside `strainScore`/`aggravates`.
 
 > `strainScore = min(10, Σ of all 9 jointLoad)` and `aggravates = joints with load ≥ 2` (key order), exactly as v1.3.0 — recomputed below.
 
@@ -96,7 +96,7 @@ The 3 neck moves use **`cat: ["Neck"]`** — no neck category existed. Flagged f
     musclesTargeted: ["forearms", "biceps"],
     movementPattern: "rotation",
     laterality: "unilateral",
-    compound: false
+    compound: true
 },
 "Elbow CARs": {
     alternatives: ["Wrist Rocks", "Forearm Pronation-Supination"],
@@ -110,7 +110,7 @@ The 3 neck moves use **`cat: ["Neck"]`** — no neck category existed. Flagged f
     musclesTargeted: ["biceps", "triceps", "forearms"],
     movementPattern: "rotation",
     laterality: "unilateral",
-    compound: false
+    compound: true
 },
 "Terminal Knee Extension": {
     alternatives: ["Glute Bridge"],
@@ -124,7 +124,7 @@ The 3 neck moves use **`cat: ["Neck"]`** — no neck category existed. Flagged f
     musclesTargeted: ["quads"],
     movementPattern: "mobility",
     laterality: "unilateral",
-    compound: false
+    compound: true
 },
 "Banded Ankle Eversion-Inversion": {
     alternatives: ["Tibialis Raise"],
@@ -151,12 +151,12 @@ The 3 neck moves use **`cat: ["Neck"]`** — no neck category existed. Flagged f
 | 1 | Neck CARs | neck | rotation | reps | 2 | neck | End-range cervical rotation under head-weight only → neck **2** (rubric: end-range = 2); all else **0**. Aggravates neck by design — a maintenance drill, so the niggle feature correctly routes around it during an acute neck flare and serves Chin Tuck instead. |
 | 2 | Chin Tuck | neck | mobility | time | **1** | — | Mid-range gentle isometric, not end-range → neck **1**, nothing ≥2 → **no aggravates**. The one neck drill servable to a mildly stiff neck — the gentle first-line option. |
 | 3 | Upper-Trap & Levator Stretch | neck | mobility | time | 2 | neck | End-range cervical side-bend/rotation stretch → neck **2** (consistent with how deep static stretches like Couch Stretch score their target). Shoulder kept **0** (light hand assist, gravity-led). |
-| 4 | Forearm Pronation-Supination | elbow | rotation | reps | 3 | elbow | Radioulnar rotation, light/optional load → elbow **2** (the limiting joint, end-range rotation), wrist **1** (holds/rotates). The only forearm-rotation drill in the library. |
-| 5 | Elbow CARs | elbow | rotation | reps | 3 | elbow | Full end-range elbow flex/extend + forearm turn → elbow **2**, wrist **1**; upper arm braced so shoulder **0**. Restores the terminal extension pressing erodes. |
-| 6 | Terminal Knee Extension | knee | mobility | reps | 4 | knee | Terminal-range knee extension, light band → knee **2** (target/end-range), hip **1** + ankle **1** (standing stabilise). Single moderate joint → isolation, `compound:false`. |
-| 7 | Banded Ankle Eversion-Inversion | ankle | mobility | reps | **2** | ankle | Seated, shin still, light band → ankle **2** only; everything else **0**. Adds the loaded side-to-side ankle plane the existing ankle work skips. |
+| 4 | Forearm Pronation-Supination | elbow | rotation | reps | 3 | elbow | Radioulnar rotation, light/optional load → elbow **2** (the limiting joint, end-range rotation), wrist **1** (holds/rotates). Two joints loaded (elbow + wrist) → `compound:true`. The only forearm-rotation drill in the library. |
+| 5 | Elbow CARs | elbow | rotation | reps | 3 | elbow | Full end-range elbow flex/extend + forearm turn → elbow **2**, wrist **1**; upper arm braced so shoulder **0**. Two joints loaded → `compound:true`. Restores the terminal extension pressing erodes. |
+| 6 | Terminal Knee Extension | knee | mobility | reps | 4 | knee | Terminal-range knee extension, light band → knee **2** (target/end-range), hip **1** + ankle **1** (standing stabilise). Three joints loaded → `compound:true` under the canonical (≥1) rule. |
+| 7 | Banded Ankle Eversion-Inversion | ankle | mobility | reps | **2** | ankle | Seated, shin still, light band → ankle **2** only; everything else **0**. Single joint → `compound:false`. Adds the loaded side-to-side ankle plane the existing ankle work skips. |
 
-**Pack shape:** strain 1–4 (all low — these are joint-care drills, not conditioning). `movementPattern`: **rotation ×3** (the two CARs + forearm rotation), **mobility ×4** — matching the brief's "most = mobility, CARs = rotation/mobility". `laterality`: bilateral ×2 (the two midline neck activations), unilateral ×5. `compound`: false ×7 (all single-joint isolation by the derived rule). `bucket`: resilience ×7.
+**Pack shape:** strain 1–4 (all low — these are joint-care drills, not conditioning). `movementPattern`: **rotation ×3** (the two CARs + forearm rotation), **mobility ×4** — matching the brief's "most = mobility, CARs = rotation/mobility". `laterality`: bilateral ×2 (the two midline neck activations), unilateral ×5. `compound` (canonical rule, ≥2 joints at load ≥1): **true ×3** (Forearm Pronation-Supination, Elbow CARs, Terminal Knee Extension — each touches a second/third joint at load 1) · **false ×4** (the three single-joint neck moves + the single-joint ankle move). `bucket`: resilience ×7.
 
 **Integration checks (for whoever merges):**
 - All `alternatives` resolve to a confirmed `allExercises` name (`Wall Slides`, `Wrist Rocks`, `Glute Bridge`, `Tibialis Raise`) or a move in *this* pack (`Chin Tuck`, `Upper-Trap & Levator Stretch`, `Forearm Pronation-Supination`) — the self-check validates against `allExercises ∪ metadata keys`.
@@ -166,4 +166,4 @@ The 3 neck moves use **`cat: ["Neck"]`** — no neck category existed. Flagged f
 
 ---
 
-**Sign-off:** T2 — 2026-06-08 18:36
+**Sign-off:** T2 — 2026-06-11 13:24
