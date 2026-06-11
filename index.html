@@ -1185,7 +1185,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec);">v81</span>
+        <span style="font-size:1.3em; color: var(--sec);">v82</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -3018,6 +3018,24 @@ window.allExercises = [
         createEx("L-Sit (Tuck)", ["Nimble", "Core"], "Bodyweight", "Calisthenics", 
             ["Hands on floor/parallettes."], ["Press down.", "Lift butt and knees off floor."], ["Hold tuck."], ["Core compression."], ["Abs", "Hip Flexors"])
 ]; // END EXERCISE DATA
+</script>
+
+<!-- 3-pack integration (v82): defs load BEFORE the metadata self-check so it validates 202/202.
+     cardio + gapfill self-append via their own IIFEs; the guard below concats anything not yet
+     present (incl. the rehab pack, which does not self-append). 163 -> 202, no duplicates. -->
+<script src="cardio-hiit-exercises.js"></script>
+<script src="mobility-gapfill-exercises.js"></script>
+<script src="rehab-mobility-exercises.js"></script>
+<script>
+(function () {
+    var have = {};
+    window.allExercises.forEach(function (e) { have[e.name] = true; });
+    [].concat(window.cardioHiitExercises || [],
+              window.mobilityGapfillExercises || [],
+              window.rehabMobilityExercises || []).forEach(function (e) {
+        if (!have[e.name]) { window.allExercises.push(e); have[e.name] = true; }
+    });
+})();
 </script>
 
 <!-- Exercise metadata (window.exerciseMeta) — loaded AFTER allExercises, BEFORE app logic (Keystone Phase A) -->
@@ -7840,7 +7858,7 @@ async function generateFromConsultation() {
     var genPrompt = 'Based on our consultation, generate a training ' + (consultMode === 'workout' ? 'workout for today' : 'plan') + '.\n\n' +
         'CLIENT PROFILE:\n' + JSON.stringify(consultProfile, null, 2) + '\n\n' +
         'AVAILABLE EQUIPMENT TYPES: ' + equipmentList.join(', ') + '\n' +
-        'TOTAL EXERCISES IN DATABASE: ' + (window.allExercises ? window.allExercises.length : 164) + '\n\n';
+        'TOTAL EXERCISES IN DATABASE: ' + (window.allExercises ? window.allExercises.length : 202) + '\n\n';
     
     if (consultMode === 'plan') {
         genPrompt += 'Return ONLY valid JSON with this structure:\n' +

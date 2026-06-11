@@ -1,19 +1,26 @@
 // ============================================================================
-// NIMBLE SHRED — EXERCISE METADATA SUBSTRATE (v1.4.0)
+// NIMBLE SHRED — EXERCISE METADATA SUBSTRATE (v1.5.0)
 // ============================================================================
 // Standalone data layer for pain-aware exercise swapping ("train around a
 // niggle"), prehab/rehab programming, set-logging UX, training-bucket /
 // equipment filtering, and SELECTION-ENGINE programming. NOT yet loaded by
 // index.html — prep substrate.
 //
-// COVERAGE: 177 entries = the 163 canonical exercises in window.allExercises
-// (index.html v60) + 14 staged Cardio/HIIT moves (cardio-hiit-exercises.js,
-// not yet in window.allExercises — see self-check "staged" note).
+// COVERAGE: 202 entries = the 163 canonical exercises in window.allExercises
+// (index.html v60) + three staged packs not yet in window.allExercises:
+// 14 Cardio/HIIT (cardio-hiit-exercises.js), 7 mobility gap-fill
+// (mobility-gapfill-exercises.js), 18 rehab/mobility (rehab-mobility-exercises.js).
+// They all land together in the integration build — see self-check "staged" note.
 //
 // v1.4.0 — SELECTION-ENGINE FIELDS. Adds movementPattern, laterality, compound
 // so a workout builder can balance push/pull, pick unilateral correctives, and
 // distinguish compound from isolation work. jointLoad/strainScore/aggravates and
 // all other fields are unchanged from v1.3.0 (the dense 9-joint pass).
+//
+// v1.5.0 — PACK MERGE. Appends the 7 mobility gap-fill + 18 rehab/mobility rows
+// (177 -> 202, all bucket:"resilience"). Adds a rehabCategory vocabulary guard
+// to the self-check (12 values incl. neck-prehab/elbow-prehab). No existing
+// v1.4.0 row is changed.
 //
 // SCHEMA — window.exerciseMeta[exerciseName] = {
 //
@@ -22,7 +29,9 @@
 //                                 0 = spared .. 3 = primary high load (dense, all 9).
 //   strainScore: number (0-10)    DERIVED = min(10, sum of jointLoad).
 //   aggravates: string[]          DERIVED = joints with load >= 2, in key order.
-//   rehabCategory: string | null
+//   rehabCategory: string | null  (12-term vocab: {shoulder,hip,adductor,knee,
+//       ankle,wrist,neck,elbow}-prehab, hip-mobility, spine-mobility,
+//       core-stability, movement-prep)
 //   logMode: "weight_reps" | "reps" | "time" | "distance"
 //   bucket: "strength" | "power" | "resilience" | "cardio"
 //   equipmentNorm: "bodyweight" | "dumbbell" | "cable" | "gym/machines"
@@ -2532,6 +2541,360 @@ window.exerciseMeta = {
         movementPattern: "locomotion",
         laterality: "bilateral",
         compound: true
+    },
+
+    // ===== MOBILITY GAP-FILL PACK (7 rows, v1.5.0 merge) =====
+    "Neck CARs": {
+        alternatives: ["Chin Tuck", "Upper-Trap & Levator Stretch"],
+        jointLoad: { neck: 2, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 2,
+        aggravates: ["neck"],
+        rehabCategory: "neck-prehab",
+        logMode: "reps",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["neck", "traps"],
+        movementPattern: "rotation",
+        laterality: "bilateral",
+        compound: false
+    },
+    "Chin Tuck": {
+        alternatives: ["Wall Slides"],
+        jointLoad: { neck: 1, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 1,
+        aggravates: [],
+        rehabCategory: "neck-prehab",
+        logMode: "time",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["neck"],
+        movementPattern: "mobility",
+        laterality: "bilateral",
+        compound: false
+    },
+    "Upper-Trap & Levator Stretch": {
+        alternatives: ["Chin Tuck"],
+        jointLoad: { neck: 2, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 2,
+        aggravates: ["neck"],
+        rehabCategory: "neck-prehab",
+        logMode: "time",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["traps", "neck"],
+        movementPattern: "mobility",
+        laterality: "unilateral",
+        compound: false
+    },
+    "Forearm Pronation-Supination": {
+        alternatives: ["Wrist Rocks"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 2, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 3,
+        aggravates: ["elbow"],
+        rehabCategory: "elbow-prehab",
+        logMode: "reps",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["forearms", "biceps"],
+        movementPattern: "rotation",
+        laterality: "unilateral",
+        compound: true
+    },
+    "Elbow CARs": {
+        alternatives: ["Wrist Rocks", "Forearm Pronation-Supination"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 2, wrist: 1, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 3,
+        aggravates: ["elbow"],
+        rehabCategory: "elbow-prehab",
+        logMode: "reps",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["biceps", "triceps", "forearms"],
+        movementPattern: "rotation",
+        laterality: "unilateral",
+        compound: true
+    },
+    "Terminal Knee Extension": {
+        alternatives: ["Glute Bridge"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 1, knee: 2, ankle: 1 },
+        strainScore: 4,
+        aggravates: ["knee"],
+        rehabCategory: "knee-prehab",
+        logMode: "reps",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["quads"],
+        movementPattern: "mobility",
+        laterality: "unilateral",
+        compound: true
+    },
+    "Banded Ankle Eversion-Inversion": {
+        alternatives: ["Tibialis Raise"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 2 },
+        strainScore: 2,
+        aggravates: ["ankle"],
+        rehabCategory: "ankle-prehab",
+        logMode: "reps",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["tibialis", "calves"],
+        movementPattern: "mobility",
+        laterality: "unilateral",
+        compound: false
+    },
+
+    // ===== REHAB/MOBILITY PACK (18 rows, v1.5.0 merge) =====
+    "Arm Circles": {
+        alternatives: ["Shoulder Dislocates", "Wall Slides"],
+        jointLoad: { neck: 0, shoulder: 1, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 1,
+        aggravates: [],
+        rehabCategory: "shoulder-prehab",
+        logMode: "time",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["frontDelts", "sideDelts", "rearDelts", "rotatorCuff"],
+        movementPattern: "mobility",
+        laterality: "bilateral",
+        compound: false
+    },
+    "Prone Y-T-W Raise": {
+        alternatives: ["Wall Slides", "Scapular Push-up"],
+        jointLoad: { neck: 0, shoulder: 2, elbow: 0, wrist: 0, tSpine: 1, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 3,
+        aggravates: ["shoulder"],
+        rehabCategory: "shoulder-prehab",
+        logMode: "reps",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["traps", "rearDelts", "rhomboids"],
+        movementPattern: "isolation",
+        laterality: "bilateral",
+        compound: true
+    },
+    "Sleeper Stretch": {
+        alternatives: ["Wall Slides", "Cable External Rotation"],
+        jointLoad: { neck: 0, shoulder: 2, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 2,
+        aggravates: ["shoulder"],
+        rehabCategory: "shoulder-prehab",
+        logMode: "time",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["rotatorCuff", "rearDelts"],
+        movementPattern: "mobility",
+        laterality: "unilateral",
+        compound: false
+    },
+    "Thread the Needle": {
+        alternatives: ["Open Book Stretch", "Cat-Cow"],
+        jointLoad: { neck: 0, shoulder: 1, elbow: 0, wrist: 1, tSpine: 2, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 4,
+        aggravates: ["tSpine"],
+        rehabCategory: "spine-mobility",
+        logMode: "time",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["lowerBack", "rhomboids", "rearDelts"],
+        movementPattern: "mobility",
+        laterality: "unilateral",
+        compound: true
+    },
+    "Open Book Stretch": {
+        alternatives: ["Thread the Needle", "Quadruped Thoracic Rotation"],
+        jointLoad: { neck: 0, shoulder: 1, elbow: 0, wrist: 0, tSpine: 2, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 3,
+        aggravates: ["tSpine"],
+        rehabCategory: "spine-mobility",
+        logMode: "time",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["lowerBack", "chest", "obliques"],
+        movementPattern: "mobility",
+        laterality: "unilateral",
+        compound: true
+    },
+    "Quadruped Thoracic Rotation": {
+        alternatives: ["Open Book Stretch", "Thread the Needle"],
+        jointLoad: { neck: 0, shoulder: 1, elbow: 0, wrist: 1, tSpine: 2, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 4,
+        aggravates: ["tSpine"],
+        rehabCategory: "spine-mobility",
+        logMode: "reps",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["lowerBack", "obliques"],
+        movementPattern: "rotation",
+        laterality: "unilateral",
+        compound: true
+    },
+    "Pigeon Pose": {
+        alternatives: ["90/90 Hip Switch", "Standing Hip CARs"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 1, hip: 2, knee: 1, ankle: 0 },
+        strainScore: 4,
+        aggravates: ["hip"],
+        rehabCategory: "hip-mobility",
+        logMode: "time",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["glutes", "hipFlexors"],
+        movementPattern: "mobility",
+        laterality: "unilateral",
+        compound: true
+    },
+    "Frog Stretch": {
+        alternatives: ["Cossack Squat", "Deep Squat Hold"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 1, hip: 2, knee: 1, ankle: 0 },
+        strainScore: 4,
+        aggravates: ["hip"],
+        rehabCategory: "hip-mobility",
+        logMode: "time",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["adductors", "hipFlexors"],
+        movementPattern: "mobility",
+        laterality: "bilateral",
+        compound: true
+    },
+    "Standing Hip CARs": {
+        alternatives: ["90/90 Hip Switch", "World's Greatest Stretch"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 2, knee: 1, ankle: 1 },
+        strainScore: 4,
+        aggravates: ["hip"],
+        rehabCategory: "hip-mobility",
+        logMode: "reps",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["hipFlexors", "glutes", "adductors"],
+        movementPattern: "rotation",
+        laterality: "unilateral",
+        compound: true
+    },
+    "Reverse Nordic Curl": {
+        alternatives: ["Couch Stretch", "ATG Split Squat"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 1, knee: 2, ankle: 0 },
+        strainScore: 3,
+        aggravates: ["knee"],
+        rehabCategory: "knee-prehab",
+        logMode: "reps",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["quads", "hipFlexors"],
+        movementPattern: "mobility",
+        laterality: "bilateral",
+        compound: true
+    },
+    "Eccentric Step Down": {
+        alternatives: ["Glute Bridge", "DB Step Up"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 1, knee: 2, ankle: 1 },
+        strainScore: 4,
+        aggravates: ["knee"],
+        rehabCategory: "knee-prehab",
+        logMode: "reps",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["quads", "glutes"],
+        movementPattern: "lunge",
+        laterality: "unilateral",
+        compound: true
+    },
+    "Knee-to-Wall Ankle Rock": {
+        alternatives: ["Ankle Alphabet", "Deep Squat Hold"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 0, knee: 1, ankle: 2 },
+        strainScore: 3,
+        aggravates: ["ankle"],
+        rehabCategory: "ankle-prehab",
+        logMode: "reps",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["calves", "tibialis"],
+        movementPattern: "mobility",
+        laterality: "unilateral",
+        compound: true
+    },
+    "Ankle Alphabet": {
+        alternatives: ["Knee-to-Wall Ankle Rock", "Tibialis Raise"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 1 },
+        strainScore: 1,
+        aggravates: [],
+        rehabCategory: "ankle-prehab",
+        logMode: "reps",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["calves", "tibialis"],
+        movementPattern: "mobility",
+        laterality: "unilateral",
+        compound: false
+    },
+    "Child's Pose": {
+        alternatives: ["Cat-Cow", "Dead Hang"],
+        jointLoad: { neck: 0, shoulder: 1, elbow: 0, wrist: 0, tSpine: 0, lowBack: 1, hip: 1, knee: 1, ankle: 0 },
+        strainScore: 4,
+        aggravates: [],
+        rehabCategory: "spine-mobility",
+        logMode: "time",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["lowerBack", "lats"],
+        movementPattern: "mobility",
+        laterality: "bilateral",
+        compound: true
+    },
+    "McGill Curl-Up": {
+        alternatives: ["Dead Bug", "Bird Dog"],
+        jointLoad: { neck: 1, shoulder: 0, elbow: 0, wrist: 0, tSpine: 0, lowBack: 1, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 2,
+        aggravates: [],
+        rehabCategory: "core-stability",
+        logMode: "reps",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["abs", "obliques"],
+        movementPattern: "anti-extension",
+        laterality: "bilateral",
+        compound: true
+    },
+    "Prone Press-Up": {
+        alternatives: ["Cat-Cow", "Thoracic Extension"],
+        jointLoad: { neck: 0, shoulder: 1, elbow: 1, wrist: 1, tSpine: 0, lowBack: 2, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 5,
+        aggravates: ["lowBack"],
+        rehabCategory: "spine-mobility",
+        logMode: "reps",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["lowerBack"],
+        movementPattern: "mobility",
+        laterality: "bilateral",
+        compound: true
+    },
+    "Wrist Flexor Stretch": {
+        alternatives: ["Wrist Extensor Stretch", "Wrist Rocks"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 1, wrist: 2, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 3,
+        aggravates: ["wrist"],
+        rehabCategory: "wrist-prehab",
+        logMode: "time",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["forearms"],
+        movementPattern: "mobility",
+        laterality: "unilateral",
+        compound: true
+    },
+    "Wrist Extensor Stretch": {
+        alternatives: ["Wrist Flexor Stretch", "Wrist Rocks"],
+        jointLoad: { neck: 0, shoulder: 0, elbow: 1, wrist: 2, tSpine: 0, lowBack: 0, hip: 0, knee: 0, ankle: 0 },
+        strainScore: 3,
+        aggravates: ["wrist"],
+        rehabCategory: "wrist-prehab",
+        logMode: "time",
+        bucket: "resilience",
+        equipmentNorm: "bodyweight",
+        musclesTargeted: ["forearms"],
+        movementPattern: "mobility",
+        laterality: "unilateral",
+        compound: true
     }
 };
 
@@ -2540,7 +2903,7 @@ window.exerciseMeta = {
 //  - app exercises with no metadata,
 //  - INCOMPLETE/inconsistent 9-joint scores (strainScore/aggravates drift),
 //  - out-of-vocabulary field values (logMode/bucket/equipmentNorm/muscle/
-//    movementPattern/laterality),
+//    movementPattern/laterality/rehabCategory),
 //  - compound not matching the derived rule (>=2 joints with load >=1),
 //  - unresolvable alternatives.
 // Staged entries (metadata ahead of the app) are reported as info, not errors.
@@ -2558,6 +2921,7 @@ window.exerciseMeta = {
         var PAT = ['push-horizontal', 'push-vertical', 'pull-horizontal', 'pull-vertical', 'squat', 'hinge',
             'lunge', 'carry', 'rotation', 'anti-rotation', 'anti-extension', 'locomotion', 'isolation', 'mobility'];
         var LAT = ['bilateral', 'unilateral', 'alternating'];
+        var REHAB = ['shoulder-prehab', 'hip-prehab', 'adductor-prehab', 'knee-prehab', 'ankle-prehab', 'wrist-prehab', 'neck-prehab', 'elbow-prehab', 'hip-mobility', 'spine-mobility', 'core-stability', 'movement-prep'];
         var names = window.allExercises.map(function (e) { return e.name; });
         var metaKeys = Object.keys(window.exerciseMeta);
         var known = {};
@@ -2589,6 +2953,7 @@ window.exerciseMeta = {
             if (EQ.indexOf(m.equipmentNorm) === -1) badEnums.push(n + ' equipmentNorm=' + m.equipmentNorm);
             if (PAT.indexOf(m.movementPattern) === -1) badEnums.push(n + ' movementPattern=' + m.movementPattern);
             if (LAT.indexOf(m.laterality) === -1) badEnums.push(n + ' laterality=' + m.laterality);
+            if (m.rehabCategory !== null && REHAB.indexOf(m.rehabCategory) === -1) badEnums.push(n + ' rehabCategory=' + m.rehabCategory);
             if (typeof m.compound !== 'boolean') badEnums.push(n + ' compound not boolean');
             if (!m.musclesTargeted || !m.musclesTargeted.length) badEnums.push(n + ' musclesTargeted empty');
             else m.musclesTargeted.forEach(function (x) { if (MV.indexOf(x) === -1) badEnums.push(n + ' muscle=' + x); });
