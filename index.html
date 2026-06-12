@@ -97,18 +97,19 @@
         .row-wrap { display: flex; gap: 10px; flex-wrap: wrap; }
         
         /* NAVIGATION */
-        .nav-bar { 
-            position: fixed; bottom: 0; left: 0; right: 0; 
-            background: #1a1a1a; display: flex; justify-content: space-around; 
-            padding: 12px 8px; border-top: 1px solid #333; z-index: 9000; 
-            padding-bottom: max(12px, env(safe-area-inset-bottom));
+        .nav-bar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: var(--surface); display: flex; justify-content: space-around;
+            padding: 8px 8px; border-top: 1px solid var(--border); z-index: 9000;
+            padding-bottom: max(8px, env(safe-area-inset-bottom));
         }
-        .nav-btn { 
-            background: none; color: #777; border: none; font-size: 0.7em; 
-            display: flex; flex-direction: column; align-items: center; 
-            gap: 3px; cursor: pointer; padding: 5px; transition: 0.2s; flex: 1;
+        .nav-btn {
+            background: none; color: var(--text-muted); border: none; font-size: 0.7em;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 3px; cursor: pointer; padding: 6px 4px; min-height: 48px; transition: color 0.2s; flex: 1;
         }
-        .nav-btn.active { color: var(--sec); }
+        .nav-btn:hover { color: #aaa; }
+        .nav-btn.active { color: var(--accent); }
         .nav-icon { font-size: 1.4em; display: flex; align-items: center; justify-content: center; height: 24px; }
         .nav-icon svg { flex-shrink: 0; }
         
@@ -1187,7 +1188,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec);">v95</span>
+        <span style="font-size:1.3em; color: var(--sec);">v96</span>
     </div>
     
     <div class="card" id="quickstart-panel">
