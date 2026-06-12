@@ -65,21 +65,24 @@
         }
         
         /* BUTTONS */
-        .btn { 
-            display: block; width: 100%; padding: 14px; border: none; 
-            border-radius: 10px; font-weight: 600; cursor: pointer; 
-            margin-top: 8px; font-size: 15px; transition: all 0.2s;
-            text-align: center;
+        .btn {
+            display: block; width: 100%; min-height: 48px; padding: 14px;
+            border: 1.5px solid transparent; border-radius: 10px; font-weight: 600;
+            cursor: pointer; margin-top: 8px; font-size: 15px; transition: all 0.15s; text-align: center;
         }
-        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn:hover { filter: brightness(1.08); }       /* fills brighten; ghost overridden below */
         .btn:active { transform: scale(0.98); }
-        .btn-main { background: var(--sec); color: #000; }
-        .btn-action { background: var(--primary); color: #000; }
+        .btn-main { background: var(--accent); color: #000; }                 /* PRIMARY (fill) */
+        .btn-action { background: transparent; color: var(--text);            /* SECONDARY (ghost) */
+                      border-color: rgba(255,255,255,0.18); }
+        .btn-action:hover { filter: none; background: var(--accent-weak);
+                            border-color: var(--accent); color: var(--accent); }
         .btn-danger { background: var(--danger); color: #fff; }
         .btn-success { background: var(--success); color: #fff; }
-        .btn-small { 
-            padding: 10px 16px; font-size: 0.85em; width: auto; 
-            display: inline-block; margin: 4px 0; border-radius: 10px;
+        .btn-small {
+            width: auto; min-height: 44px; padding: 10px 16px; font-size: 0.85em;
+            display: inline-flex; align-items: center; justify-content: center;
+            margin: 4px 0; border-radius: 10px;
         }
         
         /* INPUTS */
@@ -1189,7 +1192,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec);">v97</span>
+        <span style="font-size:1.3em; color: var(--sec);">v98</span>
     </div>
     
     <div class="card" id="quickstart-panel">
