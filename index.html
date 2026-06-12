@@ -1192,7 +1192,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec);">v98</span>
+        <span style="font-size:1.3em; color: var(--sec);">v99</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -3126,7 +3126,8 @@ let appState = {
     qsType: null, // Quick Start selected workout type (B-1 decouple); null -> engine default 'full'
     qsFocus: null, // Quick Start selected focus bucket (B-2); null -> no bucket filter
     niggleJoints: [], // B7: raw jointLoad keys flagged at check-in; read live by niggleSafe
-    niggleSetAt: null // B7: ISO date the flags were set (3-day load-time expiry backstop)
+    niggleSetAt: null, // B7: ISO date the flags were set (3-day load-time expiry backstop)
+    adherence: { skipped: {}, overrides: {}, lastPrompt: null } // PA-1: effective-type overrides + skip log (silent; PA-2 adds detection/prompt)
 };
 
 // ========================================
@@ -6061,6 +6062,13 @@ function focusQuickStart() {
     if (qs) qs.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+// PA-1: effective session type for a date — an adherence override (catch-up/swap)
+// supersedes the recurring weekly template. No override -> identical to schedule.
+function getEffectiveType(date, dayIdx) {
+    var ov = appState.adherence && appState.adherence.overrides;
+    return (ov && ov[date]) || appState.activePlan.schedule[dayIdx];
+}
+
 function updateTodaysBanner() {
     const banner = document.getElementById('todays-banner');
     if (!banner) return;
@@ -6068,7 +6076,7 @@ function updateTodaysBanner() {
     const plan = appState.activePlan;
     const today = new Date();
     const dayIdx = today.getDay();
-    const type = plan.schedule[dayIdx];
+    const type = getEffectiveType(getDateForDay(dayIdx), dayIdx);
     const dateStr = today.toLocaleDateString('en-US', {weekday:'long', month:'short', day:'numeric'});
     const calIcon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>';
     const playIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
@@ -6106,7 +6114,7 @@ function updateTodaysBanner() {
 
 function startTodaysWorkout() {
     const dayIdx = new Date().getDay();
-    const type = appState.activePlan.schedule[dayIdx];
+    const type = getEffectiveType(getDateForDay(dayIdx), dayIdx);
     quickStartWorkout(type);
 }
 
@@ -7711,6 +7719,7 @@ async function saveHistoryToCloud() {
         const payload = {
             exerciseHistory: JSON.parse(localStorage.getItem('exerciseHistory') || '{}'),
             completedWorkouts: JSON.parse(localStorage.getItem('completedWorkouts') || '{}'),
+            adherence: appState.adherence || { skipped: {}, overrides: {}, lastPrompt: null }, // PA-1: sync overrides/skips
             savedAt: new Date().toISOString()
         };
         const { error } = await supabaseClient.from('user_settings').upsert(
@@ -7753,6 +7762,15 @@ async function loadFromCloud() {
                 if (cloudBlob.completedWorkouts) localStorage.setItem('completedWorkouts', JSON.stringify(cloudBlob.completedWorkouts));
                 console.log('📥 Restored ' + cloudSets + ' sets from cloud (local had ' + localSets + ')');
             }
+        }
+
+        // PA-1: merge adherence (overrides/skips) from the cloud blob — additive, never clobbers local
+        if (cloudBlob && cloudBlob.adherence) {
+            appState.adherence = appState.adherence || { skipped: {}, overrides: {}, lastPrompt: null };
+            Object.assign(appState.adherence.skipped, cloudBlob.adherence.skipped || {});
+            Object.assign(appState.adherence.overrides, cloudBlob.adherence.overrides || {});
+            if (cloudBlob.adherence.lastPrompt) appState.adherence.lastPrompt = cloudBlob.adherence.lastPrompt;
+            saveAppState();
         }
 
         // Plan: restore into currentPlan + appState.activePlan (the keys the
