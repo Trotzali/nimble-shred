@@ -67,8 +67,8 @@
         .container { max-width: 800px; margin: 0 auto; display: none; }
         .container.active { display: block; }
         .card {
-            background: var(--surface); padding: 18px; border-radius: var(--radius);
-            margin-bottom: 14px; border: 1px solid var(--border);
+            background: var(--card); padding: 18px; border-radius: 16px;
+            margin-bottom: 14px; border: 1px solid var(--line);
             /* P3: box-shadow removed — flat, single hairline border */
         }
         /* D2 hero retoken: teal-graphite gradient is set inline on #todays-banner; this adds the soft radial teal glow (top-right), clipped and kept behind the content. */
@@ -105,7 +105,7 @@
         
         /* INPUTS */
         input, select, textarea {
-            width: 100%; min-height: 48px; padding: 12px; background: #2c2c2c;
+            width: 100%; min-height: 48px; padding: 12px; background: var(--surface-2);
             border: 1.5px solid var(--border); border-radius: 8px; color: #fff; font-size: 16px;
             margin: 5px 0; transition: border-color 0.15s, box-shadow 0.15s;
         }
@@ -121,8 +121,8 @@
         /* NAVIGATION */
         .nav-bar {
             position: fixed; bottom: 0; left: 0; right: 0;
-            background: var(--surface); display: flex; justify-content: space-around;
-            padding: 8px 8px; border-top: 1px solid var(--border); z-index: 9000;
+            background: rgba(15,16,17,.96); display: flex; justify-content: space-around;
+            padding: 8px 8px; border-top: 1px solid var(--line); z-index: 9000;
             padding-bottom: max(8px, env(safe-area-inset-bottom));
         }
         .nav-btn {
@@ -161,8 +161,8 @@
             display: flex; justify-content: space-between;
         }
         .set-active { 
-            background: #2c2c2c; padding: 12px; border-radius: 6px; 
-            border: 2px solid var(--sec); margin: 8px 0; 
+            background: var(--surface-2); padding: 12px; border-radius: 6px;
+            border: 2px solid var(--sec); margin: 8px 0;
             box-shadow: 0 0 10px rgba(3,218,198,0.2);
         }
         .progression-badge {
@@ -176,9 +176,9 @@
             gap: 8px; margin: 15px 0; 
         }
         .day-bubble { 
-            background: #333; aspect-ratio: 1; border-radius: 12px; 
+            background: var(--surface-2); aspect-ratio: 1; border-radius: 12px;
             display: flex; flex-direction: column; align-items: center; 
-            justify-content: center; cursor: pointer; border: 2px solid #444; 
+            justify-content: center; cursor: pointer; border: 2px solid var(--line2);
             padding: 8px; position: relative; transition: all 0.3s;
         }
         .day-bubble:hover { transform: translateY(-2px); }
@@ -234,7 +234,7 @@
         /* ENCYCLOPEDIA */
         .encyclopedia-section { 
             margin: 15px 0; padding: 15px; 
-            background: #1a1a1a; border-radius: 8px; 
+            background: var(--card); border-radius: 8px;
         }
         .encyclopedia-section h4 { 
             color: var(--sec); margin-bottom: 8px; 
@@ -253,10 +253,10 @@
             font-size: 0.75em; margin: 3px; font-weight: bold;
         }
         .gif-container { 
-            background: #000; border-radius: 8px; padding: 15px; 
+            background: var(--bg); border-radius: 8px; padding: 15px;
             margin: 15px 0; text-align: center; min-height: 200px;
             display: flex; align-items: center; justify-content: center;
-            border: 2px solid #333;
+            border: 2px solid var(--line);
         }
         .gif-container img { 
             max-width: 100%; max-height: 300px; 
@@ -290,7 +290,7 @@
         /* SLIDER */
         input[type="range"] {
             width: 100%; height: 8px; min-height: auto; padding: 0; margin: 10px 0;
-            border: none; border-radius: 5px; background: #333; outline: none; -webkit-appearance: none;
+            border: none; border-radius: 5px; background: var(--surface-2); outline: none; -webkit-appearance: none;
         }
         input[type="range"]::-webkit-slider-thumb { 
             -webkit-appearance: none; width: 20px; height: 20px; 
@@ -1234,7 +1234,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v110</span>
+        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v111</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -1958,7 +1958,7 @@
         </div>
         <div id="warmup-content">
             <div class="warmup-timer" id="warmup-timer">60</div>
-            <div id="warmup-gif-container" style="text-align:center; margin-bottom:10px; border-radius:12px; overflow:hidden; background:#000; display:none;">
+            <div id="warmup-gif-container" style="text-align:center; margin-bottom:10px; border-radius:12px; overflow:hidden; background:var(--bg); display:none;">
                 <img id="warmup-gif" src="" alt="" style="max-width:100%; max-height:220px; object-fit:contain; border-radius:12px;">
             </div>
             <div class="warmup-exercise" id="warmup-current-exercise">
@@ -4060,7 +4060,7 @@ function renderWorkout(exercises) {
         var media = getExerciseMedia(ex.name);
         var gifHtml = '';
         if (media && media.gif) {
-            gifHtml = '<div style="text-align:center; margin-bottom:12px; border-radius:10px; overflow:hidden; background:#000;">' +
+            gifHtml = '<div style="text-align:center; margin-bottom:12px; border-radius:10px; overflow:hidden; background:var(--bg);">' +
                 '<img src="' + media.gif + '" alt="' + ex.name + '" style="max-width:100%; max-height:250px; object-fit:contain; border-radius:10px;"' + (media.altGif ? ' data-altsrc="' + media.altGif + '"' : '') + ' onerror="gifErr(this)">' +
                 '</div>';
         }
@@ -6368,7 +6368,7 @@ function viewExerciseDetails(name) {
     let mediaHtml = '';
     if (gifUrl) {
         mediaHtml = `
-            <div class="gif-container" style="margin-bottom:12px; border-radius:12px; overflow:hidden; background:#000; text-align:center;">
+            <div class="gif-container" style="margin-bottom:12px; border-radius:12px; overflow:hidden; background:var(--bg); text-align:center;">
                 <img src="${gifUrl}" alt="${ex.name}" style="max-width:100%; max-height:300px; object-fit:contain; border-radius:12px;"
                     data-altsrc="${gifAlt}" onerror="gifErr(this)">
             </div>
