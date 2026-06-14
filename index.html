@@ -1216,7 +1216,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec);">v101</span>
+        <span style="font-size:1.3em; color: var(--sec);">v102</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -4038,7 +4038,7 @@ function renderWorkout(exercises) {
         var gifHtml = '';
         if (media && media.gif) {
             gifHtml = '<div style="text-align:center; margin-bottom:12px; border-radius:10px; overflow:hidden; background:#000;">' +
-                '<img src="' + media.gif + '" alt="' + ex.name + '" style="max-width:100%; max-height:250px; object-fit:contain; border-radius:10px;" onerror="this.parentElement.style.display=\'none\'">' +
+                '<img src="' + media.gif + '" alt="' + ex.name + '" style="max-width:100%; max-height:250px; object-fit:contain; border-radius:10px;"' + (media.altGif ? ' data-altsrc="' + media.altGif + '"' : '') + ' onerror="gifErr(this)">' +
                 '</div>';
         }
         
@@ -6163,13 +6163,94 @@ const mediaAliases = {
     "Push-up Plus": "Push-up"
 };
 
-function getExerciseMedia(name) {
+// -- Self-hosted media (Phase B): signed URLs from the PRIVATE 'exercise-gifs' bucket --
+// Reuses the existing Supabase client (no new keys/client). The slug is built from the
+// alias-resolved canonical name; hosted/alias files mint a cached signed URL; everything
+// else (the 4 outstanding + any non-hosted exercise) stays on its existing source.
+function slug(name) {
+    return String(name).toLowerCase().replace(/'/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+var MEDIA_BUCKET = 'exercise-gifs';
+var ALIAS_MAP = {
+    'atg-split-squat': 'bulgarian-split-squat.gif', 'beast-reach': 'bear-crawl.gif',
+    'cable-curl-behind-back': 'cable-bicep-curl.gif', 'cable-french-press': 'overhead-cable-extension.gif',
+    'cable-front-squat': 'cable-squat.gif', 'cable-hip-abduction-standing': 'cable-abductor.gif',
+    'cable-hip-adduction-standing': 'cable-adductor.gif', 'cable-zercher-squat': 'cable-squat.gif',
+    'deep-squat-hold': 'bodyweight-squat.gif', 'eccentric-step-down': 'step-up.gif',
+    'elbow-cars': 'forearm-pronation-supination.gif', 'fast-feet-shuffle': 'lateral-shuffle.gif',
+    'horse-stance-hold': 'sumo-squat-db.gif', 'knee-to-wall-ankle-rock': 'tibialis-raise.gif',
+    'march-in-place': 'high-knees.gif', 'no-jump-burpee': 'burpees.gif',
+    'quadruped-thoracic-rotation': 'thread-the-needle.gif', 'reverse-nordic-curl': 'couch-stretch.gif',
+    'shadow-boxing': 'jumping-jacks.gif', 'sleeper-stretch': 'cable-internal-rotation.gif',
+    'slow-mountain-climber': 'mountain-climbers.gif', 'step-touch': 'lateral-shuffle.gif',
+    'wrist-rocks': 'wrist-flexor-stretch.gif'
+};
+var HOSTED_SLUGS = new Set(['a-skips','ankle-alphabet','arm-circles','arnold-press','banded-ankle-eversion-inversion','bear-crawl','bench-dip','bicycle-crunch','bird-dog','bodyweight-squat','box-jump','bulgarian-split-squat','burpees','cable-abductor','cable-adductor','cable-bicep-curl','cable-calf-raise','cable-chest-fly-high','cable-chest-fly-low','cable-chest-fly-mid','cable-chest-press','cable-crossover','cable-crunch','cable-donkey-kick','cable-external-rotation','cable-front-raise','cable-hammer-curl','cable-internal-rotation','cable-kickback','cable-kickback-glute','cable-lateral-raise','cable-lunge','cable-overhead-press','cable-pull-through','cable-pullover-bench','cable-rdl','cable-rear-delt-fly','cable-reverse-wrist-curl','cable-row-wide-grip','cable-shrugs','cable-side-bend','cable-squat','cable-upright-row','cable-wrist-curl','cable-y-raise','calf-raise-bw','cat-cow-stretch','childs-pose','chin-tuck','chin-ups','close-grip-push-up','concentration-curl','cossack-squat','couch-stretch','crab-walk','curtsy-lunge','db-floor-press','dead-bug','dead-hang','decline-push-up','diamond-push-up','dips','dot-drill','duck-walk','dumbbell-bench-press','dumbbell-curl','dumbbell-fly','dumbbell-incline-press','dumbbell-lunge','dumbbell-pullover','dumbbell-row','dumbbell-shoulder-press','dumbbell-shrug','face-pulls','farmers-walk','flutter-kicks','forearm-pronation-supination','frog-stretch','front-raise','glute-bridge','goblet-squat','good-morning','hammer-curl','handstand-hold','high-knees','high-row-rope','inchworm','incline-push-up','inverted-row','jefferson-curl','jump-squat','jumping-jacks','jumping-lunge','kick-through','l-sit','lat-pulldown-standing','lateral-bounds','lateral-raise','lateral-shuffle','leg-raise','low-step-up-fast','lu-raise','lunge-bw','lying-cable-curl','mcgill-curl-up','mountain-climbers','neck-cars','nordic-curl','open-book-stretch','overhead-cable-extension','pallof-press','pigeon-pose','pike-push-up','pistol-squat','plank','plank-jack','plate-pinch','pogo-hops','pop-squat','powell-raise','prone-press-up','prone-y-t-w-raise','pull-up','push-up','renegade-row','reverse-crunch','reverse-grip-pushdown','reverse-lunge-to-knee-drive','reverse-plank','romanian-deadlift-dumbbell','russian-twist','scapular-push-up','scorpion-stretch','seated-cable-row','seated-calf-raise','shoulder-dislocates','side-lunge','side-plank','single-arm-cable-chest-press','single-arm-cable-row','single-leg-glute-bridge','single-leg-rdl','skater-hops','skull-crusher','squat-to-calf-raise','standing-cable-crunch','standing-cable-row','standing-hip-cars','standing-knee-to-elbow','standing-oblique-twist','step-up','straight-arm-pulldown','sumo-squat-db','superman','svend-press','swimmers','thoracic-bridge','thoracic-extension','thread-the-needle','tibialis-raise','toe-touch','tricep-kickback','tricep-pushdown-bar','tricep-pushdown-rope','tuck-jumps','upper-trap-levator-stretch','v-up','wall-slides','wide-grip-push-up','woodchopper-high-to-low','woodchopper-low-to-high','worlds-greatest-stretch','wrist-extensor-stretch','wrist-flexor-stretch','zottman-curl']);
+var signedGifCache = {};   // file -> { url, exp }
+var _signingInFlight = false;
+
+// Resolve the bucket file for an exercise (null = not self-hosted -> keep existing source)
+function hostedGifFile(name) {
+    var s = slug(mediaAliases[name] || name);
+    if (ALIAS_MAP[s]) return ALIAS_MAP[s];
+    if (HOSTED_SLUGS.has(s)) return s + '.gif';
+    return null;
+}
+
+// Cached signed URL, or null (kicks a lazy re-mint on miss/expiry)
+function getSignedGif(file) {
+    var c = signedGifCache[file];
+    if (c && c.exp > Date.now()) return c.url;
+    primeSignedGifs();
+    return null;
+}
+
+// Batch-mint signed URLs for all hosted/alias files via the existing Supabase client
+async function primeSignedGifs() {
+    if (_signingInFlight || !CLOUD_SYNC_ENABLED || !supabaseClient) return;
+    _signingInFlight = true;
+    try {
+        var fileset = {};
+        HOSTED_SLUGS.forEach(function(s) { fileset[s + '.gif'] = 1; });
+        Object.keys(ALIAS_MAP).forEach(function(k) { fileset[ALIAS_MAP[k]] = 1; });
+        var paths = Object.keys(fileset);
+        var res = await supabaseClient.storage.from(MEDIA_BUCKET).createSignedUrls(paths, 86400);
+        if (res && res.data) {
+            var exp = Date.now() + 82800000; // ~23h: re-mint before the 24h signed-URL expiry
+            res.data.forEach(function(r) { if (r && r.signedUrl && !r.error) signedGifCache[r.path] = { url: r.signedUrl, exp: exp }; });
+        }
+    } catch (e) { /* signing failed -> cache stays empty -> getExerciseMedia keeps existing sources */ }
+    _signingInFlight = false;
+}
+
+// Base (pre-Phase-B) media: alias -> exerciseMedia -> localStorage. Unchanged behaviour.
+function getBaseMedia(name) {
     const key = mediaAliases[name] || name;
     const media = exerciseMedia[key];
     if (media) return media;
     // Fallback to localStorage
     const gif = localStorage.getItem('gif_' + name);
     return gif ? { gif: gif, yt: null } : null;
+}
+
+function getExerciseMedia(name) {
+    var base = getBaseMedia(name);
+    var file = hostedGifFile(name);
+    if (file) {
+        var signed = getSignedGif(file);
+        if (signed) {
+            // Primary = signed URL; altGif = old source so img onerror falls through, never blanks
+            return { gif: signed, yt: base ? base.yt : null, altGif: base ? base.gif : null };
+        }
+    }
+    return base; // not hosted, or signing not ready -> existing source/fallback unchanged
+}
+
+// img onerror: drop to the alt (existing) source once, then hide. Preserves the fallback chain.
+function gifErr(img) {
+    var alt = img.getAttribute('data-altsrc');
+    if (alt) { img.removeAttribute('data-altsrc'); img.src = alt; }
+    else if (img.parentElement) { img.parentElement.style.display = 'none'; }
 }
 
 // ── Exercise-metadata accessors (Keystone Phase A) ──────────────────────────
@@ -6235,13 +6316,14 @@ function viewExerciseDetails(name) {
     const media = getExerciseMedia(ex.name);
     const gifUrl = media ? media.gif : localStorage.getItem('gif_' + ex.name);
     const ytUrl = media ? media.yt : null;
-    
+    const gifAlt = (media && media.altGif) ? media.altGif : '';
+
     let mediaHtml = '';
     if (gifUrl) {
         mediaHtml = `
             <div class="gif-container" style="margin-bottom:12px; border-radius:12px; overflow:hidden; background:#000; text-align:center;">
                 <img src="${gifUrl}" alt="${ex.name}" style="max-width:100%; max-height:300px; object-fit:contain; border-radius:12px;"
-                    onerror="this.parentElement.style.display='none'">
+                    data-altsrc="${gifAlt}" onerror="gifErr(this)">
             </div>
         `;
     }
@@ -6957,9 +7039,13 @@ function showWarmupExercise(index) {
     const gifContainer = document.getElementById('warmup-gif-container');
     const gifImg = document.getElementById('warmup-gif');
     if (media && media.gif) {
+        var _altGif = media.altGif || '';
         gifImg.src = media.gif;
         gifImg.alt = exercise.name;
-        gifImg.onerror = function() { gifContainer.style.display = 'none'; };
+        gifImg.onerror = function() {
+            if (_altGif && gifImg.src !== _altGif) { gifImg.src = _altGif; } // signed URL failed -> existing source
+            else { gifContainer.style.display = 'none'; }
+        };
         gifContainer.style.display = 'block';
     } else {
         gifContainer.style.display = 'none';
@@ -7650,7 +7736,8 @@ async function initSupabase() {
         console.log('🆔 User ID:', USER_ID);
 
         CLOUD_SYNC_ENABLED = true;
-        updateCloudSyncUI(); 
+        updateCloudSyncUI();
+        primeSignedGifs(); // Phase B: mint signed media URLs once the client is ready (fire-and-forget)
         await loadFromCloud();
         checkGarminConnection(); 
         console.log('✅ Supabase initialized successfully! v53');
