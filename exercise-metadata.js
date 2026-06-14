@@ -1,5 +1,5 @@
 // ============================================================================
-// NIMBLE SHRED — EXERCISE METADATA SUBSTRATE (v1.5.0)
+// NIMBLE SHRED — EXERCISE METADATA SUBSTRATE (v1.6.0)
 // ============================================================================
 // Standalone data layer for pain-aware exercise swapping ("train around a
 // niggle"), prehab/rehab programming, set-logging UX, training-bucket /
@@ -22,6 +22,12 @@
 // to the self-check (12 values incl. neck-prehab/elbow-prehab). No existing
 // v1.4.0 row is changed.
 //
+// v1.6.0 — MUSCLE ENRICHMENT. Adds `synergists` (secondary movers, 24-vocab) to
+// every entry from GymVisual Target+Synergist data (132 populated, 70 empty;
+// _synergist_patch.json). Merges 28 OK* extra-primary additions into
+// musclesTargeted; 10 DISAGREE targets kept (see _metadata_synergist_proposal.md
+// §3, incl. the sleeper-stretch SWAP-inheritance exclusion). No other field changed.
+//
 // SCHEMA — window.exerciseMeta[exerciseName] = {
 //
 //   alternatives: string[]        lower / differently-loaded swaps; all resolve.
@@ -36,6 +42,7 @@
 //   bucket: "strength" | "power" | "resilience" | "cardio"
 //   equipmentNorm: "bodyweight" | "dumbbell" | "cable" | "gym/machines"
 //   musclesTargeted: string[]     fixed 24-muscle vocabulary.
+//   synergists: string[]         secondary movers (24-vocab), GymVisual-derived (v1.6.0).
 //
 //   ── v1.4.0 SELECTION-ENGINE ADDITIONS ────────────────────────────────────
 //
@@ -74,6 +81,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["chest", "triceps", "frontDelts"],
+        synergists: ["frontDelts", "triceps"],
         movementPattern: "push-horizontal",
         laterality: "bilateral",
         compound: true
@@ -88,6 +96,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["chest", "frontDelts"],
+        synergists: ["biceps", "frontDelts"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -102,6 +111,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["chest", "frontDelts"],
+        synergists: ["biceps", "frontDelts"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -116,6 +126,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["chest"],
+        synergists: ["biceps", "sideDelts"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -130,6 +141,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["chest", "obliques", "triceps"],
+        synergists: ["frontDelts", "obliques", "abductors"],
         movementPattern: "push-horizontal",
         laterality: "unilateral",
         compound: true
@@ -144,6 +156,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["chest"],
+        synergists: ["frontDelts"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -158,6 +171,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["serratus", "lats", "chest"],
+        synergists: ["traps", "chest", "triceps"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -172,6 +186,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["lats", "biceps"],
+        synergists: ["biceps", "forearms", "rearDelts", "rotatorCuff", "traps"],
         movementPattern: "pull-vertical",
         laterality: "bilateral",
         compound: true
@@ -185,7 +200,8 @@ window.exerciseMeta = {
         logMode: "weight_reps",
         bucket: "strength",
         equipmentNorm: "cable",
-        musclesTargeted: ["rhomboids", "traps", "lats"],
+        musclesTargeted: ["rhomboids", "traps", "lats", "rotatorCuff"],
+        synergists: ["biceps", "forearms", "rearDelts", "chest"],
         movementPattern: "pull-horizontal",
         laterality: "bilateral",
         compound: true
@@ -200,6 +216,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "cable",
         musclesTargeted: ["rearDelts", "rotatorCuff"],
+        synergists: ["biceps", "forearms", "sideDelts", "rotatorCuff", "traps"],
         movementPattern: "pull-horizontal",
         laterality: "bilateral",
         compound: true
@@ -214,6 +231,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["lats"],
+        synergists: ["rearDelts", "triceps"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -227,7 +245,8 @@ window.exerciseMeta = {
         logMode: "weight_reps",
         bucket: "strength",
         equipmentNorm: "cable",
-        musclesTargeted: ["lats", "obliques"],
+        musclesTargeted: ["lats", "obliques", "rotatorCuff", "traps"],
+        synergists: ["biceps", "forearms", "rearDelts", "chest"],
         movementPattern: "pull-horizontal",
         laterality: "unilateral",
         compound: true
@@ -242,6 +261,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["traps"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -256,6 +276,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["rearDelts"],
+        synergists: ["sideDelts", "rotatorCuff", "traps"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -270,6 +291,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["rhomboids", "rearDelts"],
+        synergists: ["biceps", "forearms", "rearDelts"],
         movementPattern: "pull-horizontal",
         laterality: "bilateral",
         compound: true
@@ -284,6 +306,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["frontDelts", "triceps"],
+        synergists: ["sideDelts", "serratus", "triceps"],
         movementPattern: "push-vertical",
         laterality: "bilateral",
         compound: true
@@ -298,6 +321,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["sideDelts"],
+        synergists: ["frontDelts", "serratus"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -312,6 +336,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["frontDelts"],
+        synergists: ["sideDelts", "chest", "serratus"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -325,7 +350,8 @@ window.exerciseMeta = {
         logMode: "weight_reps",
         bucket: "resilience",
         equipmentNorm: "cable",
-        musclesTargeted: ["rotatorCuff"],
+        musclesTargeted: ["rotatorCuff", "lats"],
+        synergists: ["rearDelts"],
         movementPattern: "isolation",
         laterality: "unilateral",
         compound: true
@@ -340,6 +366,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "cable",
         musclesTargeted: ["rotatorCuff"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "unilateral",
         compound: true
@@ -354,6 +381,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["sideDelts", "traps"],
+        synergists: ["biceps", "forearms", "frontDelts", "rotatorCuff", "serratus", "traps"],
         movementPattern: "pull-vertical",
         laterality: "bilateral",
         compound: true
@@ -368,6 +396,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "cable",
         musclesTargeted: ["traps", "sideDelts"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -382,6 +411,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["triceps"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -396,6 +426,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["triceps"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -410,6 +441,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["triceps"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -424,6 +456,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["biceps"],
+        synergists: ["forearms"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -438,6 +471,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["biceps", "forearms"],
+        synergists: ["biceps"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -452,6 +486,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["biceps"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "unilateral",
         compound: true
@@ -466,6 +501,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["triceps"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "unilateral",
         compound: true
@@ -480,6 +516,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["triceps"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -494,6 +531,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["quads", "glutes"],
+        synergists: ["adductors", "calves"],
         movementPattern: "squat",
         laterality: "bilateral",
         compound: true
@@ -508,6 +546,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["glutes", "hamstrings"],
+        synergists: ["lowerBack", "hamstrings"],
         movementPattern: "hinge",
         laterality: "bilateral",
         compound: true
@@ -522,6 +561,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["hamstrings"],
+        synergists: [],
         movementPattern: "hinge",
         laterality: "bilateral",
         compound: true
@@ -536,6 +576,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["quads", "glutes"],
+        synergists: [],
         movementPattern: "lunge",
         laterality: "alternating",
         compound: true
@@ -550,6 +591,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["glutes"],
+        synergists: [],
         movementPattern: "hinge",
         laterality: "unilateral",
         compound: true
@@ -564,6 +606,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["calves"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: false
@@ -578,6 +621,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "cable",
         musclesTargeted: ["abductors"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "unilateral",
         compound: false
@@ -592,6 +636,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "cable",
         musclesTargeted: ["adductors"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "unilateral",
         compound: false
@@ -606,6 +651,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["abs"],
+        synergists: ["obliques"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -620,6 +666,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "cable",
         musclesTargeted: ["obliques"],
+        synergists: [],
         movementPattern: "rotation",
         laterality: "unilateral",
         compound: true
@@ -634,6 +681,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["abs"],
+        synergists: [],
         movementPattern: "anti-rotation",
         laterality: "unilateral",
         compound: true
@@ -648,6 +696,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "cable",
         musclesTargeted: ["obliques"],
+        synergists: [],
         movementPattern: "rotation",
         laterality: "unilateral",
         compound: true
@@ -662,6 +711,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "cable",
         musclesTargeted: ["obliques"],
+        synergists: [],
         movementPattern: "rotation",
         laterality: "unilateral",
         compound: true
@@ -676,6 +726,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["chest", "triceps", "frontDelts"],
+        synergists: ["frontDelts", "triceps"],
         movementPattern: "push-horizontal",
         laterality: "bilateral",
         compound: true
@@ -690,6 +741,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["chest", "frontDelts"],
+        synergists: ["frontDelts", "triceps"],
         movementPattern: "push-horizontal",
         laterality: "bilateral",
         compound: true
@@ -704,6 +756,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["chest"],
+        synergists: ["biceps", "frontDelts"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -718,6 +771,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["frontDelts", "sideDelts", "rearDelts", "triceps"],
+        synergists: ["sideDelts", "chest", "serratus", "triceps"],
         movementPattern: "push-vertical",
         laterality: "bilateral",
         compound: true
@@ -732,6 +786,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["frontDelts", "sideDelts", "rearDelts"],
+        synergists: ["sideDelts", "serratus", "triceps"],
         movementPattern: "push-vertical",
         laterality: "bilateral",
         compound: true
@@ -746,6 +801,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["sideDelts"],
+        synergists: ["frontDelts", "serratus"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -760,6 +816,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["frontDelts"],
+        synergists: ["sideDelts", "chest", "serratus"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -773,7 +830,8 @@ window.exerciseMeta = {
         logMode: "weight_reps",
         bucket: "strength",
         equipmentNorm: "dumbbell",
-        musclesTargeted: ["lats", "rhomboids", "biceps"],
+        musclesTargeted: ["lats", "rhomboids", "biceps", "rotatorCuff", "traps"],
+        synergists: ["biceps", "forearms", "rearDelts", "chest"],
         movementPattern: "pull-horizontal",
         laterality: "unilateral",
         compound: true
@@ -788,6 +846,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["lats", "serratus"],
+        synergists: ["rearDelts", "lats", "triceps"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -802,6 +861,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["quads", "glutes", "abs"],
+        synergists: ["adductors", "abductors", "calves"],
         movementPattern: "squat",
         laterality: "bilateral",
         compound: true
@@ -816,6 +876,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["quads", "glutes", "hamstrings"],
+        synergists: ["adductors", "calves"],
         movementPattern: "lunge",
         laterality: "alternating",
         compound: true
@@ -830,6 +891,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["glutes", "quads"],
+        synergists: ["adductors", "calves"],
         movementPattern: "lunge",
         laterality: "unilateral",
         compound: true
@@ -844,6 +906,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["hamstrings", "glutes", "lowerBack"],
+        synergists: ["quads", "calves"],
         movementPattern: "hinge",
         laterality: "bilateral",
         compound: true
@@ -858,6 +921,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["biceps"],
+        synergists: ["forearms"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -872,6 +936,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["biceps", "forearms"],
+        synergists: ["biceps"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -886,6 +951,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["triceps"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "unilateral",
         compound: true
@@ -900,6 +966,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["triceps"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -914,6 +981,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["abs", "forearms", "traps"],
+        synergists: [],
         movementPattern: "carry",
         laterality: "bilateral",
         compound: true
@@ -928,6 +996,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["biceps", "forearms"],
+        synergists: ["forearms"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -942,6 +1011,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["biceps"],
+        synergists: ["forearms"],
         movementPattern: "isolation",
         laterality: "unilateral",
         compound: true
@@ -956,6 +1026,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["triceps", "chest"],
+        synergists: ["frontDelts", "triceps"],
         movementPattern: "push-horizontal",
         laterality: "bilateral",
         compound: true
@@ -969,7 +1040,8 @@ window.exerciseMeta = {
         logMode: "weight_reps",
         bucket: "strength",
         equipmentNorm: "dumbbell",
-        musclesTargeted: ["lats", "abs", "obliques"],
+        musclesTargeted: ["lats", "abs", "obliques", "rotatorCuff", "traps"],
+        synergists: ["biceps", "forearms", "rearDelts", "chest"],
         movementPattern: "pull-horizontal",
         laterality: "alternating",
         compound: true
@@ -984,6 +1056,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["glutes", "quads"],
+        synergists: ["adductors", "calves"],
         movementPattern: "lunge",
         laterality: "alternating",
         compound: true
@@ -998,6 +1071,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["traps"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -1012,6 +1086,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["calves"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -1026,6 +1101,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["chest", "triceps", "abs"],
+        synergists: [],
         movementPattern: "push-horizontal",
         laterality: "bilateral",
         compound: true
@@ -1040,6 +1116,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["lats", "biceps"],
+        synergists: ["biceps", "forearms", "rearDelts", "rotatorCuff", "traps"],
         movementPattern: "pull-vertical",
         laterality: "bilateral",
         compound: true
@@ -1054,6 +1131,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["biceps", "lats"],
+        synergists: ["biceps", "forearms", "rearDelts", "chest", "traps"],
         movementPattern: "pull-vertical",
         laterality: "bilateral",
         compound: true
@@ -1068,6 +1146,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["chest", "triceps"],
+        synergists: ["frontDelts", "lats", "traps", "triceps"],
         movementPattern: "push-vertical",
         laterality: "bilateral",
         compound: true
@@ -1082,6 +1161,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["quads", "glutes"],
+        synergists: ["adductors", "calves"],
         movementPattern: "squat",
         laterality: "bilateral",
         compound: true
@@ -1096,6 +1176,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["quads", "glutes", "hamstrings"],
+        synergists: ["adductors", "calves"],
         movementPattern: "lunge",
         laterality: "alternating",
         compound: true
@@ -1110,6 +1191,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["glutes"],
+        synergists: ["hamstrings", "quads"],
         movementPattern: "hinge",
         laterality: "bilateral",
         compound: true
@@ -1124,6 +1206,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["abs"],
+        synergists: ["frontDelts", "glutes", "abductors", "obliques", "hipFlexors"],
         movementPattern: "anti-extension",
         laterality: "bilateral",
         compound: true
@@ -1138,6 +1221,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["obliques", "lowerBack"],
+        synergists: [],
         movementPattern: "anti-rotation",
         laterality: "unilateral",
         compound: true
@@ -1152,6 +1236,7 @@ window.exerciseMeta = {
         bucket: "cardio",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["abs", "hipFlexors", "frontDelts"],
+        synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
         compound: true
@@ -1166,6 +1251,7 @@ window.exerciseMeta = {
         bucket: "cardio",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["chest", "frontDelts", "triceps", "quads", "glutes", "abs"],
+        synergists: [],
         movementPattern: "locomotion",
         laterality: "bilateral",
         compound: true
@@ -1180,6 +1266,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["abs", "hipFlexors"],
+        synergists: ["adductors", "serratus", "abductors"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -1194,6 +1281,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["frontDelts", "sideDelts", "rearDelts", "triceps"],
+        synergists: ["chest", "serratus", "triceps"],
         movementPattern: "push-vertical",
         laterality: "bilateral",
         compound: true
@@ -1208,6 +1296,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["quads", "glutes"],
+        synergists: [],
         movementPattern: "squat",
         laterality: "unilateral",
         compound: true
@@ -1222,6 +1311,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["hamstrings"],
+        synergists: [],
         movementPattern: "hinge",
         laterality: "bilateral",
         compound: true
@@ -1235,7 +1325,8 @@ window.exerciseMeta = {
         logMode: "reps",
         bucket: "strength",
         equipmentNorm: "bodyweight",
-        musclesTargeted: ["lats", "rhomboids"],
+        musclesTargeted: ["lats", "rhomboids", "rotatorCuff", "traps"],
+        synergists: ["biceps", "forearms", "rearDelts", "chest"],
         movementPattern: "pull-horizontal",
         laterality: "bilateral",
         compound: true
@@ -1250,6 +1341,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["frontDelts", "sideDelts", "rearDelts", "triceps"],
+        synergists: [],
         movementPattern: "push-vertical",
         laterality: "bilateral",
         compound: true
@@ -1264,6 +1356,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["calves"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: false
@@ -1277,7 +1370,8 @@ window.exerciseMeta = {
         logMode: "reps",
         bucket: "resilience",
         equipmentNorm: "bodyweight",
-        musclesTargeted: ["lowerBack"],
+        musclesTargeted: ["lowerBack", "obliques", "abs"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "bilateral",
         compound: true
@@ -1292,6 +1386,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["abs", "hipFlexors"],
+        synergists: ["glutes", "quads"],
         movementPattern: "anti-extension",
         laterality: "alternating",
         compound: false
@@ -1306,6 +1401,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["lowerBack"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "bilateral",
         compound: true
@@ -1320,6 +1416,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["hipFlexors", "glutes", "hamstrings", "lowerBack"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "alternating",
         compound: true
@@ -1334,6 +1431,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["glutes"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "alternating",
         compound: true
@@ -1347,7 +1445,8 @@ window.exerciseMeta = {
         logMode: "reps",
         bucket: "resilience",
         equipmentNorm: "bodyweight",
-        musclesTargeted: ["frontDelts", "rearDelts", "rotatorCuff", "chest"],
+        musclesTargeted: ["frontDelts", "rearDelts", "rotatorCuff", "chest", "sideDelts"],
+        synergists: ["rotatorCuff", "lats", "chest", "serratus", "traps"],
         movementPattern: "mobility",
         laterality: "bilateral",
         compound: true
@@ -1362,6 +1461,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["traps", "rotatorCuff"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "bilateral",
         compound: false
@@ -1375,7 +1475,8 @@ window.exerciseMeta = {
         logMode: "time",
         bucket: "resilience",
         equipmentNorm: "bodyweight",
-        musclesTargeted: ["glutes", "hipFlexors", "adductors", "calves"],
+        musclesTargeted: ["glutes", "hipFlexors", "adductors", "calves", "quads"],
+        synergists: ["adductors", "calves"],
         movementPattern: "mobility",
         laterality: "bilateral",
         compound: true
@@ -1390,6 +1491,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["hipFlexors", "quads"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "unilateral",
         compound: true
@@ -1404,6 +1506,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["abs", "glutes", "lowerBack"],
+        synergists: ["frontDelts", "glutes"],
         movementPattern: "anti-rotation",
         laterality: "alternating",
         compound: true
@@ -1417,7 +1520,8 @@ window.exerciseMeta = {
         logMode: "weight_reps",
         bucket: "strength",
         equipmentNorm: "cable",
-        musclesTargeted: ["quads", "abs"],
+        musclesTargeted: ["quads", "abs", "glutes"],
+        synergists: ["adductors", "calves"],
         movementPattern: "squat",
         laterality: "bilateral",
         compound: true
@@ -1431,7 +1535,8 @@ window.exerciseMeta = {
         logMode: "weight_reps",
         bucket: "strength",
         equipmentNorm: "cable",
-        musclesTargeted: ["quads", "rhomboids", "traps"],
+        musclesTargeted: ["quads", "rhomboids", "traps", "glutes"],
+        synergists: ["adductors", "calves"],
         movementPattern: "squat",
         laterality: "bilateral",
         compound: true
@@ -1446,6 +1551,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["glutes"],
+        synergists: ["hamstrings"],
         movementPattern: "hinge",
         laterality: "unilateral",
         compound: true
@@ -1459,7 +1565,8 @@ window.exerciseMeta = {
         logMode: "weight_reps",
         bucket: "strength",
         equipmentNorm: "cable",
-        musclesTargeted: ["lats", "quads", "glutes", "abs"],
+        musclesTargeted: ["lats", "quads", "glutes", "abs", "rotatorCuff", "traps"],
+        synergists: ["biceps", "forearms", "rearDelts"],
         movementPattern: "pull-horizontal",
         laterality: "bilateral",
         compound: true
@@ -1474,6 +1581,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["biceps"],
+        synergists: ["forearms"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -1488,6 +1596,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["triceps"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -1502,6 +1611,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "cable",
         musclesTargeted: ["abductors"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "unilateral",
         compound: false
@@ -1516,6 +1626,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "cable",
         musclesTargeted: ["adductors"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "unilateral",
         compound: false
@@ -1530,6 +1641,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["forearms"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -1544,6 +1656,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["forearms"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -1558,6 +1671,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["obliques"],
+        synergists: ["hipFlexors"],
         movementPattern: "rotation",
         laterality: "alternating",
         compound: true
@@ -1572,6 +1686,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["abs", "obliques"],
+        synergists: [],
         movementPattern: "rotation",
         laterality: "alternating",
         compound: true
@@ -1586,6 +1701,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["abs"],
+        synergists: ["hamstrings"],
         movementPattern: "isolation",
         laterality: "alternating",
         compound: true
@@ -1599,7 +1715,8 @@ window.exerciseMeta = {
         logMode: "reps",
         bucket: "strength",
         equipmentNorm: "bodyweight",
-        musclesTargeted: ["abs"],
+        musclesTargeted: ["abs", "hipFlexors"],
+        synergists: ["adductors", "obliques", "quads", "abductors"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -1614,6 +1731,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["abs"],
+        synergists: ["obliques"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -1627,7 +1745,8 @@ window.exerciseMeta = {
         logMode: "time",
         bucket: "cardio",
         equipmentNorm: "bodyweight",
-        musclesTargeted: ["abs", "frontDelts", "abductors"],
+        musclesTargeted: ["abs", "frontDelts", "abductors", "chest"],
+        synergists: ["frontDelts", "glutes", "obliques", "triceps"],
         movementPattern: "locomotion",
         laterality: "alternating",
         compound: true
@@ -1641,7 +1760,8 @@ window.exerciseMeta = {
         logMode: "reps",
         bucket: "strength",
         equipmentNorm: "bodyweight",
-        musclesTargeted: ["abs"],
+        musclesTargeted: ["abs", "lowerBack", "glutes", "hamstrings"],
+        synergists: ["frontDelts", "sideDelts", "calves", "obliques", "chest", "serratus"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -1656,6 +1776,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["triceps", "chest"],
+        synergists: ["frontDelts", "chest"],
         movementPattern: "push-horizontal",
         laterality: "bilateral",
         compound: true
@@ -1670,6 +1791,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["chest"],
+        synergists: ["frontDelts", "triceps"],
         movementPattern: "push-horizontal",
         laterality: "bilateral",
         compound: true
@@ -1684,6 +1806,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["chest"],
+        synergists: ["frontDelts", "triceps"],
         movementPattern: "push-horizontal",
         laterality: "bilateral",
         compound: true
@@ -1698,6 +1821,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["chest"],
+        synergists: ["frontDelts", "triceps"],
         movementPattern: "push-horizontal",
         laterality: "bilateral",
         compound: true
@@ -1712,6 +1836,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["serratus"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -1725,7 +1850,8 @@ window.exerciseMeta = {
         logMode: "weight_reps",
         bucket: "strength",
         equipmentNorm: "dumbbell",
-        musclesTargeted: ["adductors", "quads"],
+        musclesTargeted: ["adductors", "quads", "glutes"],
+        synergists: ["adductors", "calves", "abductors"],
         movementPattern: "squat",
         laterality: "bilateral",
         compound: true
@@ -1740,6 +1866,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["glutes"],
+        synergists: [],
         movementPattern: "lunge",
         laterality: "alternating",
         compound: true
@@ -1753,7 +1880,8 @@ window.exerciseMeta = {
         logMode: "reps",
         bucket: "strength",
         equipmentNorm: "bodyweight",
-        musclesTargeted: ["adductors", "quads"],
+        musclesTargeted: ["adductors", "quads", "glutes"],
+        synergists: ["adductors", "abductors", "calves"],
         movementPattern: "lunge",
         laterality: "alternating",
         compound: true
@@ -1768,6 +1896,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["glutes"],
+        synergists: [],
         movementPattern: "hinge",
         laterality: "unilateral",
         compound: true
@@ -1782,6 +1911,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["hamstrings", "lowerBack"],
+        synergists: ["adductors", "glutes"],
         movementPattern: "hinge",
         laterality: "bilateral",
         compound: true
@@ -1796,6 +1926,7 @@ window.exerciseMeta = {
         bucket: "cardio",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["sideDelts", "glutes", "abductors", "calves"],
+        synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
         compound: true
@@ -1810,6 +1941,7 @@ window.exerciseMeta = {
         bucket: "cardio",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["hipFlexors", "quads", "calves"],
+        synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
         compound: true
@@ -1824,6 +1956,7 @@ window.exerciseMeta = {
         bucket: "power",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["quads", "glutes", "calves"],
+        synergists: ["adductors", "calves"],
         movementPattern: "squat",
         laterality: "bilateral",
         compound: true
@@ -1838,6 +1971,7 @@ window.exerciseMeta = {
         bucket: "power",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["glutes", "abductors", "quads", "calves"],
+        synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
         compound: true
@@ -1852,6 +1986,7 @@ window.exerciseMeta = {
         bucket: "power",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["quads", "glutes", "hamstrings", "calves"],
+        synergists: [],
         movementPattern: "lunge",
         laterality: "alternating",
         compound: true
@@ -1866,6 +2001,7 @@ window.exerciseMeta = {
         bucket: "power",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["quads", "glutes", "calves"],
+        synergists: [],
         movementPattern: "squat",
         laterality: "bilateral",
         compound: true
@@ -1880,6 +2016,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["lowerBack", "glutes"],
+        synergists: ["glutes", "hamstrings"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -1894,6 +2031,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["lowerBack"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "alternating",
         compound: true
@@ -1908,6 +2046,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["triceps"],
+        synergists: ["frontDelts", "lats", "traps", "chest"],
         movementPattern: "push-vertical",
         laterality: "bilateral",
         compound: true
@@ -1922,6 +2061,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["triceps"],
+        synergists: ["frontDelts", "chest"],
         movementPattern: "push-horizontal",
         laterality: "bilateral",
         compound: true
@@ -1936,6 +2076,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "gym/machines",
         musclesTargeted: ["forearms"],
+        synergists: ["adductors", "glutes", "quads", "calves"],
         movementPattern: "carry",
         laterality: "bilateral",
         compound: false
@@ -1950,6 +2091,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "gym/machines",
         musclesTargeted: ["chest"],
+        synergists: ["frontDelts", "triceps"],
         movementPattern: "push-horizontal",
         laterality: "bilateral",
         compound: true
@@ -1964,6 +2106,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["biceps"],
+        synergists: ["forearms"],
         movementPattern: "isolation",
         laterality: "unilateral",
         compound: true
@@ -1978,6 +2121,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["rearDelts", "rhomboids"],
+        synergists: ["biceps", "forearms", "rearDelts"],
         movementPattern: "pull-horizontal",
         laterality: "bilateral",
         compound: true
@@ -1992,6 +2136,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "cable",
         musclesTargeted: ["abs"],
+        synergists: ["obliques"],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -2006,6 +2151,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["abs", "frontDelts", "quads", "serratus"],
+        synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
         compound: true
@@ -2020,6 +2166,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["triceps", "glutes", "rearDelts", "hamstrings"],
+        synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
         compound: true
@@ -2034,6 +2181,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["abs", "obliques", "hipFlexors", "frontDelts"],
+        synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
         compound: true
@@ -2048,6 +2196,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["lowerBack", "abs", "frontDelts"],
+        synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
         compound: true
@@ -2062,6 +2211,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["quads", "glutes", "calves"],
+        synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
         compound: true
@@ -2076,6 +2226,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["tibialis"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: false
@@ -2089,7 +2240,8 @@ window.exerciseMeta = {
         logMode: "reps",
         bucket: "resilience",
         equipmentNorm: "bodyweight",
-        musclesTargeted: ["quads", "hipFlexors"],
+        musclesTargeted: ["quads", "hipFlexors", "glutes"],
+        synergists: ["adductors", "calves"],
         movementPattern: "lunge",
         laterality: "unilateral",
         compound: true
@@ -2104,6 +2256,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["sideDelts", "traps"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -2118,6 +2271,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "dumbbell",
         musclesTargeted: ["rearDelts", "rhomboids"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "unilateral",
         compound: true
@@ -2132,6 +2286,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["forearms"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "bilateral",
         compound: false
@@ -2145,7 +2300,8 @@ window.exerciseMeta = {
         logMode: "time",
         bucket: "resilience",
         equipmentNorm: "bodyweight",
-        musclesTargeted: ["lats", "forearms"],
+        musclesTargeted: ["lats", "forearms", "rotatorCuff", "traps"],
+        synergists: ["biceps", "forearms"],
         movementPattern: "mobility",
         laterality: "bilateral",
         compound: true
@@ -2159,7 +2315,8 @@ window.exerciseMeta = {
         logMode: "reps",
         bucket: "resilience",
         equipmentNorm: "bodyweight",
-        musclesTargeted: ["adductors", "quads"],
+        musclesTargeted: ["adductors", "quads", "glutes"],
+        synergists: ["adductors", "abductors", "calves"],
         movementPattern: "lunge",
         laterality: "alternating",
         compound: true
@@ -2174,6 +2331,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["lowerBack", "hamstrings"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "bilateral",
         compound: true
@@ -2188,6 +2346,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["glutes", "hipFlexors", "lowerBack"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "alternating",
         compound: true
@@ -2201,7 +2360,8 @@ window.exerciseMeta = {
         logMode: "reps",
         bucket: "resilience",
         equipmentNorm: "bodyweight",
-        musclesTargeted: ["hamstrings", "frontDelts", "abs", "serratus"],
+        musclesTargeted: ["hamstrings", "frontDelts", "abs", "serratus", "obliques", "triceps"],
+        synergists: ["adductors", "glutes", "hamstrings", "chest", "quads", "serratus", "traps", "forearms"],
         movementPattern: "locomotion",
         laterality: "bilateral",
         compound: true
@@ -2215,7 +2375,8 @@ window.exerciseMeta = {
         logMode: "reps",
         bucket: "resilience",
         equipmentNorm: "bodyweight",
-        musclesTargeted: ["lowerBack", "glutes", "frontDelts"],
+        musclesTargeted: ["lowerBack", "glutes", "frontDelts", "calves", "hamstrings", "rotatorCuff", "lats", "obliques", "traps"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "alternating",
         compound: true
@@ -2230,6 +2391,7 @@ window.exerciseMeta = {
         bucket: "strength",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["hamstrings", "glutes"],
+        synergists: [],
         movementPattern: "hinge",
         laterality: "unilateral",
         compound: true
@@ -2244,6 +2406,7 @@ window.exerciseMeta = {
         bucket: "power",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["glutes", "abductors", "quads", "calves"],
+        synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
         compound: true
@@ -2258,6 +2421,7 @@ window.exerciseMeta = {
         bucket: "power",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["calves", "quads", "tibialis"],
+        synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
         compound: true
@@ -2272,6 +2436,7 @@ window.exerciseMeta = {
         bucket: "power",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["quads", "hipFlexors", "calves", "abs"],
+        synergists: [],
         movementPattern: "squat",
         laterality: "bilateral",
         compound: true
@@ -2286,6 +2451,7 @@ window.exerciseMeta = {
         bucket: "power",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["hipFlexors", "quads", "calves"],
+        synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
         compound: true
@@ -2299,7 +2465,8 @@ window.exerciseMeta = {
         logMode: "time",
         bucket: "strength",
         equipmentNorm: "bodyweight",
-        musclesTargeted: ["quads", "adductors"],
+        musclesTargeted: ["quads", "adductors", "glutes"],
+        synergists: ["adductors", "calves", "abductors"],
         movementPattern: "squat",
         laterality: "bilateral",
         compound: true
@@ -2313,7 +2480,8 @@ window.exerciseMeta = {
         logMode: "time",
         bucket: "strength",
         equipmentNorm: "bodyweight",
-        musclesTargeted: ["lowerBack", "glutes"],
+        musclesTargeted: ["lowerBack", "glutes", "abs"],
+        synergists: ["rearDelts", "hamstrings", "lats", "obliques", "triceps"],
         movementPattern: "anti-extension",
         laterality: "bilateral",
         compound: true
@@ -2328,6 +2496,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["adductors"],
+        synergists: [],
         movementPattern: "anti-rotation",
         laterality: "unilateral",
         compound: true
@@ -2341,7 +2510,8 @@ window.exerciseMeta = {
         logMode: "time",
         bucket: "strength",
         equipmentNorm: "bodyweight",
-        musclesTargeted: ["abs", "hipFlexors"],
+        musclesTargeted: ["abs", "hipFlexors", "quads", "abductors", "triceps"],
+        synergists: [],
         movementPattern: "anti-extension",
         laterality: "bilateral",
         compound: true
@@ -2356,6 +2526,7 @@ window.exerciseMeta = {
         bucket: "cardio",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["hipFlexors", "quads", "calves"],
+        synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
         compound: true
@@ -2370,6 +2541,7 @@ window.exerciseMeta = {
         bucket: "cardio",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["glutes", "quads", "abductors", "calves"],
+        synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
         compound: true
@@ -2384,6 +2556,7 @@ window.exerciseMeta = {
         bucket: "cardio",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["abductors", "glutes", "quads", "calves"],
+        synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
         compound: true
@@ -2398,6 +2571,7 @@ window.exerciseMeta = {
         bucket: "cardio",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["abs", "obliques", "hipFlexors"],
+        synergists: [],
         movementPattern: "rotation",
         laterality: "alternating",
         compound: true
@@ -2412,6 +2586,7 @@ window.exerciseMeta = {
         bucket: "cardio",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["frontDelts", "sideDelts", "rearDelts", "triceps", "obliques"],
+        synergists: [],
         movementPattern: "rotation",
         laterality: "alternating",
         compound: true
@@ -2426,6 +2601,7 @@ window.exerciseMeta = {
         bucket: "cardio",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["quads", "glutes", "calves"],
+        synergists: ["glutes", "quads"],
         movementPattern: "squat",
         laterality: "bilateral",
         compound: true
@@ -2440,6 +2616,7 @@ window.exerciseMeta = {
         bucket: "cardio",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["calves", "quads", "tibialis"],
+        synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
         compound: true
@@ -2454,6 +2631,7 @@ window.exerciseMeta = {
         bucket: "cardio",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["abs", "hipFlexors", "frontDelts", "chest"],
+        synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
         compound: true
@@ -2468,6 +2646,7 @@ window.exerciseMeta = {
         bucket: "cardio",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["quads", "glutes", "hipFlexors", "hamstrings"],
+        synergists: [],
         movementPattern: "lunge",
         laterality: "alternating",
         compound: true
@@ -2482,6 +2661,7 @@ window.exerciseMeta = {
         bucket: "cardio",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["obliques", "abs"],
+        synergists: [],
         movementPattern: "rotation",
         laterality: "alternating",
         compound: true
@@ -2496,6 +2676,7 @@ window.exerciseMeta = {
         bucket: "cardio",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["quads", "glutes", "calves"],
+        synergists: ["adductors", "calves"],
         movementPattern: "lunge",
         laterality: "alternating",
         compound: true
@@ -2510,6 +2691,7 @@ window.exerciseMeta = {
         bucket: "cardio",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["chest", "frontDelts", "triceps", "quads", "abs"],
+        synergists: [],
         movementPattern: "locomotion",
         laterality: "bilateral",
         compound: true
@@ -2524,6 +2706,7 @@ window.exerciseMeta = {
         bucket: "power",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["quads", "glutes", "adductors", "calves"],
+        synergists: [],
         movementPattern: "squat",
         laterality: "bilateral",
         compound: true
@@ -2538,6 +2721,7 @@ window.exerciseMeta = {
         bucket: "power",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["calves", "quads", "tibialis"],
+        synergists: [],
         movementPattern: "locomotion",
         laterality: "bilateral",
         compound: true
@@ -2554,6 +2738,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["neck", "traps"],
+        synergists: [],
         movementPattern: "rotation",
         laterality: "bilateral",
         compound: false
@@ -2568,6 +2753,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["neck"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "bilateral",
         compound: false
@@ -2582,6 +2768,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["traps", "neck"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "unilateral",
         compound: false
@@ -2596,6 +2783,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["forearms", "biceps"],
+        synergists: [],
         movementPattern: "rotation",
         laterality: "unilateral",
         compound: true
@@ -2610,6 +2798,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["biceps", "triceps", "forearms"],
+        synergists: [],
         movementPattern: "rotation",
         laterality: "unilateral",
         compound: true
@@ -2624,6 +2813,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["quads"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "unilateral",
         compound: true
@@ -2638,6 +2828,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["tibialis", "calves"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "unilateral",
         compound: false
@@ -2654,6 +2845,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["frontDelts", "sideDelts", "rearDelts", "rotatorCuff"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "bilateral",
         compound: false
@@ -2668,6 +2860,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["traps", "rearDelts", "rhomboids"],
+        synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
         compound: true
@@ -2682,6 +2875,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["rotatorCuff", "rearDelts"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "unilateral",
         compound: false
@@ -2696,6 +2890,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["lowerBack", "rhomboids", "rearDelts"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "unilateral",
         compound: true
@@ -2709,7 +2904,8 @@ window.exerciseMeta = {
         logMode: "time",
         bucket: "resilience",
         equipmentNorm: "bodyweight",
-        musclesTargeted: ["lowerBack", "chest", "obliques"],
+        musclesTargeted: ["lowerBack", "chest", "obliques", "frontDelts", "abs"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "unilateral",
         compound: true
@@ -2724,6 +2920,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["lowerBack", "obliques"],
+        synergists: [],
         movementPattern: "rotation",
         laterality: "unilateral",
         compound: true
@@ -2737,7 +2934,8 @@ window.exerciseMeta = {
         logMode: "time",
         bucket: "resilience",
         equipmentNorm: "bodyweight",
-        musclesTargeted: ["glutes", "hipFlexors"],
+        musclesTargeted: ["glutes", "hipFlexors", "adductors", "lowerBack", "abductors", "hamstrings", "quads"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "unilateral",
         compound: true
@@ -2752,6 +2950,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["adductors", "hipFlexors"],
+        synergists: ["hamstrings"],
         movementPattern: "mobility",
         laterality: "bilateral",
         compound: true
@@ -2765,7 +2964,8 @@ window.exerciseMeta = {
         logMode: "reps",
         bucket: "resilience",
         equipmentNorm: "bodyweight",
-        musclesTargeted: ["hipFlexors", "glutes", "adductors"],
+        musclesTargeted: ["hipFlexors", "glutes", "adductors", "lowerBack", "abductors", "obliques", "abs"],
+        synergists: [],
         movementPattern: "rotation",
         laterality: "unilateral",
         compound: true
@@ -2780,6 +2980,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["quads", "hipFlexors"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "bilateral",
         compound: true
@@ -2794,6 +2995,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["quads", "glutes"],
+        synergists: ["adductors", "calves"],
         movementPattern: "lunge",
         laterality: "unilateral",
         compound: true
@@ -2808,6 +3010,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["calves", "tibialis"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "unilateral",
         compound: true
@@ -2822,6 +3025,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["calves", "tibialis"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "unilateral",
         compound: false
@@ -2836,6 +3040,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["lowerBack", "lats"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "bilateral",
         compound: true
@@ -2850,6 +3055,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["abs", "obliques"],
+        synergists: ["obliques"],
         movementPattern: "anti-extension",
         laterality: "bilateral",
         compound: true
@@ -2864,6 +3070,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["lowerBack"],
+        synergists: ["lowerBack", "glutes", "hamstrings"],
         movementPattern: "mobility",
         laterality: "bilateral",
         compound: true
@@ -2878,6 +3085,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["forearms"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "unilateral",
         compound: true
@@ -2892,6 +3100,7 @@ window.exerciseMeta = {
         bucket: "resilience",
         equipmentNorm: "bodyweight",
         musclesTargeted: ["forearms"],
+        synergists: [],
         movementPattern: "mobility",
         laterality: "unilateral",
         compound: true
@@ -2957,6 +3166,7 @@ window.exerciseMeta = {
             if (typeof m.compound !== 'boolean') badEnums.push(n + ' compound not boolean');
             if (!m.musclesTargeted || !m.musclesTargeted.length) badEnums.push(n + ' musclesTargeted empty');
             else m.musclesTargeted.forEach(function (x) { if (MV.indexOf(x) === -1) badEnums.push(n + ' muscle=' + x); });
+            (m.synergists || []).forEach(function (x) { if (MV.indexOf(x) === -1) badEnums.push(n + ' synergist=' + x); });
             (m.alternatives || []).forEach(function (a) { if (!known[a]) badAlts.push(n + ' -> ' + a); });
         });
 

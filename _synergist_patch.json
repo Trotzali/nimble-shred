@@ -1,0 +1,1229 @@
+{
+  "ankle-alphabet": {
+    "synergists": [],
+    "targetPrimary": [
+      "calves",
+      "tibialis"
+    ]
+  },
+  "arm-circles": {
+    "synergists": [],
+    "targetPrimary": [
+      "frontDelts",
+      "sideDelts",
+      "rearDelts"
+    ]
+  },
+  "arnold-press": {
+    "synergists": [
+      "sideDelts",
+      "serratus",
+      "triceps"
+    ],
+    "targetPrimary": [
+      "frontDelts"
+    ]
+  },
+  "atg-split-squat": {
+    "synergists": [
+      "adductors",
+      "calves"
+    ],
+    "targetPrimary": [
+      "glutes",
+      "quads"
+    ]
+  },
+  "bench-dip": {
+    "synergists": [
+      "frontDelts",
+      "lats",
+      "traps",
+      "chest"
+    ],
+    "targetPrimary": [
+      "triceps"
+    ]
+  },
+  "bird-dog": {
+    "synergists": [
+      "frontDelts",
+      "glutes"
+    ],
+    "targetPrimary": [
+      "lowerBack"
+    ]
+  },
+  "bodyweight-squat": {
+    "synergists": [
+      "adductors",
+      "calves"
+    ],
+    "targetPrimary": [
+      "glutes",
+      "quads"
+    ]
+  },
+  "bulgarian-split-squat": {
+    "synergists": [
+      "adductors",
+      "calves"
+    ],
+    "targetPrimary": [
+      "glutes",
+      "quads"
+    ]
+  },
+  "cable-bicep-curl": {
+    "synergists": [
+      "forearms"
+    ],
+    "targetPrimary": [
+      "biceps"
+    ]
+  },
+  "cable-calf-raise": {
+    "synergists": [],
+    "targetPrimary": [
+      "calves"
+    ]
+  },
+  "cable-chest-fly-high": {
+    "synergists": [
+      "biceps",
+      "frontDelts"
+    ],
+    "targetPrimary": [
+      "chest"
+    ]
+  },
+  "cable-chest-fly-low": {
+    "synergists": [
+      "biceps",
+      "frontDelts"
+    ],
+    "targetPrimary": [
+      "chest"
+    ]
+  },
+  "cable-chest-fly-mid": {
+    "synergists": [
+      "biceps",
+      "sideDelts"
+    ],
+    "targetPrimary": [
+      "chest"
+    ]
+  },
+  "cable-chest-press": {
+    "synergists": [
+      "frontDelts",
+      "triceps"
+    ],
+    "targetPrimary": [
+      "chest"
+    ]
+  },
+  "cable-crossover": {
+    "synergists": [
+      "frontDelts"
+    ],
+    "targetPrimary": [
+      "chest"
+    ]
+  },
+  "cable-crunch": {
+    "synergists": [
+      "obliques"
+    ],
+    "targetPrimary": [
+      "abs"
+    ]
+  },
+  "cable-curl-behind-back": {
+    "synergists": [
+      "forearms"
+    ],
+    "targetPrimary": [
+      "biceps"
+    ]
+  },
+  "cable-donkey-kick": {
+    "synergists": [
+      "hamstrings"
+    ],
+    "targetPrimary": [
+      "glutes"
+    ]
+  },
+  "cable-external-rotation": {
+    "synergists": [
+      "rearDelts"
+    ],
+    "targetPrimary": [
+      "lats",
+      "rotatorCuff"
+    ]
+  },
+  "cable-french-press": {
+    "synergists": [],
+    "targetPrimary": [
+      "triceps"
+    ]
+  },
+  "cable-front-raise": {
+    "synergists": [
+      "sideDelts",
+      "chest",
+      "serratus"
+    ],
+    "targetPrimary": [
+      "frontDelts"
+    ]
+  },
+  "cable-front-squat": {
+    "synergists": [
+      "adductors",
+      "calves"
+    ],
+    "targetPrimary": [
+      "glutes",
+      "quads"
+    ]
+  },
+  "cable-hammer-curl": {
+    "synergists": [
+      "biceps"
+    ],
+    "targetPrimary": [
+      "forearms"
+    ]
+  },
+  "cable-internal-rotation": {
+    "synergists": [],
+    "targetPrimary": [
+      "frontDelts",
+      "chest"
+    ]
+  },
+  "cable-kickback": {
+    "synergists": [],
+    "targetPrimary": [
+      "triceps"
+    ]
+  },
+  "cable-lateral-raise": {
+    "synergists": [
+      "frontDelts",
+      "serratus"
+    ],
+    "targetPrimary": [
+      "sideDelts"
+    ]
+  },
+  "cable-lunge": {
+    "synergists": [],
+    "targetPrimary": [
+      "glutes",
+      "quads"
+    ]
+  },
+  "cable-overhead-press": {
+    "synergists": [
+      "sideDelts",
+      "serratus",
+      "triceps"
+    ],
+    "targetPrimary": [
+      "frontDelts"
+    ]
+  },
+  "cable-pull-through": {
+    "synergists": [
+      "lowerBack",
+      "hamstrings"
+    ],
+    "targetPrimary": [
+      "glutes"
+    ]
+  },
+  "cable-pullover-bench": {
+    "synergists": [
+      "traps",
+      "chest",
+      "triceps"
+    ],
+    "targetPrimary": [
+      "lats"
+    ]
+  },
+  "cable-rear-delt-fly": {
+    "synergists": [
+      "sideDelts",
+      "rotatorCuff",
+      "traps"
+    ],
+    "targetPrimary": [
+      "rearDelts"
+    ]
+  },
+  "cable-reverse-wrist-curl": {
+    "synergists": [],
+    "targetPrimary": [
+      "forearms"
+    ]
+  },
+  "cable-row-wide-grip": {
+    "synergists": [
+      "biceps",
+      "forearms",
+      "rearDelts"
+    ],
+    "targetPrimary": [
+      "rotatorCuff",
+      "lats",
+      "traps"
+    ]
+  },
+  "cable-shrugs": {
+    "synergists": [],
+    "targetPrimary": [
+      "traps"
+    ]
+  },
+  "cable-side-bend": {
+    "synergists": [],
+    "targetPrimary": [
+      "obliques"
+    ]
+  },
+  "cable-squat": {
+    "synergists": [
+      "adductors",
+      "calves"
+    ],
+    "targetPrimary": [
+      "glutes",
+      "quads"
+    ]
+  },
+  "cable-upright-row": {
+    "synergists": [
+      "biceps",
+      "forearms",
+      "frontDelts",
+      "rotatorCuff",
+      "serratus",
+      "traps"
+    ],
+    "targetPrimary": [
+      "sideDelts"
+    ]
+  },
+  "cable-wrist-curl": {
+    "synergists": [],
+    "targetPrimary": [
+      "forearms"
+    ]
+  },
+  "cable-y-raise": {
+    "synergists": [],
+    "targetPrimary": [
+      "sideDelts"
+    ]
+  },
+  "cable-zercher-squat": {
+    "synergists": [
+      "adductors",
+      "calves"
+    ],
+    "targetPrimary": [
+      "glutes",
+      "quads"
+    ]
+  },
+  "calf-raise-bw": {
+    "synergists": [],
+    "targetPrimary": [
+      "calves"
+    ]
+  },
+  "cat-cow-stretch": {
+    "synergists": [],
+    "targetPrimary": [
+      "lowerBack",
+      "obliques",
+      "abs"
+    ]
+  },
+  "chin-ups": {
+    "synergists": [
+      "biceps",
+      "forearms",
+      "rearDelts",
+      "chest",
+      "traps"
+    ],
+    "targetPrimary": [
+      "lats"
+    ]
+  },
+  "close-grip-push-up": {
+    "synergists": [
+      "frontDelts",
+      "chest"
+    ],
+    "targetPrimary": [
+      "triceps"
+    ]
+  },
+  "concentration-curl": {
+    "synergists": [
+      "forearms"
+    ],
+    "targetPrimary": [
+      "biceps"
+    ]
+  },
+  "cossack-squat": {
+    "synergists": [
+      "adductors",
+      "abductors",
+      "calves"
+    ],
+    "targetPrimary": [
+      "glutes",
+      "quads"
+    ]
+  },
+  "db-floor-press": {
+    "synergists": [
+      "frontDelts",
+      "triceps"
+    ],
+    "targetPrimary": [
+      "chest"
+    ]
+  },
+  "dead-bug": {
+    "synergists": [
+      "glutes",
+      "quads"
+    ],
+    "targetPrimary": [
+      "abs"
+    ]
+  },
+  "dead-hang": {
+    "synergists": [
+      "biceps",
+      "forearms"
+    ],
+    "targetPrimary": [
+      "rotatorCuff",
+      "lats",
+      "traps"
+    ]
+  },
+  "decline-push-up": {
+    "synergists": [
+      "frontDelts",
+      "triceps"
+    ],
+    "targetPrimary": [
+      "chest"
+    ]
+  },
+  "deep-squat-hold": {
+    "synergists": [
+      "adductors",
+      "calves"
+    ],
+    "targetPrimary": [
+      "glutes",
+      "quads"
+    ]
+  },
+  "diamond-push-up": {
+    "synergists": [
+      "frontDelts",
+      "chest"
+    ],
+    "targetPrimary": [
+      "triceps"
+    ]
+  },
+  "dips": {
+    "synergists": [
+      "frontDelts",
+      "lats",
+      "traps",
+      "triceps"
+    ],
+    "targetPrimary": [
+      "chest"
+    ]
+  },
+  "dumbbell-bench-press": {
+    "synergists": [
+      "frontDelts",
+      "triceps"
+    ],
+    "targetPrimary": [
+      "chest"
+    ]
+  },
+  "dumbbell-curl": {
+    "synergists": [
+      "forearms"
+    ],
+    "targetPrimary": [
+      "biceps"
+    ]
+  },
+  "dumbbell-fly": {
+    "synergists": [
+      "biceps",
+      "frontDelts"
+    ],
+    "targetPrimary": [
+      "chest"
+    ]
+  },
+  "dumbbell-incline-press": {
+    "synergists": [
+      "frontDelts",
+      "triceps"
+    ],
+    "targetPrimary": [
+      "chest"
+    ]
+  },
+  "dumbbell-lunge": {
+    "synergists": [
+      "adductors",
+      "calves"
+    ],
+    "targetPrimary": [
+      "glutes",
+      "quads"
+    ]
+  },
+  "dumbbell-pullover": {
+    "synergists": [
+      "rearDelts",
+      "lats",
+      "triceps"
+    ],
+    "targetPrimary": [
+      "chest"
+    ]
+  },
+  "dumbbell-row": {
+    "synergists": [
+      "biceps",
+      "forearms",
+      "rearDelts",
+      "chest"
+    ],
+    "targetPrimary": [
+      "rotatorCuff",
+      "lats",
+      "traps"
+    ]
+  },
+  "dumbbell-shoulder-press": {
+    "synergists": [
+      "sideDelts",
+      "chest",
+      "serratus",
+      "triceps"
+    ],
+    "targetPrimary": [
+      "frontDelts"
+    ]
+  },
+  "dumbbell-shrug": {
+    "synergists": [],
+    "targetPrimary": [
+      "traps"
+    ]
+  },
+  "eccentric-step-down": {
+    "synergists": [
+      "adductors",
+      "calves"
+    ],
+    "targetPrimary": [
+      "glutes",
+      "quads"
+    ]
+  },
+  "face-pulls": {
+    "synergists": [
+      "biceps",
+      "forearms",
+      "sideDelts",
+      "rotatorCuff",
+      "traps"
+    ],
+    "targetPrimary": [
+      "rearDelts"
+    ]
+  },
+  "farmers-walk": {
+    "synergists": [],
+    "targetPrimary": [
+      "adductors",
+      "calves",
+      "glutes",
+      "hamstrings",
+      "quads"
+    ]
+  },
+  "flutter-kicks": {
+    "synergists": [
+      "hamstrings"
+    ],
+    "targetPrimary": [
+      "glutes"
+    ]
+  },
+  "frog-stretch": {
+    "synergists": [
+      "hamstrings"
+    ],
+    "targetPrimary": [
+      "glutes",
+      "abductors"
+    ]
+  },
+  "front-raise": {
+    "synergists": [
+      "sideDelts",
+      "chest",
+      "serratus"
+    ],
+    "targetPrimary": [
+      "frontDelts"
+    ]
+  },
+  "glute-bridge": {
+    "synergists": [
+      "hamstrings",
+      "quads"
+    ],
+    "targetPrimary": [
+      "glutes"
+    ]
+  },
+  "goblet-squat": {
+    "synergists": [
+      "adductors",
+      "abductors",
+      "calves"
+    ],
+    "targetPrimary": [
+      "glutes",
+      "quads"
+    ]
+  },
+  "good-morning": {
+    "synergists": [
+      "adductors",
+      "glutes"
+    ],
+    "targetPrimary": [
+      "hamstrings"
+    ]
+  },
+  "hammer-curl": {
+    "synergists": [
+      "biceps"
+    ],
+    "targetPrimary": [
+      "forearms"
+    ]
+  },
+  "high-row-rope": {
+    "synergists": [
+      "biceps",
+      "forearms",
+      "rearDelts"
+    ],
+    "targetPrimary": [
+      "rotatorCuff",
+      "lats",
+      "traps"
+    ]
+  },
+  "horse-stance-hold": {
+    "synergists": [
+      "adductors",
+      "calves",
+      "abductors"
+    ],
+    "targetPrimary": [
+      "glutes",
+      "quads"
+    ]
+  },
+  "inchworm": {
+    "synergists": [
+      "adductors",
+      "glutes",
+      "hamstrings",
+      "chest",
+      "quads",
+      "serratus",
+      "traps",
+      "forearms"
+    ],
+    "targetPrimary": [
+      "frontDelts",
+      "obliques",
+      "abs",
+      "triceps"
+    ]
+  },
+  "incline-push-up": {
+    "synergists": [
+      "frontDelts",
+      "triceps"
+    ],
+    "targetPrimary": [
+      "chest"
+    ]
+  },
+  "inverted-row": {
+    "synergists": [
+      "biceps",
+      "forearms",
+      "rearDelts",
+      "chest"
+    ],
+    "targetPrimary": [
+      "rotatorCuff",
+      "lats",
+      "traps"
+    ]
+  },
+  "jump-squat": {
+    "synergists": [
+      "adductors",
+      "calves"
+    ],
+    "targetPrimary": [
+      "glutes",
+      "quads"
+    ]
+  },
+  "l-sit": {
+    "synergists": [],
+    "targetPrimary": [
+      "hipFlexors",
+      "quads",
+      "abs",
+      "abductors",
+      "triceps"
+    ]
+  },
+  "lat-pulldown-standing": {
+    "synergists": [
+      "biceps",
+      "forearms",
+      "rearDelts",
+      "rotatorCuff",
+      "traps"
+    ],
+    "targetPrimary": [
+      "lats"
+    ]
+  },
+  "lateral-raise": {
+    "synergists": [
+      "frontDelts",
+      "serratus"
+    ],
+    "targetPrimary": [
+      "sideDelts"
+    ]
+  },
+  "leg-raise": {
+    "synergists": [
+      "adductors",
+      "serratus",
+      "abductors"
+    ],
+    "targetPrimary": [
+      "hipFlexors"
+    ]
+  },
+  "low-step-up-fast": {
+    "synergists": [
+      "adductors",
+      "calves"
+    ],
+    "targetPrimary": [
+      "glutes",
+      "quads"
+    ]
+  },
+  "lunge-bw": {
+    "synergists": [
+      "adductors",
+      "calves"
+    ],
+    "targetPrimary": [
+      "glutes",
+      "quads"
+    ]
+  },
+  "lying-cable-curl": {
+    "synergists": [
+      "forearms"
+    ],
+    "targetPrimary": [
+      "biceps"
+    ]
+  },
+  "mcgill-curl-up": {
+    "synergists": [
+      "obliques"
+    ],
+    "targetPrimary": [
+      "abs"
+    ]
+  },
+  "neck-cars": {
+    "synergists": [],
+    "targetPrimary": [
+      "traps",
+      "neck"
+    ]
+  },
+  "open-book-stretch": {
+    "synergists": [],
+    "targetPrimary": [
+      "frontDelts",
+      "obliques",
+      "chest",
+      "abs"
+    ]
+  },
+  "overhead-cable-extension": {
+    "synergists": [],
+    "targetPrimary": [
+      "triceps"
+    ]
+  },
+  "pallof-press": {
+    "synergists": [],
+    "targetPrimary": [
+      "obliques"
+    ]
+  },
+  "pigeon-pose": {
+    "synergists": [],
+    "targetPrimary": [
+      "adductors",
+      "lowerBack",
+      "glutes",
+      "abductors",
+      "hamstrings",
+      "hipFlexors",
+      "quads"
+    ]
+  },
+  "pike-push-up": {
+    "synergists": [
+      "chest",
+      "serratus",
+      "triceps"
+    ],
+    "targetPrimary": [
+      "frontDelts"
+    ]
+  },
+  "plank": {
+    "synergists": [
+      "frontDelts",
+      "glutes",
+      "abductors",
+      "obliques",
+      "hipFlexors"
+    ],
+    "targetPrimary": [
+      "abs"
+    ]
+  },
+  "plank-jack": {
+    "synergists": [
+      "frontDelts",
+      "glutes",
+      "obliques",
+      "triceps"
+    ],
+    "targetPrimary": [
+      "abductors",
+      "chest"
+    ]
+  },
+  "plate-pinch": {
+    "synergists": [
+      "adductors",
+      "glutes",
+      "quads",
+      "calves"
+    ],
+    "targetPrimary": [
+      "forearms"
+    ]
+  },
+  "prone-press-up": {
+    "synergists": [
+      "lowerBack",
+      "glutes",
+      "hamstrings"
+    ],
+    "targetPrimary": [
+      "abs"
+    ]
+  },
+  "pull-up": {
+    "synergists": [
+      "biceps",
+      "forearms",
+      "rearDelts",
+      "rotatorCuff",
+      "traps"
+    ],
+    "targetPrimary": [
+      "lats"
+    ]
+  },
+  "renegade-row": {
+    "synergists": [
+      "biceps",
+      "forearms",
+      "rearDelts",
+      "chest"
+    ],
+    "targetPrimary": [
+      "rotatorCuff",
+      "lats",
+      "traps"
+    ]
+  },
+  "reverse-crunch": {
+    "synergists": [
+      "obliques"
+    ],
+    "targetPrimary": [
+      "abs"
+    ]
+  },
+  "reverse-grip-pushdown": {
+    "synergists": [],
+    "targetPrimary": [
+      "triceps"
+    ]
+  },
+  "reverse-plank": {
+    "synergists": [
+      "rearDelts",
+      "hamstrings",
+      "lats",
+      "obliques",
+      "triceps"
+    ],
+    "targetPrimary": [
+      "glutes",
+      "abs"
+    ]
+  },
+  "romanian-deadlift-dumbbell": {
+    "synergists": [
+      "quads",
+      "calves"
+    ],
+    "targetPrimary": [
+      "glutes",
+      "hamstrings"
+    ]
+  },
+  "russian-twist": {
+    "synergists": [
+      "hipFlexors"
+    ],
+    "targetPrimary": [
+      "obliques"
+    ]
+  },
+  "seated-cable-row": {
+    "synergists": [
+      "biceps",
+      "forearms",
+      "rearDelts",
+      "chest"
+    ],
+    "targetPrimary": [
+      "rotatorCuff",
+      "lats",
+      "traps"
+    ]
+  },
+  "seated-calf-raise": {
+    "synergists": [],
+    "targetPrimary": [
+      "calves"
+    ]
+  },
+  "shoulder-dislocates": {
+    "synergists": [
+      "rotatorCuff",
+      "lats",
+      "chest",
+      "serratus",
+      "traps"
+    ],
+    "targetPrimary": [
+      "frontDelts",
+      "sideDelts",
+      "rearDelts"
+    ]
+  },
+  "side-lunge": {
+    "synergists": [
+      "adductors",
+      "abductors",
+      "calves"
+    ],
+    "targetPrimary": [
+      "glutes",
+      "quads"
+    ]
+  },
+  "side-plank": {
+    "synergists": [],
+    "targetPrimary": [
+      "obliques"
+    ]
+  },
+  "single-arm-cable-chest-press": {
+    "synergists": [
+      "frontDelts",
+      "obliques",
+      "abductors"
+    ],
+    "targetPrimary": [
+      "chest"
+    ]
+  },
+  "single-arm-cable-row": {
+    "synergists": [
+      "biceps",
+      "forearms",
+      "rearDelts",
+      "chest"
+    ],
+    "targetPrimary": [
+      "rotatorCuff",
+      "lats",
+      "traps"
+    ]
+  },
+  "skull-crusher": {
+    "synergists": [],
+    "targetPrimary": [
+      "triceps"
+    ]
+  },
+  "sleeper-stretch": {
+    "synergists": [],
+    "targetPrimary": [
+      "frontDelts",
+      "chest"
+    ]
+  },
+  "squat-to-calf-raise": {
+    "synergists": [
+      "glutes",
+      "quads"
+    ],
+    "targetPrimary": [
+      "calves"
+    ]
+  },
+  "standing-cable-crunch": {
+    "synergists": [
+      "obliques"
+    ],
+    "targetPrimary": [
+      "abs"
+    ]
+  },
+  "standing-cable-row": {
+    "synergists": [
+      "biceps",
+      "forearms",
+      "rearDelts"
+    ],
+    "targetPrimary": [
+      "rotatorCuff",
+      "lats",
+      "traps"
+    ]
+  },
+  "standing-hip-cars": {
+    "synergists": [],
+    "targetPrimary": [
+      "lowerBack",
+      "abductors",
+      "hipFlexors",
+      "obliques",
+      "abs"
+    ]
+  },
+  "step-up": {
+    "synergists": [
+      "adductors",
+      "calves"
+    ],
+    "targetPrimary": [
+      "glutes",
+      "quads"
+    ]
+  },
+  "straight-arm-pulldown": {
+    "synergists": [
+      "rearDelts",
+      "triceps"
+    ],
+    "targetPrimary": [
+      "lats"
+    ]
+  },
+  "sumo-squat-db": {
+    "synergists": [
+      "adductors",
+      "calves",
+      "abductors"
+    ],
+    "targetPrimary": [
+      "glutes",
+      "quads"
+    ]
+  },
+  "superman": {
+    "synergists": [
+      "glutes",
+      "hamstrings"
+    ],
+    "targetPrimary": [
+      "lowerBack"
+    ]
+  },
+  "svend-press": {
+    "synergists": [
+      "frontDelts",
+      "triceps"
+    ],
+    "targetPrimary": [
+      "chest"
+    ]
+  },
+  "thoracic-bridge": {
+    "synergists": [],
+    "targetPrimary": [
+      "calves",
+      "glutes",
+      "hamstrings",
+      "rotatorCuff",
+      "lats",
+      "obliques",
+      "traps"
+    ]
+  },
+  "toe-touch": {
+    "synergists": [
+      "frontDelts",
+      "sideDelts",
+      "calves",
+      "obliques",
+      "chest",
+      "serratus"
+    ],
+    "targetPrimary": [
+      "lowerBack",
+      "glutes",
+      "hamstrings",
+      "abs"
+    ]
+  },
+  "tricep-kickback": {
+    "synergists": [],
+    "targetPrimary": [
+      "triceps"
+    ]
+  },
+  "tricep-pushdown-bar": {
+    "synergists": [],
+    "targetPrimary": [
+      "triceps"
+    ]
+  },
+  "tricep-pushdown-rope": {
+    "synergists": [],
+    "targetPrimary": [
+      "triceps"
+    ]
+  },
+  "v-up": {
+    "synergists": [
+      "adductors",
+      "obliques",
+      "quads",
+      "abductors"
+    ],
+    "targetPrimary": [
+      "hipFlexors",
+      "abs"
+    ]
+  },
+  "wide-grip-push-up": {
+    "synergists": [
+      "frontDelts",
+      "triceps"
+    ],
+    "targetPrimary": [
+      "chest"
+    ]
+  },
+  "wrist-extensor-stretch": {
+    "synergists": [],
+    "targetPrimary": [
+      "forearms"
+    ]
+  },
+  "wrist-flexor-stretch": {
+    "synergists": [],
+    "targetPrimary": [
+      "forearms"
+    ]
+  },
+  "wrist-rocks": {
+    "synergists": [],
+    "targetPrimary": [
+      "forearms"
+    ]
+  },
+  "zottman-curl": {
+    "synergists": [
+      "forearms"
+    ],
+    "targetPrimary": [
+      "biceps"
+    ]
+  }
+}
