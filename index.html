@@ -31,29 +31,37 @@
     var USER_ID = null;
     var LAST_SYNC_TIME = null;
     </script>
+    <!-- D1 reskin (v107): webfont foundation — Archivo (display) / Hanken Grotesk (body) / JetBrains Mono (data) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #121212; --card: #1e1e1e; --primary: #8A8F98; --sec: #03DAC6;
-            --text: #fff; --gold: #FFD700; --danger: #CF6679; --warn: #FF9800;
-            --success: #00C853; --push-color: #FF6B6B; --pull-color: #4ECDC4;
+            /* D1 reskin foundation (v107): graphite base, teal accent (locked), 2nd-tone amber, type tokens.
+               LOCKED values from the redesign-10 prototype + T5 audit (_reskin_token_audit.md). Substrate only. */
+            --bg: #0F1011; --card: #16191B; --surface: var(--card); --surface-2: #1C2123;
+            --line: #272C2F; --line2: #323A3D; --border: var(--line);
+            --text: #F2F0EB; --text-muted: #969C9F; --hint: #5F666A;
+            --sec: #03DAC6; --accent: var(--sec); --accent-weak: rgba(3,218,198,0.30);
+            --teal-ink: #04302A; --teal-deep: #0B4A40;
+            --amber: #E0A35C; --warn: var(--amber);
+            --success: #00C853; --danger: #CF6679; --radius: 14px;
+            --font-display: 'Archivo', sans-serif; --font-body: 'Hanken Grotesk', sans-serif; --font-mono: 'JetBrains Mono', monospace;
+            /* Retained legacy tokens — OUT OF D1 SCOPE (do not collapse this phase): --primary still has other
+               consumers (left intact per "don't hunt further"); workout-type rainbow + --gold/--rest-color untouched. */
+            --primary: #8A8F98;
+            --gold: #FFD700;
+            --push-color: #FF6B6B; --pull-color: #4ECDC4;
             --legs-color: #95E1D3; --cardio-color: #3498db; --nimble-color: #5BB98B;
             --rest-color: #555;
-            /* P1: --primary neutralised from Material Purple 200 (#BB86FC) to desaturated slate — kills the AI palette tell; accent stays teal (--sec) */
-            /* FLAG 2 groundwork (inert): additive token aliases to existing live equivalents; no consumers yet, zero behaviour change */
-            --accent: var(--sec);
-            --surface: var(--card);
-            --border: rgba(255,255,255,0.04);
-            --text-muted: #888;
-            --radius: 14px;
-            --shadow: 0 2px 12px rgba(0,0,0,0.3);
-            --accent-weak: rgba(3, 218, 198, 0.30);   /* teal @ low alpha — focus ring (P5), ghost-hover fill (P2) */
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            background: var(--bg); color: var(--text); padding: 20px; 
+        body {
+            font-family: var(--font-body);
+            background: var(--bg); color: var(--text); padding: 20px;
             padding-bottom: 100px; -webkit-tap-highlight-color: transparent;
         }
+        /* D1: headings + card titles (rendered as h2/h3/h4) route to the display face */
+        h1, h2, h3, h4 { font-family: var(--font-display); }
         
         /* CONTAINERS */
         .container { max-width: 800px; margin: 0 auto; display: none; }
@@ -126,9 +134,9 @@
         }
         .chip:hover { background: rgba(255,255,255,0.1); border-color: var(--sec); color: var(--sec); }
         .chip:active { transform: scale(0.96); }
-        .chip.active { 
-            background: var(--primary); color: #000; 
-            border-color: var(--primary); font-weight: bold; 
+        .chip.active {
+            background: var(--sec); color: #000;
+            border-color: var(--sec); font-weight: bold;
         }
         
         /* PROGRESSIVE SETS */
@@ -147,8 +155,8 @@
             border: 2px solid var(--sec); margin: 8px 0; 
             box-shadow: 0 0 10px rgba(3,218,198,0.2);
         }
-        .progression-badge { 
-            background: var(--gold); color: #000; padding: 4px 8px; 
+        .progression-badge {
+            background: var(--success); color: #000; padding: 4px 8px;
             border-radius: 12px; font-size: 0.75em; font-weight: bold; 
         }
         
@@ -229,8 +237,8 @@
         .encyclopedia-section li:before { 
             content: '▸'; position: absolute; left: 0; color: var(--sec); 
         }
-        .muscle-badge { 
-            display: inline-block; background: var(--primary); 
+        .muscle-badge {
+            display: inline-block; background: var(--sec);
             color: #000; padding: 3px 8px; border-radius: 12px; 
             font-size: 0.75em; margin: 3px; font-weight: bold;
         }
@@ -333,7 +341,7 @@
         .recovery-score {
             font-size: 72px;
             font-weight: 700;
-            font-family: monospace;
+            font-family: var(--font-mono);
             text-align: center;
             margin: 30px 0;
             background: linear-gradient(135deg, #00ff9d, #00d4ff);
@@ -376,7 +384,7 @@
         .metric-value {
             font-size: 1.8em;
             font-weight: 700;
-            font-family: monospace;
+            font-family: var(--font-mono);
             color: #00ff9d;
         }
         .ai-recommendation {
@@ -407,7 +415,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-family: monospace;
+            font-family: var(--font-mono);
             font-size: 0.9em;
         }
         .file-item .file-name { color: #00ff9d; }
@@ -599,7 +607,7 @@
             transition: background 0.3s;
         }
         .consult-progress-dot.filled { background: var(--sec); }
-        .consult-progress-dot.active { background: var(--primary); }
+        .consult-progress-dot.active { background: var(--sec); }
         .consult-messages {
             flex: 1; overflow-y: auto; padding: 16px;
             display: flex; flex-direction: column; gap: 12px;
@@ -1216,7 +1224,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec);">v106</span>
+        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v107</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -1494,7 +1502,7 @@
             <strong>Status:</strong> <span id="cloud-status-text">Initializing...</span>
         </div>
         <div style="margin-bottom: 10px;">
-            <strong>Device ID:</strong> <span id="device-id-text" style="font-family: monospace; font-size: 0.85em;"></span>
+            <strong>Device ID:</strong> <span id="device-id-text" style="font-family: var(--font-mono); font-size: 0.85em;"></span>
         </div>
       <div id="cloud-sync-info" style="margin-top: 15px;">
             <p><strong>Last sync:</strong> <span id="last-sync-time">Never</span></p>
@@ -1788,7 +1796,7 @@
                 <summary style="cursor: pointer; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> View Raw Garmin Data
                 </summary>
-                <div id="rawData" style="margin-top: 15px; font-family: monospace; font-size: 0.85em; background: #000; padding: 15px; border-radius: 8px; overflow-x: auto; max-height: 400px; overflow-y: auto;"></div>
+                <div id="rawData" style="margin-top: 15px; font-family: var(--font-mono); font-size: 0.85em; background: #000; padding: 15px; border-radius: 8px; overflow-x: auto; max-height: 400px; overflow-y: auto;"></div>
             </details>
         </div>
         
