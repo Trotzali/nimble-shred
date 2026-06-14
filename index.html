@@ -1216,7 +1216,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec);">v102</span>
+        <span style="font-size:1.3em; color: var(--sec);">v103</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -5794,7 +5794,9 @@ function renderPlanOverview() {
     }
     
     // Weekly schedule summary
-    var schedule = (savedPlan && savedPlan.weekSchedule) ? savedPlan.weekSchedule : (activePlan ? activePlan.schedule : null);
+    // #9/#10: read the live, editable activePlan.schedule (same source as calendar + banner);
+    // currentPlan.weekSchedule only as fallback, so a day edit can't desync the overview pills.
+    var schedule = (activePlan && activePlan.schedule) ? activePlan.schedule : ((savedPlan && savedPlan.weekSchedule) || null);
     if (schedule) {
         var dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         var typeColors = {push:'#FF6B6B', pull:'#4ECDC4', legs:'#95E1D3', cardio:'#3498db', nimble:'#5BB98B', rest:'#555'};
