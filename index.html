@@ -71,7 +71,15 @@
             margin-bottom: 14px; border: 1px solid var(--border);
             /* P3: box-shadow removed — flat, single hairline border */
         }
-        
+        /* D2 hero retoken: teal-graphite gradient is set inline on #todays-banner; this adds the soft radial teal glow (top-right), clipped and kept behind the content. */
+        #todays-banner { position: relative; overflow: hidden; }
+        #todays-banner::after {
+            content: ''; position: absolute; top: -45%; right: -20%;
+            width: 70%; height: 150%; pointer-events: none; z-index: 0;
+            background: radial-gradient(circle, rgba(3,218,198,.16), transparent 72%);
+        }
+        #todays-banner > * { position: relative; z-index: 1; }
+
         /* BUTTONS */
         .btn {
             display: block; width: 100%; min-height: 48px; padding: 14px;
@@ -1215,7 +1223,7 @@
 <div class="container active" id="view-coach">
 
     <!-- TODAY'S BANNER (Coach tab only — #6a) -->
-    <div id="todays-banner" class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: none;">
+    <div id="todays-banner" class="card" style="background: linear-gradient(162deg,#0F3A34 0%,#13211F 60%,#13181A 100%); border: 1px solid #1d4540; border-radius: 20px; display: none;">
         <h3 style="margin-bottom: 10px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg> <span id="today-date"></span></h3>
         <div style="font-size: 1.1em; margin-bottom: 15px;">
             Planned: <span id="today-workout"></span>
@@ -1224,7 +1232,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v108</span>
+        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v109</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -6170,7 +6178,7 @@ function updateTodaysBanner() {
     banner.innerHTML =
         '<h3 style="margin-bottom:10px;">' + calIcon + dateStr + '</h3>' +
         '<div style="font-size:1.1em; margin-bottom:15px;">Planned: ' + typeIcon + ' ' + typeLabel(type).toUpperCase() + '</div>' +
-        '<button class="btn btn-main" id="today-start-btn" onclick="startTodaysWorkout()">' + playIcon + ' Start Today\'s Plan: ' + typeLabel(type).toUpperCase() + '</button>';
+        '<button class="btn btn-main" id="today-start-btn" style="color: var(--teal-ink);" onclick="startTodaysWorkout()">' + playIcon + ' Start Today\'s Plan: ' + typeLabel(type).toUpperCase() + '</button>';
 }
 
 function startTodaysWorkout() {
