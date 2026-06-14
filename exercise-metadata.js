@@ -1,5 +1,5 @@
 // ============================================================================
-// NIMBLE SHRED — EXERCISE METADATA SUBSTRATE (v1.6.0)
+// NIMBLE SHRED — EXERCISE METADATA SUBSTRATE (v1.7.0)
 // ============================================================================
 // Standalone data layer for pain-aware exercise swapping ("train around a
 // niggle"), prehab/rehab programming, set-logging UX, training-bucket /
@@ -27,6 +27,14 @@
 // _synergist_patch.json). Merges 28 OK* extra-primary additions into
 // musclesTargeted; 10 DISAGREE targets kept (see _metadata_synergist_proposal.md
 // §3, incl. the sleeper-stretch SWAP-inheritance exclusion). No other field changed.
+//
+// v1.7.0 — RELATIONSHIP LAYER. Adds four ADDITIVE fields to every entry from
+// _relationship_metadata_patch.json (derived purely from existing fields, see
+// _relationship_metadata_proposal.md): antagonistOf[] (24-vocab muscles opposed,
+// for push-pull / antagonist supersets; 177 populated, 25 []), redundantWith[]
+// (near-twin entries for picker variety, symmetric, threshold 0.67; 134 populated,
+// 68 [], 45 clusters), forceVector (vertical 104 / horizontal 53 / rotational 20 /
+// axial 17 / lateral 8) and axialLoad boolean (35 true). No existing field changed.
 //
 // SCHEMA — window.exerciseMeta[exerciseName] = {
 //
@@ -65,6 +73,21 @@
 //       also lightly loads the wrist reads compound=true by this mechanical
 //       definition — it is NOT a movementPattern judgement).
 //
+//   ── v1.7.0 RELATIONSHIP ADDITIONS (all derived, additive) ────────────────
+//
+//   antagonistOf: string[]   24-vocab muscle groups opposed by this entry's
+//       primary movers (push-pull balance / antagonist supersets). [] when the
+//       movers have no clean single antagonist or the move is self-balanced.
+//   redundantWith: string[]  entry names with near-identical stimulus (same
+//       movementPattern AND Jaccard(musclesTargeted) >= 0.67). Symmetric; for
+//       picker variety / dedup. Equipment intentionally ignored.
+//   forceVector: "vertical" | "horizontal" | "lateral" | "rotational" | "axial"
+//       primary line of resistance/movement (from movementPattern, isolation/
+//       mobility fall back to primary muscle).
+//   axialLoad: boolean — does the load compress the spine? true for squat/hinge/
+//       push-vertical/carry and loaded lunges; false for traction pulls,
+//       horizontal/supported work, and bodyweight isolation.
+//
 // GENERATED from exercise-metadata.js v1.3.0 (+ this pass). All alternatives
 // resolve; every entry carries a complete 9-joint score and all three new
 // selection fields.
@@ -84,7 +107,11 @@ window.exerciseMeta = {
         synergists: ["frontDelts", "triceps"],
         movementPattern: "push-horizontal",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lats", "rhomboids", "rearDelts", "biceps"],
+        redundantWith: ["Dumbbell Bench Press"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Cable Chest Fly (High)": {
         alternatives: ["Cable Chest Fly (Mid)", "Svend Press"],
@@ -99,7 +126,11 @@ window.exerciseMeta = {
         synergists: ["biceps", "frontDelts"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lats", "rhomboids", "rearDelts"],
+        redundantWith: ["Cable Chest Fly (Low)"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Cable Chest Fly (Low)": {
         alternatives: ["Cable Chest Fly (Mid)", "Svend Press"],
@@ -114,7 +145,11 @@ window.exerciseMeta = {
         synergists: ["biceps", "frontDelts"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lats", "rhomboids", "rearDelts"],
+        redundantWith: ["Cable Chest Fly (High)"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Cable Chest Fly (Mid)": {
         alternatives: ["Svend Press"],
@@ -129,7 +164,11 @@ window.exerciseMeta = {
         synergists: ["biceps", "sideDelts"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lats", "rhomboids", "rearDelts"],
+        redundantWith: ["Cable Crossover", "Dumbbell Fly"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Single Arm Cable Chest Press": {
         alternatives: ["Cable Chest Press", "DB Floor Press"],
@@ -144,7 +183,11 @@ window.exerciseMeta = {
         synergists: ["frontDelts", "obliques", "abductors"],
         movementPattern: "push-horizontal",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lats", "rhomboids", "rearDelts", "lowerBack", "biceps"],
+        redundantWith: [],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Cable Crossover": {
         alternatives: ["Cable Chest Fly (Mid)", "Svend Press"],
@@ -159,7 +202,11 @@ window.exerciseMeta = {
         synergists: ["frontDelts"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lats", "rhomboids", "rearDelts"],
+        redundantWith: ["Cable Chest Fly (Mid)", "Dumbbell Fly"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Cable Pullover (Bench)": {
         alternatives: ["Straight Arm Pulldown"],
@@ -174,7 +221,11 @@ window.exerciseMeta = {
         synergists: ["traps", "chest", "triceps"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["rhomboids", "frontDelts", "rearDelts"],
+        redundantWith: [],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Lat Pulldown (Standing)": {
         alternatives: ["Straight Arm Pulldown", "Seated Cable Row"],
@@ -189,7 +240,11 @@ window.exerciseMeta = {
         synergists: ["biceps", "forearms", "rearDelts", "rotatorCuff", "traps"],
         movementPattern: "pull-vertical",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["chest", "frontDelts", "triceps"],
+        redundantWith: ["Chin-ups", "Pull-ups"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Seated Cable Row": {
         alternatives: ["Single Arm Cable Row", "Inverted Row"],
@@ -204,7 +259,11 @@ window.exerciseMeta = {
         synergists: ["biceps", "forearms", "rearDelts", "chest"],
         movementPattern: "pull-horizontal",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["chest", "serratus", "frontDelts"],
+        redundantWith: ["Dumbbell Row", "Inverted Row"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Face Pulls": {
         alternatives: ["Cable Rear Delt Fly", "Wall Slides"],
@@ -219,7 +278,11 @@ window.exerciseMeta = {
         synergists: ["biceps", "forearms", "sideDelts", "rotatorCuff", "traps"],
         movementPattern: "pull-horizontal",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["chest", "frontDelts"],
+        redundantWith: [],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Straight Arm Pulldown": {
         alternatives: ["Lat Pulldown (Standing)"],
@@ -234,7 +297,11 @@ window.exerciseMeta = {
         synergists: ["rearDelts", "triceps"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["chest", "frontDelts"],
+        redundantWith: [],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Single Arm Cable Row": {
         alternatives: ["Inverted Row", "Seated Cable Row"],
@@ -249,7 +316,11 @@ window.exerciseMeta = {
         synergists: ["biceps", "forearms", "rearDelts", "chest"],
         movementPattern: "pull-horizontal",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["chest", "frontDelts", "lowerBack"],
+        redundantWith: ["Renegade Row"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Cable Shrugs": {
         alternatives: ["DB Shrugs"],
@@ -264,7 +335,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: [],
+        redundantWith: ["DB Shrugs"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Cable Rear Delt Fly": {
         alternatives: ["Face Pulls", "Powell Raise"],
@@ -279,7 +354,11 @@ window.exerciseMeta = {
         synergists: ["sideDelts", "rotatorCuff", "traps"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["chest", "frontDelts"],
+        redundantWith: [],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "High Row (Rope)": {
         alternatives: ["Face Pulls", "Seated Cable Row"],
@@ -294,7 +373,11 @@ window.exerciseMeta = {
         synergists: ["biceps", "forearms", "rearDelts"],
         movementPattern: "pull-horizontal",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["chest", "serratus", "frontDelts"],
+        redundantWith: ["Cable Row (Wide Grip)"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Cable Overhead Press": {
         alternatives: ["Dumbbell Shoulder Press", "Cable Front Raise"],
@@ -309,7 +392,11 @@ window.exerciseMeta = {
         synergists: ["sideDelts", "serratus", "triceps"],
         movementPattern: "push-vertical",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["rearDelts", "lats", "biceps"],
+        redundantWith: [],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Cable Lateral Raise": {
         alternatives: ["Lateral Raise"],
@@ -324,7 +411,11 @@ window.exerciseMeta = {
         synergists: ["frontDelts", "serratus"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: [],
+        redundantWith: ["Lateral Raise"],
+        forceVector: "lateral",
+        axialLoad: false
     },
     "Cable Front Raise": {
         alternatives: ["Front Raise"],
@@ -339,7 +430,11 @@ window.exerciseMeta = {
         synergists: ["sideDelts", "chest", "serratus"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["rearDelts", "lats"],
+        redundantWith: ["Front Raise"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Cable External Rotation": {
         alternatives: ["Face Pulls", "Wall Slides"],
@@ -354,7 +449,11 @@ window.exerciseMeta = {
         synergists: ["rearDelts"],
         movementPattern: "isolation",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["chest", "frontDelts"],
+        redundantWith: [],
+        forceVector: "rotational",
+        axialLoad: false
     },
     "Cable Internal Rotation": {
         alternatives: ["Cable External Rotation", "Face Pulls"],
@@ -369,7 +468,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: [],
+        redundantWith: [],
+        forceVector: "rotational",
+        axialLoad: false
     },
     "Cable Upright Row": {
         alternatives: ["Cable Lateral Raise", "Lateral Raise"],
@@ -384,7 +487,11 @@ window.exerciseMeta = {
         synergists: ["biceps", "forearms", "frontDelts", "rotatorCuff", "serratus", "traps"],
         movementPattern: "pull-vertical",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: [],
+        redundantWith: [],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Cable Y-Raise": {
         alternatives: ["Wall Slides", "Face Pulls"],
@@ -399,7 +506,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: [],
+        redundantWith: ["Lu Raise"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Tricep Pushdown (Rope)": {
         alternatives: ["Cable Kickback"],
@@ -414,7 +525,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["biceps"],
+        redundantWith: ["Cable French Press", "Cable Kickback", "Overhead Cable Extension", "Reverse Grip Pushdown", "Skull Crusher (DB)", "Tricep Kickback", "Tricep Pushdown (Bar)"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Tricep Pushdown (Bar)": {
         alternatives: ["Tricep Pushdown (Rope)", "Cable Kickback"],
@@ -429,7 +544,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["biceps"],
+        redundantWith: ["Cable French Press", "Cable Kickback", "Overhead Cable Extension", "Reverse Grip Pushdown", "Skull Crusher (DB)", "Tricep Kickback", "Tricep Pushdown (Rope)"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Overhead Cable Extension": {
         alternatives: ["Tricep Pushdown (Rope)", "Cable Kickback"],
@@ -444,7 +563,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["biceps"],
+        redundantWith: ["Cable French Press", "Cable Kickback", "Reverse Grip Pushdown", "Skull Crusher (DB)", "Tricep Kickback", "Tricep Pushdown (Bar)", "Tricep Pushdown (Rope)"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Cable Bicep Curl": {
         alternatives: ["Cable Hammer Curl"],
@@ -459,7 +582,11 @@ window.exerciseMeta = {
         synergists: ["forearms"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["triceps"],
+        redundantWith: ["Bayesian Curl", "Cable Curl (Behind Back)", "Concentration Curl", "Dumbbell Curl", "Lying Cable Curl"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Cable Hammer Curl": {
         alternatives: ["Hammer Curl"],
@@ -474,7 +601,11 @@ window.exerciseMeta = {
         synergists: ["biceps"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["triceps"],
+        redundantWith: ["Hammer Curl", "Zottman Curl"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Bayesian Curl": {
         alternatives: ["Cable Bicep Curl", "Cable Hammer Curl"],
@@ -489,7 +620,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["triceps"],
+        redundantWith: ["Cable Bicep Curl", "Cable Curl (Behind Back)", "Concentration Curl", "Dumbbell Curl", "Lying Cable Curl"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Cable Kickback": {
         alternatives: ["Tricep Pushdown (Rope)"],
@@ -504,7 +639,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["biceps"],
+        redundantWith: ["Cable French Press", "Overhead Cable Extension", "Reverse Grip Pushdown", "Skull Crusher (DB)", "Tricep Kickback", "Tricep Pushdown (Bar)", "Tricep Pushdown (Rope)"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Reverse Grip Pushdown": {
         alternatives: ["Tricep Pushdown (Rope)"],
@@ -519,7 +658,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["biceps"],
+        redundantWith: ["Cable French Press", "Cable Kickback", "Overhead Cable Extension", "Skull Crusher (DB)", "Tricep Kickback", "Tricep Pushdown (Bar)", "Tricep Pushdown (Rope)"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Cable Squat": {
         alternatives: ["Bodyweight Squat", "Glute Bridge"],
@@ -534,7 +677,11 @@ window.exerciseMeta = {
         synergists: ["adductors", "calves"],
         movementPattern: "squat",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hamstrings", "hipFlexors"],
+        redundantWith: ["Bodyweight Squat", "Pistol Squat"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Cable Pull-Through": {
         alternatives: ["Glute Bridge", "Cable Kickback (Glute)"],
@@ -549,7 +696,11 @@ window.exerciseMeta = {
         synergists: ["lowerBack", "hamstrings"],
         movementPattern: "hinge",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hipFlexors", "quads"],
+        redundantWith: ["Single Leg RDL (BW)"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Cable RDL": {
         alternatives: ["Cable Pull-Through", "Glute Bridge"],
@@ -564,7 +715,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "hinge",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["quads"],
+        redundantWith: ["Nordic Curl"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Cable Lunge": {
         alternatives: ["Lunge (BW)", "DB Step Up"],
@@ -579,7 +734,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "lunge",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["hamstrings", "hipFlexors"],
+        redundantWith: ["Bulgarian Split Squat", "DB Step Up", "Eccentric Step Down"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Cable Kickback (Glute)": {
         alternatives: ["Glute Bridge", "Cable Donkey Kick"],
@@ -594,7 +753,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "hinge",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hipFlexors"],
+        redundantWith: ["Cable Donkey Kick", "Glute Bridge", "Single Leg Glute Bridge"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Cable Calf Raise": {
         alternatives: ["Calf Raise (BW)", "Seated Calf Raise"],
@@ -609,7 +772,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: false
+        compound: false,
+        antagonistOf: ["tibialis"],
+        redundantWith: ["Calf Raise (BW)", "Seated Calf Raise"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Cable Abductor": {
         alternatives: ["Cable Hip Abduction (Standing)", "Side Plank"],
@@ -624,7 +791,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "unilateral",
-        compound: false
+        compound: false,
+        antagonistOf: ["adductors"],
+        redundantWith: ["Cable Hip Abduction (Standing)"],
+        forceVector: "lateral",
+        axialLoad: false
     },
     "Cable Adductor": {
         alternatives: ["Cable Hip Adduction (Standing)"],
@@ -639,7 +810,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "unilateral",
-        compound: false
+        compound: false,
+        antagonistOf: ["abductors"],
+        redundantWith: ["Cable Hip Adduction (Standing)"],
+        forceVector: "lateral",
+        axialLoad: false
     },
     "Cable Crunch": {
         alternatives: ["Reverse Crunch", "Dead Bug"],
@@ -654,7 +829,11 @@ window.exerciseMeta = {
         synergists: ["obliques"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lowerBack"],
+        redundantWith: ["Flutter Kicks", "Reverse Crunch", "Standing Cable Crunch"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Woodchopper (High to Low)": {
         alternatives: ["Pallof Press"],
@@ -669,7 +848,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "rotation",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lowerBack"],
+        redundantWith: ["Cable Side Bend", "Russian Twist", "Woodchopper (Low to High)"],
+        forceVector: "rotational",
+        axialLoad: false
     },
     "Pallof Press": {
         alternatives: ["Dead Bug", "Bird Dog"],
@@ -684,7 +867,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "anti-rotation",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lowerBack"],
+        redundantWith: [],
+        forceVector: "rotational",
+        axialLoad: false
     },
     "Cable Side Bend": {
         alternatives: ["Side Plank", "Pallof Press"],
@@ -699,7 +886,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "rotation",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lowerBack"],
+        redundantWith: ["Russian Twist", "Woodchopper (High to Low)", "Woodchopper (Low to High)"],
+        forceVector: "rotational",
+        axialLoad: false
     },
     "Woodchopper (Low to High)": {
         alternatives: ["Pallof Press"],
@@ -714,7 +905,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "rotation",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lowerBack"],
+        redundantWith: ["Cable Side Bend", "Russian Twist", "Woodchopper (High to Low)"],
+        forceVector: "rotational",
+        axialLoad: false
     },
     "Dumbbell Bench Press": {
         alternatives: ["DB Floor Press", "Push-ups"],
@@ -729,7 +924,11 @@ window.exerciseMeta = {
         synergists: ["frontDelts", "triceps"],
         movementPattern: "push-horizontal",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lats", "rhomboids", "rearDelts", "biceps"],
+        redundantWith: ["Cable Chest Press"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Dumbbell Incline Press": {
         alternatives: ["DB Floor Press", "Decline Push-up"],
@@ -744,7 +943,11 @@ window.exerciseMeta = {
         synergists: ["frontDelts", "triceps"],
         movementPattern: "push-horizontal",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lats", "rhomboids", "rearDelts"],
+        redundantWith: [],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Dumbbell Fly": {
         alternatives: ["Cable Chest Fly (Mid)", "Svend Press"],
@@ -759,7 +962,11 @@ window.exerciseMeta = {
         synergists: ["biceps", "frontDelts"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lats", "rhomboids", "rearDelts"],
+        redundantWith: ["Cable Chest Fly (Mid)", "Cable Crossover"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Dumbbell Shoulder Press": {
         alternatives: ["Front Raise", "Lateral Raise"],
@@ -774,7 +981,11 @@ window.exerciseMeta = {
         synergists: ["sideDelts", "chest", "serratus", "triceps"],
         movementPattern: "push-vertical",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lats", "chest", "biceps"],
+        redundantWith: ["Arnold Press", "Handstand Hold", "Pike Push-up"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Arnold Press": {
         alternatives: ["Dumbbell Shoulder Press", "Front Raise"],
@@ -789,7 +1000,11 @@ window.exerciseMeta = {
         synergists: ["sideDelts", "serratus", "triceps"],
         movementPattern: "push-vertical",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lats", "chest"],
+        redundantWith: ["Dumbbell Shoulder Press", "Handstand Hold", "Pike Push-up"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Lateral Raise": {
         alternatives: ["Cable Lateral Raise"],
@@ -804,7 +1019,11 @@ window.exerciseMeta = {
         synergists: ["frontDelts", "serratus"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: [],
+        redundantWith: ["Cable Lateral Raise"],
+        forceVector: "lateral",
+        axialLoad: false
     },
     "Front Raise": {
         alternatives: ["Cable Front Raise"],
@@ -819,7 +1038,11 @@ window.exerciseMeta = {
         synergists: ["sideDelts", "chest", "serratus"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["rearDelts", "lats"],
+        redundantWith: ["Cable Front Raise"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Dumbbell Row": {
         alternatives: ["Seated Cable Row", "Inverted Row"],
@@ -834,7 +1057,11 @@ window.exerciseMeta = {
         synergists: ["biceps", "forearms", "rearDelts", "chest"],
         movementPattern: "pull-horizontal",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["chest", "frontDelts", "serratus", "triceps"],
+        redundantWith: ["Inverted Row", "Seated Cable Row"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Dumbbell Pullover": {
         alternatives: ["Straight Arm Pulldown"],
@@ -849,7 +1076,11 @@ window.exerciseMeta = {
         synergists: ["rearDelts", "lats", "triceps"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["chest", "frontDelts", "rhomboids"],
+        redundantWith: [],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Goblet Squat": {
         alternatives: ["Bodyweight Squat", "Cable Squat"],
@@ -864,7 +1095,11 @@ window.exerciseMeta = {
         synergists: ["adductors", "abductors", "calves"],
         movementPattern: "squat",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hamstrings", "hipFlexors", "lowerBack"],
+        redundantWith: ["Cable Front Squat"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Dumbbell Lunge": {
         alternatives: ["Lunge (BW)", "DB Step Up"],
@@ -879,7 +1114,11 @@ window.exerciseMeta = {
         synergists: ["adductors", "calves"],
         movementPattern: "lunge",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["hipFlexors"],
+        redundantWith: ["Jumping Lunge", "Lunge (BW)", "Reverse Lunge to Knee Drive"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Bulgarian Split Squat": {
         alternatives: ["DB Step Up", "Lunge (BW)"],
@@ -894,7 +1133,11 @@ window.exerciseMeta = {
         synergists: ["adductors", "calves"],
         movementPattern: "lunge",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hipFlexors", "hamstrings"],
+        redundantWith: ["Cable Lunge", "DB Step Up", "Eccentric Step Down"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Romanian Deadlift (DB)": {
         alternatives: ["Cable Pull-Through", "Glute Bridge"],
@@ -909,7 +1152,11 @@ window.exerciseMeta = {
         synergists: ["quads", "calves"],
         movementPattern: "hinge",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["quads", "hipFlexors", "abs"],
+        redundantWith: [],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Dumbbell Curl": {
         alternatives: ["Hammer Curl"],
@@ -924,7 +1171,11 @@ window.exerciseMeta = {
         synergists: ["forearms"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["triceps"],
+        redundantWith: ["Bayesian Curl", "Cable Bicep Curl", "Cable Curl (Behind Back)", "Concentration Curl", "Lying Cable Curl"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Hammer Curl": {
         alternatives: ["Cable Hammer Curl"],
@@ -939,7 +1190,11 @@ window.exerciseMeta = {
         synergists: ["biceps"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["triceps"],
+        redundantWith: ["Cable Hammer Curl", "Zottman Curl"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Tricep Kickback": {
         alternatives: ["Cable Kickback", "Tricep Pushdown (Rope)"],
@@ -954,7 +1209,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["biceps"],
+        redundantWith: ["Cable French Press", "Cable Kickback", "Overhead Cable Extension", "Reverse Grip Pushdown", "Skull Crusher (DB)", "Tricep Pushdown (Bar)", "Tricep Pushdown (Rope)"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Skull Crusher (DB)": {
         alternatives: ["Tricep Pushdown (Rope)", "Cable Kickback"],
@@ -969,7 +1228,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["biceps"],
+        redundantWith: ["Cable French Press", "Cable Kickback", "Overhead Cable Extension", "Reverse Grip Pushdown", "Tricep Kickback", "Tricep Pushdown (Bar)", "Tricep Pushdown (Rope)"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Farmers Walk": {
         alternatives: ["Plank", "DB Shrugs"],
@@ -984,7 +1247,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "carry",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lowerBack"],
+        redundantWith: [],
+        forceVector: "axial",
+        axialLoad: true
     },
     "Zottman Curl": {
         alternatives: ["Hammer Curl", "Dumbbell Curl"],
@@ -999,7 +1266,11 @@ window.exerciseMeta = {
         synergists: ["forearms"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["triceps"],
+        redundantWith: ["Cable Hammer Curl", "Hammer Curl"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Concentration Curl": {
         alternatives: ["Dumbbell Curl", "Cable Bicep Curl"],
@@ -1014,7 +1285,11 @@ window.exerciseMeta = {
         synergists: ["forearms"],
         movementPattern: "isolation",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["triceps"],
+        redundantWith: ["Bayesian Curl", "Cable Bicep Curl", "Cable Curl (Behind Back)", "Dumbbell Curl", "Lying Cable Curl"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "DB Floor Press": {
         alternatives: ["Svend Press", "Incline Push-up"],
@@ -1029,7 +1304,11 @@ window.exerciseMeta = {
         synergists: ["frontDelts", "triceps"],
         movementPattern: "push-horizontal",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["biceps", "lats", "rhomboids", "rearDelts"],
+        redundantWith: ["Diamond Push-up"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Renegade Row": {
         alternatives: ["Dumbbell Row", "Bird Dog"],
@@ -1044,7 +1323,11 @@ window.exerciseMeta = {
         synergists: ["biceps", "forearms", "rearDelts", "chest"],
         movementPattern: "pull-horizontal",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["chest", "frontDelts", "lowerBack"],
+        redundantWith: ["Single Arm Cable Row"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "DB Step Up": {
         alternatives: ["Lunge (BW)", "Glute Bridge"],
@@ -1059,7 +1342,11 @@ window.exerciseMeta = {
         synergists: ["adductors", "calves"],
         movementPattern: "lunge",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["hipFlexors", "hamstrings"],
+        redundantWith: ["Bulgarian Split Squat", "Cable Lunge", "Eccentric Step Down"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "DB Shrugs": {
         alternatives: ["Cable Shrugs"],
@@ -1074,7 +1361,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: [],
+        redundantWith: ["Cable Shrugs"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Seated Calf Raise": {
         alternatives: ["Calf Raise (BW)", "Cable Calf Raise"],
@@ -1089,7 +1380,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["tibialis"],
+        redundantWith: ["Cable Calf Raise", "Calf Raise (BW)"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Push-ups": {
         alternatives: ["Incline Push-up", "DB Floor Press"],
@@ -1104,7 +1399,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "push-horizontal",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lats", "rhomboids", "rearDelts", "biceps", "lowerBack"],
+        redundantWith: [],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Pull-ups": {
         alternatives: ["Lat Pulldown (Standing)", "Inverted Row"],
@@ -1119,7 +1418,11 @@ window.exerciseMeta = {
         synergists: ["biceps", "forearms", "rearDelts", "rotatorCuff", "traps"],
         movementPattern: "pull-vertical",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["chest", "frontDelts", "triceps"],
+        redundantWith: ["Chin-ups", "Lat Pulldown (Standing)"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Chin-ups": {
         alternatives: ["Lat Pulldown (Standing)", "Inverted Row"],
@@ -1134,7 +1437,11 @@ window.exerciseMeta = {
         synergists: ["biceps", "forearms", "rearDelts", "chest", "traps"],
         movementPattern: "pull-vertical",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["triceps", "chest", "frontDelts"],
+        redundantWith: ["Lat Pulldown (Standing)", "Pull-ups"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Dips": {
         alternatives: ["Close Grip Push-up", "Push-ups"],
@@ -1149,7 +1456,11 @@ window.exerciseMeta = {
         synergists: ["frontDelts", "lats", "traps", "triceps"],
         movementPattern: "push-vertical",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lats", "rhomboids", "rearDelts", "biceps"],
+        redundantWith: [],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Bodyweight Squat": {
         alternatives: ["Glute Bridge"],
@@ -1164,7 +1475,11 @@ window.exerciseMeta = {
         synergists: ["adductors", "calves"],
         movementPattern: "squat",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hamstrings", "hipFlexors"],
+        redundantWith: ["Cable Squat", "Pistol Squat"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Lunge (BW)": {
         alternatives: ["Bodyweight Squat", "Glute Bridge"],
@@ -1179,7 +1494,11 @@ window.exerciseMeta = {
         synergists: ["adductors", "calves"],
         movementPattern: "lunge",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["hipFlexors"],
+        redundantWith: ["Dumbbell Lunge", "Jumping Lunge", "Reverse Lunge to Knee Drive"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Glute Bridge": {
         alternatives: ["Cable Kickback (Glute)"],
@@ -1194,7 +1513,11 @@ window.exerciseMeta = {
         synergists: ["hamstrings", "quads"],
         movementPattern: "hinge",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hipFlexors"],
+        redundantWith: ["Cable Donkey Kick", "Cable Kickback (Glute)", "Single Leg Glute Bridge"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Plank": {
         alternatives: ["Dead Bug", "Bird Dog"],
@@ -1209,7 +1532,11 @@ window.exerciseMeta = {
         synergists: ["frontDelts", "glutes", "abductors", "obliques", "hipFlexors"],
         movementPattern: "anti-extension",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lowerBack"],
+        redundantWith: [],
+        forceVector: "axial",
+        axialLoad: false
     },
     "Side Plank": {
         alternatives: ["Pallof Press"],
@@ -1224,7 +1551,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "anti-rotation",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["abs"],
+        redundantWith: [],
+        forceVector: "rotational",
+        axialLoad: false
     },
     "Mountain Climbers": {
         alternatives: ["Dead Bug", "High Knees"],
@@ -1239,7 +1570,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["lowerBack", "glutes", "rearDelts", "lats"],
+        redundantWith: ["Kick Through", "Slow Mountain Climber"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Burpees": {
         alternatives: ["Jumping Jacks", "Mountain Climbers"],
@@ -1254,7 +1589,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "locomotion",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lats", "rhomboids", "rearDelts", "biceps", "hamstrings", "hipFlexors", "lowerBack"],
+        redundantWith: ["No-Jump Burpee"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Hanging Leg Raise": {
         alternatives: ["Reverse Crunch", "Dead Bug"],
@@ -1269,7 +1608,11 @@ window.exerciseMeta = {
         synergists: ["adductors", "serratus", "abductors"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lowerBack", "glutes"],
+        redundantWith: ["V-Ups"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Pike Push-up": {
         alternatives: ["Dumbbell Shoulder Press", "Push-ups"],
@@ -1284,7 +1627,11 @@ window.exerciseMeta = {
         synergists: ["chest", "serratus", "triceps"],
         movementPattern: "push-vertical",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lats", "chest", "biceps"],
+        redundantWith: ["Arnold Press", "Dumbbell Shoulder Press", "Handstand Hold"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Pistol Squat": {
         alternatives: ["Bulgarian Split Squat", "DB Step Up"],
@@ -1299,7 +1646,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "squat",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hamstrings", "hipFlexors"],
+        redundantWith: ["Bodyweight Squat", "Cable Squat"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Nordic Curl": {
         alternatives: ["Single Leg RDL (BW)", "Glute Bridge"],
@@ -1314,7 +1665,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "hinge",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["quads"],
+        redundantWith: ["Cable RDL"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Inverted Row": {
         alternatives: ["Seated Cable Row"],
@@ -1329,7 +1684,11 @@ window.exerciseMeta = {
         synergists: ["biceps", "forearms", "rearDelts", "chest"],
         movementPattern: "pull-horizontal",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["chest", "frontDelts", "serratus"],
+        redundantWith: ["Dumbbell Row", "Seated Cable Row"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Handstand Hold": {
         alternatives: ["Pike Push-up", "Dumbbell Shoulder Press"],
@@ -1344,7 +1703,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "push-vertical",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lats", "chest", "biceps"],
+        redundantWith: ["Arnold Press", "Dumbbell Shoulder Press", "Pike Push-up"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Calf Raise (BW)": {
         alternatives: ["Seated Calf Raise"],
@@ -1359,7 +1722,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: false
+        compound: false,
+        antagonistOf: ["tibialis"],
+        redundantWith: ["Cable Calf Raise", "Seated Calf Raise"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Cat-Cow": {
         alternatives: ["Thoracic Extension"],
@@ -1374,7 +1741,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: [],
+        redundantWith: [],
+        forceVector: "axial",
+        axialLoad: false
     },
     "Dead Bug": {
         alternatives: ["Bird Dog"],
@@ -1389,7 +1760,11 @@ window.exerciseMeta = {
         synergists: ["glutes", "quads"],
         movementPattern: "anti-extension",
         laterality: "alternating",
-        compound: false
+        compound: false,
+        antagonistOf: ["lowerBack", "glutes"],
+        redundantWith: [],
+        forceVector: "axial",
+        axialLoad: false
     },
     "Thoracic Extension": {
         alternatives: ["Cat-Cow"],
@@ -1404,7 +1779,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["abs"],
+        redundantWith: ["Prone Press-Up"],
+        forceVector: "axial",
+        axialLoad: false
     },
     "World's Greatest Stretch": {
         alternatives: ["90/90 Hip Switch", "Cat-Cow"],
@@ -1419,7 +1798,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["quads", "abs"],
+        redundantWith: ["Scorpion Stretch"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "90/90 Hip Switch": {
         alternatives: [],
@@ -1434,7 +1817,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["hipFlexors"],
+        redundantWith: [],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Shoulder Dislocates": {
         alternatives: ["Wall Slides"],
@@ -1449,7 +1836,11 @@ window.exerciseMeta = {
         synergists: ["rotatorCuff", "lats", "chest", "serratus", "traps"],
         movementPattern: "mobility",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lats", "rhomboids"],
+        redundantWith: ["Arm Circles"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Wall Slides": {
         alternatives: [],
@@ -1464,7 +1855,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "bilateral",
-        compound: false
+        compound: false,
+        antagonistOf: [],
+        redundantWith: [],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Deep Squat Hold": {
         alternatives: ["90/90 Hip Switch", "Bodyweight Squat"],
@@ -1479,7 +1874,11 @@ window.exerciseMeta = {
         synergists: ["adductors", "calves"],
         movementPattern: "mobility",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["abductors", "tibialis", "hamstrings"],
+        redundantWith: [],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Couch Stretch": {
         alternatives: ["90/90 Hip Switch", "World's Greatest Stretch"],
@@ -1494,7 +1893,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["glutes", "hamstrings"],
+        redundantWith: ["Reverse Nordic Curl"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Bird Dog": {
         alternatives: ["Dead Bug"],
@@ -1509,7 +1912,11 @@ window.exerciseMeta = {
         synergists: ["frontDelts", "glutes"],
         movementPattern: "anti-rotation",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["hipFlexors"],
+        redundantWith: [],
+        forceVector: "rotational",
+        axialLoad: false
     },
     "Cable Front Squat": {
         alternatives: ["Cable Squat", "Goblet Squat"],
@@ -1524,7 +1931,11 @@ window.exerciseMeta = {
         synergists: ["adductors", "calves"],
         movementPattern: "squat",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hamstrings", "lowerBack", "hipFlexors"],
+        redundantWith: ["Goblet Squat"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Cable Zercher Squat": {
         alternatives: ["Cable Front Squat", "Goblet Squat"],
@@ -1539,7 +1950,11 @@ window.exerciseMeta = {
         synergists: ["adductors", "calves"],
         movementPattern: "squat",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hamstrings", "chest", "serratus", "hipFlexors"],
+        redundantWith: [],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Cable Donkey Kick": {
         alternatives: ["Cable Kickback (Glute)", "Glute Bridge"],
@@ -1554,7 +1969,11 @@ window.exerciseMeta = {
         synergists: ["hamstrings"],
         movementPattern: "hinge",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hipFlexors"],
+        redundantWith: ["Cable Kickback (Glute)", "Glute Bridge", "Single Leg Glute Bridge"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Standing Cable Row": {
         alternatives: ["Seated Cable Row", "Single Arm Cable Row"],
@@ -1569,7 +1988,11 @@ window.exerciseMeta = {
         synergists: ["biceps", "forearms", "rearDelts"],
         movementPattern: "pull-horizontal",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["chest", "frontDelts", "hamstrings", "hipFlexors", "lowerBack"],
+        redundantWith: [],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Lying Cable Curl": {
         alternatives: ["Cable Hammer Curl"],
@@ -1584,7 +2007,11 @@ window.exerciseMeta = {
         synergists: ["forearms"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["triceps"],
+        redundantWith: ["Bayesian Curl", "Cable Bicep Curl", "Cable Curl (Behind Back)", "Concentration Curl", "Dumbbell Curl"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Cable French Press": {
         alternatives: ["Tricep Pushdown (Rope)", "Cable Kickback"],
@@ -1599,7 +2026,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["biceps"],
+        redundantWith: ["Cable Kickback", "Overhead Cable Extension", "Reverse Grip Pushdown", "Skull Crusher (DB)", "Tricep Kickback", "Tricep Pushdown (Bar)", "Tricep Pushdown (Rope)"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Cable Hip Abduction (Standing)": {
         alternatives: ["Cable Abductor"],
@@ -1614,7 +2045,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "unilateral",
-        compound: false
+        compound: false,
+        antagonistOf: ["adductors"],
+        redundantWith: ["Cable Abductor"],
+        forceVector: "lateral",
+        axialLoad: false
     },
     "Cable Hip Adduction (Standing)": {
         alternatives: ["Cable Adductor"],
@@ -1629,7 +2064,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "unilateral",
-        compound: false
+        compound: false,
+        antagonistOf: ["abductors"],
+        redundantWith: ["Cable Adductor"],
+        forceVector: "lateral",
+        axialLoad: false
     },
     "Cable Wrist Curl": {
         alternatives: ["Wrist Rocks"],
@@ -1644,7 +2083,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: [],
+        redundantWith: ["Cable Reverse Wrist Curl"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Cable Reverse Wrist Curl": {
         alternatives: ["Wrist Rocks"],
@@ -1659,7 +2102,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: [],
+        redundantWith: ["Cable Wrist Curl"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Russian Twist": {
         alternatives: ["Pallof Press", "Side Plank"],
@@ -1674,7 +2121,11 @@ window.exerciseMeta = {
         synergists: ["hipFlexors"],
         movementPattern: "rotation",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["lowerBack"],
+        redundantWith: ["Cable Side Bend", "Woodchopper (High to Low)", "Woodchopper (Low to High)"],
+        forceVector: "rotational",
+        axialLoad: false
     },
     "Bicycle Crunch": {
         alternatives: ["Dead Bug"],
@@ -1689,7 +2140,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "rotation",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["lowerBack"],
+        redundantWith: ["Standing Oblique Twist"],
+        forceVector: "rotational",
+        axialLoad: false
     },
     "Flutter Kicks": {
         alternatives: ["Dead Bug", "Reverse Crunch"],
@@ -1704,7 +2159,11 @@ window.exerciseMeta = {
         synergists: ["hamstrings"],
         movementPattern: "isolation",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["lowerBack"],
+        redundantWith: ["Cable Crunch", "Reverse Crunch", "Standing Cable Crunch"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "V-Ups": {
         alternatives: ["Reverse Crunch", "Dead Bug"],
@@ -1719,7 +2178,11 @@ window.exerciseMeta = {
         synergists: ["adductors", "obliques", "quads", "abductors"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lowerBack", "glutes"],
+        redundantWith: ["Hanging Leg Raise"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Reverse Crunch": {
         alternatives: ["Dead Bug"],
@@ -1734,7 +2197,11 @@ window.exerciseMeta = {
         synergists: ["obliques"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lowerBack"],
+        redundantWith: ["Cable Crunch", "Flutter Kicks", "Standing Cable Crunch"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Plank Jack": {
         alternatives: ["Plank", "Jumping Jacks"],
@@ -1749,7 +2216,11 @@ window.exerciseMeta = {
         synergists: ["frontDelts", "glutes", "obliques", "triceps"],
         movementPattern: "locomotion",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["lowerBack", "rearDelts", "lats", "adductors", "rhomboids"],
+        redundantWith: [],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Toe Touch": {
         alternatives: ["Reverse Crunch", "Dead Bug"],
@@ -1764,7 +2235,11 @@ window.exerciseMeta = {
         synergists: ["frontDelts", "sideDelts", "calves", "obliques", "chest", "serratus"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hipFlexors", "quads"],
+        redundantWith: [],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Diamond Push-up": {
         alternatives: ["Close Grip Push-up", "Push-ups"],
@@ -1779,7 +2254,11 @@ window.exerciseMeta = {
         synergists: ["frontDelts", "chest"],
         movementPattern: "push-horizontal",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["biceps", "lats", "rhomboids", "rearDelts"],
+        redundantWith: ["DB Floor Press"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Wide Grip Push-up": {
         alternatives: ["Push-ups", "Incline Push-up"],
@@ -1794,7 +2273,11 @@ window.exerciseMeta = {
         synergists: ["frontDelts", "triceps"],
         movementPattern: "push-horizontal",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lats", "rhomboids", "rearDelts"],
+        redundantWith: ["Decline Push-up", "Incline Push-up", "Svend Press"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Decline Push-up": {
         alternatives: ["Push-ups", "Incline Push-up"],
@@ -1809,7 +2292,11 @@ window.exerciseMeta = {
         synergists: ["frontDelts", "triceps"],
         movementPattern: "push-horizontal",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lats", "rhomboids", "rearDelts"],
+        redundantWith: ["Incline Push-up", "Svend Press", "Wide Grip Push-up"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Incline Push-up": {
         alternatives: ["DB Floor Press"],
@@ -1824,7 +2311,11 @@ window.exerciseMeta = {
         synergists: ["frontDelts", "triceps"],
         movementPattern: "push-horizontal",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lats", "rhomboids", "rearDelts"],
+        redundantWith: ["Decline Push-up", "Svend Press", "Wide Grip Push-up"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Scapular Push-up": {
         alternatives: ["Wall Slides"],
@@ -1839,7 +2330,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["rhomboids"],
+        redundantWith: [],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Sumo Squat (DB)": {
         alternatives: ["Goblet Squat", "Bodyweight Squat"],
@@ -1854,7 +2349,11 @@ window.exerciseMeta = {
         synergists: ["adductors", "calves", "abductors"],
         movementPattern: "squat",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["abductors", "hamstrings", "hipFlexors"],
+        redundantWith: ["Horse Stance Hold", "Pop Squat"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Curtsy Lunge": {
         alternatives: ["Lunge (BW)"],
@@ -1869,7 +2368,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "lunge",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["hipFlexors"],
+        redundantWith: [],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Side Lunge": {
         alternatives: ["Sumo Squat (DB)", "Lunge (BW)"],
@@ -1884,7 +2387,11 @@ window.exerciseMeta = {
         synergists: ["adductors", "abductors", "calves"],
         movementPattern: "lunge",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["abductors", "hamstrings", "hipFlexors"],
+        redundantWith: ["Cossack Squat"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Single Leg Glute Bridge": {
         alternatives: ["Glute Bridge"],
@@ -1899,7 +2406,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "hinge",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hipFlexors"],
+        redundantWith: ["Cable Donkey Kick", "Cable Kickback (Glute)", "Glute Bridge"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Good Morning (BW)": {
         alternatives: ["Glute Bridge", "Cable Pull-Through"],
@@ -1914,7 +2425,11 @@ window.exerciseMeta = {
         synergists: ["adductors", "glutes"],
         movementPattern: "hinge",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["quads", "abs"],
+        redundantWith: [],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Jumping Jacks": {
         alternatives: [],
@@ -1929,7 +2444,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["hipFlexors", "adductors", "tibialis"],
+        redundantWith: [],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "High Knees": {
         alternatives: ["Jumping Jacks"],
@@ -1944,7 +2463,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["glutes", "hamstrings", "tibialis"],
+        redundantWith: ["A-Skips", "March in Place"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Jump Squat": {
         alternatives: ["Bodyweight Squat", "Box Jump"],
@@ -1959,7 +2482,11 @@ window.exerciseMeta = {
         synergists: ["adductors", "calves"],
         movementPattern: "squat",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hamstrings", "hipFlexors", "tibialis"],
+        redundantWith: ["Box Jump", "Pop Squat", "Squat to Calf Raise"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Skater Hops": {
         alternatives: ["Side Lunge", "Jumping Jacks"],
@@ -1974,7 +2501,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["hipFlexors", "adductors", "hamstrings", "tibialis"],
+        redundantWith: ["Duck Walk", "Lateral Bounds", "Lateral Shuffle", "Step Touch"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Jumping Lunge": {
         alternatives: ["Lunge (BW)"],
@@ -1989,7 +2520,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "lunge",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["hipFlexors", "tibialis"],
+        redundantWith: ["Dumbbell Lunge", "Low Step-Up (Fast)", "Lunge (BW)"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Box Jump": {
         alternatives: ["DB Step Up", "Bodyweight Squat"],
@@ -2004,7 +2539,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "squat",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hamstrings", "hipFlexors", "tibialis"],
+        redundantWith: ["Jump Squat", "Pop Squat", "Squat to Calf Raise"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Superman": {
         alternatives: ["Bird Dog"],
@@ -2019,7 +2558,11 @@ window.exerciseMeta = {
         synergists: ["glutes", "hamstrings"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["abs", "hipFlexors"],
+        redundantWith: [],
+        forceVector: "axial",
+        axialLoad: false
     },
     "Swimmers": {
         alternatives: ["Bird Dog"],
@@ -2034,7 +2577,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["abs"],
+        redundantWith: [],
+        forceVector: "axial",
+        axialLoad: false
     },
     "Bench Dip": {
         alternatives: ["Close Grip Push-up", "Tricep Pushdown (Rope)"],
@@ -2049,7 +2596,11 @@ window.exerciseMeta = {
         synergists: ["frontDelts", "lats", "traps", "chest"],
         movementPattern: "push-vertical",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["biceps"],
+        redundantWith: [],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Close Grip Push-up": {
         alternatives: ["Tricep Pushdown (Rope)", "Incline Push-up"],
@@ -2064,7 +2615,11 @@ window.exerciseMeta = {
         synergists: ["frontDelts", "chest"],
         movementPattern: "push-horizontal",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["biceps"],
+        redundantWith: [],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Plate Pinch": {
         alternatives: ["Farmers Walk", "Dead Hang"],
@@ -2079,7 +2634,11 @@ window.exerciseMeta = {
         synergists: ["adductors", "glutes", "quads", "calves"],
         movementPattern: "carry",
         laterality: "bilateral",
-        compound: false
+        compound: false,
+        antagonistOf: [],
+        redundantWith: [],
+        forceVector: "axial",
+        axialLoad: true
     },
     "Svend Press": {
         alternatives: [],
@@ -2094,7 +2653,11 @@ window.exerciseMeta = {
         synergists: ["frontDelts", "triceps"],
         movementPattern: "push-horizontal",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lats", "rhomboids", "rearDelts"],
+        redundantWith: ["Decline Push-up", "Incline Push-up", "Wide Grip Push-up"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Cable Curl (Behind Back)": {
         alternatives: ["Cable Bicep Curl"],
@@ -2109,7 +2672,11 @@ window.exerciseMeta = {
         synergists: ["forearms"],
         movementPattern: "isolation",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["triceps"],
+        redundantWith: ["Bayesian Curl", "Cable Bicep Curl", "Concentration Curl", "Dumbbell Curl", "Lying Cable Curl"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Cable Row (Wide Grip)": {
         alternatives: ["Face Pulls", "Seated Cable Row"],
@@ -2124,7 +2691,11 @@ window.exerciseMeta = {
         synergists: ["biceps", "forearms", "rearDelts"],
         movementPattern: "pull-horizontal",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["chest", "frontDelts", "serratus"],
+        redundantWith: ["High Row (Rope)"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Standing Cable Crunch": {
         alternatives: ["Reverse Crunch", "Dead Bug"],
@@ -2139,7 +2710,11 @@ window.exerciseMeta = {
         synergists: ["obliques"],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lowerBack"],
+        redundantWith: ["Cable Crunch", "Flutter Kicks", "Reverse Crunch"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Bear Crawl": {
         alternatives: ["Bird Dog", "Dead Bug"],
@@ -2154,7 +2729,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["lowerBack", "rearDelts", "lats", "hamstrings", "rhomboids"],
+        redundantWith: [],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Crab Walk": {
         alternatives: ["Glute Bridge"],
@@ -2169,7 +2748,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["biceps", "hipFlexors", "chest", "frontDelts", "quads"],
+        redundantWith: [],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Kick Through": {
         alternatives: ["Bear Crawl"],
@@ -2184,7 +2767,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["lowerBack", "glutes", "rearDelts", "lats"],
+        redundantWith: ["Mountain Climbers"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Beast Reach": {
         alternatives: ["Cat-Cow", "Bear Crawl"],
@@ -2199,7 +2786,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["rearDelts", "lats"],
+        redundantWith: [],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Duck Walk": {
         alternatives: ["Deep Squat Hold", "Bodyweight Squat"],
@@ -2214,7 +2805,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["hamstrings", "hipFlexors", "tibialis"],
+        redundantWith: ["Lateral Bounds", "Lateral Shuffle", "Skater Hops", "Step Touch"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Tibialis Raise": {
         alternatives: [],
@@ -2229,7 +2824,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: false
+        compound: false,
+        antagonistOf: ["calves"],
+        redundantWith: [],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "ATG Split Squat": {
         alternatives: ["Lunge (BW)", "Couch Stretch"],
@@ -2244,7 +2843,11 @@ window.exerciseMeta = {
         synergists: ["adductors", "calves"],
         movementPattern: "lunge",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hamstrings"],
+        redundantWith: ["Reverse Lunge to Knee Drive"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Lu Raise": {
         alternatives: ["Lateral Raise", "Wall Slides"],
@@ -2259,7 +2862,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: [],
+        redundantWith: ["Cable Y-Raise"],
+        forceVector: "lateral",
+        axialLoad: false
     },
     "Powell Raise": {
         alternatives: ["Cable Rear Delt Fly", "Face Pulls"],
@@ -2274,7 +2881,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["chest", "frontDelts", "serratus"],
+        redundantWith: [],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Wrist Rocks": {
         alternatives: [],
@@ -2289,7 +2900,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "bilateral",
-        compound: false
+        compound: false,
+        antagonistOf: [],
+        redundantWith: ["Wrist Extensor Stretch", "Wrist Flexor Stretch"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Dead Hang": {
         alternatives: [],
@@ -2304,7 +2919,11 @@ window.exerciseMeta = {
         synergists: ["biceps", "forearms"],
         movementPattern: "mobility",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["chest", "frontDelts"],
+        redundantWith: [],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Cossack Squat": {
         alternatives: ["Side Lunge", "90/90 Hip Switch"],
@@ -2319,7 +2938,11 @@ window.exerciseMeta = {
         synergists: ["adductors", "abductors", "calves"],
         movementPattern: "lunge",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["abductors", "hamstrings", "hipFlexors"],
+        redundantWith: ["Side Lunge"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Jefferson Curl": {
         alternatives: ["Cat-Cow"],
@@ -2334,7 +2957,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["abs", "quads"],
+        redundantWith: [],
+        forceVector: "axial",
+        axialLoad: false
     },
     "Scorpion Stretch": {
         alternatives: ["Cat-Cow", "90/90 Hip Switch"],
@@ -2349,7 +2976,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["abs"],
+        redundantWith: ["World's Greatest Stretch"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Inchworm": {
         alternatives: ["Cat-Cow", "World's Greatest Stretch"],
@@ -2364,7 +2995,11 @@ window.exerciseMeta = {
         synergists: ["adductors", "glutes", "hamstrings", "chest", "quads", "serratus", "traps", "forearms"],
         movementPattern: "locomotion",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["quads", "rearDelts", "lats", "lowerBack", "rhomboids", "biceps"],
+        redundantWith: [],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Thoracic Bridge": {
         alternatives: ["Thoracic Extension", "Cat-Cow"],
@@ -2379,7 +3014,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["abs", "hipFlexors", "rearDelts", "tibialis", "quads", "chest"],
+        redundantWith: [],
+        forceVector: "axial",
+        axialLoad: false
     },
     "Single Leg RDL (BW)": {
         alternatives: ["Good Morning (BW)", "Glute Bridge"],
@@ -2394,7 +3033,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "hinge",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["quads", "hipFlexors"],
+        redundantWith: ["Cable Pull-Through"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Lateral Bounds": {
         alternatives: ["Side Lunge"],
@@ -2409,7 +3052,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["hipFlexors", "adductors", "hamstrings", "tibialis"],
+        redundantWith: ["Duck Walk", "Lateral Shuffle", "Skater Hops", "Step Touch"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Dot Drill": {
         alternatives: ["Jumping Jacks", "High Knees"],
@@ -2424,7 +3071,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["hamstrings"],
+        redundantWith: ["Fast Feet Shuffle", "Pogo Hops"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Tuck Jumps": {
         alternatives: ["Jump Squat", "Box Jump"],
@@ -2439,7 +3090,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "squat",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hamstrings", "glutes", "tibialis", "lowerBack"],
+        redundantWith: [],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "A-Skips": {
         alternatives: ["High Knees", "Jumping Jacks"],
@@ -2454,7 +3109,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["glutes", "hamstrings", "tibialis"],
+        redundantWith: ["High Knees", "March in Place"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Horse Stance Hold": {
         alternatives: ["Deep Squat Hold", "Bodyweight Squat"],
@@ -2469,7 +3128,11 @@ window.exerciseMeta = {
         synergists: ["adductors", "calves", "abductors"],
         movementPattern: "squat",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hamstrings", "abductors", "hipFlexors"],
+        redundantWith: ["Pop Squat", "Sumo Squat (DB)"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Reverse Plank": {
         alternatives: ["Glute Bridge"],
@@ -2484,7 +3147,11 @@ window.exerciseMeta = {
         synergists: ["rearDelts", "hamstrings", "lats", "obliques", "triceps"],
         movementPattern: "anti-extension",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hipFlexors"],
+        redundantWith: [],
+        forceVector: "axial",
+        axialLoad: false
     },
     "Copenhagen Plank": {
         alternatives: ["Side Plank", "Cable Adductor"],
@@ -2499,7 +3166,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "anti-rotation",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["abductors"],
+        redundantWith: [],
+        forceVector: "rotational",
+        axialLoad: false
     },
     "L-Sit (Tuck)": {
         alternatives: ["Reverse Crunch", "Hanging Leg Raise"],
@@ -2514,7 +3185,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "anti-extension",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lowerBack", "glutes", "hamstrings", "adductors", "biceps"],
+        redundantWith: [],
+        forceVector: "axial",
+        axialLoad: false
     },
     "March in Place": {
         alternatives: ["Step Touch", "Shadow Boxing"],
@@ -2529,7 +3204,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["glutes", "hamstrings", "tibialis"],
+        redundantWith: ["A-Skips", "High Knees"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Step Touch": {
         alternatives: ["March in Place", "Lateral Shuffle"],
@@ -2544,7 +3223,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["hipFlexors", "hamstrings", "adductors", "tibialis"],
+        redundantWith: ["Duck Walk", "Lateral Bounds", "Lateral Shuffle", "Skater Hops"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Lateral Shuffle": {
         alternatives: ["Step Touch", "Fast Feet Shuffle"],
@@ -2559,7 +3242,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["adductors", "hipFlexors", "hamstrings", "tibialis"],
+        redundantWith: ["Duck Walk", "Lateral Bounds", "Skater Hops", "Step Touch"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Standing Knee-to-Elbow": {
         alternatives: ["March in Place", "Standing Oblique Twist"],
@@ -2574,7 +3261,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "rotation",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["lowerBack", "glutes"],
+        redundantWith: [],
+        forceVector: "rotational",
+        axialLoad: false
     },
     "Shadow Boxing": {
         alternatives: ["March in Place", "Step Touch"],
@@ -2589,7 +3280,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "rotation",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["lats", "chest", "biceps", "lowerBack"],
+        redundantWith: [],
+        forceVector: "rotational",
+        axialLoad: false
     },
     "Squat to Calf Raise": {
         alternatives: ["Bodyweight Squat", "March in Place"],
@@ -2604,7 +3299,11 @@ window.exerciseMeta = {
         synergists: ["glutes", "quads"],
         movementPattern: "squat",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hamstrings", "hipFlexors", "tibialis"],
+        redundantWith: ["Box Jump", "Jump Squat", "Pop Squat"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Fast Feet Shuffle": {
         alternatives: ["March in Place", "Step Touch"],
@@ -2619,7 +3318,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["hamstrings"],
+        redundantWith: ["Dot Drill", "Pogo Hops"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Slow Mountain Climber": {
         alternatives: ["March in Place", "Reverse Lunge to Knee Drive"],
@@ -2634,7 +3337,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "locomotion",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["lowerBack", "glutes", "rearDelts", "lats", "rhomboids"],
+        redundantWith: ["Mountain Climbers"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Reverse Lunge to Knee Drive": {
         alternatives: ["March in Place", "Step Touch"],
@@ -2649,7 +3356,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "lunge",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: [],
+        redundantWith: ["ATG Split Squat", "Dumbbell Lunge", "Lunge (BW)"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Standing Oblique Twist": {
         alternatives: ["Standing Knee-to-Elbow", "March in Place"],
@@ -2664,7 +3375,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "rotation",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["lowerBack"],
+        redundantWith: ["Bicycle Crunch"],
+        forceVector: "rotational",
+        axialLoad: false
     },
     "Low Step-Up (Fast)": {
         alternatives: ["March in Place", "Step Touch"],
@@ -2679,7 +3394,11 @@ window.exerciseMeta = {
         synergists: ["adductors", "calves"],
         movementPattern: "lunge",
         laterality: "alternating",
-        compound: true
+        compound: true,
+        antagonistOf: ["hamstrings", "hipFlexors", "tibialis"],
+        redundantWith: ["Jumping Lunge"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "No-Jump Burpee": {
         alternatives: ["Squat to Calf Raise", "March in Place"],
@@ -2694,7 +3413,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "locomotion",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lats", "rhomboids", "rearDelts", "biceps", "hamstrings", "lowerBack"],
+        redundantWith: ["Burpees"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
     "Pop Squat": {
         alternatives: ["Squat to Calf Raise", "Bodyweight Squat"],
@@ -2709,7 +3432,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "squat",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hamstrings", "hipFlexors", "abductors", "tibialis"],
+        redundantWith: ["Box Jump", "Horse Stance Hold", "Jump Squat", "Squat to Calf Raise", "Sumo Squat (DB)"],
+        forceVector: "vertical",
+        axialLoad: true
     },
     "Pogo Hops": {
         alternatives: ["Fast Feet Shuffle", "Calf Raise (BW)"],
@@ -2724,7 +3451,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "locomotion",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hamstrings"],
+        redundantWith: ["Dot Drill", "Fast Feet Shuffle"],
+        forceVector: "horizontal",
+        axialLoad: false
     },
 
     // ===== MOBILITY GAP-FILL PACK (7 rows, v1.5.0 merge) =====
@@ -2741,7 +3472,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "rotation",
         laterality: "bilateral",
-        compound: false
+        compound: false,
+        antagonistOf: [],
+        redundantWith: [],
+        forceVector: "rotational",
+        axialLoad: false
     },
     "Chin Tuck": {
         alternatives: ["Wall Slides"],
@@ -2756,7 +3491,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "bilateral",
-        compound: false
+        compound: false,
+        antagonistOf: [],
+        redundantWith: [],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Upper-Trap & Levator Stretch": {
         alternatives: ["Chin Tuck"],
@@ -2771,7 +3510,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "unilateral",
-        compound: false
+        compound: false,
+        antagonistOf: [],
+        redundantWith: [],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Forearm Pronation-Supination": {
         alternatives: ["Wrist Rocks"],
@@ -2786,7 +3529,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "rotation",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["triceps"],
+        redundantWith: [],
+        forceVector: "rotational",
+        axialLoad: false
     },
     "Elbow CARs": {
         alternatives: ["Wrist Rocks", "Forearm Pronation-Supination"],
@@ -2801,7 +3548,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "rotation",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: [],
+        redundantWith: [],
+        forceVector: "rotational",
+        axialLoad: false
     },
     "Terminal Knee Extension": {
         alternatives: ["Glute Bridge"],
@@ -2816,7 +3567,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hamstrings"],
+        redundantWith: [],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Banded Ankle Eversion-Inversion": {
         alternatives: ["Tibialis Raise"],
@@ -2831,7 +3586,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "unilateral",
-        compound: false
+        compound: false,
+        antagonistOf: [],
+        redundantWith: ["Ankle Alphabet", "Knee-to-Wall Ankle Rock"],
+        forceVector: "vertical",
+        axialLoad: false
     },
 
     // ===== REHAB/MOBILITY PACK (18 rows, v1.5.0 merge) =====
@@ -2848,7 +3607,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "bilateral",
-        compound: false
+        compound: false,
+        antagonistOf: ["lats", "chest"],
+        redundantWith: ["Shoulder Dislocates"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Prone Y-T-W Raise": {
         alternatives: ["Wall Slides", "Scapular Push-up"],
@@ -2863,7 +3626,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "isolation",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["chest", "frontDelts", "serratus"],
+        redundantWith: [],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Sleeper Stretch": {
         alternatives: ["Wall Slides", "Cable External Rotation"],
@@ -2878,7 +3645,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "unilateral",
-        compound: false
+        compound: false,
+        antagonistOf: ["chest", "frontDelts"],
+        redundantWith: [],
+        forceVector: "rotational",
+        axialLoad: false
     },
     "Thread the Needle": {
         alternatives: ["Open Book Stretch", "Cat-Cow"],
@@ -2893,7 +3664,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["abs", "chest", "serratus", "frontDelts"],
+        redundantWith: [],
+        forceVector: "axial",
+        axialLoad: false
     },
     "Open Book Stretch": {
         alternatives: ["Thread the Needle", "Quadruped Thoracic Rotation"],
@@ -2908,7 +3683,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lats", "rhomboids", "rearDelts"],
+        redundantWith: [],
+        forceVector: "axial",
+        axialLoad: false
     },
     "Quadruped Thoracic Rotation": {
         alternatives: ["Open Book Stretch", "Thread the Needle"],
@@ -2923,7 +3702,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "rotation",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["abs"],
+        redundantWith: [],
+        forceVector: "rotational",
+        axialLoad: false
     },
     "Pigeon Pose": {
         alternatives: ["90/90 Hip Switch", "Standing Hip CARs"],
@@ -2938,7 +3721,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["abs"],
+        redundantWith: [],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Frog Stretch": {
         alternatives: ["Cossack Squat", "Deep Squat Hold"],
@@ -2953,7 +3740,11 @@ window.exerciseMeta = {
         synergists: ["hamstrings"],
         movementPattern: "mobility",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["abductors", "glutes"],
+        redundantWith: [],
+        forceVector: "lateral",
+        axialLoad: false
     },
     "Standing Hip CARs": {
         alternatives: ["90/90 Hip Switch", "World's Greatest Stretch"],
@@ -2968,7 +3759,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "rotation",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: [],
+        redundantWith: [],
+        forceVector: "rotational",
+        axialLoad: false
     },
     "Reverse Nordic Curl": {
         alternatives: ["Couch Stretch", "ATG Split Squat"],
@@ -2983,7 +3778,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hamstrings", "glutes"],
+        redundantWith: ["Couch Stretch"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Eccentric Step Down": {
         alternatives: ["Glute Bridge", "DB Step Up"],
@@ -2998,7 +3797,11 @@ window.exerciseMeta = {
         synergists: ["adductors", "calves"],
         movementPattern: "lunge",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["hamstrings", "hipFlexors"],
+        redundantWith: ["Bulgarian Split Squat", "Cable Lunge", "DB Step Up"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Knee-to-Wall Ankle Rock": {
         alternatives: ["Ankle Alphabet", "Deep Squat Hold"],
@@ -3013,7 +3816,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: [],
+        redundantWith: ["Ankle Alphabet", "Banded Ankle Eversion-Inversion"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Ankle Alphabet": {
         alternatives: ["Knee-to-Wall Ankle Rock", "Tibialis Raise"],
@@ -3028,7 +3835,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "unilateral",
-        compound: false
+        compound: false,
+        antagonistOf: [],
+        redundantWith: ["Banded Ankle Eversion-Inversion", "Knee-to-Wall Ankle Rock"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Child's Pose": {
         alternatives: ["Cat-Cow", "Dead Hang"],
@@ -3043,7 +3854,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["abs", "chest", "frontDelts"],
+        redundantWith: [],
+        forceVector: "axial",
+        axialLoad: false
     },
     "McGill Curl-Up": {
         alternatives: ["Dead Bug", "Bird Dog"],
@@ -3058,7 +3873,11 @@ window.exerciseMeta = {
         synergists: ["obliques"],
         movementPattern: "anti-extension",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["lowerBack"],
+        redundantWith: [],
+        forceVector: "axial",
+        axialLoad: false
     },
     "Prone Press-Up": {
         alternatives: ["Cat-Cow", "Thoracic Extension"],
@@ -3073,7 +3892,11 @@ window.exerciseMeta = {
         synergists: ["lowerBack", "glutes", "hamstrings"],
         movementPattern: "mobility",
         laterality: "bilateral",
-        compound: true
+        compound: true,
+        antagonistOf: ["abs"],
+        redundantWith: ["Thoracic Extension"],
+        forceVector: "axial",
+        axialLoad: false
     },
     "Wrist Flexor Stretch": {
         alternatives: ["Wrist Extensor Stretch", "Wrist Rocks"],
@@ -3088,7 +3911,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: [],
+        redundantWith: ["Wrist Extensor Stretch", "Wrist Rocks"],
+        forceVector: "vertical",
+        axialLoad: false
     },
     "Wrist Extensor Stretch": {
         alternatives: ["Wrist Flexor Stretch", "Wrist Rocks"],
@@ -3103,7 +3930,11 @@ window.exerciseMeta = {
         synergists: [],
         movementPattern: "mobility",
         laterality: "unilateral",
-        compound: true
+        compound: true,
+        antagonistOf: [],
+        redundantWith: ["Wrist Flexor Stretch", "Wrist Rocks"],
+        forceVector: "vertical",
+        axialLoad: false
     }
 };
 
@@ -3112,7 +3943,8 @@ window.exerciseMeta = {
 //  - app exercises with no metadata,
 //  - INCOMPLETE/inconsistent 9-joint scores (strainScore/aggravates drift),
 //  - out-of-vocabulary field values (logMode/bucket/equipmentNorm/muscle/
-//    movementPattern/laterality/rehabCategory),
+//    movementPattern/laterality/rehabCategory/antagonistOf/forceVector,
+//    plus axialLoad-not-boolean),
 //  - compound not matching the derived rule (>=2 joints with load >=1),
 //  - unresolvable alternatives.
 // Staged entries (metadata ahead of the app) are reported as info, not errors.
@@ -3131,6 +3963,7 @@ window.exerciseMeta = {
             'lunge', 'carry', 'rotation', 'anti-rotation', 'anti-extension', 'locomotion', 'isolation', 'mobility'];
         var LAT = ['bilateral', 'unilateral', 'alternating'];
         var REHAB = ['shoulder-prehab', 'hip-prehab', 'adductor-prehab', 'knee-prehab', 'ankle-prehab', 'wrist-prehab', 'neck-prehab', 'elbow-prehab', 'hip-mobility', 'spine-mobility', 'core-stability', 'movement-prep'];
+        var FV = ['vertical', 'horizontal', 'lateral', 'rotational', 'axial']; // v1.7.0 forceVector vocab
         var names = window.allExercises.map(function (e) { return e.name; });
         var metaKeys = Object.keys(window.exerciseMeta);
         var known = {};
@@ -3167,6 +4000,9 @@ window.exerciseMeta = {
             if (!m.musclesTargeted || !m.musclesTargeted.length) badEnums.push(n + ' musclesTargeted empty');
             else m.musclesTargeted.forEach(function (x) { if (MV.indexOf(x) === -1) badEnums.push(n + ' muscle=' + x); });
             (m.synergists || []).forEach(function (x) { if (MV.indexOf(x) === -1) badEnums.push(n + ' synergist=' + x); });
+            (m.antagonistOf || []).forEach(function (x) { if (MV.indexOf(x) === -1) badEnums.push(n + ' antagonistOf=' + x); }); // v1.7.0
+            if (FV.indexOf(m.forceVector) === -1) badEnums.push(n + ' forceVector=' + m.forceVector); // v1.7.0
+            if (typeof m.axialLoad !== 'boolean') badEnums.push(n + ' axialLoad not boolean'); // v1.7.0
             (m.alternatives || []).forEach(function (a) { if (!known[a]) badAlts.push(n + ' -> ' + a); });
         });
 

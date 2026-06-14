@@ -1,0 +1,2252 @@
+{
+  "Cable Chest Press": {
+    "antagonistOf": [
+      "lats",
+      "rhomboids",
+      "rearDelts",
+      "biceps"
+    ],
+    "redundantWith": [
+      "Dumbbell Bench Press"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Cable Chest Fly (High)": {
+    "antagonistOf": [
+      "lats",
+      "rhomboids",
+      "rearDelts"
+    ],
+    "redundantWith": [
+      "Cable Chest Fly (Low)"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Cable Chest Fly (Low)": {
+    "antagonistOf": [
+      "lats",
+      "rhomboids",
+      "rearDelts"
+    ],
+    "redundantWith": [
+      "Cable Chest Fly (High)"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Cable Chest Fly (Mid)": {
+    "antagonistOf": [
+      "lats",
+      "rhomboids",
+      "rearDelts"
+    ],
+    "redundantWith": [
+      "Cable Crossover",
+      "Dumbbell Fly"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Single Arm Cable Chest Press": {
+    "antagonistOf": [
+      "lats",
+      "rhomboids",
+      "rearDelts",
+      "lowerBack",
+      "biceps"
+    ],
+    "redundantWith": [],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Cable Crossover": {
+    "antagonistOf": [
+      "lats",
+      "rhomboids",
+      "rearDelts"
+    ],
+    "redundantWith": [
+      "Cable Chest Fly (Mid)",
+      "Dumbbell Fly"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Cable Pullover (Bench)": {
+    "antagonistOf": [
+      "rhomboids",
+      "frontDelts",
+      "rearDelts"
+    ],
+    "redundantWith": [],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Lat Pulldown (Standing)": {
+    "antagonistOf": [
+      "chest",
+      "frontDelts",
+      "triceps"
+    ],
+    "redundantWith": [
+      "Chin-ups",
+      "Pull-ups"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Seated Cable Row": {
+    "antagonistOf": [
+      "chest",
+      "serratus",
+      "frontDelts"
+    ],
+    "redundantWith": [
+      "Dumbbell Row",
+      "Inverted Row"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Face Pulls": {
+    "antagonistOf": [
+      "chest",
+      "frontDelts"
+    ],
+    "redundantWith": [],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Straight Arm Pulldown": {
+    "antagonistOf": [
+      "chest",
+      "frontDelts"
+    ],
+    "redundantWith": [],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Single Arm Cable Row": {
+    "antagonistOf": [
+      "chest",
+      "frontDelts",
+      "lowerBack"
+    ],
+    "redundantWith": [
+      "Renegade Row"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Cable Shrugs": {
+    "antagonistOf": [],
+    "redundantWith": [
+      "DB Shrugs"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Cable Rear Delt Fly": {
+    "antagonistOf": [
+      "chest",
+      "frontDelts"
+    ],
+    "redundantWith": [],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "High Row (Rope)": {
+    "antagonistOf": [
+      "chest",
+      "serratus",
+      "frontDelts"
+    ],
+    "redundantWith": [
+      "Cable Row (Wide Grip)"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Cable Overhead Press": {
+    "antagonistOf": [
+      "rearDelts",
+      "lats",
+      "biceps"
+    ],
+    "redundantWith": [],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Cable Lateral Raise": {
+    "antagonistOf": [],
+    "redundantWith": [
+      "Lateral Raise"
+    ],
+    "forceVector": "lateral",
+    "axialLoad": false
+  },
+  "Cable Front Raise": {
+    "antagonistOf": [
+      "rearDelts",
+      "lats"
+    ],
+    "redundantWith": [
+      "Front Raise"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Cable External Rotation": {
+    "antagonistOf": [
+      "chest",
+      "frontDelts"
+    ],
+    "redundantWith": [],
+    "forceVector": "rotational",
+    "axialLoad": false
+  },
+  "Cable Internal Rotation": {
+    "antagonistOf": [],
+    "redundantWith": [],
+    "forceVector": "rotational",
+    "axialLoad": false
+  },
+  "Cable Upright Row": {
+    "antagonistOf": [],
+    "redundantWith": [],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Cable Y-Raise": {
+    "antagonistOf": [],
+    "redundantWith": [
+      "Lu Raise"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Tricep Pushdown (Rope)": {
+    "antagonistOf": [
+      "biceps"
+    ],
+    "redundantWith": [
+      "Cable French Press",
+      "Cable Kickback",
+      "Overhead Cable Extension",
+      "Reverse Grip Pushdown",
+      "Skull Crusher (DB)",
+      "Tricep Kickback",
+      "Tricep Pushdown (Bar)"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Tricep Pushdown (Bar)": {
+    "antagonistOf": [
+      "biceps"
+    ],
+    "redundantWith": [
+      "Cable French Press",
+      "Cable Kickback",
+      "Overhead Cable Extension",
+      "Reverse Grip Pushdown",
+      "Skull Crusher (DB)",
+      "Tricep Kickback",
+      "Tricep Pushdown (Rope)"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Overhead Cable Extension": {
+    "antagonistOf": [
+      "biceps"
+    ],
+    "redundantWith": [
+      "Cable French Press",
+      "Cable Kickback",
+      "Reverse Grip Pushdown",
+      "Skull Crusher (DB)",
+      "Tricep Kickback",
+      "Tricep Pushdown (Bar)",
+      "Tricep Pushdown (Rope)"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Cable Bicep Curl": {
+    "antagonistOf": [
+      "triceps"
+    ],
+    "redundantWith": [
+      "Bayesian Curl",
+      "Cable Curl (Behind Back)",
+      "Concentration Curl",
+      "Dumbbell Curl",
+      "Lying Cable Curl"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Cable Hammer Curl": {
+    "antagonistOf": [
+      "triceps"
+    ],
+    "redundantWith": [
+      "Hammer Curl",
+      "Zottman Curl"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Bayesian Curl": {
+    "antagonistOf": [
+      "triceps"
+    ],
+    "redundantWith": [
+      "Cable Bicep Curl",
+      "Cable Curl (Behind Back)",
+      "Concentration Curl",
+      "Dumbbell Curl",
+      "Lying Cable Curl"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Cable Kickback": {
+    "antagonistOf": [
+      "biceps"
+    ],
+    "redundantWith": [
+      "Cable French Press",
+      "Overhead Cable Extension",
+      "Reverse Grip Pushdown",
+      "Skull Crusher (DB)",
+      "Tricep Kickback",
+      "Tricep Pushdown (Bar)",
+      "Tricep Pushdown (Rope)"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Reverse Grip Pushdown": {
+    "antagonistOf": [
+      "biceps"
+    ],
+    "redundantWith": [
+      "Cable French Press",
+      "Cable Kickback",
+      "Overhead Cable Extension",
+      "Skull Crusher (DB)",
+      "Tricep Kickback",
+      "Tricep Pushdown (Bar)",
+      "Tricep Pushdown (Rope)"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Cable Squat": {
+    "antagonistOf": [
+      "hamstrings",
+      "hipFlexors"
+    ],
+    "redundantWith": [
+      "Bodyweight Squat",
+      "Pistol Squat"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Cable Pull-Through": {
+    "antagonistOf": [
+      "hipFlexors",
+      "quads"
+    ],
+    "redundantWith": [
+      "Single Leg RDL (BW)"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Cable RDL": {
+    "antagonistOf": [
+      "quads"
+    ],
+    "redundantWith": [
+      "Nordic Curl"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Cable Lunge": {
+    "antagonistOf": [
+      "hamstrings",
+      "hipFlexors"
+    ],
+    "redundantWith": [
+      "Bulgarian Split Squat",
+      "DB Step Up",
+      "Eccentric Step Down"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Cable Kickback (Glute)": {
+    "antagonistOf": [
+      "hipFlexors"
+    ],
+    "redundantWith": [
+      "Cable Donkey Kick",
+      "Glute Bridge",
+      "Single Leg Glute Bridge"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Cable Calf Raise": {
+    "antagonistOf": [
+      "tibialis"
+    ],
+    "redundantWith": [
+      "Calf Raise (BW)",
+      "Seated Calf Raise"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Cable Abductor": {
+    "antagonistOf": [
+      "adductors"
+    ],
+    "redundantWith": [
+      "Cable Hip Abduction (Standing)"
+    ],
+    "forceVector": "lateral",
+    "axialLoad": false
+  },
+  "Cable Adductor": {
+    "antagonistOf": [
+      "abductors"
+    ],
+    "redundantWith": [
+      "Cable Hip Adduction (Standing)"
+    ],
+    "forceVector": "lateral",
+    "axialLoad": false
+  },
+  "Cable Crunch": {
+    "antagonistOf": [
+      "lowerBack"
+    ],
+    "redundantWith": [
+      "Flutter Kicks",
+      "Reverse Crunch",
+      "Standing Cable Crunch"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Woodchopper (High to Low)": {
+    "antagonistOf": [
+      "lowerBack"
+    ],
+    "redundantWith": [
+      "Cable Side Bend",
+      "Russian Twist",
+      "Woodchopper (Low to High)"
+    ],
+    "forceVector": "rotational",
+    "axialLoad": false
+  },
+  "Pallof Press": {
+    "antagonistOf": [
+      "lowerBack"
+    ],
+    "redundantWith": [],
+    "forceVector": "rotational",
+    "axialLoad": false
+  },
+  "Cable Side Bend": {
+    "antagonistOf": [
+      "lowerBack"
+    ],
+    "redundantWith": [
+      "Russian Twist",
+      "Woodchopper (High to Low)",
+      "Woodchopper (Low to High)"
+    ],
+    "forceVector": "rotational",
+    "axialLoad": false
+  },
+  "Woodchopper (Low to High)": {
+    "antagonistOf": [
+      "lowerBack"
+    ],
+    "redundantWith": [
+      "Cable Side Bend",
+      "Russian Twist",
+      "Woodchopper (High to Low)"
+    ],
+    "forceVector": "rotational",
+    "axialLoad": false
+  },
+  "Dumbbell Bench Press": {
+    "antagonistOf": [
+      "lats",
+      "rhomboids",
+      "rearDelts",
+      "biceps"
+    ],
+    "redundantWith": [
+      "Cable Chest Press"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Dumbbell Incline Press": {
+    "antagonistOf": [
+      "lats",
+      "rhomboids",
+      "rearDelts"
+    ],
+    "redundantWith": [],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Dumbbell Fly": {
+    "antagonistOf": [
+      "lats",
+      "rhomboids",
+      "rearDelts"
+    ],
+    "redundantWith": [
+      "Cable Chest Fly (Mid)",
+      "Cable Crossover"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Dumbbell Shoulder Press": {
+    "antagonistOf": [
+      "lats",
+      "chest",
+      "biceps"
+    ],
+    "redundantWith": [
+      "Arnold Press",
+      "Handstand Hold",
+      "Pike Push-up"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Arnold Press": {
+    "antagonistOf": [
+      "lats",
+      "chest"
+    ],
+    "redundantWith": [
+      "Dumbbell Shoulder Press",
+      "Handstand Hold",
+      "Pike Push-up"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Lateral Raise": {
+    "antagonistOf": [],
+    "redundantWith": [
+      "Cable Lateral Raise"
+    ],
+    "forceVector": "lateral",
+    "axialLoad": false
+  },
+  "Front Raise": {
+    "antagonistOf": [
+      "rearDelts",
+      "lats"
+    ],
+    "redundantWith": [
+      "Cable Front Raise"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Dumbbell Row": {
+    "antagonistOf": [
+      "chest",
+      "frontDelts",
+      "serratus",
+      "triceps"
+    ],
+    "redundantWith": [
+      "Inverted Row",
+      "Seated Cable Row"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Dumbbell Pullover": {
+    "antagonistOf": [
+      "chest",
+      "frontDelts",
+      "rhomboids"
+    ],
+    "redundantWith": [],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Goblet Squat": {
+    "antagonistOf": [
+      "hamstrings",
+      "hipFlexors",
+      "lowerBack"
+    ],
+    "redundantWith": [
+      "Cable Front Squat"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Dumbbell Lunge": {
+    "antagonistOf": [
+      "hipFlexors"
+    ],
+    "redundantWith": [
+      "Jumping Lunge",
+      "Lunge (BW)",
+      "Reverse Lunge to Knee Drive"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Bulgarian Split Squat": {
+    "antagonistOf": [
+      "hipFlexors",
+      "hamstrings"
+    ],
+    "redundantWith": [
+      "Cable Lunge",
+      "DB Step Up",
+      "Eccentric Step Down"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Romanian Deadlift (DB)": {
+    "antagonistOf": [
+      "quads",
+      "hipFlexors",
+      "abs"
+    ],
+    "redundantWith": [],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Dumbbell Curl": {
+    "antagonistOf": [
+      "triceps"
+    ],
+    "redundantWith": [
+      "Bayesian Curl",
+      "Cable Bicep Curl",
+      "Cable Curl (Behind Back)",
+      "Concentration Curl",
+      "Lying Cable Curl"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Hammer Curl": {
+    "antagonistOf": [
+      "triceps"
+    ],
+    "redundantWith": [
+      "Cable Hammer Curl",
+      "Zottman Curl"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Tricep Kickback": {
+    "antagonistOf": [
+      "biceps"
+    ],
+    "redundantWith": [
+      "Cable French Press",
+      "Cable Kickback",
+      "Overhead Cable Extension",
+      "Reverse Grip Pushdown",
+      "Skull Crusher (DB)",
+      "Tricep Pushdown (Bar)",
+      "Tricep Pushdown (Rope)"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Skull Crusher (DB)": {
+    "antagonistOf": [
+      "biceps"
+    ],
+    "redundantWith": [
+      "Cable French Press",
+      "Cable Kickback",
+      "Overhead Cable Extension",
+      "Reverse Grip Pushdown",
+      "Tricep Kickback",
+      "Tricep Pushdown (Bar)",
+      "Tricep Pushdown (Rope)"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Farmers Walk": {
+    "antagonistOf": [
+      "lowerBack"
+    ],
+    "redundantWith": [],
+    "forceVector": "axial",
+    "axialLoad": true
+  },
+  "Zottman Curl": {
+    "antagonistOf": [
+      "triceps"
+    ],
+    "redundantWith": [
+      "Cable Hammer Curl",
+      "Hammer Curl"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Concentration Curl": {
+    "antagonistOf": [
+      "triceps"
+    ],
+    "redundantWith": [
+      "Bayesian Curl",
+      "Cable Bicep Curl",
+      "Cable Curl (Behind Back)",
+      "Dumbbell Curl",
+      "Lying Cable Curl"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "DB Floor Press": {
+    "antagonistOf": [
+      "biceps",
+      "lats",
+      "rhomboids",
+      "rearDelts"
+    ],
+    "redundantWith": [
+      "Diamond Push-up"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Renegade Row": {
+    "antagonistOf": [
+      "chest",
+      "frontDelts",
+      "lowerBack"
+    ],
+    "redundantWith": [
+      "Single Arm Cable Row"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "DB Step Up": {
+    "antagonistOf": [
+      "hipFlexors",
+      "hamstrings"
+    ],
+    "redundantWith": [
+      "Bulgarian Split Squat",
+      "Cable Lunge",
+      "Eccentric Step Down"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "DB Shrugs": {
+    "antagonistOf": [],
+    "redundantWith": [
+      "Cable Shrugs"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Seated Calf Raise": {
+    "antagonistOf": [
+      "tibialis"
+    ],
+    "redundantWith": [
+      "Cable Calf Raise",
+      "Calf Raise (BW)"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Push-ups": {
+    "antagonistOf": [
+      "lats",
+      "rhomboids",
+      "rearDelts",
+      "biceps",
+      "lowerBack"
+    ],
+    "redundantWith": [],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Pull-ups": {
+    "antagonistOf": [
+      "chest",
+      "frontDelts",
+      "triceps"
+    ],
+    "redundantWith": [
+      "Chin-ups",
+      "Lat Pulldown (Standing)"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Chin-ups": {
+    "antagonistOf": [
+      "triceps",
+      "chest",
+      "frontDelts"
+    ],
+    "redundantWith": [
+      "Lat Pulldown (Standing)",
+      "Pull-ups"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Dips": {
+    "antagonistOf": [
+      "lats",
+      "rhomboids",
+      "rearDelts",
+      "biceps"
+    ],
+    "redundantWith": [],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Bodyweight Squat": {
+    "antagonistOf": [
+      "hamstrings",
+      "hipFlexors"
+    ],
+    "redundantWith": [
+      "Cable Squat",
+      "Pistol Squat"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Lunge (BW)": {
+    "antagonistOf": [
+      "hipFlexors"
+    ],
+    "redundantWith": [
+      "Dumbbell Lunge",
+      "Jumping Lunge",
+      "Reverse Lunge to Knee Drive"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Glute Bridge": {
+    "antagonistOf": [
+      "hipFlexors"
+    ],
+    "redundantWith": [
+      "Cable Donkey Kick",
+      "Cable Kickback (Glute)",
+      "Single Leg Glute Bridge"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Plank": {
+    "antagonistOf": [
+      "lowerBack"
+    ],
+    "redundantWith": [],
+    "forceVector": "axial",
+    "axialLoad": false
+  },
+  "Side Plank": {
+    "antagonistOf": [
+      "abs"
+    ],
+    "redundantWith": [],
+    "forceVector": "rotational",
+    "axialLoad": false
+  },
+  "Mountain Climbers": {
+    "antagonistOf": [
+      "lowerBack",
+      "glutes",
+      "rearDelts",
+      "lats"
+    ],
+    "redundantWith": [
+      "Kick Through",
+      "Slow Mountain Climber"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Burpees": {
+    "antagonistOf": [
+      "lats",
+      "rhomboids",
+      "rearDelts",
+      "biceps",
+      "hamstrings",
+      "hipFlexors",
+      "lowerBack"
+    ],
+    "redundantWith": [
+      "No-Jump Burpee"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Hanging Leg Raise": {
+    "antagonistOf": [
+      "lowerBack",
+      "glutes"
+    ],
+    "redundantWith": [
+      "V-Ups"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Pike Push-up": {
+    "antagonistOf": [
+      "lats",
+      "chest",
+      "biceps"
+    ],
+    "redundantWith": [
+      "Arnold Press",
+      "Dumbbell Shoulder Press",
+      "Handstand Hold"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Pistol Squat": {
+    "antagonistOf": [
+      "hamstrings",
+      "hipFlexors"
+    ],
+    "redundantWith": [
+      "Bodyweight Squat",
+      "Cable Squat"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Nordic Curl": {
+    "antagonistOf": [
+      "quads"
+    ],
+    "redundantWith": [
+      "Cable RDL"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Inverted Row": {
+    "antagonistOf": [
+      "chest",
+      "frontDelts",
+      "serratus"
+    ],
+    "redundantWith": [
+      "Dumbbell Row",
+      "Seated Cable Row"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Handstand Hold": {
+    "antagonistOf": [
+      "lats",
+      "chest",
+      "biceps"
+    ],
+    "redundantWith": [
+      "Arnold Press",
+      "Dumbbell Shoulder Press",
+      "Pike Push-up"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Calf Raise (BW)": {
+    "antagonistOf": [
+      "tibialis"
+    ],
+    "redundantWith": [
+      "Cable Calf Raise",
+      "Seated Calf Raise"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Cat-Cow": {
+    "antagonistOf": [],
+    "redundantWith": [],
+    "forceVector": "axial",
+    "axialLoad": false
+  },
+  "Dead Bug": {
+    "antagonistOf": [
+      "lowerBack",
+      "glutes"
+    ],
+    "redundantWith": [],
+    "forceVector": "axial",
+    "axialLoad": false
+  },
+  "Thoracic Extension": {
+    "antagonistOf": [
+      "abs"
+    ],
+    "redundantWith": [
+      "Prone Press-Up"
+    ],
+    "forceVector": "axial",
+    "axialLoad": false
+  },
+  "World's Greatest Stretch": {
+    "antagonistOf": [
+      "quads",
+      "abs"
+    ],
+    "redundantWith": [
+      "Scorpion Stretch"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "90/90 Hip Switch": {
+    "antagonistOf": [
+      "hipFlexors"
+    ],
+    "redundantWith": [],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Shoulder Dislocates": {
+    "antagonistOf": [
+      "lats",
+      "rhomboids"
+    ],
+    "redundantWith": [
+      "Arm Circles"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Wall Slides": {
+    "antagonistOf": [],
+    "redundantWith": [],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Deep Squat Hold": {
+    "antagonistOf": [
+      "abductors",
+      "tibialis",
+      "hamstrings"
+    ],
+    "redundantWith": [],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Couch Stretch": {
+    "antagonistOf": [
+      "glutes",
+      "hamstrings"
+    ],
+    "redundantWith": [
+      "Reverse Nordic Curl"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Bird Dog": {
+    "antagonistOf": [
+      "hipFlexors"
+    ],
+    "redundantWith": [],
+    "forceVector": "rotational",
+    "axialLoad": false
+  },
+  "Cable Front Squat": {
+    "antagonistOf": [
+      "hamstrings",
+      "lowerBack",
+      "hipFlexors"
+    ],
+    "redundantWith": [
+      "Goblet Squat"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Cable Zercher Squat": {
+    "antagonistOf": [
+      "hamstrings",
+      "chest",
+      "serratus",
+      "hipFlexors"
+    ],
+    "redundantWith": [],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Cable Donkey Kick": {
+    "antagonistOf": [
+      "hipFlexors"
+    ],
+    "redundantWith": [
+      "Cable Kickback (Glute)",
+      "Glute Bridge",
+      "Single Leg Glute Bridge"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Standing Cable Row": {
+    "antagonistOf": [
+      "chest",
+      "frontDelts",
+      "hamstrings",
+      "hipFlexors",
+      "lowerBack"
+    ],
+    "redundantWith": [],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Lying Cable Curl": {
+    "antagonistOf": [
+      "triceps"
+    ],
+    "redundantWith": [
+      "Bayesian Curl",
+      "Cable Bicep Curl",
+      "Cable Curl (Behind Back)",
+      "Concentration Curl",
+      "Dumbbell Curl"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Cable French Press": {
+    "antagonistOf": [
+      "biceps"
+    ],
+    "redundantWith": [
+      "Cable Kickback",
+      "Overhead Cable Extension",
+      "Reverse Grip Pushdown",
+      "Skull Crusher (DB)",
+      "Tricep Kickback",
+      "Tricep Pushdown (Bar)",
+      "Tricep Pushdown (Rope)"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Cable Hip Abduction (Standing)": {
+    "antagonistOf": [
+      "adductors"
+    ],
+    "redundantWith": [
+      "Cable Abductor"
+    ],
+    "forceVector": "lateral",
+    "axialLoad": false
+  },
+  "Cable Hip Adduction (Standing)": {
+    "antagonistOf": [
+      "abductors"
+    ],
+    "redundantWith": [
+      "Cable Adductor"
+    ],
+    "forceVector": "lateral",
+    "axialLoad": false
+  },
+  "Cable Wrist Curl": {
+    "antagonistOf": [],
+    "redundantWith": [
+      "Cable Reverse Wrist Curl"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Cable Reverse Wrist Curl": {
+    "antagonistOf": [],
+    "redundantWith": [
+      "Cable Wrist Curl"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Russian Twist": {
+    "antagonistOf": [
+      "lowerBack"
+    ],
+    "redundantWith": [
+      "Cable Side Bend",
+      "Woodchopper (High to Low)",
+      "Woodchopper (Low to High)"
+    ],
+    "forceVector": "rotational",
+    "axialLoad": false
+  },
+  "Bicycle Crunch": {
+    "antagonistOf": [
+      "lowerBack"
+    ],
+    "redundantWith": [
+      "Standing Oblique Twist"
+    ],
+    "forceVector": "rotational",
+    "axialLoad": false
+  },
+  "Flutter Kicks": {
+    "antagonistOf": [
+      "lowerBack"
+    ],
+    "redundantWith": [
+      "Cable Crunch",
+      "Reverse Crunch",
+      "Standing Cable Crunch"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "V-Ups": {
+    "antagonistOf": [
+      "lowerBack",
+      "glutes"
+    ],
+    "redundantWith": [
+      "Hanging Leg Raise"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Reverse Crunch": {
+    "antagonistOf": [
+      "lowerBack"
+    ],
+    "redundantWith": [
+      "Cable Crunch",
+      "Flutter Kicks",
+      "Standing Cable Crunch"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Plank Jack": {
+    "antagonistOf": [
+      "lowerBack",
+      "rearDelts",
+      "lats",
+      "adductors",
+      "rhomboids"
+    ],
+    "redundantWith": [],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Toe Touch": {
+    "antagonistOf": [
+      "hipFlexors",
+      "quads"
+    ],
+    "redundantWith": [],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Diamond Push-up": {
+    "antagonistOf": [
+      "biceps",
+      "lats",
+      "rhomboids",
+      "rearDelts"
+    ],
+    "redundantWith": [
+      "DB Floor Press"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Wide Grip Push-up": {
+    "antagonistOf": [
+      "lats",
+      "rhomboids",
+      "rearDelts"
+    ],
+    "redundantWith": [
+      "Decline Push-up",
+      "Incline Push-up",
+      "Svend Press"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Decline Push-up": {
+    "antagonistOf": [
+      "lats",
+      "rhomboids",
+      "rearDelts"
+    ],
+    "redundantWith": [
+      "Incline Push-up",
+      "Svend Press",
+      "Wide Grip Push-up"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Incline Push-up": {
+    "antagonistOf": [
+      "lats",
+      "rhomboids",
+      "rearDelts"
+    ],
+    "redundantWith": [
+      "Decline Push-up",
+      "Svend Press",
+      "Wide Grip Push-up"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Scapular Push-up": {
+    "antagonistOf": [
+      "rhomboids"
+    ],
+    "redundantWith": [],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Sumo Squat (DB)": {
+    "antagonistOf": [
+      "abductors",
+      "hamstrings",
+      "hipFlexors"
+    ],
+    "redundantWith": [
+      "Horse Stance Hold",
+      "Pop Squat"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Curtsy Lunge": {
+    "antagonistOf": [
+      "hipFlexors"
+    ],
+    "redundantWith": [],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Side Lunge": {
+    "antagonistOf": [
+      "abductors",
+      "hamstrings",
+      "hipFlexors"
+    ],
+    "redundantWith": [
+      "Cossack Squat"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Single Leg Glute Bridge": {
+    "antagonistOf": [
+      "hipFlexors"
+    ],
+    "redundantWith": [
+      "Cable Donkey Kick",
+      "Cable Kickback (Glute)",
+      "Glute Bridge"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Good Morning (BW)": {
+    "antagonistOf": [
+      "quads",
+      "abs"
+    ],
+    "redundantWith": [],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Jumping Jacks": {
+    "antagonistOf": [
+      "hipFlexors",
+      "adductors",
+      "tibialis"
+    ],
+    "redundantWith": [],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "High Knees": {
+    "antagonistOf": [
+      "glutes",
+      "hamstrings",
+      "tibialis"
+    ],
+    "redundantWith": [
+      "A-Skips",
+      "March in Place"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Jump Squat": {
+    "antagonistOf": [
+      "hamstrings",
+      "hipFlexors",
+      "tibialis"
+    ],
+    "redundantWith": [
+      "Box Jump",
+      "Pop Squat",
+      "Squat to Calf Raise"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Skater Hops": {
+    "antagonistOf": [
+      "hipFlexors",
+      "adductors",
+      "hamstrings",
+      "tibialis"
+    ],
+    "redundantWith": [
+      "Duck Walk",
+      "Lateral Bounds",
+      "Lateral Shuffle",
+      "Step Touch"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Jumping Lunge": {
+    "antagonistOf": [
+      "hipFlexors",
+      "tibialis"
+    ],
+    "redundantWith": [
+      "Dumbbell Lunge",
+      "Low Step-Up (Fast)",
+      "Lunge (BW)"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Box Jump": {
+    "antagonistOf": [
+      "hamstrings",
+      "hipFlexors",
+      "tibialis"
+    ],
+    "redundantWith": [
+      "Jump Squat",
+      "Pop Squat",
+      "Squat to Calf Raise"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Superman": {
+    "antagonistOf": [
+      "abs",
+      "hipFlexors"
+    ],
+    "redundantWith": [],
+    "forceVector": "axial",
+    "axialLoad": false
+  },
+  "Swimmers": {
+    "antagonistOf": [
+      "abs"
+    ],
+    "redundantWith": [],
+    "forceVector": "axial",
+    "axialLoad": false
+  },
+  "Bench Dip": {
+    "antagonistOf": [
+      "biceps"
+    ],
+    "redundantWith": [],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Close Grip Push-up": {
+    "antagonistOf": [
+      "biceps"
+    ],
+    "redundantWith": [],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Plate Pinch": {
+    "antagonistOf": [],
+    "redundantWith": [],
+    "forceVector": "axial",
+    "axialLoad": true
+  },
+  "Svend Press": {
+    "antagonistOf": [
+      "lats",
+      "rhomboids",
+      "rearDelts"
+    ],
+    "redundantWith": [
+      "Decline Push-up",
+      "Incline Push-up",
+      "Wide Grip Push-up"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Cable Curl (Behind Back)": {
+    "antagonistOf": [
+      "triceps"
+    ],
+    "redundantWith": [
+      "Bayesian Curl",
+      "Cable Bicep Curl",
+      "Concentration Curl",
+      "Dumbbell Curl",
+      "Lying Cable Curl"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Cable Row (Wide Grip)": {
+    "antagonistOf": [
+      "chest",
+      "frontDelts",
+      "serratus"
+    ],
+    "redundantWith": [
+      "High Row (Rope)"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Standing Cable Crunch": {
+    "antagonistOf": [
+      "lowerBack"
+    ],
+    "redundantWith": [
+      "Cable Crunch",
+      "Flutter Kicks",
+      "Reverse Crunch"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Bear Crawl": {
+    "antagonistOf": [
+      "lowerBack",
+      "rearDelts",
+      "lats",
+      "hamstrings",
+      "rhomboids"
+    ],
+    "redundantWith": [],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Crab Walk": {
+    "antagonistOf": [
+      "biceps",
+      "hipFlexors",
+      "chest",
+      "frontDelts",
+      "quads"
+    ],
+    "redundantWith": [],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Kick Through": {
+    "antagonistOf": [
+      "lowerBack",
+      "glutes",
+      "rearDelts",
+      "lats"
+    ],
+    "redundantWith": [
+      "Mountain Climbers"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Beast Reach": {
+    "antagonistOf": [
+      "rearDelts",
+      "lats"
+    ],
+    "redundantWith": [],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Duck Walk": {
+    "antagonistOf": [
+      "hamstrings",
+      "hipFlexors",
+      "tibialis"
+    ],
+    "redundantWith": [
+      "Lateral Bounds",
+      "Lateral Shuffle",
+      "Skater Hops",
+      "Step Touch"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Tibialis Raise": {
+    "antagonistOf": [
+      "calves"
+    ],
+    "redundantWith": [],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "ATG Split Squat": {
+    "antagonistOf": [
+      "hamstrings"
+    ],
+    "redundantWith": [
+      "Reverse Lunge to Knee Drive"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Lu Raise": {
+    "antagonistOf": [],
+    "redundantWith": [
+      "Cable Y-Raise"
+    ],
+    "forceVector": "lateral",
+    "axialLoad": false
+  },
+  "Powell Raise": {
+    "antagonistOf": [
+      "chest",
+      "frontDelts",
+      "serratus"
+    ],
+    "redundantWith": [],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Wrist Rocks": {
+    "antagonistOf": [],
+    "redundantWith": [
+      "Wrist Extensor Stretch",
+      "Wrist Flexor Stretch"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Dead Hang": {
+    "antagonistOf": [
+      "chest",
+      "frontDelts"
+    ],
+    "redundantWith": [],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Cossack Squat": {
+    "antagonistOf": [
+      "abductors",
+      "hamstrings",
+      "hipFlexors"
+    ],
+    "redundantWith": [
+      "Side Lunge"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Jefferson Curl": {
+    "antagonistOf": [
+      "abs",
+      "quads"
+    ],
+    "redundantWith": [],
+    "forceVector": "axial",
+    "axialLoad": false
+  },
+  "Scorpion Stretch": {
+    "antagonistOf": [
+      "abs"
+    ],
+    "redundantWith": [
+      "World's Greatest Stretch"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Inchworm": {
+    "antagonistOf": [
+      "quads",
+      "rearDelts",
+      "lats",
+      "lowerBack",
+      "rhomboids",
+      "biceps"
+    ],
+    "redundantWith": [],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Thoracic Bridge": {
+    "antagonistOf": [
+      "abs",
+      "hipFlexors",
+      "rearDelts",
+      "tibialis",
+      "quads",
+      "chest"
+    ],
+    "redundantWith": [],
+    "forceVector": "axial",
+    "axialLoad": false
+  },
+  "Single Leg RDL (BW)": {
+    "antagonistOf": [
+      "quads",
+      "hipFlexors"
+    ],
+    "redundantWith": [
+      "Cable Pull-Through"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Lateral Bounds": {
+    "antagonistOf": [
+      "hipFlexors",
+      "adductors",
+      "hamstrings",
+      "tibialis"
+    ],
+    "redundantWith": [
+      "Duck Walk",
+      "Lateral Shuffle",
+      "Skater Hops",
+      "Step Touch"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Dot Drill": {
+    "antagonistOf": [
+      "hamstrings"
+    ],
+    "redundantWith": [
+      "Fast Feet Shuffle",
+      "Pogo Hops"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Tuck Jumps": {
+    "antagonistOf": [
+      "hamstrings",
+      "glutes",
+      "tibialis",
+      "lowerBack"
+    ],
+    "redundantWith": [],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "A-Skips": {
+    "antagonistOf": [
+      "glutes",
+      "hamstrings",
+      "tibialis"
+    ],
+    "redundantWith": [
+      "High Knees",
+      "March in Place"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Horse Stance Hold": {
+    "antagonistOf": [
+      "hamstrings",
+      "abductors",
+      "hipFlexors"
+    ],
+    "redundantWith": [
+      "Pop Squat",
+      "Sumo Squat (DB)"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Reverse Plank": {
+    "antagonistOf": [
+      "hipFlexors"
+    ],
+    "redundantWith": [],
+    "forceVector": "axial",
+    "axialLoad": false
+  },
+  "Copenhagen Plank": {
+    "antagonistOf": [
+      "abductors"
+    ],
+    "redundantWith": [],
+    "forceVector": "rotational",
+    "axialLoad": false
+  },
+  "L-Sit (Tuck)": {
+    "antagonistOf": [
+      "lowerBack",
+      "glutes",
+      "hamstrings",
+      "adductors",
+      "biceps"
+    ],
+    "redundantWith": [],
+    "forceVector": "axial",
+    "axialLoad": false
+  },
+  "March in Place": {
+    "antagonistOf": [
+      "glutes",
+      "hamstrings",
+      "tibialis"
+    ],
+    "redundantWith": [
+      "A-Skips",
+      "High Knees"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Step Touch": {
+    "antagonistOf": [
+      "hipFlexors",
+      "hamstrings",
+      "adductors",
+      "tibialis"
+    ],
+    "redundantWith": [
+      "Duck Walk",
+      "Lateral Bounds",
+      "Lateral Shuffle",
+      "Skater Hops"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Lateral Shuffle": {
+    "antagonistOf": [
+      "adductors",
+      "hipFlexors",
+      "hamstrings",
+      "tibialis"
+    ],
+    "redundantWith": [
+      "Duck Walk",
+      "Lateral Bounds",
+      "Skater Hops",
+      "Step Touch"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Standing Knee-to-Elbow": {
+    "antagonistOf": [
+      "lowerBack",
+      "glutes"
+    ],
+    "redundantWith": [],
+    "forceVector": "rotational",
+    "axialLoad": false
+  },
+  "Shadow Boxing": {
+    "antagonistOf": [
+      "lats",
+      "chest",
+      "biceps",
+      "lowerBack"
+    ],
+    "redundantWith": [],
+    "forceVector": "rotational",
+    "axialLoad": false
+  },
+  "Squat to Calf Raise": {
+    "antagonistOf": [
+      "hamstrings",
+      "hipFlexors",
+      "tibialis"
+    ],
+    "redundantWith": [
+      "Box Jump",
+      "Jump Squat",
+      "Pop Squat"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Fast Feet Shuffle": {
+    "antagonistOf": [
+      "hamstrings"
+    ],
+    "redundantWith": [
+      "Dot Drill",
+      "Pogo Hops"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Slow Mountain Climber": {
+    "antagonistOf": [
+      "lowerBack",
+      "glutes",
+      "rearDelts",
+      "lats",
+      "rhomboids"
+    ],
+    "redundantWith": [
+      "Mountain Climbers"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Reverse Lunge to Knee Drive": {
+    "antagonistOf": [],
+    "redundantWith": [
+      "ATG Split Squat",
+      "Dumbbell Lunge",
+      "Lunge (BW)"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Standing Oblique Twist": {
+    "antagonistOf": [
+      "lowerBack"
+    ],
+    "redundantWith": [
+      "Bicycle Crunch"
+    ],
+    "forceVector": "rotational",
+    "axialLoad": false
+  },
+  "Low Step-Up (Fast)": {
+    "antagonistOf": [
+      "hamstrings",
+      "hipFlexors",
+      "tibialis"
+    ],
+    "redundantWith": [
+      "Jumping Lunge"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "No-Jump Burpee": {
+    "antagonistOf": [
+      "lats",
+      "rhomboids",
+      "rearDelts",
+      "biceps",
+      "hamstrings",
+      "lowerBack"
+    ],
+    "redundantWith": [
+      "Burpees"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Pop Squat": {
+    "antagonistOf": [
+      "hamstrings",
+      "hipFlexors",
+      "abductors",
+      "tibialis"
+    ],
+    "redundantWith": [
+      "Box Jump",
+      "Horse Stance Hold",
+      "Jump Squat",
+      "Squat to Calf Raise",
+      "Sumo Squat (DB)"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": true
+  },
+  "Pogo Hops": {
+    "antagonistOf": [
+      "hamstrings"
+    ],
+    "redundantWith": [
+      "Dot Drill",
+      "Fast Feet Shuffle"
+    ],
+    "forceVector": "horizontal",
+    "axialLoad": false
+  },
+  "Neck CARs": {
+    "antagonistOf": [],
+    "redundantWith": [],
+    "forceVector": "rotational",
+    "axialLoad": false
+  },
+  "Chin Tuck": {
+    "antagonistOf": [],
+    "redundantWith": [],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Upper-Trap & Levator Stretch": {
+    "antagonistOf": [],
+    "redundantWith": [],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Forearm Pronation-Supination": {
+    "antagonistOf": [
+      "triceps"
+    ],
+    "redundantWith": [],
+    "forceVector": "rotational",
+    "axialLoad": false
+  },
+  "Elbow CARs": {
+    "antagonistOf": [],
+    "redundantWith": [],
+    "forceVector": "rotational",
+    "axialLoad": false
+  },
+  "Terminal Knee Extension": {
+    "antagonistOf": [
+      "hamstrings"
+    ],
+    "redundantWith": [],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Banded Ankle Eversion-Inversion": {
+    "antagonistOf": [],
+    "redundantWith": [
+      "Ankle Alphabet",
+      "Knee-to-Wall Ankle Rock"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Arm Circles": {
+    "antagonistOf": [
+      "lats",
+      "chest"
+    ],
+    "redundantWith": [
+      "Shoulder Dislocates"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Prone Y-T-W Raise": {
+    "antagonistOf": [
+      "chest",
+      "frontDelts",
+      "serratus"
+    ],
+    "redundantWith": [],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Sleeper Stretch": {
+    "antagonistOf": [
+      "chest",
+      "frontDelts"
+    ],
+    "redundantWith": [],
+    "forceVector": "rotational",
+    "axialLoad": false
+  },
+  "Thread the Needle": {
+    "antagonistOf": [
+      "abs",
+      "chest",
+      "serratus",
+      "frontDelts"
+    ],
+    "redundantWith": [],
+    "forceVector": "axial",
+    "axialLoad": false
+  },
+  "Open Book Stretch": {
+    "antagonistOf": [
+      "lats",
+      "rhomboids",
+      "rearDelts"
+    ],
+    "redundantWith": [],
+    "forceVector": "axial",
+    "axialLoad": false
+  },
+  "Quadruped Thoracic Rotation": {
+    "antagonistOf": [
+      "abs"
+    ],
+    "redundantWith": [],
+    "forceVector": "rotational",
+    "axialLoad": false
+  },
+  "Pigeon Pose": {
+    "antagonistOf": [
+      "abs"
+    ],
+    "redundantWith": [],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Frog Stretch": {
+    "antagonistOf": [
+      "abductors",
+      "glutes"
+    ],
+    "redundantWith": [],
+    "forceVector": "lateral",
+    "axialLoad": false
+  },
+  "Standing Hip CARs": {
+    "antagonistOf": [],
+    "redundantWith": [],
+    "forceVector": "rotational",
+    "axialLoad": false
+  },
+  "Reverse Nordic Curl": {
+    "antagonistOf": [
+      "hamstrings",
+      "glutes"
+    ],
+    "redundantWith": [
+      "Couch Stretch"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Eccentric Step Down": {
+    "antagonistOf": [
+      "hamstrings",
+      "hipFlexors"
+    ],
+    "redundantWith": [
+      "Bulgarian Split Squat",
+      "Cable Lunge",
+      "DB Step Up"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Knee-to-Wall Ankle Rock": {
+    "antagonistOf": [],
+    "redundantWith": [
+      "Ankle Alphabet",
+      "Banded Ankle Eversion-Inversion"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Ankle Alphabet": {
+    "antagonistOf": [],
+    "redundantWith": [
+      "Banded Ankle Eversion-Inversion",
+      "Knee-to-Wall Ankle Rock"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Child's Pose": {
+    "antagonistOf": [
+      "abs",
+      "chest",
+      "frontDelts"
+    ],
+    "redundantWith": [],
+    "forceVector": "axial",
+    "axialLoad": false
+  },
+  "McGill Curl-Up": {
+    "antagonistOf": [
+      "lowerBack"
+    ],
+    "redundantWith": [],
+    "forceVector": "axial",
+    "axialLoad": false
+  },
+  "Prone Press-Up": {
+    "antagonistOf": [
+      "abs"
+    ],
+    "redundantWith": [
+      "Thoracic Extension"
+    ],
+    "forceVector": "axial",
+    "axialLoad": false
+  },
+  "Wrist Flexor Stretch": {
+    "antagonistOf": [],
+    "redundantWith": [
+      "Wrist Extensor Stretch",
+      "Wrist Rocks"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  },
+  "Wrist Extensor Stretch": {
+    "antagonistOf": [],
+    "redundantWith": [
+      "Wrist Flexor Stretch",
+      "Wrist Rocks"
+    ],
+    "forceVector": "vertical",
+    "axialLoad": false
+  }
+}
