@@ -1216,7 +1216,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec);">v104</span>
+        <span style="font-size:1.3em; color: var(--sec);">v105</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -4289,7 +4289,7 @@ function skipExercise(exerciseName) {
 }
 
 function saveSetToHistory(name, setData) {
-    const today = new Date().toISOString().split('T')[0];
+    const today = localDateKey();
     let history = JSON.parse(localStorage.getItem('exerciseHistory')) || {};
     if(!history[name]) history[name] = [];
     history[name].push({...setData, sessionDate: today});
@@ -4297,7 +4297,7 @@ function saveSetToHistory(name, setData) {
 }
 
 function getTodaysSetData(name) {
-    const today = new Date().toISOString().split('T')[0];
+    const today = localDateKey();
     const history = JSON.parse(localStorage.getItem('exerciseHistory')) || {};
     return (history[name] || []).filter(s => s.sessionDate === today);
 }
@@ -4319,7 +4319,7 @@ function getProgression(name) {
         return { lastSession: null, suggest: null, suggestedWeight: 0, suggestedReps: 10, hint: null };
     }
     
-    var today = new Date().toISOString().split('T')[0];
+    var today = localDateKey();
     
     // Group sets by session date
     var sessions = {};
@@ -4423,7 +4423,7 @@ function getProgression(name) {
 function endWorkout() {
     if(confirm('End workout early?')) {
         window._lastWorkoutType = appState.currentWorkout?.type || 'unknown';
-        window._lastWorkoutDate = new Date().toISOString().split('T')[0];
+        window._lastWorkoutDate = localDateKey();
         window._endedEarly = true;
 
         document.getElementById('workout-interface').style.display = 'none';
@@ -4482,12 +4482,22 @@ function markDayCompleted(dayIndex) {
     updateTodaysBanner(); // reflect completion immediately, no reload (#6b)
 }
 
+// #7: local-date key (YYYY-MM-DD from the device's LOCAL calendar day) for all date
+// grouping/keys. Render already parses local; the keys were UTC, so 00:00-10:00 in
+// Melbourne keyed to the previous day. Full-ISO per-set timestamps stay UTC.
+function localDateKey(d) {
+    var dt = d || new Date();
+    var m = String(dt.getMonth() + 1).padStart(2, '0');
+    var day = String(dt.getDate()).padStart(2, '0');
+    return dt.getFullYear() + '-' + m + '-' + day;
+}
+
 function getDateForDay(dayIndex) {
     const today = new Date();
     const diff = dayIndex - today.getDay();
     const target = new Date(today);
     target.setDate(today.getDate() + diff);
-    return target.toISOString().split('T')[0];
+    return localDateKey(target);
 }
 
 // ========================================
@@ -4542,7 +4552,7 @@ function skipRPE() {
 }
 
 function saveRPEData(rpe, tags) {
-    const date = window._lastWorkoutDate || new Date().toISOString().split('T')[0];
+    const date = window._lastWorkoutDate || localDateKey();
     let rpeHistory = JSON.parse(localStorage.getItem('rpeHistory')) || {};
     
     rpeHistory[date] = {
@@ -4826,7 +4836,7 @@ function renderWeeklyBriefing() {
     for (var i = 0; i < 7; i++) {
         var d = new Date(monday);
         d.setDate(monday.getDate() + i);
-        weekDates.push(d.toISOString().split('T')[0]);
+        weekDates.push(localDateKey(d));
     }
     
     // Sessions this week
@@ -4865,7 +4875,7 @@ function renderWeeklyBriefing() {
     for (var j = 0; j < 7; j++) {
         var lwd = new Date(monday);
         lwd.setDate(monday.getDate() - 7 + j);
-        lastWeekDates.push(lwd.toISOString().split('T')[0]);
+        lastWeekDates.push(localDateKey(lwd));
     }
     
     var lastWeekVolume = 0;
@@ -4996,7 +5006,7 @@ function renderDeloadDetective() {
         for (var d = 0; d < 7; d++) {
             var wd = new Date(weekStart);
             wd.setDate(weekStart.getDate() + d);
-            weekDates.push(wd.toISOString().split('T')[0]);
+            weekDates.push(localDateKey(wd));
         }
         
         var volume = 0;
@@ -5136,14 +5146,14 @@ function renderRecoveryScorecard() {
     var rpeHistory = JSON.parse(localStorage.getItem('rpeHistory')) || {};
     
     var now = new Date();
-    var today = now.toISOString().split('T')[0];
+    var today = localDateKey(now);
     
     // Collect last 14 days of data
     var last14 = [];
     for (var i = 0; i < 14; i++) {
         var d = new Date(now);
         d.setDate(now.getDate() - i);
-        last14.push(d.toISOString().split('T')[0]);
+        last14.push(localDateKey(d));
     }
     
     // Metrics
@@ -5289,7 +5299,7 @@ function renderMechanic() {
     for (var i = 0; i < 28; i++) {
         var d = new Date(now);
         d.setDate(now.getDate() - i);
-        last28.push(d.toISOString().split('T')[0]);
+        last28.push(localDateKey(d));
     }
     
     var alerts = [];
@@ -7145,7 +7155,7 @@ function updateAiCoach() {
     for(let i = 0; i < 7; i++) {
         const date = new Date(startOfWeek);
         date.setDate(startOfWeek.getDate() + i);
-        const dateStr = date.toISOString().split('T')[0];
+        const dateStr = localDateKey(date);
         
         if(completedWorkouts[dateStr]) {
             workoutsThisWeek++;
@@ -8601,7 +8611,7 @@ function patchFinishWorkoutForAssessment() {
             buildStrengthProfile();
             // Don't call origFinish RPE modal — we handle completion ourselves
             // But still save session data
-            var today = new Date().toISOString().split('T')[0];
+            var today = localDateKey();
             var completed = JSON.parse(localStorage.getItem('completedWorkouts')) || {};
             completed[today] = { type: 'assessment', date: today, rpe: 5 };
             localStorage.setItem('completedWorkouts', JSON.stringify(completed));
@@ -8647,7 +8657,7 @@ function buildStrengthProfile() {
         if (sets.length === 0) return;
         
         // Get the heaviest successful set (most recent session)
-        var today = new Date().toISOString().split('T')[0];
+        var today = localDateKey();
         var todaySets = sets.filter(function(s) { return s.sessionDate === today; });
         if (todaySets.length === 0) todaySets = sets.slice(-3); // fallback to last 3 sets
         
