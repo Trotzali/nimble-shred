@@ -142,7 +142,7 @@
         .chip {
             padding: 10px 18px; background: var(--surface-2); border: 1px solid var(--line);
             border-radius: 10px; font-size: 0.85em; cursor: pointer; font-weight: 500;
-            color: #ccc; transition: all 0.2s; user-select: none;
+            color: #ccc; font-family: inherit; transition: all 0.2s; user-select: none;
         }
         .chip svg { opacity: 0.65; }
         .chip:hover { background: rgba(255,255,255,0.1); border-color: var(--sec); color: var(--sec); }
@@ -1247,7 +1247,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v113</span>
+        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v114</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -1275,10 +1275,10 @@
         
         <div class="section-label">Equipment</div>
         <div class="gear-row" id="session-gear-toggles">
-            <button class="rpe-tag selected" onclick="setSessionGear(this,'gym')" data-session-gear="gym">🏋️ Full Gym</button>
-            <button class="rpe-tag" onclick="setSessionGear(this,'cable')" data-session-gear="cable">🔌 Cables</button>
-            <button class="rpe-tag" onclick="setSessionGear(this,'dumbbell')" data-session-gear="dumbbell">🔩 Dumbbells</button>
-            <button class="rpe-tag" onclick="setSessionGear(this,'bodyweight')" data-session-gear="bodyweight">🤸 Bodyweight</button>
+            <button class="chip active" onclick="setSessionGear(this,'gym')" data-session-gear="gym">🏋️ Full Gym</button>
+            <button class="chip" onclick="setSessionGear(this,'cable')" data-session-gear="cable">🔌 Cables</button>
+            <button class="chip" onclick="setSessionGear(this,'dumbbell')" data-session-gear="dumbbell">🔩 Dumbbells</button>
+            <button class="chip" onclick="setSessionGear(this,'bodyweight')" data-session-gear="bodyweight">🤸 Bodyweight</button>
         </div>
         
         <div class="section-label" style="margin-top:16px;">Workout Type</div>
@@ -1685,8 +1685,8 @@
     <div class="card">
         <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg> Weight Unit</h3>
         <div class="gear-row">
-            <button class="rpe-tag selected" data-weight-unit="kg" onclick="setWeightUnit('kg')">kg</button>
-            <button class="rpe-tag" data-weight-unit="lbs" onclick="setWeightUnit('lbs')">lbs</button>
+            <button class="chip active" data-weight-unit="kg" onclick="setWeightUnit('kg')">kg</button>
+            <button class="chip" data-weight-unit="lbs" onclick="setWeightUnit('lbs')">lbs</button>
         </div>
         <p class="text-muted" style="margin-top:10px; font-size:0.8em;">
             Display label only — switching does <strong>not</strong> convert saved numbers (40 stays 40). New sets are logged in the unit shown.
@@ -3410,7 +3410,7 @@ function setWeightUnit(unit) {
     appState.weightUnit = unit === 'lbs' ? 'lbs' : 'kg';
     saveAppState();
     document.querySelectorAll('[data-weight-unit]').forEach(function(b) {
-        b.classList.toggle('selected', b.getAttribute('data-weight-unit') === appState.weightUnit);
+        b.classList.toggle('active', b.getAttribute('data-weight-unit') === appState.weightUnit);
     });
     // Re-label an active workout card (skip mid-rest so the timer isn't disturbed)
     if (appState.currentWorkout && appState.currentWorkout.length && !document.getElementById('active-rest-timer')) {
@@ -3609,8 +3609,8 @@ function endRestTimer() {
 
 function setSessionGear(btn, gear) {
     sessionGear = gear;
-    document.querySelectorAll('[data-session-gear]').forEach(function(b) { b.classList.remove('selected'); });
-    document.querySelectorAll('[data-session-gear="' + gear + '"]').forEach(function(b) { b.classList.add('selected'); });
+    document.querySelectorAll('[data-session-gear]').forEach(function(b) { b.classList.remove('active'); });
+    document.querySelectorAll('[data-session-gear="' + gear + '"]').forEach(function(b) { b.classList.add('active'); });
 }
 
 function applySessionGear(gear) {
@@ -4581,7 +4581,7 @@ function showRPEModal() {
     document.getElementById('rpe-slider').value = 5;
     updateRPEDisplay(5);
     // Reset tags
-    document.querySelectorAll('.rpe-tag').forEach(t => t.classList.remove('selected'));
+    document.querySelectorAll('#rpe-tags-container .rpe-tag').forEach(t => t.classList.remove('selected'));
 }
 
 function updateRPEDisplay(val) {
@@ -4599,7 +4599,7 @@ function toggleRPETag(btn) {
 
 function submitRPE() {
     const rpe = parseInt(document.getElementById('rpe-slider').value);
-    const tags = Array.from(document.querySelectorAll('.rpe-tag.selected')).map(t => t.dataset.tag);
+    const tags = Array.from(document.querySelectorAll('#rpe-tags-container .rpe-tag.selected')).map(t => t.dataset.tag);
     
     saveRPEData(rpe, tags);
     
@@ -6696,7 +6696,7 @@ function updateSettingsUI() {
 
     // Weight unit toggle state
     document.querySelectorAll('[data-weight-unit]').forEach(function(b) {
-        b.classList.toggle('selected', b.getAttribute('data-weight-unit') === getWeightUnit());
+        b.classList.toggle('active', b.getAttribute('data-weight-unit') === getWeightUnit());
     });
 }
 
