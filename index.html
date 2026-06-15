@@ -117,7 +117,6 @@
         
         /* LAYOUT */
         .row { display: flex; gap: 10px; align-items: center; }
-        .row-wrap { display: flex; gap: 10px; flex-wrap: wrap; }
         
         /* NAVIGATION */
         .nav-bar {
@@ -261,11 +260,6 @@
         .encyclopedia-section li:before { 
             content: '▸'; position: absolute; left: 0; color: var(--sec); 
         }
-        .muscle-badge {
-            display: inline-block; background: var(--sec);
-            color: #000; padding: 3px 8px; border-radius: 12px; 
-            font-size: 0.75em; margin: 3px; font-weight: bold;
-        }
         .gif-container { 
             background: var(--bg); border-radius: 8px; padding: 15px;
             margin: 15px 0; text-align: center; min-height: 200px;
@@ -320,35 +314,6 @@
             background: var(--sec); height: 8px; border-radius: 5px;
         }
         
-        /* GIF SEARCH */
-        .gif-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
-            gap: 10px; 
-            margin-top: 15px; 
-        }
-        .gif-item { 
-            cursor: pointer; 
-            border-radius: 8px; 
-            overflow: hidden; 
-            border: 2px solid transparent; 
-            transition: all 0.2s; 
-            aspect-ratio: 1;
-        }
-        .gif-item:hover { 
-            border-color: var(--sec); 
-            transform: scale(1.05); 
-        }
-        .gif-item img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-        }
-        .gif-actions { 
-            display: flex; 
-            gap: 10px; 
-            margin-top: 10px; 
-        }
         
         /* GARMIN RECOVERY STYLES */
         .drop-zone {
@@ -718,11 +683,6 @@
             border-radius: 8px; background: rgba(3,218,198,0.15);
             color: var(--sec); margin-bottom: 6px;
         }
-        .strength-profile-card {
-            background: linear-gradient(135deg, rgba(3,218,198,0.06), rgba(138,143,152,0.06));
-            border: 1px solid rgba(3,218,198,0.15); border-radius: 12px;
-            padding: 16px; margin: 12px 0;
-        }
         .sp-bar-bg {
             height: 8px; background: rgba(255,255,255,0.06);
             border-radius: 4px; overflow: hidden; margin-top: 4px;
@@ -876,10 +836,7 @@
         
         /* UTILITIES */
         .hidden { display: none !important; }
-        .text-center { text-align: center; }
         .text-muted { color: #aaa; font-size: 0.85em; }
-        .mb-10 { margin-bottom: 10px; }
-        .mt-10 { margin-top: 10px; }
         
         /* ==========================================
            AI CHAT SYSTEM
@@ -1257,7 +1214,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v115</span>
+        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v116</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -6366,19 +6323,11 @@ function getBucket(name) {            // focus axis (Phase B / #24)
     var m = getExerciseMeta(name);
     return (m && m.bucket) || 'strength';            // default: treat unknown as strength
 }
-function getEquipmentNorm(name) {     // equipment axis
-    var m = getExerciseMeta(name);
-    return (m && m.equipmentNorm) || null;
-}
 function getLogMode(name) {           // #5 set-logging
     var m = getExerciseMeta(name);
     var mode = m && m.logMode;
     // reps/time are the live modes; unknown/missing/reserved 'distance' -> weight_reps (today's UI)
     return (mode === 'reps' || mode === 'time') ? mode : 'weight_reps';
-}
-function getAlternatives(name) {      // niggle / pain-swap
-    var m = getExerciseMeta(name);
-    return (m && Array.isArray(m.alternatives)) ? m.alternatives : [];
 }
 function getMovementPattern(name) {   // v1.4.0 14-enum, primary pattern only
     var m = getExerciseMeta(name);
@@ -6387,10 +6336,6 @@ function getMovementPattern(name) {   // v1.4.0 14-enum, primary pattern only
     var ae = (typeof assessmentExerciseList !== 'undefined' && assessmentExerciseList)
         ? assessmentExerciseList.find(function (a) { return a.name === name; }) : null;
     return ae ? ae.pattern : null;
-}
-function getLaterality(name) {        // 'bilateral' | 'unilateral' | 'alternating'
-    var m = getExerciseMeta(name);
-    return (m && m.laterality) || 'bilateral';       // default on miss
 }
 function getCompound(name) {          // boolean (reads stored value; never recomputes)
     var m = getExerciseMeta(name);
@@ -6804,61 +6749,8 @@ function importImages(event) {
     reader.readAsText(file);
 }
 
-// ========================================
-// SIMPLE GOOGLE IMAGE SEARCH
-// ========================================
-function openGifSearch(exerciseName) {
-    // Build Google Images search URL for animated GIF showing form and muscles
-    const searchQuery = `${exerciseName} exercise animated GIF male form muscles worked`;
-    const googleImagesUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}&tbm=isch&tbs=itp:animated`;
-    
-    // Open in new tab
-    window.open(googleImagesUrl, '_blank');
-    
-    // Optional: Show a quick tip
-    speak(`Opening Google Images for ${exerciseName}`);
-}
 
-function removeExerciseGif(exerciseName) {
-    if(confirm(`Remove image for ${exerciseName}?`)) {
-        localStorage.removeItem(`gif_${exerciseName}`);
-        speak('Image removed');
-        viewExerciseDetails(exerciseName);
-    }
-}
 
-function pasteImageUrl(exerciseName) {
-    // Get the input field ID (sanitized exercise name)
-    const inputId = `paste-url-${exerciseName.replace(/[^a-zA-Z0-9]/g, '_')}`;
-    const input = document.getElementById(inputId);
-    
-    if(!input) {
-        alert('Error: Could not find input field');
-        return;
-    }
-    
-    const imageUrl = input.value.trim();
-    
-    // Validate URL
-    if(!imageUrl) {
-        alert('Please paste an image URL first');
-        return;
-    }
-    
-    // Basic URL validation
-    if(!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
-        alert('Please enter a valid URL starting with http:// or https://');
-        return;
-    }
-    
-    // Save to localStorage
-    localStorage.setItem(`gif_${exerciseName}`, imageUrl);
-    
-    // Clear input and refresh view
-    input.value = '';
-    speak(`Image URL saved for ${exerciseName}`);
-    viewExerciseDetails(exerciseName);
-}
 
 // ========================================
 // GPS TRACKING FEATURE
@@ -7304,9 +7196,6 @@ function updateAiCoach() {
 // ========================================
 // UTILITY FUNCTIONS
 // ========================================
-function capitalizeFirst(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
 
 // ========================================
 // GARMIN CSV UPLOAD & AI ANALYSIS
@@ -7864,15 +7753,6 @@ async function saveWorkoutToCloud(workout) {
     } catch (error) { console.error('Error saving workout:', error); return false; }
 }
 
-async function loadWorkoutsFromCloud() {
-    if (!CLOUD_SYNC_ENABLED || !supabaseClient) return [];
-    try {
-        const { data, error } = await supabaseClient.from('workouts').select('*').eq('user_id', USER_ID).order('date', { ascending: false });
-        if (error) throw error;
-        console.log(`📥 Loaded ${data.length} workouts from cloud`);
-        return data || [];
-    } catch (error) { console.error('Error loading workouts:', error); return []; }
-}
 
 async function savePlanToCloud(plan) {
     if (!CLOUD_SYNC_ENABLED || !supabaseClient) return false;
@@ -8462,9 +8342,6 @@ function buildConsultSystemPrompt() {
     'Don\'t rush — if you only have 2-3 fields, keep asking. But don\'t over-ask if they seem keen to get going.';
 }
 
-// Keep backward compatibility — old function redirects to new
-function startAIPlanWizard() { startConsultation(); }
-function closeAIWizard() { closeConsultation(); }
 // (removed duplicate acceptPlan shim here — H-04 #10d: it overrode the real generator handler;
 //  the consultation "View My Plan" path closes itself inline, so nothing needs this stub.)
 
@@ -8859,11 +8736,6 @@ function exportWorkoutHistory() {
     showNotification(''+IC.check+' History downloaded', 'success');
 }
 
-function downloadBlob(blob, filename) {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-}
 
 // ==========================================================================
 // 7. GLOBAL INITIALIZATION (Final Fixed Order)
@@ -9396,25 +9268,6 @@ function addAIMessageToChat(message, context = null) {
 }
 
 // Integration helper for daily AI updates
-function notifyUserOfAIUpdate(updateType, changes) {
-    let message = '';
-    
-    switch (updateType) {
-        case 'workout_modified':
-            message = `I've modified today's workout based on your recovery data:\n\n${changes.join('\n')}`;
-            break;
-        case 'rest_recommended':
-            message = `Based on your recovery metrics, I recommend taking a rest day today. Your body needs time to recover.`;
-            break;
-        case 'intensity_adjusted':
-            message = `I've adjusted your workout intensity:\n\n${changes.join('\n')}`;
-            break;
-        default:
-            message = changes.join('\n');
-    }
-    
-    addAIMessageToChat(message, 'Daily Recovery Update');
-}
 
 </script>
 
