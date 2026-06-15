@@ -1214,7 +1214,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v116</span>
+        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v117</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -3514,6 +3514,11 @@ function confirmNiggles(workAround) {
 }
 
 // REST TIMER — shows between sets
+// Rest-timer fix: single raw clear of the sole interval id (no DOM/announce side effects).
+function clearRestTimer() {
+    if (restTimerInterval) { clearInterval(restTimerInterval); restTimerInterval = null; }
+}
+
 function startRestTimer(containerEl) {
     var config = checkInConfig[sessionCheckIn] || checkInConfig.skip;
     var totalSeconds = config.restBase;
@@ -3536,7 +3541,7 @@ function startRestTimer(containerEl) {
         setActive.id = 'hidden-set-input';
     }
     
-    if (restTimerInterval) clearInterval(restTimerInterval);
+    clearRestTimer();
     restTimerInterval = setInterval(function() {
         restTimerSeconds--;
         var display = document.getElementById('rest-timer-display');
@@ -3561,8 +3566,7 @@ function formatRestTime(s) {
 }
 
 function skipRestTimer() {
-    if (restTimerInterval) clearInterval(restTimerInterval);
-    restTimerInterval = null;
+    clearRestTimer();
     endRestTimer();
 }
 
@@ -4012,6 +4016,7 @@ function renderSessionSummary() {
     el.innerHTML = html;
 }
 function renderWorkout(exercises) {
+    clearRestTimer(); // rest-timer fix: silence any live ticker before wiping the DOM (raw clear, no phantom Go)
     const container = document.getElementById('workout-list');
     container.innerHTML = '';
     renderSessionSummary(); // A: keep the session summary in sync with each render
@@ -4453,6 +4458,7 @@ function getProgression(name) {
 
 function endWorkout() {
     if(confirm('End workout early?')) {
+        clearRestTimer(); // rest-timer fix: no phantom Go after ending mid-rest
         window._lastWorkoutType = appState.currentWorkout?.type || 'unknown';
         window._lastWorkoutDate = localDateKey();
         window._endedEarly = true;
@@ -4472,6 +4478,7 @@ function endWorkout() {
 }
 
 function finishWorkout() {
+    clearRestTimer(); // rest-timer fix: no phantom Go after finishing mid-rest
     const today = new Date().getDay();
     markDayCompleted(today);
     
