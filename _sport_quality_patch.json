@@ -1,0 +1,506 @@
+{
+ "Cable Chest Press": [],
+ "Cable Chest Fly (High)": [],
+ "Cable Chest Fly (Low)": [],
+ "Cable Chest Fly (Mid)": [],
+ "Single Arm Cable Chest Press": [],
+ "Cable Crossover": [],
+ "Cable Pullover (Bench)": [],
+ "Lat Pulldown (Standing)": [],
+ "Seated Cable Row": [
+  "scapular-cuff"
+ ],
+ "Face Pulls": [
+  "scapular-cuff"
+ ],
+ "Straight Arm Pulldown": [],
+ "Single Arm Cable Row": [
+  "scapular-cuff"
+ ],
+ "Cable Shrugs": [],
+ "Cable Rear Delt Fly": [
+  "scapular-cuff"
+ ],
+ "High Row (Rope)": [],
+ "Cable Overhead Press": [],
+ "Cable Lateral Raise": [],
+ "Cable Front Raise": [],
+ "Cable External Rotation": [
+  "scapular-cuff"
+ ],
+ "Cable Internal Rotation": [
+  "scapular-cuff"
+ ],
+ "Cable Upright Row": [],
+ "Cable Y-Raise": [
+  "scapular-cuff"
+ ],
+ "Tricep Pushdown (Rope)": [],
+ "Tricep Pushdown (Bar)": [],
+ "Overhead Cable Extension": [],
+ "Cable Bicep Curl": [],
+ "Cable Hammer Curl": [],
+ "Bayesian Curl": [],
+ "Cable Kickback": [],
+ "Reverse Grip Pushdown": [],
+ "Cable Squat": [
+  "posterior-chain"
+ ],
+ "Cable Pull-Through": [
+  "eccentric-hamstring",
+  "posterior-chain"
+ ],
+ "Cable RDL": [
+  "eccentric-hamstring",
+  "posterior-chain"
+ ],
+ "Cable Lunge": [
+  "single-leg",
+  "posterior-chain"
+ ],
+ "Cable Kickback (Glute)": [
+  "single-leg",
+  "posterior-chain"
+ ],
+ "Cable Calf Raise": [
+  "calf-eccentric"
+ ],
+ "Cable Abductor": [],
+ "Cable Adductor": [
+  "adductor"
+ ],
+ "Cable Crunch": [],
+ "Woodchopper (High to Low)": [
+  "rotational-power"
+ ],
+ "Pallof Press": [
+  "rotational-power"
+ ],
+ "Cable Side Bend": [
+  "rotational-power"
+ ],
+ "Woodchopper (Low to High)": [
+  "rotational-power"
+ ],
+ "Dumbbell Bench Press": [],
+ "Dumbbell Incline Press": [],
+ "Dumbbell Fly": [],
+ "Dumbbell Shoulder Press": [],
+ "Arnold Press": [],
+ "Lateral Raise": [],
+ "Front Raise": [],
+ "Dumbbell Row": [
+  "scapular-cuff"
+ ],
+ "Dumbbell Pullover": [],
+ "Goblet Squat": [
+  "posterior-chain"
+ ],
+ "Dumbbell Lunge": [
+  "single-leg",
+  "posterior-chain"
+ ],
+ "Bulgarian Split Squat": [
+  "single-leg",
+  "posterior-chain"
+ ],
+ "Romanian Deadlift (DB)": [
+  "eccentric-hamstring",
+  "posterior-chain"
+ ],
+ "Dumbbell Curl": [],
+ "Hammer Curl": [],
+ "Tricep Kickback": [],
+ "Skull Crusher (DB)": [],
+ "Farmers Walk": [
+  "lumbar-endurance"
+ ],
+ "Zottman Curl": [],
+ "Concentration Curl": [],
+ "DB Floor Press": [],
+ "Renegade Row": [
+  "scapular-cuff"
+ ],
+ "DB Step Up": [
+  "single-leg",
+  "posterior-chain"
+ ],
+ "DB Shrugs": [],
+ "Seated Calf Raise": [
+  "calf-eccentric"
+ ],
+ "Push-ups": [],
+ "Pull-ups": [],
+ "Chin-ups": [],
+ "Dips": [],
+ "Bodyweight Squat": [
+  "posterior-chain"
+ ],
+ "Lunge (BW)": [
+  "single-leg",
+  "posterior-chain"
+ ],
+ "Glute Bridge": [
+  "posterior-chain"
+ ],
+ "Plank": [
+  "lumbar-endurance"
+ ],
+ "Side Plank": [
+  "rotational-power",
+  "lumbar-endurance"
+ ],
+ "Mountain Climbers": [
+  "repeat-effort"
+ ],
+ "Burpees": [
+  "repeat-effort"
+ ],
+ "Hanging Leg Raise": [],
+ "Pike Push-up": [],
+ "Pistol Squat": [
+  "single-leg",
+  "posterior-chain"
+ ],
+ "Nordic Curl": [
+  "eccentric-hamstring",
+  "posterior-chain"
+ ],
+ "Inverted Row": [
+  "scapular-cuff"
+ ],
+ "Handstand Hold": [],
+ "Calf Raise (BW)": [
+  "calf-eccentric"
+ ],
+ "Cat-Cow": [],
+ "Dead Bug": [
+  "lumbar-endurance"
+ ],
+ "Thoracic Extension": [],
+ "World's Greatest Stretch": [],
+ "90/90 Hip Switch": [],
+ "Shoulder Dislocates": [
+  "scapular-cuff"
+ ],
+ "Wall Slides": [
+  "scapular-cuff"
+ ],
+ "Deep Squat Hold": [
+  "adductor",
+  "calf-eccentric"
+ ],
+ "Couch Stretch": [],
+ "Bird Dog": [
+  "rotational-power",
+  "lumbar-endurance"
+ ],
+ "Cable Front Squat": [
+  "posterior-chain"
+ ],
+ "Cable Zercher Squat": [
+  "posterior-chain"
+ ],
+ "Cable Donkey Kick": [
+  "single-leg",
+  "posterior-chain"
+ ],
+ "Standing Cable Row": [
+  "scapular-cuff"
+ ],
+ "Lying Cable Curl": [],
+ "Cable French Press": [],
+ "Cable Hip Abduction (Standing)": [],
+ "Cable Hip Adduction (Standing)": [
+  "adductor"
+ ],
+ "Cable Wrist Curl": [],
+ "Cable Reverse Wrist Curl": [],
+ "Russian Twist": [
+  "rotational-power"
+ ],
+ "Bicycle Crunch": [
+  "rotational-power"
+ ],
+ "Flutter Kicks": [],
+ "V-Ups": [],
+ "Reverse Crunch": [],
+ "Plank Jack": [
+  "repeat-effort"
+ ],
+ "Toe Touch": [],
+ "Diamond Push-up": [],
+ "Wide Grip Push-up": [],
+ "Decline Push-up": [],
+ "Incline Push-up": [],
+ "Scapular Push-up": [
+  "scapular-cuff"
+ ],
+ "Sumo Squat (DB)": [
+  "adductor",
+  "posterior-chain"
+ ],
+ "Curtsy Lunge": [
+  "single-leg",
+  "posterior-chain"
+ ],
+ "Side Lunge": [
+  "adductor",
+  "single-leg",
+  "posterior-chain"
+ ],
+ "Single Leg Glute Bridge": [
+  "single-leg",
+  "posterior-chain"
+ ],
+ "Good Morning (BW)": [
+  "eccentric-hamstring",
+  "posterior-chain"
+ ],
+ "Jumping Jacks": [
+  "repeat-effort"
+ ],
+ "High Knees": [
+  "calf-eccentric",
+  "repeat-effort"
+ ],
+ "Jump Squat": [
+  "calf-eccentric",
+  "landing-decel",
+  "posterior-chain"
+ ],
+ "Skater Hops": [
+  "calf-eccentric",
+  "landing-decel",
+  "repeat-effort"
+ ],
+ "Jumping Lunge": [
+  "calf-eccentric",
+  "single-leg",
+  "landing-decel",
+  "posterior-chain"
+ ],
+ "Box Jump": [
+  "calf-eccentric",
+  "landing-decel",
+  "posterior-chain"
+ ],
+ "Superman": [
+  "lumbar-endurance"
+ ],
+ "Swimmers": [
+  "lumbar-endurance"
+ ],
+ "Bench Dip": [],
+ "Close Grip Push-up": [],
+ "Plate Pinch": [
+  "lumbar-endurance"
+ ],
+ "Svend Press": [],
+ "Cable Curl (Behind Back)": [],
+ "Cable Row (Wide Grip)": [],
+ "Standing Cable Crunch": [],
+ "Bear Crawl": [
+  "repeat-effort"
+ ],
+ "Crab Walk": [
+  "repeat-effort"
+ ],
+ "Kick Through": [
+  "repeat-effort"
+ ],
+ "Beast Reach": [
+  "repeat-effort"
+ ],
+ "Duck Walk": [
+  "calf-eccentric",
+  "repeat-effort"
+ ],
+ "Tibialis Raise": [],
+ "ATG Split Squat": [
+  "single-leg",
+  "landing-decel",
+  "posterior-chain"
+ ],
+ "Lu Raise": [
+  "scapular-cuff"
+ ],
+ "Powell Raise": [
+  "scapular-cuff"
+ ],
+ "Wrist Rocks": [],
+ "Dead Hang": [
+  "scapular-cuff"
+ ],
+ "Cossack Squat": [
+  "adductor",
+  "single-leg",
+  "posterior-chain"
+ ],
+ "Jefferson Curl": [],
+ "Scorpion Stretch": [],
+ "Inchworm": [
+  "repeat-effort"
+ ],
+ "Thoracic Bridge": [
+  "scapular-cuff"
+ ],
+ "Single Leg RDL (BW)": [
+  "eccentric-hamstring",
+  "single-leg",
+  "posterior-chain"
+ ],
+ "Lateral Bounds": [
+  "calf-eccentric",
+  "landing-decel",
+  "repeat-effort"
+ ],
+ "Dot Drill": [
+  "calf-eccentric",
+  "landing-decel",
+  "repeat-effort"
+ ],
+ "Tuck Jumps": [
+  "calf-eccentric",
+  "landing-decel"
+ ],
+ "A-Skips": [
+  "calf-eccentric",
+  "landing-decel",
+  "repeat-effort"
+ ],
+ "Horse Stance Hold": [
+  "adductor",
+  "posterior-chain"
+ ],
+ "Reverse Plank": [
+  "lumbar-endurance"
+ ],
+ "Copenhagen Plank": [
+  "adductor",
+  "rotational-power"
+ ],
+ "L-Sit (Tuck)": [
+  "lumbar-endurance"
+ ],
+ "March in Place": [
+  "repeat-effort"
+ ],
+ "Step Touch": [
+  "repeat-effort"
+ ],
+ "Lateral Shuffle": [
+  "calf-eccentric",
+  "repeat-effort"
+ ],
+ "Standing Knee-to-Elbow": [
+  "rotational-power",
+  "repeat-effort"
+ ],
+ "Shadow Boxing": [
+  "rotational-power",
+  "repeat-effort"
+ ],
+ "Squat to Calf Raise": [
+  "calf-eccentric",
+  "posterior-chain",
+  "repeat-effort"
+ ],
+ "Fast Feet Shuffle": [
+  "calf-eccentric",
+  "repeat-effort"
+ ],
+ "Slow Mountain Climber": [
+  "repeat-effort"
+ ],
+ "Reverse Lunge to Knee Drive": [
+  "single-leg",
+  "posterior-chain",
+  "repeat-effort"
+ ],
+ "Standing Oblique Twist": [
+  "rotational-power",
+  "repeat-effort"
+ ],
+ "Low Step-Up (Fast)": [
+  "single-leg",
+  "posterior-chain",
+  "repeat-effort"
+ ],
+ "No-Jump Burpee": [
+  "repeat-effort"
+ ],
+ "Pop Squat": [
+  "adductor",
+  "calf-eccentric",
+  "landing-decel",
+  "posterior-chain"
+ ],
+ "Pogo Hops": [
+  "calf-eccentric",
+  "landing-decel",
+  "repeat-effort"
+ ],
+ "Neck CARs": [
+  "rotational-power"
+ ],
+ "Chin Tuck": [],
+ "Upper-Trap & Levator Stretch": [],
+ "Forearm Pronation-Supination": [
+  "rotational-power"
+ ],
+ "Elbow CARs": [
+  "rotational-power"
+ ],
+ "Terminal Knee Extension": [
+  "landing-decel"
+ ],
+ "Banded Ankle Eversion-Inversion": [
+  "calf-eccentric"
+ ],
+ "Arm Circles": [
+  "scapular-cuff"
+ ],
+ "Prone Y-T-W Raise": [
+  "scapular-cuff"
+ ],
+ "Sleeper Stretch": [
+  "scapular-cuff"
+ ],
+ "Thread the Needle": [],
+ "Open Book Stretch": [],
+ "Quadruped Thoracic Rotation": [
+  "rotational-power"
+ ],
+ "Pigeon Pose": [
+  "adductor"
+ ],
+ "Frog Stretch": [
+  "adductor"
+ ],
+ "Standing Hip CARs": [
+  "adductor",
+  "rotational-power"
+ ],
+ "Reverse Nordic Curl": [
+  "landing-decel"
+ ],
+ "Eccentric Step Down": [
+  "single-leg",
+  "landing-decel",
+  "posterior-chain"
+ ],
+ "Knee-to-Wall Ankle Rock": [
+  "calf-eccentric"
+ ],
+ "Ankle Alphabet": [],
+ "Child's Pose": [],
+ "McGill Curl-Up": [
+  "lumbar-endurance"
+ ],
+ "Prone Press-Up": [
+  "lumbar-endurance"
+ ],
+ "Wrist Flexor Stretch": [],
+ "Wrist Extensor Stretch": []
+}

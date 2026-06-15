@@ -1,5 +1,5 @@
 // ============================================================================
-// NIMBLE SHRED — EXERCISE METADATA SUBSTRATE (v1.7.1)
+// NIMBLE SHRED — EXERCISE METADATA SUBSTRATE (v1.8.0)
 // ============================================================================
 // Standalone data layer for pain-aware exercise swapping ("train around a
 // niggle"), prehab/rehab programming, set-logging UX, training-bucket /
@@ -42,7 +42,18 @@
 // field touched. Self-check gains two invariants (synergists disjoint from
 // musclesTargeted and from antagonistOf) so it can't regress.
 //
+// v1.8.0 — PROGRESSION + SPORT LAYER. Three ADDITIVE fields to every entry,
+// applied slug->entry like prior patches (never overwriting): regressions[] +
+// progressions[] (T2 _progressions_patch.json; 144 laddered, 58 [], reciprocal
+// A.prog B <=> B.reg A, values are entry names) and sportQualities[] (T3
+// _sport_quality_patch.json; 118 tagged, 84 [], 10-term vocab). Self-check vocab
+// guard extended (sportQualities in-vocab; regressions/progressions resolve +
+// stay reciprocal). No existing field changed.
+//
 // SCHEMA — window.exerciseMeta[exerciseName] = {
+//   regressions: string[]   easier ladder rung(s), entry names (v1.8.0, reciprocal w/ progressions).
+//   progressions: string[]  harder ladder rung(s), entry names (v1.8.0, reciprocal w/ regressions).
+//   sportQualities: string[]  AFL/surf overlay tags, 10-vocab (v1.8.0).
 //
 //   alternatives: string[]        lower / differently-loaded swaps; all resolve.
 //   jointLoad: { neck, shoulder, elbow, wrist, tSpine, lowBack, hip, knee, ankle }
@@ -117,7 +128,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "rhomboids", "rearDelts", "biceps"],
         redundantWith: ["Dumbbell Bench Press"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Dumbbell Bench Press", "Dumbbell Incline Press"],
+        progressions: ["Single Arm Cable Chest Press"],
+        sportQualities: []
     },
     "Cable Chest Fly (High)": {
         alternatives: ["Cable Chest Fly (Mid)", "Svend Press"],
@@ -136,7 +150,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "rhomboids", "rearDelts"],
         redundantWith: ["Cable Chest Fly (Low)"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Cable Chest Fly (Mid)"],
+        progressions: [],
+        sportQualities: []
     },
     "Cable Chest Fly (Low)": {
         alternatives: ["Cable Chest Fly (Mid)", "Svend Press"],
@@ -155,7 +172,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "rhomboids", "rearDelts"],
         redundantWith: ["Cable Chest Fly (High)"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Cable Chest Fly (Mid)"],
+        progressions: [],
+        sportQualities: []
     },
     "Cable Chest Fly (Mid)": {
         alternatives: ["Svend Press"],
@@ -174,7 +194,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "rhomboids", "rearDelts"],
         redundantWith: ["Cable Crossover", "Dumbbell Fly"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Dumbbell Fly"],
+        progressions: ["Cable Chest Fly (High)", "Cable Chest Fly (Low)", "Cable Crossover"],
+        sportQualities: []
     },
     "Single Arm Cable Chest Press": {
         alternatives: ["Cable Chest Press", "DB Floor Press"],
@@ -193,7 +216,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "rhomboids", "rearDelts", "lowerBack", "biceps"],
         redundantWith: [],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Cable Chest Press"],
+        progressions: [],
+        sportQualities: []
     },
     "Cable Crossover": {
         alternatives: ["Cable Chest Fly (Mid)", "Svend Press"],
@@ -212,7 +238,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "rhomboids", "rearDelts"],
         redundantWith: ["Cable Chest Fly (Mid)", "Dumbbell Fly"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Cable Chest Fly (Mid)"],
+        progressions: [],
+        sportQualities: []
     },
     "Cable Pullover (Bench)": {
         alternatives: ["Straight Arm Pulldown"],
@@ -231,7 +260,10 @@ window.exerciseMeta = {
         antagonistOf: ["rhomboids", "frontDelts", "rearDelts"],
         redundantWith: [],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: []
     },
     "Lat Pulldown (Standing)": {
         alternatives: ["Straight Arm Pulldown", "Seated Cable Row"],
@@ -250,7 +282,10 @@ window.exerciseMeta = {
         antagonistOf: ["chest", "frontDelts", "triceps"],
         redundantWith: ["Chin-ups", "Pull-ups"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Inverted Row"],
+        progressions: ["Chin-ups"],
+        sportQualities: []
     },
     "Seated Cable Row": {
         alternatives: ["Single Arm Cable Row", "Inverted Row"],
@@ -269,7 +304,10 @@ window.exerciseMeta = {
         antagonistOf: ["chest", "serratus", "frontDelts"],
         redundantWith: ["Dumbbell Row", "Inverted Row"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Inverted Row"],
+        progressions: ["Standing Cable Row"],
+        sportQualities: ["scapular-cuff"]
     },
     "Face Pulls": {
         alternatives: ["Cable Rear Delt Fly", "Wall Slides"],
@@ -288,7 +326,10 @@ window.exerciseMeta = {
         antagonistOf: ["chest", "frontDelts"],
         redundantWith: [],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["scapular-cuff"]
     },
     "Straight Arm Pulldown": {
         alternatives: ["Lat Pulldown (Standing)"],
@@ -307,7 +348,10 @@ window.exerciseMeta = {
         antagonistOf: ["chest", "frontDelts"],
         redundantWith: [],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: []
     },
     "Single Arm Cable Row": {
         alternatives: ["Inverted Row", "Seated Cable Row"],
@@ -326,7 +370,10 @@ window.exerciseMeta = {
         antagonistOf: ["chest", "frontDelts", "lowerBack"],
         redundantWith: ["Renegade Row"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Inverted Row"],
+        progressions: ["Standing Cable Row"],
+        sportQualities: ["scapular-cuff"]
     },
     "Cable Shrugs": {
         alternatives: ["DB Shrugs"],
@@ -345,7 +392,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: ["DB Shrugs"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: []
     },
     "Cable Rear Delt Fly": {
         alternatives: ["Face Pulls", "Powell Raise"],
@@ -364,7 +414,10 @@ window.exerciseMeta = {
         antagonistOf: ["chest", "frontDelts"],
         redundantWith: [],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["scapular-cuff"]
     },
     "High Row (Rope)": {
         alternatives: ["Face Pulls", "Seated Cable Row"],
@@ -383,7 +436,10 @@ window.exerciseMeta = {
         antagonistOf: ["chest", "serratus", "frontDelts"],
         redundantWith: ["Cable Row (Wide Grip)"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: []
     },
     "Cable Overhead Press": {
         alternatives: ["Dumbbell Shoulder Press", "Cable Front Raise"],
@@ -402,7 +458,10 @@ window.exerciseMeta = {
         antagonistOf: ["rearDelts", "lats", "biceps"],
         redundantWith: [],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: [],
+        progressions: ["Arnold Press"],
+        sportQualities: []
     },
     "Cable Lateral Raise": {
         alternatives: ["Lateral Raise"],
@@ -421,7 +480,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: ["Lateral Raise"],
         forceVector: "lateral",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Lu Raise"],
+        sportQualities: []
     },
     "Cable Front Raise": {
         alternatives: ["Front Raise"],
@@ -440,7 +502,10 @@ window.exerciseMeta = {
         antagonistOf: ["rearDelts", "lats"],
         redundantWith: ["Front Raise"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: []
     },
     "Cable External Rotation": {
         alternatives: ["Face Pulls", "Wall Slides"],
@@ -459,7 +524,10 @@ window.exerciseMeta = {
         antagonistOf: ["chest", "frontDelts"],
         redundantWith: [],
         forceVector: "rotational",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["scapular-cuff"]
     },
     "Cable Internal Rotation": {
         alternatives: ["Cable External Rotation", "Face Pulls"],
@@ -478,7 +546,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: [],
         forceVector: "rotational",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["scapular-cuff"]
     },
     "Cable Upright Row": {
         alternatives: ["Cable Lateral Raise", "Lateral Raise"],
@@ -497,7 +568,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: [],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: []
     },
     "Cable Y-Raise": {
         alternatives: ["Wall Slides", "Face Pulls"],
@@ -516,7 +590,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: ["Lu Raise"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["scapular-cuff"]
     },
     "Tricep Pushdown (Rope)": {
         alternatives: ["Cable Kickback"],
@@ -535,7 +612,10 @@ window.exerciseMeta = {
         antagonistOf: ["biceps"],
         redundantWith: ["Cable French Press", "Cable Kickback", "Overhead Cable Extension", "Reverse Grip Pushdown", "Skull Crusher (DB)", "Tricep Kickback", "Tricep Pushdown (Bar)"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Reverse Grip Pushdown", "Tricep Pushdown (Bar)"],
+        sportQualities: []
     },
     "Tricep Pushdown (Bar)": {
         alternatives: ["Tricep Pushdown (Rope)", "Cable Kickback"],
@@ -554,7 +634,10 @@ window.exerciseMeta = {
         antagonistOf: ["biceps"],
         redundantWith: ["Cable French Press", "Cable Kickback", "Overhead Cable Extension", "Reverse Grip Pushdown", "Skull Crusher (DB)", "Tricep Kickback", "Tricep Pushdown (Rope)"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Cable Kickback", "Tricep Kickback", "Tricep Pushdown (Rope)"],
+        progressions: ["Cable French Press", "Overhead Cable Extension", "Skull Crusher (DB)"],
+        sportQualities: []
     },
     "Overhead Cable Extension": {
         alternatives: ["Tricep Pushdown (Rope)", "Cable Kickback"],
@@ -573,7 +656,10 @@ window.exerciseMeta = {
         antagonistOf: ["biceps"],
         redundantWith: ["Cable French Press", "Cable Kickback", "Reverse Grip Pushdown", "Skull Crusher (DB)", "Tricep Kickback", "Tricep Pushdown (Bar)", "Tricep Pushdown (Rope)"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Reverse Grip Pushdown", "Tricep Pushdown (Bar)"],
+        progressions: [],
+        sportQualities: []
     },
     "Cable Bicep Curl": {
         alternatives: ["Cable Hammer Curl"],
@@ -592,7 +678,10 @@ window.exerciseMeta = {
         antagonistOf: ["triceps"],
         redundantWith: ["Bayesian Curl", "Cable Curl (Behind Back)", "Concentration Curl", "Dumbbell Curl", "Lying Cable Curl"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Bayesian Curl", "Cable Curl (Behind Back)", "Concentration Curl", "Zottman Curl"],
+        sportQualities: []
     },
     "Cable Hammer Curl": {
         alternatives: ["Hammer Curl"],
@@ -611,7 +700,10 @@ window.exerciseMeta = {
         antagonistOf: ["triceps"],
         redundantWith: ["Hammer Curl", "Zottman Curl"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Bayesian Curl", "Cable Curl (Behind Back)", "Concentration Curl", "Zottman Curl"],
+        sportQualities: []
     },
     "Bayesian Curl": {
         alternatives: ["Cable Bicep Curl", "Cable Hammer Curl"],
@@ -630,7 +722,10 @@ window.exerciseMeta = {
         antagonistOf: ["triceps"],
         redundantWith: ["Cable Bicep Curl", "Cable Curl (Behind Back)", "Concentration Curl", "Dumbbell Curl", "Lying Cable Curl"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Cable Bicep Curl", "Cable Hammer Curl", "Dumbbell Curl", "Hammer Curl", "Lying Cable Curl"],
+        progressions: [],
+        sportQualities: []
     },
     "Cable Kickback": {
         alternatives: ["Tricep Pushdown (Rope)"],
@@ -649,7 +744,10 @@ window.exerciseMeta = {
         antagonistOf: ["biceps"],
         redundantWith: ["Cable French Press", "Overhead Cable Extension", "Reverse Grip Pushdown", "Skull Crusher (DB)", "Tricep Kickback", "Tricep Pushdown (Bar)", "Tricep Pushdown (Rope)"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Reverse Grip Pushdown", "Tricep Pushdown (Bar)"],
+        sportQualities: []
     },
     "Reverse Grip Pushdown": {
         alternatives: ["Tricep Pushdown (Rope)"],
@@ -668,7 +766,10 @@ window.exerciseMeta = {
         antagonistOf: ["biceps"],
         redundantWith: ["Cable French Press", "Cable Kickback", "Overhead Cable Extension", "Skull Crusher (DB)", "Tricep Kickback", "Tricep Pushdown (Bar)", "Tricep Pushdown (Rope)"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Cable Kickback", "Tricep Kickback", "Tricep Pushdown (Rope)"],
+        progressions: ["Cable French Press", "Overhead Cable Extension", "Skull Crusher (DB)"],
+        sportQualities: []
     },
     "Cable Squat": {
         alternatives: ["Bodyweight Squat", "Glute Bridge"],
@@ -687,7 +788,10 @@ window.exerciseMeta = {
         antagonistOf: ["hamstrings", "hipFlexors"],
         redundantWith: ["Bodyweight Squat", "Pistol Squat"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Bodyweight Squat", "Squat to Calf Raise"],
+        progressions: ["Cable Front Squat", "Cable Zercher Squat"],
+        sportQualities: ["posterior-chain"]
     },
     "Cable Pull-Through": {
         alternatives: ["Glute Bridge", "Cable Kickback (Glute)"],
@@ -706,7 +810,10 @@ window.exerciseMeta = {
         antagonistOf: ["hipFlexors", "quads"],
         redundantWith: ["Single Leg RDL (BW)"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Good Morning (BW)"],
+        progressions: ["Romanian Deadlift (DB)"],
+        sportQualities: ["eccentric-hamstring", "posterior-chain"]
     },
     "Cable RDL": {
         alternatives: ["Cable Pull-Through", "Glute Bridge"],
@@ -725,7 +832,10 @@ window.exerciseMeta = {
         antagonistOf: ["quads"],
         redundantWith: ["Nordic Curl"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Good Morning (BW)"],
+        progressions: ["Romanian Deadlift (DB)"],
+        sportQualities: ["eccentric-hamstring", "posterior-chain"]
     },
     "Cable Lunge": {
         alternatives: ["Lunge (BW)", "DB Step Up"],
@@ -744,7 +854,10 @@ window.exerciseMeta = {
         antagonistOf: ["hamstrings", "hipFlexors"],
         redundantWith: ["Bulgarian Split Squat", "DB Step Up", "Eccentric Step Down"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Curtsy Lunge", "Reverse Lunge to Knee Drive"],
+        progressions: ["ATG Split Squat"],
+        sportQualities: ["single-leg", "posterior-chain"]
     },
     "Cable Kickback (Glute)": {
         alternatives: ["Glute Bridge", "Cable Donkey Kick"],
@@ -763,7 +876,10 @@ window.exerciseMeta = {
         antagonistOf: ["hipFlexors"],
         redundantWith: ["Cable Donkey Kick", "Glute Bridge", "Single Leg Glute Bridge"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["single-leg", "posterior-chain"]
     },
     "Cable Calf Raise": {
         alternatives: ["Calf Raise (BW)", "Seated Calf Raise"],
@@ -782,7 +898,10 @@ window.exerciseMeta = {
         antagonistOf: ["tibialis"],
         redundantWith: ["Calf Raise (BW)", "Seated Calf Raise"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Calf Raise (BW)"],
+        progressions: [],
+        sportQualities: ["calf-eccentric"]
     },
     "Cable Abductor": {
         alternatives: ["Cable Hip Abduction (Standing)", "Side Plank"],
@@ -801,7 +920,10 @@ window.exerciseMeta = {
         antagonistOf: ["adductors"],
         redundantWith: ["Cable Hip Abduction (Standing)"],
         forceVector: "lateral",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: []
     },
     "Cable Adductor": {
         alternatives: ["Cable Hip Adduction (Standing)"],
@@ -820,7 +942,10 @@ window.exerciseMeta = {
         antagonistOf: ["abductors"],
         redundantWith: ["Cable Hip Adduction (Standing)"],
         forceVector: "lateral",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["adductor"]
     },
     "Cable Crunch": {
         alternatives: ["Reverse Crunch", "Dead Bug"],
@@ -839,7 +964,10 @@ window.exerciseMeta = {
         antagonistOf: ["lowerBack"],
         redundantWith: ["Flutter Kicks", "Reverse Crunch", "Standing Cable Crunch"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Reverse Crunch"],
+        progressions: ["Flutter Kicks", "Hanging Leg Raise", "V-Ups"],
+        sportQualities: []
     },
     "Woodchopper (High to Low)": {
         alternatives: ["Pallof Press"],
@@ -858,7 +986,10 @@ window.exerciseMeta = {
         antagonistOf: ["lowerBack"],
         redundantWith: ["Cable Side Bend", "Russian Twist", "Woodchopper (Low to High)"],
         forceVector: "rotational",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Russian Twist", "Standing Oblique Twist"],
+        progressions: [],
+        sportQualities: ["rotational-power"]
     },
     "Pallof Press": {
         alternatives: ["Dead Bug", "Bird Dog"],
@@ -877,7 +1008,10 @@ window.exerciseMeta = {
         antagonistOf: ["lowerBack"],
         redundantWith: [],
         forceVector: "rotational",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Bird Dog"],
+        progressions: ["Side Plank"],
+        sportQualities: ["rotational-power"]
     },
     "Cable Side Bend": {
         alternatives: ["Side Plank", "Pallof Press"],
@@ -896,7 +1030,10 @@ window.exerciseMeta = {
         antagonistOf: ["lowerBack"],
         redundantWith: ["Russian Twist", "Woodchopper (High to Low)", "Woodchopper (Low to High)"],
         forceVector: "rotational",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["rotational-power"]
     },
     "Woodchopper (Low to High)": {
         alternatives: ["Pallof Press"],
@@ -915,7 +1052,10 @@ window.exerciseMeta = {
         antagonistOf: ["lowerBack"],
         redundantWith: ["Cable Side Bend", "Russian Twist", "Woodchopper (High to Low)"],
         forceVector: "rotational",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Russian Twist", "Standing Oblique Twist"],
+        progressions: [],
+        sportQualities: ["rotational-power"]
     },
     "Dumbbell Bench Press": {
         alternatives: ["DB Floor Press", "Push-ups"],
@@ -934,7 +1074,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "rhomboids", "rearDelts", "biceps"],
         redundantWith: ["Cable Chest Press"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["DB Floor Press"],
+        progressions: ["Cable Chest Press"],
+        sportQualities: []
     },
     "Dumbbell Incline Press": {
         alternatives: ["DB Floor Press", "Decline Push-up"],
@@ -953,7 +1096,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "rhomboids", "rearDelts"],
         redundantWith: [],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["DB Floor Press"],
+        progressions: ["Cable Chest Press"],
+        sportQualities: []
     },
     "Dumbbell Fly": {
         alternatives: ["Cable Chest Fly (Mid)", "Svend Press"],
@@ -972,7 +1118,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "rhomboids", "rearDelts"],
         redundantWith: ["Cable Chest Fly (Mid)", "Cable Crossover"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Cable Chest Fly (Mid)"],
+        sportQualities: []
     },
     "Dumbbell Shoulder Press": {
         alternatives: ["Front Raise", "Lateral Raise"],
@@ -991,7 +1140,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "chest", "biceps"],
         redundantWith: ["Arnold Press", "Handstand Hold", "Pike Push-up"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: [],
+        progressions: ["Arnold Press"],
+        sportQualities: []
     },
     "Arnold Press": {
         alternatives: ["Dumbbell Shoulder Press", "Front Raise"],
@@ -1010,7 +1162,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "chest"],
         redundantWith: ["Dumbbell Shoulder Press", "Handstand Hold", "Pike Push-up"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Cable Overhead Press", "Dumbbell Shoulder Press"],
+        progressions: [],
+        sportQualities: []
     },
     "Lateral Raise": {
         alternatives: ["Cable Lateral Raise"],
@@ -1029,7 +1184,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: ["Cable Lateral Raise"],
         forceVector: "lateral",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Lu Raise"],
+        sportQualities: []
     },
     "Front Raise": {
         alternatives: ["Cable Front Raise"],
@@ -1048,7 +1206,10 @@ window.exerciseMeta = {
         antagonistOf: ["rearDelts", "lats"],
         redundantWith: ["Cable Front Raise"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: []
     },
     "Dumbbell Row": {
         alternatives: ["Seated Cable Row", "Inverted Row"],
@@ -1067,7 +1228,10 @@ window.exerciseMeta = {
         antagonistOf: ["chest", "frontDelts", "serratus", "triceps"],
         redundantWith: ["Inverted Row", "Seated Cable Row"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Inverted Row"],
+        progressions: ["Standing Cable Row"],
+        sportQualities: ["scapular-cuff"]
     },
     "Dumbbell Pullover": {
         alternatives: ["Straight Arm Pulldown"],
@@ -1086,7 +1250,10 @@ window.exerciseMeta = {
         antagonistOf: ["chest", "frontDelts", "rhomboids"],
         redundantWith: [],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: []
     },
     "Goblet Squat": {
         alternatives: ["Bodyweight Squat", "Cable Squat"],
@@ -1105,7 +1272,10 @@ window.exerciseMeta = {
         antagonistOf: ["hamstrings", "hipFlexors", "lowerBack"],
         redundantWith: ["Cable Front Squat"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Bodyweight Squat", "Squat to Calf Raise"],
+        progressions: ["Cable Front Squat", "Cable Zercher Squat"],
+        sportQualities: ["posterior-chain"]
     },
     "Dumbbell Lunge": {
         alternatives: ["Lunge (BW)", "DB Step Up"],
@@ -1124,7 +1294,10 @@ window.exerciseMeta = {
         antagonistOf: ["hipFlexors"],
         redundantWith: ["Jumping Lunge", "Lunge (BW)", "Reverse Lunge to Knee Drive"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Curtsy Lunge", "Reverse Lunge to Knee Drive"],
+        progressions: ["ATG Split Squat"],
+        sportQualities: ["single-leg", "posterior-chain"]
     },
     "Bulgarian Split Squat": {
         alternatives: ["DB Step Up", "Lunge (BW)"],
@@ -1143,7 +1316,10 @@ window.exerciseMeta = {
         antagonistOf: ["hipFlexors", "hamstrings"],
         redundantWith: ["Cable Lunge", "DB Step Up", "Eccentric Step Down"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Curtsy Lunge", "Reverse Lunge to Knee Drive"],
+        progressions: ["ATG Split Squat"],
+        sportQualities: ["single-leg", "posterior-chain"]
     },
     "Romanian Deadlift (DB)": {
         alternatives: ["Cable Pull-Through", "Glute Bridge"],
@@ -1162,7 +1338,10 @@ window.exerciseMeta = {
         antagonistOf: ["quads", "hipFlexors", "abs"],
         redundantWith: [],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Cable Pull-Through", "Cable RDL"],
+        progressions: ["Single Leg RDL (BW)"],
+        sportQualities: ["eccentric-hamstring", "posterior-chain"]
     },
     "Dumbbell Curl": {
         alternatives: ["Hammer Curl"],
@@ -1181,7 +1360,10 @@ window.exerciseMeta = {
         antagonistOf: ["triceps"],
         redundantWith: ["Bayesian Curl", "Cable Bicep Curl", "Cable Curl (Behind Back)", "Concentration Curl", "Lying Cable Curl"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Bayesian Curl", "Cable Curl (Behind Back)", "Concentration Curl", "Zottman Curl"],
+        sportQualities: []
     },
     "Hammer Curl": {
         alternatives: ["Cable Hammer Curl"],
@@ -1200,7 +1382,10 @@ window.exerciseMeta = {
         antagonistOf: ["triceps"],
         redundantWith: ["Cable Hammer Curl", "Zottman Curl"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Bayesian Curl", "Cable Curl (Behind Back)", "Concentration Curl", "Zottman Curl"],
+        sportQualities: []
     },
     "Tricep Kickback": {
         alternatives: ["Cable Kickback", "Tricep Pushdown (Rope)"],
@@ -1219,7 +1404,10 @@ window.exerciseMeta = {
         antagonistOf: ["biceps"],
         redundantWith: ["Cable French Press", "Cable Kickback", "Overhead Cable Extension", "Reverse Grip Pushdown", "Skull Crusher (DB)", "Tricep Pushdown (Bar)", "Tricep Pushdown (Rope)"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Reverse Grip Pushdown", "Tricep Pushdown (Bar)"],
+        sportQualities: []
     },
     "Skull Crusher (DB)": {
         alternatives: ["Tricep Pushdown (Rope)", "Cable Kickback"],
@@ -1238,7 +1426,10 @@ window.exerciseMeta = {
         antagonistOf: ["biceps"],
         redundantWith: ["Cable French Press", "Cable Kickback", "Overhead Cable Extension", "Reverse Grip Pushdown", "Tricep Kickback", "Tricep Pushdown (Bar)", "Tricep Pushdown (Rope)"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Reverse Grip Pushdown", "Tricep Pushdown (Bar)"],
+        progressions: [],
+        sportQualities: []
     },
     "Farmers Walk": {
         alternatives: ["Plank", "DB Shrugs"],
@@ -1257,7 +1448,10 @@ window.exerciseMeta = {
         antagonistOf: ["lowerBack"],
         redundantWith: [],
         forceVector: "axial",
-        axialLoad: true
+        axialLoad: true,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["lumbar-endurance"]
     },
     "Zottman Curl": {
         alternatives: ["Hammer Curl", "Dumbbell Curl"],
@@ -1276,7 +1470,10 @@ window.exerciseMeta = {
         antagonistOf: ["triceps"],
         redundantWith: ["Cable Hammer Curl", "Hammer Curl"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Cable Bicep Curl", "Cable Hammer Curl", "Dumbbell Curl", "Hammer Curl", "Lying Cable Curl"],
+        progressions: [],
+        sportQualities: []
     },
     "Concentration Curl": {
         alternatives: ["Dumbbell Curl", "Cable Bicep Curl"],
@@ -1295,7 +1492,10 @@ window.exerciseMeta = {
         antagonistOf: ["triceps"],
         redundantWith: ["Bayesian Curl", "Cable Bicep Curl", "Cable Curl (Behind Back)", "Dumbbell Curl", "Lying Cable Curl"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Cable Bicep Curl", "Cable Hammer Curl", "Dumbbell Curl", "Hammer Curl", "Lying Cable Curl"],
+        progressions: [],
+        sportQualities: []
     },
     "DB Floor Press": {
         alternatives: ["Svend Press", "Incline Push-up"],
@@ -1314,7 +1514,10 @@ window.exerciseMeta = {
         antagonistOf: ["biceps", "lats", "rhomboids", "rearDelts"],
         redundantWith: ["Diamond Push-up"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Dumbbell Bench Press", "Dumbbell Incline Press"],
+        sportQualities: []
     },
     "Renegade Row": {
         alternatives: ["Dumbbell Row", "Bird Dog"],
@@ -1333,7 +1536,10 @@ window.exerciseMeta = {
         antagonistOf: ["chest", "frontDelts", "lowerBack"],
         redundantWith: ["Single Arm Cable Row"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Standing Cable Row"],
+        progressions: [],
+        sportQualities: ["scapular-cuff"]
     },
     "DB Step Up": {
         alternatives: ["Lunge (BW)", "Glute Bridge"],
@@ -1352,7 +1558,10 @@ window.exerciseMeta = {
         antagonistOf: ["hipFlexors", "hamstrings"],
         redundantWith: ["Bulgarian Split Squat", "Cable Lunge", "Eccentric Step Down"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Low Step-Up (Fast)"],
+        progressions: ["Eccentric Step Down"],
+        sportQualities: ["single-leg", "posterior-chain"]
     },
     "DB Shrugs": {
         alternatives: ["Cable Shrugs"],
@@ -1371,7 +1580,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: ["Cable Shrugs"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: []
     },
     "Seated Calf Raise": {
         alternatives: ["Calf Raise (BW)", "Cable Calf Raise"],
@@ -1390,7 +1602,10 @@ window.exerciseMeta = {
         antagonistOf: ["tibialis"],
         redundantWith: ["Cable Calf Raise", "Calf Raise (BW)"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Calf Raise (BW)"],
+        progressions: [],
+        sportQualities: ["calf-eccentric"]
     },
     "Push-ups": {
         alternatives: ["Incline Push-up", "DB Floor Press"],
@@ -1409,7 +1624,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "rhomboids", "rearDelts", "biceps", "lowerBack"],
         redundantWith: [],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Incline Push-up"],
+        progressions: ["Decline Push-up", "Wide Grip Push-up"],
+        sportQualities: []
     },
     "Pull-ups": {
         alternatives: ["Lat Pulldown (Standing)", "Inverted Row"],
@@ -1428,7 +1646,10 @@ window.exerciseMeta = {
         antagonistOf: ["chest", "frontDelts", "triceps"],
         redundantWith: ["Chin-ups", "Lat Pulldown (Standing)"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Chin-ups"],
+        progressions: [],
+        sportQualities: []
     },
     "Chin-ups": {
         alternatives: ["Lat Pulldown (Standing)", "Inverted Row"],
@@ -1447,7 +1668,10 @@ window.exerciseMeta = {
         antagonistOf: ["triceps", "chest", "frontDelts"],
         redundantWith: ["Lat Pulldown (Standing)", "Pull-ups"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Lat Pulldown (Standing)"],
+        progressions: ["Pull-ups"],
+        sportQualities: []
     },
     "Dips": {
         alternatives: ["Close Grip Push-up", "Push-ups"],
@@ -1466,7 +1690,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "rhomboids", "rearDelts", "biceps"],
         redundantWith: [],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Bench Dip"],
+        progressions: [],
+        sportQualities: []
     },
     "Bodyweight Squat": {
         alternatives: ["Glute Bridge"],
@@ -1485,7 +1712,10 @@ window.exerciseMeta = {
         antagonistOf: ["hamstrings", "hipFlexors"],
         redundantWith: ["Cable Squat", "Pistol Squat"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Horse Stance Hold"],
+        progressions: ["Cable Squat", "Goblet Squat", "Pop Squat", "Sumo Squat (DB)"],
+        sportQualities: ["posterior-chain"]
     },
     "Lunge (BW)": {
         alternatives: ["Bodyweight Squat", "Glute Bridge"],
@@ -1504,7 +1734,10 @@ window.exerciseMeta = {
         antagonistOf: ["hipFlexors"],
         redundantWith: ["Dumbbell Lunge", "Jumping Lunge", "Reverse Lunge to Knee Drive"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Curtsy Lunge", "Reverse Lunge to Knee Drive"],
+        sportQualities: ["single-leg", "posterior-chain"]
     },
     "Glute Bridge": {
         alternatives: ["Cable Kickback (Glute)"],
@@ -1523,7 +1756,10 @@ window.exerciseMeta = {
         antagonistOf: ["hipFlexors"],
         redundantWith: ["Cable Donkey Kick", "Cable Kickback (Glute)", "Single Leg Glute Bridge"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: [],
+        progressions: ["Single Leg Glute Bridge"],
+        sportQualities: ["posterior-chain"]
     },
     "Plank": {
         alternatives: ["Dead Bug", "Bird Dog"],
@@ -1542,7 +1778,10 @@ window.exerciseMeta = {
         antagonistOf: ["lowerBack"],
         redundantWith: [],
         forceVector: "axial",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["McGill Curl-Up"],
+        progressions: ["L-Sit (Tuck)"],
+        sportQualities: ["lumbar-endurance"]
     },
     "Side Plank": {
         alternatives: ["Pallof Press"],
@@ -1561,7 +1800,10 @@ window.exerciseMeta = {
         antagonistOf: ["abs"],
         redundantWith: [],
         forceVector: "rotational",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Pallof Press"],
+        progressions: ["Copenhagen Plank"],
+        sportQualities: ["rotational-power", "lumbar-endurance"]
     },
     "Mountain Climbers": {
         alternatives: ["Dead Bug", "High Knees"],
@@ -1580,7 +1822,10 @@ window.exerciseMeta = {
         antagonistOf: ["lowerBack", "glutes", "rearDelts", "lats"],
         redundantWith: ["Kick Through", "Slow Mountain Climber"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Slow Mountain Climber"],
+        progressions: [],
+        sportQualities: ["repeat-effort"]
     },
     "Burpees": {
         alternatives: ["Jumping Jacks", "Mountain Climbers"],
@@ -1599,7 +1844,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "rhomboids", "rearDelts", "biceps", "hamstrings", "hipFlexors", "lowerBack"],
         redundantWith: ["No-Jump Burpee"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["No-Jump Burpee"],
+        progressions: [],
+        sportQualities: ["repeat-effort"]
     },
     "Hanging Leg Raise": {
         alternatives: ["Reverse Crunch", "Dead Bug"],
@@ -1618,7 +1866,10 @@ window.exerciseMeta = {
         antagonistOf: ["lowerBack", "glutes"],
         redundantWith: ["V-Ups"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Cable Crunch", "Standing Cable Crunch", "Toe Touch"],
+        progressions: [],
+        sportQualities: []
     },
     "Pike Push-up": {
         alternatives: ["Dumbbell Shoulder Press", "Push-ups"],
@@ -1637,7 +1888,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "chest", "biceps"],
         redundantWith: ["Arnold Press", "Dumbbell Shoulder Press", "Handstand Hold"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Close Grip Push-up", "Diamond Push-up"],
+        progressions: ["Handstand Hold"],
+        sportQualities: []
     },
     "Pistol Squat": {
         alternatives: ["Bulgarian Split Squat", "DB Step Up"],
@@ -1656,7 +1910,10 @@ window.exerciseMeta = {
         antagonistOf: ["hamstrings", "hipFlexors"],
         redundantWith: ["Bodyweight Squat", "Cable Squat"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Cable Front Squat", "Cable Zercher Squat"],
+        progressions: [],
+        sportQualities: ["single-leg", "posterior-chain"]
     },
     "Nordic Curl": {
         alternatives: ["Single Leg RDL (BW)", "Glute Bridge"],
@@ -1675,7 +1932,10 @@ window.exerciseMeta = {
         antagonistOf: ["quads"],
         redundantWith: ["Cable RDL"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Single Leg RDL (BW)"],
+        progressions: [],
+        sportQualities: ["eccentric-hamstring", "posterior-chain"]
     },
     "Inverted Row": {
         alternatives: ["Seated Cable Row"],
@@ -1694,7 +1954,10 @@ window.exerciseMeta = {
         antagonistOf: ["chest", "frontDelts", "serratus"],
         redundantWith: ["Dumbbell Row", "Seated Cable Row"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Dumbbell Row", "Lat Pulldown (Standing)", "Seated Cable Row", "Single Arm Cable Row"],
+        sportQualities: ["scapular-cuff"]
     },
     "Handstand Hold": {
         alternatives: ["Pike Push-up", "Dumbbell Shoulder Press"],
@@ -1713,7 +1976,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "chest", "biceps"],
         redundantWith: ["Arnold Press", "Dumbbell Shoulder Press", "Pike Push-up"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Pike Push-up"],
+        progressions: [],
+        sportQualities: []
     },
     "Calf Raise (BW)": {
         alternatives: ["Seated Calf Raise"],
@@ -1732,7 +1998,10 @@ window.exerciseMeta = {
         antagonistOf: ["tibialis"],
         redundantWith: ["Cable Calf Raise", "Seated Calf Raise"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Cable Calf Raise", "Seated Calf Raise"],
+        sportQualities: ["calf-eccentric"]
     },
     "Cat-Cow": {
         alternatives: ["Thoracic Extension"],
@@ -1751,7 +2020,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: [],
         forceVector: "axial",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Open Book Stretch", "Thoracic Extension", "Thread the Needle"],
+        sportQualities: []
     },
     "Dead Bug": {
         alternatives: ["Bird Dog"],
@@ -1770,7 +2042,10 @@ window.exerciseMeta = {
         antagonistOf: ["lowerBack", "glutes"],
         redundantWith: [],
         forceVector: "axial",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["McGill Curl-Up"],
+        sportQualities: ["lumbar-endurance"]
     },
     "Thoracic Extension": {
         alternatives: ["Cat-Cow"],
@@ -1789,7 +2064,10 @@ window.exerciseMeta = {
         antagonistOf: ["abs"],
         redundantWith: ["Prone Press-Up"],
         forceVector: "axial",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Cat-Cow"],
+        progressions: ["Thoracic Bridge"],
+        sportQualities: []
     },
     "World's Greatest Stretch": {
         alternatives: ["90/90 Hip Switch", "Cat-Cow"],
@@ -1808,7 +2086,10 @@ window.exerciseMeta = {
         antagonistOf: ["quads", "abs"],
         redundantWith: ["Scorpion Stretch"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Couch Stretch"],
+        progressions: [],
+        sportQualities: []
     },
     "90/90 Hip Switch": {
         alternatives: [],
@@ -1827,7 +2108,10 @@ window.exerciseMeta = {
         antagonistOf: ["hipFlexors"],
         redundantWith: [],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Pigeon Pose"],
+        sportQualities: []
     },
     "Shoulder Dislocates": {
         alternatives: ["Wall Slides"],
@@ -1846,7 +2130,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "rhomboids"],
         redundantWith: ["Arm Circles"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["scapular-cuff"]
     },
     "Wall Slides": {
         alternatives: [],
@@ -1865,7 +2152,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: [],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["scapular-cuff"]
     },
     "Deep Squat Hold": {
         alternatives: ["90/90 Hip Switch", "Bodyweight Squat"],
@@ -1884,7 +2174,10 @@ window.exerciseMeta = {
         antagonistOf: ["abductors", "tibialis", "hamstrings"],
         redundantWith: [],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Pigeon Pose"],
+        progressions: [],
+        sportQualities: ["adductor", "calf-eccentric"]
     },
     "Couch Stretch": {
         alternatives: ["90/90 Hip Switch", "World's Greatest Stretch"],
@@ -1903,7 +2196,10 @@ window.exerciseMeta = {
         antagonistOf: ["glutes", "hamstrings"],
         redundantWith: ["Reverse Nordic Curl"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["World's Greatest Stretch"],
+        sportQualities: []
     },
     "Bird Dog": {
         alternatives: ["Dead Bug"],
@@ -1922,7 +2218,10 @@ window.exerciseMeta = {
         antagonistOf: ["hipFlexors"],
         redundantWith: [],
         forceVector: "rotational",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Pallof Press"],
+        sportQualities: ["rotational-power", "lumbar-endurance"]
     },
     "Cable Front Squat": {
         alternatives: ["Cable Squat", "Goblet Squat"],
@@ -1941,7 +2240,10 @@ window.exerciseMeta = {
         antagonistOf: ["hamstrings", "lowerBack", "hipFlexors"],
         redundantWith: ["Goblet Squat"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Cable Squat", "Goblet Squat", "Sumo Squat (DB)"],
+        progressions: ["Pistol Squat"],
+        sportQualities: ["posterior-chain"]
     },
     "Cable Zercher Squat": {
         alternatives: ["Cable Front Squat", "Goblet Squat"],
@@ -1960,7 +2262,10 @@ window.exerciseMeta = {
         antagonistOf: ["hamstrings", "chest", "serratus", "hipFlexors"],
         redundantWith: [],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Cable Squat", "Goblet Squat", "Sumo Squat (DB)"],
+        progressions: ["Pistol Squat"],
+        sportQualities: ["posterior-chain"]
     },
     "Cable Donkey Kick": {
         alternatives: ["Cable Kickback (Glute)", "Glute Bridge"],
@@ -1979,7 +2284,10 @@ window.exerciseMeta = {
         antagonistOf: ["hipFlexors"],
         redundantWith: ["Cable Kickback (Glute)", "Glute Bridge", "Single Leg Glute Bridge"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["single-leg", "posterior-chain"]
     },
     "Standing Cable Row": {
         alternatives: ["Seated Cable Row", "Single Arm Cable Row"],
@@ -1998,7 +2306,10 @@ window.exerciseMeta = {
         antagonistOf: ["chest", "frontDelts", "hamstrings", "hipFlexors", "lowerBack"],
         redundantWith: [],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Dumbbell Row", "Seated Cable Row", "Single Arm Cable Row"],
+        progressions: ["Renegade Row"],
+        sportQualities: ["scapular-cuff"]
     },
     "Lying Cable Curl": {
         alternatives: ["Cable Hammer Curl"],
@@ -2017,7 +2328,10 @@ window.exerciseMeta = {
         antagonistOf: ["triceps"],
         redundantWith: ["Bayesian Curl", "Cable Bicep Curl", "Cable Curl (Behind Back)", "Concentration Curl", "Dumbbell Curl"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Bayesian Curl", "Cable Curl (Behind Back)", "Concentration Curl", "Zottman Curl"],
+        sportQualities: []
     },
     "Cable French Press": {
         alternatives: ["Tricep Pushdown (Rope)", "Cable Kickback"],
@@ -2036,7 +2350,10 @@ window.exerciseMeta = {
         antagonistOf: ["biceps"],
         redundantWith: ["Cable Kickback", "Overhead Cable Extension", "Reverse Grip Pushdown", "Skull Crusher (DB)", "Tricep Kickback", "Tricep Pushdown (Bar)", "Tricep Pushdown (Rope)"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Reverse Grip Pushdown", "Tricep Pushdown (Bar)"],
+        progressions: [],
+        sportQualities: []
     },
     "Cable Hip Abduction (Standing)": {
         alternatives: ["Cable Abductor"],
@@ -2055,7 +2372,10 @@ window.exerciseMeta = {
         antagonistOf: ["adductors"],
         redundantWith: ["Cable Abductor"],
         forceVector: "lateral",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: []
     },
     "Cable Hip Adduction (Standing)": {
         alternatives: ["Cable Adductor"],
@@ -2074,7 +2394,10 @@ window.exerciseMeta = {
         antagonistOf: ["abductors"],
         redundantWith: ["Cable Adductor"],
         forceVector: "lateral",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["adductor"]
     },
     "Cable Wrist Curl": {
         alternatives: ["Wrist Rocks"],
@@ -2093,7 +2416,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: ["Cable Reverse Wrist Curl"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: []
     },
     "Cable Reverse Wrist Curl": {
         alternatives: ["Wrist Rocks"],
@@ -2112,7 +2438,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: ["Cable Wrist Curl"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: []
     },
     "Russian Twist": {
         alternatives: ["Pallof Press", "Side Plank"],
@@ -2131,7 +2460,10 @@ window.exerciseMeta = {
         antagonistOf: ["lowerBack"],
         redundantWith: ["Cable Side Bend", "Woodchopper (High to Low)", "Woodchopper (Low to High)"],
         forceVector: "rotational",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Bicycle Crunch"],
+        progressions: ["Woodchopper (High to Low)", "Woodchopper (Low to High)"],
+        sportQualities: ["rotational-power"]
     },
     "Bicycle Crunch": {
         alternatives: ["Dead Bug"],
@@ -2150,7 +2482,10 @@ window.exerciseMeta = {
         antagonistOf: ["lowerBack"],
         redundantWith: ["Standing Oblique Twist"],
         forceVector: "rotational",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Standing Knee-to-Elbow"],
+        progressions: ["Russian Twist", "Standing Oblique Twist"],
+        sportQualities: ["rotational-power"]
     },
     "Flutter Kicks": {
         alternatives: ["Dead Bug", "Reverse Crunch"],
@@ -2169,7 +2504,10 @@ window.exerciseMeta = {
         antagonistOf: ["lowerBack"],
         redundantWith: ["Cable Crunch", "Reverse Crunch", "Standing Cable Crunch"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Cable Crunch", "Standing Cable Crunch", "Toe Touch"],
+        progressions: [],
+        sportQualities: []
     },
     "V-Ups": {
         alternatives: ["Reverse Crunch", "Dead Bug"],
@@ -2188,7 +2526,10 @@ window.exerciseMeta = {
         antagonistOf: ["lowerBack", "glutes"],
         redundantWith: ["Hanging Leg Raise"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Cable Crunch", "Standing Cable Crunch", "Toe Touch"],
+        progressions: [],
+        sportQualities: []
     },
     "Reverse Crunch": {
         alternatives: ["Dead Bug"],
@@ -2207,7 +2548,10 @@ window.exerciseMeta = {
         antagonistOf: ["lowerBack"],
         redundantWith: ["Cable Crunch", "Flutter Kicks", "Standing Cable Crunch"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Cable Crunch", "Standing Cable Crunch", "Toe Touch"],
+        sportQualities: []
     },
     "Plank Jack": {
         alternatives: ["Plank", "Jumping Jacks"],
@@ -2226,7 +2570,10 @@ window.exerciseMeta = {
         antagonistOf: ["lowerBack", "rearDelts", "lats", "adductors", "rhomboids"],
         redundantWith: [],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["repeat-effort"]
     },
     "Toe Touch": {
         alternatives: ["Reverse Crunch", "Dead Bug"],
@@ -2245,7 +2592,10 @@ window.exerciseMeta = {
         antagonistOf: ["hipFlexors", "quads"],
         redundantWith: [],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Reverse Crunch"],
+        progressions: ["Flutter Kicks", "Hanging Leg Raise", "V-Ups"],
+        sportQualities: []
     },
     "Diamond Push-up": {
         alternatives: ["Close Grip Push-up", "Push-ups"],
@@ -2264,7 +2614,10 @@ window.exerciseMeta = {
         antagonistOf: ["biceps", "lats", "rhomboids", "rearDelts"],
         redundantWith: ["DB Floor Press"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Decline Push-up", "Wide Grip Push-up"],
+        progressions: ["Pike Push-up"],
+        sportQualities: []
     },
     "Wide Grip Push-up": {
         alternatives: ["Push-ups", "Incline Push-up"],
@@ -2283,7 +2636,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "rhomboids", "rearDelts"],
         redundantWith: ["Decline Push-up", "Incline Push-up", "Svend Press"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Push-ups"],
+        progressions: ["Close Grip Push-up", "Diamond Push-up"],
+        sportQualities: []
     },
     "Decline Push-up": {
         alternatives: ["Push-ups", "Incline Push-up"],
@@ -2302,7 +2658,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "rhomboids", "rearDelts"],
         redundantWith: ["Incline Push-up", "Svend Press", "Wide Grip Push-up"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Push-ups"],
+        progressions: ["Close Grip Push-up", "Diamond Push-up"],
+        sportQualities: []
     },
     "Incline Push-up": {
         alternatives: ["DB Floor Press"],
@@ -2321,7 +2680,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "rhomboids", "rearDelts"],
         redundantWith: ["Decline Push-up", "Svend Press", "Wide Grip Push-up"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Push-ups"],
+        sportQualities: []
     },
     "Scapular Push-up": {
         alternatives: ["Wall Slides"],
@@ -2340,7 +2702,10 @@ window.exerciseMeta = {
         antagonistOf: ["rhomboids"],
         redundantWith: [],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["scapular-cuff"]
     },
     "Sumo Squat (DB)": {
         alternatives: ["Goblet Squat", "Bodyweight Squat"],
@@ -2359,7 +2724,10 @@ window.exerciseMeta = {
         antagonistOf: ["abductors", "hamstrings", "hipFlexors"],
         redundantWith: ["Horse Stance Hold", "Pop Squat"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Bodyweight Squat", "Squat to Calf Raise"],
+        progressions: ["Cable Front Squat", "Cable Zercher Squat"],
+        sportQualities: ["adductor", "posterior-chain"]
     },
     "Curtsy Lunge": {
         alternatives: ["Lunge (BW)"],
@@ -2378,7 +2746,10 @@ window.exerciseMeta = {
         antagonistOf: ["hipFlexors"],
         redundantWith: [],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Lunge (BW)"],
+        progressions: ["Bulgarian Split Squat", "Cable Lunge", "Dumbbell Lunge"],
+        sportQualities: ["single-leg", "posterior-chain"]
     },
     "Side Lunge": {
         alternatives: ["Sumo Squat (DB)", "Lunge (BW)"],
@@ -2397,7 +2768,10 @@ window.exerciseMeta = {
         antagonistOf: ["abductors", "hamstrings", "hipFlexors"],
         redundantWith: ["Cossack Squat"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Cossack Squat"],
+        sportQualities: ["adductor", "single-leg", "posterior-chain"]
     },
     "Single Leg Glute Bridge": {
         alternatives: ["Glute Bridge"],
@@ -2416,7 +2790,10 @@ window.exerciseMeta = {
         antagonistOf: ["hipFlexors"],
         redundantWith: ["Cable Donkey Kick", "Cable Kickback (Glute)", "Glute Bridge"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Glute Bridge"],
+        progressions: [],
+        sportQualities: ["single-leg", "posterior-chain"]
     },
     "Good Morning (BW)": {
         alternatives: ["Glute Bridge", "Cable Pull-Through"],
@@ -2435,7 +2812,10 @@ window.exerciseMeta = {
         antagonistOf: ["quads", "abs"],
         redundantWith: [],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: [],
+        progressions: ["Cable Pull-Through", "Cable RDL"],
+        sportQualities: ["eccentric-hamstring", "posterior-chain"]
     },
     "Jumping Jacks": {
         alternatives: [],
@@ -2454,7 +2834,10 @@ window.exerciseMeta = {
         antagonistOf: ["hipFlexors", "adductors", "tibialis"],
         redundantWith: [],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["repeat-effort"]
     },
     "High Knees": {
         alternatives: ["Jumping Jacks"],
@@ -2473,7 +2856,10 @@ window.exerciseMeta = {
         antagonistOf: ["glutes", "hamstrings", "tibialis"],
         redundantWith: ["A-Skips", "March in Place"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["March in Place"],
+        progressions: ["A-Skips"],
+        sportQualities: ["calf-eccentric", "repeat-effort"]
     },
     "Jump Squat": {
         alternatives: ["Bodyweight Squat", "Box Jump"],
@@ -2492,7 +2878,10 @@ window.exerciseMeta = {
         antagonistOf: ["hamstrings", "hipFlexors", "tibialis"],
         redundantWith: ["Box Jump", "Pop Squat", "Squat to Calf Raise"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Pop Squat"],
+        progressions: ["Tuck Jumps"],
+        sportQualities: ["calf-eccentric", "landing-decel", "posterior-chain"]
     },
     "Skater Hops": {
         alternatives: ["Side Lunge", "Jumping Jacks"],
@@ -2511,7 +2900,10 @@ window.exerciseMeta = {
         antagonistOf: ["hipFlexors", "adductors", "hamstrings", "tibialis"],
         redundantWith: ["Duck Walk", "Lateral Bounds", "Lateral Shuffle", "Step Touch"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Lateral Shuffle"],
+        progressions: [],
+        sportQualities: ["calf-eccentric", "landing-decel", "repeat-effort"]
     },
     "Jumping Lunge": {
         alternatives: ["Lunge (BW)"],
@@ -2530,7 +2922,10 @@ window.exerciseMeta = {
         antagonistOf: ["hipFlexors", "tibialis"],
         redundantWith: ["Dumbbell Lunge", "Low Step-Up (Fast)", "Lunge (BW)"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["ATG Split Squat"],
+        progressions: [],
+        sportQualities: ["calf-eccentric", "single-leg", "landing-decel", "posterior-chain"]
     },
     "Box Jump": {
         alternatives: ["DB Step Up", "Bodyweight Squat"],
@@ -2549,7 +2944,10 @@ window.exerciseMeta = {
         antagonistOf: ["hamstrings", "hipFlexors", "tibialis"],
         redundantWith: ["Jump Squat", "Pop Squat", "Squat to Calf Raise"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Pop Squat"],
+        progressions: ["Tuck Jumps"],
+        sportQualities: ["calf-eccentric", "landing-decel", "posterior-chain"]
     },
     "Superman": {
         alternatives: ["Bird Dog"],
@@ -2568,7 +2966,10 @@ window.exerciseMeta = {
         antagonistOf: ["abs", "hipFlexors"],
         redundantWith: [],
         forceVector: "axial",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Swimmers"],
+        sportQualities: ["lumbar-endurance"]
     },
     "Swimmers": {
         alternatives: ["Bird Dog"],
@@ -2587,7 +2988,10 @@ window.exerciseMeta = {
         antagonistOf: ["abs"],
         redundantWith: [],
         forceVector: "axial",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Superman"],
+        progressions: [],
+        sportQualities: ["lumbar-endurance"]
     },
     "Bench Dip": {
         alternatives: ["Close Grip Push-up", "Tricep Pushdown (Rope)"],
@@ -2606,7 +3010,10 @@ window.exerciseMeta = {
         antagonistOf: ["biceps"],
         redundantWith: [],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: [],
+        progressions: ["Dips"],
+        sportQualities: []
     },
     "Close Grip Push-up": {
         alternatives: ["Tricep Pushdown (Rope)", "Incline Push-up"],
@@ -2625,7 +3032,10 @@ window.exerciseMeta = {
         antagonistOf: ["biceps"],
         redundantWith: [],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Decline Push-up", "Wide Grip Push-up"],
+        progressions: ["Pike Push-up"],
+        sportQualities: []
     },
     "Plate Pinch": {
         alternatives: ["Farmers Walk", "Dead Hang"],
@@ -2644,7 +3054,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: [],
         forceVector: "axial",
-        axialLoad: true
+        axialLoad: true,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["lumbar-endurance"]
     },
     "Svend Press": {
         alternatives: [],
@@ -2663,7 +3076,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "rhomboids", "rearDelts"],
         redundantWith: ["Decline Push-up", "Incline Push-up", "Wide Grip Push-up"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: []
     },
     "Cable Curl (Behind Back)": {
         alternatives: ["Cable Bicep Curl"],
@@ -2682,7 +3098,10 @@ window.exerciseMeta = {
         antagonistOf: ["triceps"],
         redundantWith: ["Bayesian Curl", "Cable Bicep Curl", "Concentration Curl", "Dumbbell Curl", "Lying Cable Curl"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Cable Bicep Curl", "Cable Hammer Curl", "Dumbbell Curl", "Hammer Curl", "Lying Cable Curl"],
+        progressions: [],
+        sportQualities: []
     },
     "Cable Row (Wide Grip)": {
         alternatives: ["Face Pulls", "Seated Cable Row"],
@@ -2701,7 +3120,10 @@ window.exerciseMeta = {
         antagonistOf: ["chest", "frontDelts", "serratus"],
         redundantWith: ["High Row (Rope)"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: []
     },
     "Standing Cable Crunch": {
         alternatives: ["Reverse Crunch", "Dead Bug"],
@@ -2720,7 +3142,10 @@ window.exerciseMeta = {
         antagonistOf: ["lowerBack"],
         redundantWith: ["Cable Crunch", "Flutter Kicks", "Reverse Crunch"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Reverse Crunch"],
+        progressions: ["Flutter Kicks", "Hanging Leg Raise", "V-Ups"],
+        sportQualities: []
     },
     "Bear Crawl": {
         alternatives: ["Bird Dog", "Dead Bug"],
@@ -2739,7 +3164,10 @@ window.exerciseMeta = {
         antagonistOf: ["lowerBack", "rearDelts", "lats", "hamstrings", "rhomboids"],
         redundantWith: [],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Crab Walk", "Kick Through"],
+        sportQualities: ["repeat-effort"]
     },
     "Crab Walk": {
         alternatives: ["Glute Bridge"],
@@ -2758,7 +3186,10 @@ window.exerciseMeta = {
         antagonistOf: ["biceps", "hipFlexors", "chest", "frontDelts", "quads"],
         redundantWith: [],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Bear Crawl"],
+        progressions: ["Beast Reach"],
+        sportQualities: ["repeat-effort"]
     },
     "Kick Through": {
         alternatives: ["Bear Crawl"],
@@ -2777,7 +3208,10 @@ window.exerciseMeta = {
         antagonistOf: ["lowerBack", "glutes", "rearDelts", "lats"],
         redundantWith: ["Mountain Climbers"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Bear Crawl"],
+        progressions: ["Beast Reach"],
+        sportQualities: ["repeat-effort"]
     },
     "Beast Reach": {
         alternatives: ["Cat-Cow", "Bear Crawl"],
@@ -2796,7 +3230,10 @@ window.exerciseMeta = {
         antagonistOf: ["rearDelts", "lats"],
         redundantWith: [],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Crab Walk", "Kick Through"],
+        progressions: [],
+        sportQualities: ["repeat-effort"]
     },
     "Duck Walk": {
         alternatives: ["Deep Squat Hold", "Bodyweight Squat"],
@@ -2815,7 +3252,10 @@ window.exerciseMeta = {
         antagonistOf: ["hamstrings", "hipFlexors", "tibialis"],
         redundantWith: ["Lateral Bounds", "Lateral Shuffle", "Skater Hops", "Step Touch"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["calf-eccentric", "repeat-effort"]
     },
     "Tibialis Raise": {
         alternatives: [],
@@ -2834,7 +3274,10 @@ window.exerciseMeta = {
         antagonistOf: ["calves"],
         redundantWith: [],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: []
     },
     "ATG Split Squat": {
         alternatives: ["Lunge (BW)", "Couch Stretch"],
@@ -2853,7 +3296,10 @@ window.exerciseMeta = {
         antagonistOf: ["hamstrings"],
         redundantWith: ["Reverse Lunge to Knee Drive"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Bulgarian Split Squat", "Cable Lunge", "Dumbbell Lunge"],
+        progressions: ["Jumping Lunge"],
+        sportQualities: ["single-leg", "landing-decel", "posterior-chain"]
     },
     "Lu Raise": {
         alternatives: ["Lateral Raise", "Wall Slides"],
@@ -2872,7 +3318,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: ["Cable Y-Raise"],
         forceVector: "lateral",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Cable Lateral Raise", "Lateral Raise"],
+        progressions: [],
+        sportQualities: ["scapular-cuff"]
     },
     "Powell Raise": {
         alternatives: ["Cable Rear Delt Fly", "Face Pulls"],
@@ -2891,7 +3340,10 @@ window.exerciseMeta = {
         antagonistOf: ["chest", "frontDelts", "serratus"],
         redundantWith: [],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["scapular-cuff"]
     },
     "Wrist Rocks": {
         alternatives: [],
@@ -2910,7 +3362,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: ["Wrist Extensor Stretch", "Wrist Flexor Stretch"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: []
     },
     "Dead Hang": {
         alternatives: [],
@@ -2929,7 +3384,10 @@ window.exerciseMeta = {
         antagonistOf: ["chest", "frontDelts"],
         redundantWith: [],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["scapular-cuff"]
     },
     "Cossack Squat": {
         alternatives: ["Side Lunge", "90/90 Hip Switch"],
@@ -2948,7 +3406,10 @@ window.exerciseMeta = {
         antagonistOf: ["abductors", "hamstrings", "hipFlexors"],
         redundantWith: ["Side Lunge"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Side Lunge"],
+        progressions: [],
+        sportQualities: ["adductor", "single-leg", "posterior-chain"]
     },
     "Jefferson Curl": {
         alternatives: ["Cat-Cow"],
@@ -2967,7 +3428,10 @@ window.exerciseMeta = {
         antagonistOf: ["abs", "quads"],
         redundantWith: [],
         forceVector: "axial",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: []
     },
     "Scorpion Stretch": {
         alternatives: ["Cat-Cow", "90/90 Hip Switch"],
@@ -2986,7 +3450,10 @@ window.exerciseMeta = {
         antagonistOf: ["abs"],
         redundantWith: ["World's Greatest Stretch"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: []
     },
     "Inchworm": {
         alternatives: ["Cat-Cow", "World's Greatest Stretch"],
@@ -3005,7 +3472,10 @@ window.exerciseMeta = {
         antagonistOf: ["quads", "rearDelts", "lats", "lowerBack", "rhomboids", "biceps"],
         redundantWith: [],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["repeat-effort"]
     },
     "Thoracic Bridge": {
         alternatives: ["Thoracic Extension", "Cat-Cow"],
@@ -3024,7 +3494,10 @@ window.exerciseMeta = {
         antagonistOf: ["abs", "hipFlexors", "rearDelts", "tibialis", "quads", "chest"],
         redundantWith: [],
         forceVector: "axial",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Open Book Stretch", "Thoracic Extension", "Thread the Needle"],
+        progressions: [],
+        sportQualities: ["scapular-cuff"]
     },
     "Single Leg RDL (BW)": {
         alternatives: ["Good Morning (BW)", "Glute Bridge"],
@@ -3043,7 +3516,10 @@ window.exerciseMeta = {
         antagonistOf: ["quads", "hipFlexors"],
         redundantWith: ["Cable Pull-Through"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Romanian Deadlift (DB)"],
+        progressions: ["Nordic Curl"],
+        sportQualities: ["eccentric-hamstring", "single-leg", "posterior-chain"]
     },
     "Lateral Bounds": {
         alternatives: ["Side Lunge"],
@@ -3062,7 +3538,10 @@ window.exerciseMeta = {
         antagonistOf: ["hipFlexors", "adductors", "hamstrings", "tibialis"],
         redundantWith: ["Duck Walk", "Lateral Shuffle", "Skater Hops", "Step Touch"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Lateral Shuffle"],
+        progressions: [],
+        sportQualities: ["calf-eccentric", "landing-decel", "repeat-effort"]
     },
     "Dot Drill": {
         alternatives: ["Jumping Jacks", "High Knees"],
@@ -3081,7 +3560,10 @@ window.exerciseMeta = {
         antagonistOf: ["hamstrings"],
         redundantWith: ["Fast Feet Shuffle", "Pogo Hops"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Fast Feet Shuffle"],
+        progressions: ["Pogo Hops"],
+        sportQualities: ["calf-eccentric", "landing-decel", "repeat-effort"]
     },
     "Tuck Jumps": {
         alternatives: ["Jump Squat", "Box Jump"],
@@ -3100,7 +3582,10 @@ window.exerciseMeta = {
         antagonistOf: ["hamstrings", "glutes", "tibialis", "lowerBack"],
         redundantWith: [],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Box Jump", "Jump Squat"],
+        progressions: [],
+        sportQualities: ["calf-eccentric", "landing-decel"]
     },
     "A-Skips": {
         alternatives: ["High Knees", "Jumping Jacks"],
@@ -3119,7 +3604,10 @@ window.exerciseMeta = {
         antagonistOf: ["glutes", "hamstrings", "tibialis"],
         redundantWith: ["High Knees", "March in Place"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["High Knees"],
+        progressions: [],
+        sportQualities: ["calf-eccentric", "landing-decel", "repeat-effort"]
     },
     "Horse Stance Hold": {
         alternatives: ["Deep Squat Hold", "Bodyweight Squat"],
@@ -3138,7 +3626,10 @@ window.exerciseMeta = {
         antagonistOf: ["hamstrings", "abductors", "hipFlexors"],
         redundantWith: ["Pop Squat", "Sumo Squat (DB)"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: [],
+        progressions: ["Bodyweight Squat", "Squat to Calf Raise"],
+        sportQualities: ["adductor", "posterior-chain"]
     },
     "Reverse Plank": {
         alternatives: ["Glute Bridge"],
@@ -3157,7 +3648,10 @@ window.exerciseMeta = {
         antagonistOf: ["hipFlexors"],
         redundantWith: [],
         forceVector: "axial",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["lumbar-endurance"]
     },
     "Copenhagen Plank": {
         alternatives: ["Side Plank", "Cable Adductor"],
@@ -3176,7 +3670,10 @@ window.exerciseMeta = {
         antagonistOf: ["abductors"],
         redundantWith: [],
         forceVector: "rotational",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Side Plank"],
+        progressions: [],
+        sportQualities: ["adductor", "rotational-power"]
     },
     "L-Sit (Tuck)": {
         alternatives: ["Reverse Crunch", "Hanging Leg Raise"],
@@ -3195,7 +3692,10 @@ window.exerciseMeta = {
         antagonistOf: ["lowerBack", "glutes", "hamstrings", "adductors", "biceps"],
         redundantWith: [],
         forceVector: "axial",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Plank"],
+        progressions: [],
+        sportQualities: ["lumbar-endurance"]
     },
     "March in Place": {
         alternatives: ["Step Touch", "Shadow Boxing"],
@@ -3214,7 +3714,10 @@ window.exerciseMeta = {
         antagonistOf: ["glutes", "hamstrings", "tibialis"],
         redundantWith: ["A-Skips", "High Knees"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["High Knees"],
+        sportQualities: ["repeat-effort"]
     },
     "Step Touch": {
         alternatives: ["March in Place", "Lateral Shuffle"],
@@ -3233,7 +3736,10 @@ window.exerciseMeta = {
         antagonistOf: ["hipFlexors", "hamstrings", "adductors", "tibialis"],
         redundantWith: ["Duck Walk", "Lateral Bounds", "Lateral Shuffle", "Skater Hops"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Lateral Shuffle"],
+        sportQualities: ["repeat-effort"]
     },
     "Lateral Shuffle": {
         alternatives: ["Step Touch", "Fast Feet Shuffle"],
@@ -3252,7 +3758,10 @@ window.exerciseMeta = {
         antagonistOf: ["adductors", "hipFlexors", "hamstrings", "tibialis"],
         redundantWith: ["Duck Walk", "Lateral Bounds", "Skater Hops", "Step Touch"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Step Touch"],
+        progressions: ["Lateral Bounds", "Skater Hops"],
+        sportQualities: ["calf-eccentric", "repeat-effort"]
     },
     "Standing Knee-to-Elbow": {
         alternatives: ["March in Place", "Standing Oblique Twist"],
@@ -3271,7 +3780,10 @@ window.exerciseMeta = {
         antagonistOf: ["lowerBack", "glutes"],
         redundantWith: [],
         forceVector: "rotational",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Bicycle Crunch"],
+        sportQualities: ["rotational-power", "repeat-effort"]
     },
     "Shadow Boxing": {
         alternatives: ["March in Place", "Step Touch"],
@@ -3290,7 +3802,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "chest", "biceps", "lowerBack"],
         redundantWith: [],
         forceVector: "rotational",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["rotational-power", "repeat-effort"]
     },
     "Squat to Calf Raise": {
         alternatives: ["Bodyweight Squat", "March in Place"],
@@ -3309,7 +3824,10 @@ window.exerciseMeta = {
         antagonistOf: ["hamstrings", "hipFlexors", "tibialis"],
         redundantWith: ["Box Jump", "Jump Squat", "Pop Squat"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Horse Stance Hold"],
+        progressions: ["Cable Squat", "Goblet Squat", "Sumo Squat (DB)"],
+        sportQualities: ["calf-eccentric", "posterior-chain", "repeat-effort"]
     },
     "Fast Feet Shuffle": {
         alternatives: ["March in Place", "Step Touch"],
@@ -3328,7 +3846,10 @@ window.exerciseMeta = {
         antagonistOf: ["hamstrings"],
         redundantWith: ["Dot Drill", "Pogo Hops"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Dot Drill"],
+        sportQualities: ["calf-eccentric", "repeat-effort"]
     },
     "Slow Mountain Climber": {
         alternatives: ["March in Place", "Reverse Lunge to Knee Drive"],
@@ -3347,7 +3868,10 @@ window.exerciseMeta = {
         antagonistOf: ["lowerBack", "glutes", "rearDelts", "lats", "rhomboids"],
         redundantWith: ["Mountain Climbers"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Mountain Climbers"],
+        sportQualities: ["repeat-effort"]
     },
     "Reverse Lunge to Knee Drive": {
         alternatives: ["March in Place", "Step Touch"],
@@ -3366,7 +3890,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: ["ATG Split Squat", "Dumbbell Lunge", "Lunge (BW)"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Lunge (BW)"],
+        progressions: ["Bulgarian Split Squat", "Cable Lunge", "Dumbbell Lunge"],
+        sportQualities: ["single-leg", "posterior-chain", "repeat-effort"]
     },
     "Standing Oblique Twist": {
         alternatives: ["Standing Knee-to-Elbow", "March in Place"],
@@ -3385,7 +3912,10 @@ window.exerciseMeta = {
         antagonistOf: ["lowerBack"],
         redundantWith: ["Bicycle Crunch"],
         forceVector: "rotational",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Bicycle Crunch"],
+        progressions: ["Woodchopper (High to Low)", "Woodchopper (Low to High)"],
+        sportQualities: ["rotational-power", "repeat-effort"]
     },
     "Low Step-Up (Fast)": {
         alternatives: ["March in Place", "Step Touch"],
@@ -3404,7 +3934,10 @@ window.exerciseMeta = {
         antagonistOf: ["hamstrings", "hipFlexors", "tibialis"],
         redundantWith: ["Jumping Lunge"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["DB Step Up"],
+        sportQualities: ["single-leg", "posterior-chain", "repeat-effort"]
     },
     "No-Jump Burpee": {
         alternatives: ["Squat to Calf Raise", "March in Place"],
@@ -3423,7 +3956,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "rhomboids", "rearDelts", "biceps", "hamstrings", "lowerBack"],
         redundantWith: ["Burpees"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Burpees"],
+        sportQualities: ["repeat-effort"]
     },
     "Pop Squat": {
         alternatives: ["Squat to Calf Raise", "Bodyweight Squat"],
@@ -3442,7 +3978,10 @@ window.exerciseMeta = {
         antagonistOf: ["hamstrings", "hipFlexors", "abductors", "tibialis"],
         redundantWith: ["Box Jump", "Horse Stance Hold", "Jump Squat", "Squat to Calf Raise", "Sumo Squat (DB)"],
         forceVector: "vertical",
-        axialLoad: true
+        axialLoad: true,
+        regressions: ["Bodyweight Squat"],
+        progressions: ["Box Jump", "Jump Squat"],
+        sportQualities: ["adductor", "calf-eccentric", "landing-decel", "posterior-chain"]
     },
     "Pogo Hops": {
         alternatives: ["Fast Feet Shuffle", "Calf Raise (BW)"],
@@ -3461,7 +4000,10 @@ window.exerciseMeta = {
         antagonistOf: ["hamstrings"],
         redundantWith: ["Dot Drill", "Fast Feet Shuffle"],
         forceVector: "horizontal",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Dot Drill"],
+        progressions: [],
+        sportQualities: ["calf-eccentric", "landing-decel", "repeat-effort"]
     },
 
     // ===== MOBILITY GAP-FILL PACK (7 rows, v1.5.0 merge) =====
@@ -3482,7 +4024,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: [],
         forceVector: "rotational",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["rotational-power"]
     },
     "Chin Tuck": {
         alternatives: ["Wall Slides"],
@@ -3501,7 +4046,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: [],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: []
     },
     "Upper-Trap & Levator Stretch": {
         alternatives: ["Chin Tuck"],
@@ -3520,7 +4068,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: [],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: []
     },
     "Forearm Pronation-Supination": {
         alternatives: ["Wrist Rocks"],
@@ -3539,7 +4090,10 @@ window.exerciseMeta = {
         antagonistOf: ["triceps"],
         redundantWith: [],
         forceVector: "rotational",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["rotational-power"]
     },
     "Elbow CARs": {
         alternatives: ["Wrist Rocks", "Forearm Pronation-Supination"],
@@ -3558,7 +4112,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: [],
         forceVector: "rotational",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["rotational-power"]
     },
     "Terminal Knee Extension": {
         alternatives: ["Glute Bridge"],
@@ -3577,7 +4134,10 @@ window.exerciseMeta = {
         antagonistOf: ["hamstrings"],
         redundantWith: [],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Reverse Nordic Curl"],
+        sportQualities: ["landing-decel"]
     },
     "Banded Ankle Eversion-Inversion": {
         alternatives: ["Tibialis Raise"],
@@ -3596,7 +4156,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: ["Ankle Alphabet", "Knee-to-Wall Ankle Rock"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["calf-eccentric"]
     },
 
     // ===== REHAB/MOBILITY PACK (18 rows, v1.5.0 merge) =====
@@ -3617,7 +4180,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "chest"],
         redundantWith: ["Shoulder Dislocates"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["scapular-cuff"]
     },
     "Prone Y-T-W Raise": {
         alternatives: ["Wall Slides", "Scapular Push-up"],
@@ -3636,7 +4202,10 @@ window.exerciseMeta = {
         antagonistOf: ["chest", "frontDelts", "serratus"],
         redundantWith: [],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["scapular-cuff"]
     },
     "Sleeper Stretch": {
         alternatives: ["Wall Slides", "Cable External Rotation"],
@@ -3655,7 +4224,10 @@ window.exerciseMeta = {
         antagonistOf: ["chest", "frontDelts"],
         redundantWith: [],
         forceVector: "rotational",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["scapular-cuff"]
     },
     "Thread the Needle": {
         alternatives: ["Open Book Stretch", "Cat-Cow"],
@@ -3674,7 +4246,10 @@ window.exerciseMeta = {
         antagonistOf: ["abs", "chest", "serratus", "frontDelts"],
         redundantWith: [],
         forceVector: "axial",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Cat-Cow"],
+        progressions: ["Thoracic Bridge"],
+        sportQualities: []
     },
     "Open Book Stretch": {
         alternatives: ["Thread the Needle", "Quadruped Thoracic Rotation"],
@@ -3693,7 +4268,10 @@ window.exerciseMeta = {
         antagonistOf: ["lats", "rhomboids", "rearDelts"],
         redundantWith: [],
         forceVector: "axial",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Cat-Cow"],
+        progressions: ["Thoracic Bridge"],
+        sportQualities: []
     },
     "Quadruped Thoracic Rotation": {
         alternatives: ["Open Book Stretch", "Thread the Needle"],
@@ -3712,7 +4290,10 @@ window.exerciseMeta = {
         antagonistOf: ["abs"],
         redundantWith: [],
         forceVector: "rotational",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["rotational-power"]
     },
     "Pigeon Pose": {
         alternatives: ["90/90 Hip Switch", "Standing Hip CARs"],
@@ -3731,7 +4312,10 @@ window.exerciseMeta = {
         antagonistOf: ["abs"],
         redundantWith: [],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["90/90 Hip Switch"],
+        progressions: ["Deep Squat Hold"],
+        sportQualities: ["adductor"]
     },
     "Frog Stretch": {
         alternatives: ["Cossack Squat", "Deep Squat Hold"],
@@ -3750,7 +4334,10 @@ window.exerciseMeta = {
         antagonistOf: ["abductors", "glutes"],
         redundantWith: [],
         forceVector: "lateral",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["adductor"]
     },
     "Standing Hip CARs": {
         alternatives: ["90/90 Hip Switch", "World's Greatest Stretch"],
@@ -3769,7 +4356,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: [],
         forceVector: "rotational",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["adductor", "rotational-power"]
     },
     "Reverse Nordic Curl": {
         alternatives: ["Couch Stretch", "ATG Split Squat"],
@@ -3788,7 +4378,10 @@ window.exerciseMeta = {
         antagonistOf: ["hamstrings", "glutes"],
         redundantWith: ["Couch Stretch"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Terminal Knee Extension"],
+        progressions: [],
+        sportQualities: ["landing-decel"]
     },
     "Eccentric Step Down": {
         alternatives: ["Glute Bridge", "DB Step Up"],
@@ -3807,7 +4400,10 @@ window.exerciseMeta = {
         antagonistOf: ["hamstrings", "hipFlexors"],
         redundantWith: ["Bulgarian Split Squat", "Cable Lunge", "DB Step Up"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["DB Step Up"],
+        progressions: [],
+        sportQualities: ["single-leg", "landing-decel", "posterior-chain"]
     },
     "Knee-to-Wall Ankle Rock": {
         alternatives: ["Ankle Alphabet", "Deep Squat Hold"],
@@ -3826,7 +4422,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: ["Ankle Alphabet", "Banded Ankle Eversion-Inversion"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Ankle Alphabet"],
+        progressions: [],
+        sportQualities: ["calf-eccentric"]
     },
     "Ankle Alphabet": {
         alternatives: ["Knee-to-Wall Ankle Rock", "Tibialis Raise"],
@@ -3845,7 +4444,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: ["Banded Ankle Eversion-Inversion", "Knee-to-Wall Ankle Rock"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: ["Knee-to-Wall Ankle Rock"],
+        sportQualities: []
     },
     "Child's Pose": {
         alternatives: ["Cat-Cow", "Dead Hang"],
@@ -3864,7 +4466,10 @@ window.exerciseMeta = {
         antagonistOf: ["abs", "chest", "frontDelts"],
         redundantWith: [],
         forceVector: "axial",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: []
     },
     "McGill Curl-Up": {
         alternatives: ["Dead Bug", "Bird Dog"],
@@ -3883,7 +4488,10 @@ window.exerciseMeta = {
         antagonistOf: ["lowerBack"],
         redundantWith: [],
         forceVector: "axial",
-        axialLoad: false
+        axialLoad: false,
+        regressions: ["Dead Bug"],
+        progressions: ["Plank"],
+        sportQualities: ["lumbar-endurance"]
     },
     "Prone Press-Up": {
         alternatives: ["Cat-Cow", "Thoracic Extension"],
@@ -3902,7 +4510,10 @@ window.exerciseMeta = {
         antagonistOf: ["abs"],
         redundantWith: ["Thoracic Extension"],
         forceVector: "axial",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: ["lumbar-endurance"]
     },
     "Wrist Flexor Stretch": {
         alternatives: ["Wrist Extensor Stretch", "Wrist Rocks"],
@@ -3921,7 +4532,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: ["Wrist Extensor Stretch", "Wrist Rocks"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: []
     },
     "Wrist Extensor Stretch": {
         alternatives: ["Wrist Flexor Stretch", "Wrist Rocks"],
@@ -3940,7 +4554,10 @@ window.exerciseMeta = {
         antagonistOf: [],
         redundantWith: ["Wrist Flexor Stretch", "Wrist Rocks"],
         forceVector: "vertical",
-        axialLoad: false
+        axialLoad: false,
+        regressions: [],
+        progressions: [],
+        sportQualities: []
     }
 };
 
@@ -3970,6 +4587,7 @@ window.exerciseMeta = {
         var LAT = ['bilateral', 'unilateral', 'alternating'];
         var REHAB = ['shoulder-prehab', 'hip-prehab', 'adductor-prehab', 'knee-prehab', 'ankle-prehab', 'wrist-prehab', 'neck-prehab', 'elbow-prehab', 'hip-mobility', 'spine-mobility', 'core-stability', 'movement-prep'];
         var FV = ['vertical', 'horizontal', 'lateral', 'rotational', 'axial']; // v1.7.0 forceVector vocab
+        var SQV = ['scapular-cuff', 'posterior-chain', 'eccentric-hamstring', 'single-leg', 'calf-eccentric', 'adductor', 'rotational-power', 'lumbar-endurance', 'repeat-effort', 'landing-decel']; // v1.8.0 sportQualities vocab (10)
         var names = window.allExercises.map(function (e) { return e.name; });
         var metaKeys = Object.keys(window.exerciseMeta);
         var known = {};
@@ -4011,6 +4629,11 @@ window.exerciseMeta = {
             (m.antagonistOf || []).forEach(function (x) { if (MV.indexOf(x) === -1) badEnums.push(n + ' antagonistOf=' + x); }); // v1.7.0
             if (FV.indexOf(m.forceVector) === -1) badEnums.push(n + ' forceVector=' + m.forceVector); // v1.7.0
             if (typeof m.axialLoad !== 'boolean') badEnums.push(n + ' axialLoad not boolean'); // v1.7.0
+            (m.sportQualities || []).forEach(function (x) { if (SQV.indexOf(x) === -1) badEnums.push(n + ' sportQuality=' + x); }); // v1.8.0
+            (m.regressions || []).forEach(function (a) { if (!known[a]) badAlts.push(n + ' reg-> ' + a); }); // v1.8.0
+            (m.progressions || []).forEach(function (a) { if (!known[a]) badAlts.push(n + ' prog-> ' + a); }); // v1.8.0
+            (m.progressions || []).forEach(function (b) { var o = window.exerciseMeta[b]; if (o && (o.regressions || []).indexOf(n) === -1) incomplete.push(n + ' (progression ' + b + ' not reciprocated)'); }); // v1.8.0
+            (m.regressions || []).forEach(function (b) { var o = window.exerciseMeta[b]; if (o && (o.progressions || []).indexOf(n) === -1) incomplete.push(n + ' (regression ' + b + ' not reciprocated)'); }); // v1.8.0
             (m.alternatives || []).forEach(function (a) { if (!known[a]) badAlts.push(n + ' -> ' + a); });
         });
 

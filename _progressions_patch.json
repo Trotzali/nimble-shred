@@ -1,0 +1,1334 @@
+{
+  "cable-chest-press": {
+    "regressions": [
+      "dumbbell-bench-press",
+      "dumbbell-incline-press"
+    ],
+    "progressions": [
+      "single-arm-cable-chest-press"
+    ]
+  },
+  "cable-chest-fly-high": {
+    "regressions": [
+      "cable-chest-fly-mid"
+    ],
+    "progressions": []
+  },
+  "cable-chest-fly-low": {
+    "regressions": [
+      "cable-chest-fly-mid"
+    ],
+    "progressions": []
+  },
+  "cable-chest-fly-mid": {
+    "regressions": [
+      "dumbbell-fly"
+    ],
+    "progressions": [
+      "cable-chest-fly-high",
+      "cable-chest-fly-low",
+      "cable-crossover"
+    ]
+  },
+  "single-arm-cable-chest-press": {
+    "regressions": [
+      "cable-chest-press"
+    ],
+    "progressions": []
+  },
+  "cable-crossover": {
+    "regressions": [
+      "cable-chest-fly-mid"
+    ],
+    "progressions": []
+  },
+  "cable-pullover-bench": {
+    "regressions": [],
+    "progressions": []
+  },
+  "lat-pulldown-standing": {
+    "regressions": [
+      "inverted-row"
+    ],
+    "progressions": [
+      "chin-ups"
+    ]
+  },
+  "seated-cable-row": {
+    "regressions": [
+      "inverted-row"
+    ],
+    "progressions": [
+      "standing-cable-row"
+    ]
+  },
+  "face-pulls": {
+    "regressions": [],
+    "progressions": []
+  },
+  "straight-arm-pulldown": {
+    "regressions": [],
+    "progressions": []
+  },
+  "single-arm-cable-row": {
+    "regressions": [
+      "inverted-row"
+    ],
+    "progressions": [
+      "standing-cable-row"
+    ]
+  },
+  "cable-shrugs": {
+    "regressions": [],
+    "progressions": []
+  },
+  "cable-rear-delt-fly": {
+    "regressions": [],
+    "progressions": []
+  },
+  "high-row-rope": {
+    "regressions": [],
+    "progressions": []
+  },
+  "cable-overhead-press": {
+    "regressions": [],
+    "progressions": [
+      "arnold-press"
+    ]
+  },
+  "cable-lateral-raise": {
+    "regressions": [],
+    "progressions": [
+      "lu-raise"
+    ]
+  },
+  "cable-front-raise": {
+    "regressions": [],
+    "progressions": []
+  },
+  "cable-external-rotation": {
+    "regressions": [],
+    "progressions": []
+  },
+  "cable-internal-rotation": {
+    "regressions": [],
+    "progressions": []
+  },
+  "cable-upright-row": {
+    "regressions": [],
+    "progressions": []
+  },
+  "cable-y-raise": {
+    "regressions": [],
+    "progressions": []
+  },
+  "tricep-pushdown-rope": {
+    "regressions": [],
+    "progressions": [
+      "reverse-grip-pushdown",
+      "tricep-pushdown-bar"
+    ]
+  },
+  "tricep-pushdown-bar": {
+    "regressions": [
+      "cable-kickback",
+      "tricep-kickback",
+      "tricep-pushdown-rope"
+    ],
+    "progressions": [
+      "cable-french-press",
+      "overhead-cable-extension",
+      "skull-crusher"
+    ]
+  },
+  "overhead-cable-extension": {
+    "regressions": [
+      "reverse-grip-pushdown",
+      "tricep-pushdown-bar"
+    ],
+    "progressions": []
+  },
+  "cable-bicep-curl": {
+    "regressions": [],
+    "progressions": [
+      "bayesian-curl",
+      "cable-curl-behind-back",
+      "concentration-curl",
+      "zottman-curl"
+    ]
+  },
+  "cable-hammer-curl": {
+    "regressions": [],
+    "progressions": [
+      "bayesian-curl",
+      "cable-curl-behind-back",
+      "concentration-curl",
+      "zottman-curl"
+    ]
+  },
+  "bayesian-curl": {
+    "regressions": [
+      "cable-bicep-curl",
+      "cable-hammer-curl",
+      "dumbbell-curl",
+      "hammer-curl",
+      "lying-cable-curl"
+    ],
+    "progressions": []
+  },
+  "cable-kickback": {
+    "regressions": [],
+    "progressions": [
+      "reverse-grip-pushdown",
+      "tricep-pushdown-bar"
+    ]
+  },
+  "reverse-grip-pushdown": {
+    "regressions": [
+      "cable-kickback",
+      "tricep-kickback",
+      "tricep-pushdown-rope"
+    ],
+    "progressions": [
+      "cable-french-press",
+      "overhead-cable-extension",
+      "skull-crusher"
+    ]
+  },
+  "cable-squat": {
+    "regressions": [
+      "bodyweight-squat",
+      "squat-to-calf-raise"
+    ],
+    "progressions": [
+      "cable-front-squat",
+      "cable-zercher-squat"
+    ]
+  },
+  "cable-pull-through": {
+    "regressions": [
+      "good-morning"
+    ],
+    "progressions": [
+      "romanian-deadlift-dumbbell"
+    ]
+  },
+  "cable-rdl": {
+    "regressions": [
+      "good-morning"
+    ],
+    "progressions": [
+      "romanian-deadlift-dumbbell"
+    ]
+  },
+  "cable-lunge": {
+    "regressions": [
+      "curtsy-lunge",
+      "reverse-lunge-to-knee-drive"
+    ],
+    "progressions": [
+      "atg-split-squat"
+    ]
+  },
+  "cable-kickback-glute": {
+    "regressions": [],
+    "progressions": []
+  },
+  "cable-calf-raise": {
+    "regressions": [
+      "calf-raise-bw"
+    ],
+    "progressions": []
+  },
+  "cable-abductor": {
+    "regressions": [],
+    "progressions": []
+  },
+  "cable-adductor": {
+    "regressions": [],
+    "progressions": []
+  },
+  "cable-crunch": {
+    "regressions": [
+      "reverse-crunch"
+    ],
+    "progressions": [
+      "flutter-kicks",
+      "leg-raise",
+      "v-up"
+    ]
+  },
+  "woodchopper-high-to-low": {
+    "regressions": [
+      "russian-twist",
+      "standing-oblique-twist"
+    ],
+    "progressions": []
+  },
+  "pallof-press": {
+    "regressions": [
+      "bird-dog"
+    ],
+    "progressions": [
+      "side-plank"
+    ]
+  },
+  "cable-side-bend": {
+    "regressions": [],
+    "progressions": []
+  },
+  "woodchopper-low-to-high": {
+    "regressions": [
+      "russian-twist",
+      "standing-oblique-twist"
+    ],
+    "progressions": []
+  },
+  "dumbbell-bench-press": {
+    "regressions": [
+      "db-floor-press"
+    ],
+    "progressions": [
+      "cable-chest-press"
+    ]
+  },
+  "dumbbell-incline-press": {
+    "regressions": [
+      "db-floor-press"
+    ],
+    "progressions": [
+      "cable-chest-press"
+    ]
+  },
+  "dumbbell-fly": {
+    "regressions": [],
+    "progressions": [
+      "cable-chest-fly-mid"
+    ]
+  },
+  "dumbbell-shoulder-press": {
+    "regressions": [],
+    "progressions": [
+      "arnold-press"
+    ]
+  },
+  "arnold-press": {
+    "regressions": [
+      "cable-overhead-press",
+      "dumbbell-shoulder-press"
+    ],
+    "progressions": []
+  },
+  "lateral-raise": {
+    "regressions": [],
+    "progressions": [
+      "lu-raise"
+    ]
+  },
+  "front-raise": {
+    "regressions": [],
+    "progressions": []
+  },
+  "dumbbell-row": {
+    "regressions": [
+      "inverted-row"
+    ],
+    "progressions": [
+      "standing-cable-row"
+    ]
+  },
+  "dumbbell-pullover": {
+    "regressions": [],
+    "progressions": []
+  },
+  "goblet-squat": {
+    "regressions": [
+      "bodyweight-squat",
+      "squat-to-calf-raise"
+    ],
+    "progressions": [
+      "cable-front-squat",
+      "cable-zercher-squat"
+    ]
+  },
+  "dumbbell-lunge": {
+    "regressions": [
+      "curtsy-lunge",
+      "reverse-lunge-to-knee-drive"
+    ],
+    "progressions": [
+      "atg-split-squat"
+    ]
+  },
+  "bulgarian-split-squat": {
+    "regressions": [
+      "curtsy-lunge",
+      "reverse-lunge-to-knee-drive"
+    ],
+    "progressions": [
+      "atg-split-squat"
+    ]
+  },
+  "romanian-deadlift-dumbbell": {
+    "regressions": [
+      "cable-pull-through",
+      "cable-rdl"
+    ],
+    "progressions": [
+      "single-leg-rdl"
+    ]
+  },
+  "dumbbell-curl": {
+    "regressions": [],
+    "progressions": [
+      "bayesian-curl",
+      "cable-curl-behind-back",
+      "concentration-curl",
+      "zottman-curl"
+    ]
+  },
+  "hammer-curl": {
+    "regressions": [],
+    "progressions": [
+      "bayesian-curl",
+      "cable-curl-behind-back",
+      "concentration-curl",
+      "zottman-curl"
+    ]
+  },
+  "tricep-kickback": {
+    "regressions": [],
+    "progressions": [
+      "reverse-grip-pushdown",
+      "tricep-pushdown-bar"
+    ]
+  },
+  "skull-crusher": {
+    "regressions": [
+      "reverse-grip-pushdown",
+      "tricep-pushdown-bar"
+    ],
+    "progressions": []
+  },
+  "farmers-walk": {
+    "regressions": [],
+    "progressions": []
+  },
+  "zottman-curl": {
+    "regressions": [
+      "cable-bicep-curl",
+      "cable-hammer-curl",
+      "dumbbell-curl",
+      "hammer-curl",
+      "lying-cable-curl"
+    ],
+    "progressions": []
+  },
+  "concentration-curl": {
+    "regressions": [
+      "cable-bicep-curl",
+      "cable-hammer-curl",
+      "dumbbell-curl",
+      "hammer-curl",
+      "lying-cable-curl"
+    ],
+    "progressions": []
+  },
+  "db-floor-press": {
+    "regressions": [],
+    "progressions": [
+      "dumbbell-bench-press",
+      "dumbbell-incline-press"
+    ]
+  },
+  "renegade-row": {
+    "regressions": [
+      "standing-cable-row"
+    ],
+    "progressions": []
+  },
+  "step-up": {
+    "regressions": [
+      "low-step-up-fast"
+    ],
+    "progressions": [
+      "eccentric-step-down"
+    ]
+  },
+  "dumbbell-shrug": {
+    "regressions": [],
+    "progressions": []
+  },
+  "seated-calf-raise": {
+    "regressions": [
+      "calf-raise-bw"
+    ],
+    "progressions": []
+  },
+  "push-up": {
+    "regressions": [
+      "incline-push-up"
+    ],
+    "progressions": [
+      "decline-push-up",
+      "wide-grip-push-up"
+    ]
+  },
+  "pull-up": {
+    "regressions": [
+      "chin-ups"
+    ],
+    "progressions": []
+  },
+  "chin-ups": {
+    "regressions": [
+      "lat-pulldown-standing"
+    ],
+    "progressions": [
+      "pull-up"
+    ]
+  },
+  "dips": {
+    "regressions": [
+      "bench-dip"
+    ],
+    "progressions": []
+  },
+  "bodyweight-squat": {
+    "regressions": [
+      "horse-stance-hold"
+    ],
+    "progressions": [
+      "cable-squat",
+      "goblet-squat",
+      "pop-squat",
+      "sumo-squat-db"
+    ]
+  },
+  "lunge-bw": {
+    "regressions": [],
+    "progressions": [
+      "curtsy-lunge",
+      "reverse-lunge-to-knee-drive"
+    ]
+  },
+  "glute-bridge": {
+    "regressions": [],
+    "progressions": [
+      "single-leg-glute-bridge"
+    ]
+  },
+  "plank": {
+    "regressions": [
+      "mcgill-curl-up"
+    ],
+    "progressions": [
+      "l-sit"
+    ]
+  },
+  "side-plank": {
+    "regressions": [
+      "pallof-press"
+    ],
+    "progressions": [
+      "copenhagen-plank"
+    ]
+  },
+  "mountain-climbers": {
+    "regressions": [
+      "slow-mountain-climber"
+    ],
+    "progressions": []
+  },
+  "burpees": {
+    "regressions": [
+      "no-jump-burpee"
+    ],
+    "progressions": []
+  },
+  "leg-raise": {
+    "regressions": [
+      "cable-crunch",
+      "standing-cable-crunch",
+      "toe-touch"
+    ],
+    "progressions": []
+  },
+  "pike-push-up": {
+    "regressions": [
+      "close-grip-push-up",
+      "diamond-push-up"
+    ],
+    "progressions": [
+      "handstand-hold"
+    ]
+  },
+  "pistol-squat": {
+    "regressions": [
+      "cable-front-squat",
+      "cable-zercher-squat"
+    ],
+    "progressions": []
+  },
+  "nordic-curl": {
+    "regressions": [
+      "single-leg-rdl"
+    ],
+    "progressions": []
+  },
+  "inverted-row": {
+    "regressions": [],
+    "progressions": [
+      "dumbbell-row",
+      "lat-pulldown-standing",
+      "seated-cable-row",
+      "single-arm-cable-row"
+    ]
+  },
+  "handstand-hold": {
+    "regressions": [
+      "pike-push-up"
+    ],
+    "progressions": []
+  },
+  "calf-raise-bw": {
+    "regressions": [],
+    "progressions": [
+      "cable-calf-raise",
+      "seated-calf-raise"
+    ]
+  },
+  "cat-cow-stretch": {
+    "regressions": [],
+    "progressions": [
+      "open-book-stretch",
+      "thoracic-extension",
+      "thread-the-needle"
+    ]
+  },
+  "dead-bug": {
+    "regressions": [],
+    "progressions": [
+      "mcgill-curl-up"
+    ]
+  },
+  "thoracic-extension": {
+    "regressions": [
+      "cat-cow-stretch"
+    ],
+    "progressions": [
+      "thoracic-bridge"
+    ]
+  },
+  "worlds-greatest-stretch": {
+    "regressions": [
+      "couch-stretch"
+    ],
+    "progressions": []
+  },
+  "90-90-hip-stretch": {
+    "regressions": [],
+    "progressions": [
+      "pigeon-pose"
+    ]
+  },
+  "shoulder-dislocates": {
+    "regressions": [],
+    "progressions": []
+  },
+  "wall-slides": {
+    "regressions": [],
+    "progressions": []
+  },
+  "deep-squat-hold": {
+    "regressions": [
+      "pigeon-pose"
+    ],
+    "progressions": []
+  },
+  "couch-stretch": {
+    "regressions": [],
+    "progressions": [
+      "worlds-greatest-stretch"
+    ]
+  },
+  "bird-dog": {
+    "regressions": [],
+    "progressions": [
+      "pallof-press"
+    ]
+  },
+  "cable-front-squat": {
+    "regressions": [
+      "cable-squat",
+      "goblet-squat",
+      "sumo-squat-db"
+    ],
+    "progressions": [
+      "pistol-squat"
+    ]
+  },
+  "cable-zercher-squat": {
+    "regressions": [
+      "cable-squat",
+      "goblet-squat",
+      "sumo-squat-db"
+    ],
+    "progressions": [
+      "pistol-squat"
+    ]
+  },
+  "cable-donkey-kick": {
+    "regressions": [],
+    "progressions": []
+  },
+  "standing-cable-row": {
+    "regressions": [
+      "dumbbell-row",
+      "seated-cable-row",
+      "single-arm-cable-row"
+    ],
+    "progressions": [
+      "renegade-row"
+    ]
+  },
+  "lying-cable-curl": {
+    "regressions": [],
+    "progressions": [
+      "bayesian-curl",
+      "cable-curl-behind-back",
+      "concentration-curl",
+      "zottman-curl"
+    ]
+  },
+  "cable-french-press": {
+    "regressions": [
+      "reverse-grip-pushdown",
+      "tricep-pushdown-bar"
+    ],
+    "progressions": []
+  },
+  "cable-hip-abduction-standing": {
+    "regressions": [],
+    "progressions": []
+  },
+  "cable-hip-adduction-standing": {
+    "regressions": [],
+    "progressions": []
+  },
+  "cable-wrist-curl": {
+    "regressions": [],
+    "progressions": []
+  },
+  "cable-reverse-wrist-curl": {
+    "regressions": [],
+    "progressions": []
+  },
+  "russian-twist": {
+    "regressions": [
+      "bicycle-crunch"
+    ],
+    "progressions": [
+      "woodchopper-high-to-low",
+      "woodchopper-low-to-high"
+    ]
+  },
+  "bicycle-crunch": {
+    "regressions": [
+      "standing-knee-to-elbow"
+    ],
+    "progressions": [
+      "russian-twist",
+      "standing-oblique-twist"
+    ]
+  },
+  "flutter-kicks": {
+    "regressions": [
+      "cable-crunch",
+      "standing-cable-crunch",
+      "toe-touch"
+    ],
+    "progressions": []
+  },
+  "v-up": {
+    "regressions": [
+      "cable-crunch",
+      "standing-cable-crunch",
+      "toe-touch"
+    ],
+    "progressions": []
+  },
+  "reverse-crunch": {
+    "regressions": [],
+    "progressions": [
+      "cable-crunch",
+      "standing-cable-crunch",
+      "toe-touch"
+    ]
+  },
+  "plank-jack": {
+    "regressions": [],
+    "progressions": []
+  },
+  "toe-touch": {
+    "regressions": [
+      "reverse-crunch"
+    ],
+    "progressions": [
+      "flutter-kicks",
+      "leg-raise",
+      "v-up"
+    ]
+  },
+  "diamond-push-up": {
+    "regressions": [
+      "decline-push-up",
+      "wide-grip-push-up"
+    ],
+    "progressions": [
+      "pike-push-up"
+    ]
+  },
+  "wide-grip-push-up": {
+    "regressions": [
+      "push-up"
+    ],
+    "progressions": [
+      "close-grip-push-up",
+      "diamond-push-up"
+    ]
+  },
+  "decline-push-up": {
+    "regressions": [
+      "push-up"
+    ],
+    "progressions": [
+      "close-grip-push-up",
+      "diamond-push-up"
+    ]
+  },
+  "incline-push-up": {
+    "regressions": [],
+    "progressions": [
+      "push-up"
+    ]
+  },
+  "scapular-push-up": {
+    "regressions": [],
+    "progressions": []
+  },
+  "sumo-squat-db": {
+    "regressions": [
+      "bodyweight-squat",
+      "squat-to-calf-raise"
+    ],
+    "progressions": [
+      "cable-front-squat",
+      "cable-zercher-squat"
+    ]
+  },
+  "curtsy-lunge": {
+    "regressions": [
+      "lunge-bw"
+    ],
+    "progressions": [
+      "bulgarian-split-squat",
+      "cable-lunge",
+      "dumbbell-lunge"
+    ]
+  },
+  "side-lunge": {
+    "regressions": [],
+    "progressions": [
+      "cossack-squat"
+    ]
+  },
+  "single-leg-glute-bridge": {
+    "regressions": [
+      "glute-bridge"
+    ],
+    "progressions": []
+  },
+  "good-morning": {
+    "regressions": [],
+    "progressions": [
+      "cable-pull-through",
+      "cable-rdl"
+    ]
+  },
+  "jumping-jacks": {
+    "regressions": [],
+    "progressions": []
+  },
+  "high-knees": {
+    "regressions": [
+      "march-in-place"
+    ],
+    "progressions": [
+      "a-skips"
+    ]
+  },
+  "jump-squat": {
+    "regressions": [
+      "pop-squat"
+    ],
+    "progressions": [
+      "tuck-jumps"
+    ]
+  },
+  "skater-hops": {
+    "regressions": [
+      "lateral-shuffle"
+    ],
+    "progressions": []
+  },
+  "jumping-lunge": {
+    "regressions": [
+      "atg-split-squat"
+    ],
+    "progressions": []
+  },
+  "box-jump": {
+    "regressions": [
+      "pop-squat"
+    ],
+    "progressions": [
+      "tuck-jumps"
+    ]
+  },
+  "superman": {
+    "regressions": [],
+    "progressions": [
+      "swimmers"
+    ]
+  },
+  "swimmers": {
+    "regressions": [
+      "superman"
+    ],
+    "progressions": []
+  },
+  "bench-dip": {
+    "regressions": [],
+    "progressions": [
+      "dips"
+    ]
+  },
+  "close-grip-push-up": {
+    "regressions": [
+      "decline-push-up",
+      "wide-grip-push-up"
+    ],
+    "progressions": [
+      "pike-push-up"
+    ]
+  },
+  "plate-pinch": {
+    "regressions": [],
+    "progressions": []
+  },
+  "svend-press": {
+    "regressions": [],
+    "progressions": []
+  },
+  "cable-curl-behind-back": {
+    "regressions": [
+      "cable-bicep-curl",
+      "cable-hammer-curl",
+      "dumbbell-curl",
+      "hammer-curl",
+      "lying-cable-curl"
+    ],
+    "progressions": []
+  },
+  "cable-row-wide-grip": {
+    "regressions": [],
+    "progressions": []
+  },
+  "standing-cable-crunch": {
+    "regressions": [
+      "reverse-crunch"
+    ],
+    "progressions": [
+      "flutter-kicks",
+      "leg-raise",
+      "v-up"
+    ]
+  },
+  "bear-crawl": {
+    "regressions": [],
+    "progressions": [
+      "crab-walk",
+      "kick-through"
+    ]
+  },
+  "crab-walk": {
+    "regressions": [
+      "bear-crawl"
+    ],
+    "progressions": [
+      "beast-reach"
+    ]
+  },
+  "kick-through": {
+    "regressions": [
+      "bear-crawl"
+    ],
+    "progressions": [
+      "beast-reach"
+    ]
+  },
+  "beast-reach": {
+    "regressions": [
+      "crab-walk",
+      "kick-through"
+    ],
+    "progressions": []
+  },
+  "duck-walk": {
+    "regressions": [],
+    "progressions": []
+  },
+  "tibialis-raise": {
+    "regressions": [],
+    "progressions": []
+  },
+  "atg-split-squat": {
+    "regressions": [
+      "bulgarian-split-squat",
+      "cable-lunge",
+      "dumbbell-lunge"
+    ],
+    "progressions": [
+      "jumping-lunge"
+    ]
+  },
+  "lu-raise": {
+    "regressions": [
+      "cable-lateral-raise",
+      "lateral-raise"
+    ],
+    "progressions": []
+  },
+  "powell-raise": {
+    "regressions": [],
+    "progressions": []
+  },
+  "wrist-rocks": {
+    "regressions": [],
+    "progressions": []
+  },
+  "dead-hang": {
+    "regressions": [],
+    "progressions": []
+  },
+  "cossack-squat": {
+    "regressions": [
+      "side-lunge"
+    ],
+    "progressions": []
+  },
+  "jefferson-curl": {
+    "regressions": [],
+    "progressions": []
+  },
+  "scorpion-stretch": {
+    "regressions": [],
+    "progressions": []
+  },
+  "inchworm": {
+    "regressions": [],
+    "progressions": []
+  },
+  "thoracic-bridge": {
+    "regressions": [
+      "open-book-stretch",
+      "thoracic-extension",
+      "thread-the-needle"
+    ],
+    "progressions": []
+  },
+  "single-leg-rdl": {
+    "regressions": [
+      "romanian-deadlift-dumbbell"
+    ],
+    "progressions": [
+      "nordic-curl"
+    ]
+  },
+  "lateral-bounds": {
+    "regressions": [
+      "lateral-shuffle"
+    ],
+    "progressions": []
+  },
+  "dot-drill": {
+    "regressions": [
+      "fast-feet-shuffle"
+    ],
+    "progressions": [
+      "pogo-hops"
+    ]
+  },
+  "tuck-jumps": {
+    "regressions": [
+      "box-jump",
+      "jump-squat"
+    ],
+    "progressions": []
+  },
+  "a-skips": {
+    "regressions": [
+      "high-knees"
+    ],
+    "progressions": []
+  },
+  "horse-stance-hold": {
+    "regressions": [],
+    "progressions": [
+      "bodyweight-squat",
+      "squat-to-calf-raise"
+    ]
+  },
+  "reverse-plank": {
+    "regressions": [],
+    "progressions": []
+  },
+  "copenhagen-plank": {
+    "regressions": [
+      "side-plank"
+    ],
+    "progressions": []
+  },
+  "l-sit": {
+    "regressions": [
+      "plank"
+    ],
+    "progressions": []
+  },
+  "march-in-place": {
+    "regressions": [],
+    "progressions": [
+      "high-knees"
+    ]
+  },
+  "step-touch": {
+    "regressions": [],
+    "progressions": [
+      "lateral-shuffle"
+    ]
+  },
+  "lateral-shuffle": {
+    "regressions": [
+      "step-touch"
+    ],
+    "progressions": [
+      "lateral-bounds",
+      "skater-hops"
+    ]
+  },
+  "standing-knee-to-elbow": {
+    "regressions": [],
+    "progressions": [
+      "bicycle-crunch"
+    ]
+  },
+  "shadow-boxing": {
+    "regressions": [],
+    "progressions": []
+  },
+  "squat-to-calf-raise": {
+    "regressions": [
+      "horse-stance-hold"
+    ],
+    "progressions": [
+      "cable-squat",
+      "goblet-squat",
+      "sumo-squat-db"
+    ]
+  },
+  "fast-feet-shuffle": {
+    "regressions": [],
+    "progressions": [
+      "dot-drill"
+    ]
+  },
+  "slow-mountain-climber": {
+    "regressions": [],
+    "progressions": [
+      "mountain-climbers"
+    ]
+  },
+  "reverse-lunge-to-knee-drive": {
+    "regressions": [
+      "lunge-bw"
+    ],
+    "progressions": [
+      "bulgarian-split-squat",
+      "cable-lunge",
+      "dumbbell-lunge"
+    ]
+  },
+  "standing-oblique-twist": {
+    "regressions": [
+      "bicycle-crunch"
+    ],
+    "progressions": [
+      "woodchopper-high-to-low",
+      "woodchopper-low-to-high"
+    ]
+  },
+  "low-step-up-fast": {
+    "regressions": [],
+    "progressions": [
+      "step-up"
+    ]
+  },
+  "no-jump-burpee": {
+    "regressions": [],
+    "progressions": [
+      "burpees"
+    ]
+  },
+  "pop-squat": {
+    "regressions": [
+      "bodyweight-squat"
+    ],
+    "progressions": [
+      "box-jump",
+      "jump-squat"
+    ]
+  },
+  "pogo-hops": {
+    "regressions": [
+      "dot-drill"
+    ],
+    "progressions": []
+  },
+  "neck-cars": {
+    "regressions": [],
+    "progressions": []
+  },
+  "chin-tuck": {
+    "regressions": [],
+    "progressions": []
+  },
+  "upper-trap-levator-stretch": {
+    "regressions": [],
+    "progressions": []
+  },
+  "forearm-pronation-supination": {
+    "regressions": [],
+    "progressions": []
+  },
+  "elbow-cars": {
+    "regressions": [],
+    "progressions": []
+  },
+  "terminal-knee-extension": {
+    "regressions": [],
+    "progressions": [
+      "reverse-nordic-curl"
+    ]
+  },
+  "banded-ankle-eversion-inversion": {
+    "regressions": [],
+    "progressions": []
+  },
+  "arm-circles": {
+    "regressions": [],
+    "progressions": []
+  },
+  "prone-y-t-w-raise": {
+    "regressions": [],
+    "progressions": []
+  },
+  "sleeper-stretch": {
+    "regressions": [],
+    "progressions": []
+  },
+  "thread-the-needle": {
+    "regressions": [
+      "cat-cow-stretch"
+    ],
+    "progressions": [
+      "thoracic-bridge"
+    ]
+  },
+  "open-book-stretch": {
+    "regressions": [
+      "cat-cow-stretch"
+    ],
+    "progressions": [
+      "thoracic-bridge"
+    ]
+  },
+  "quadruped-thoracic-rotation": {
+    "regressions": [],
+    "progressions": []
+  },
+  "pigeon-pose": {
+    "regressions": [
+      "90-90-hip-stretch"
+    ],
+    "progressions": [
+      "deep-squat-hold"
+    ]
+  },
+  "frog-stretch": {
+    "regressions": [],
+    "progressions": []
+  },
+  "standing-hip-cars": {
+    "regressions": [],
+    "progressions": []
+  },
+  "reverse-nordic-curl": {
+    "regressions": [
+      "terminal-knee-extension"
+    ],
+    "progressions": []
+  },
+  "eccentric-step-down": {
+    "regressions": [
+      "step-up"
+    ],
+    "progressions": []
+  },
+  "knee-to-wall-ankle-rock": {
+    "regressions": [
+      "ankle-alphabet"
+    ],
+    "progressions": []
+  },
+  "ankle-alphabet": {
+    "regressions": [],
+    "progressions": [
+      "knee-to-wall-ankle-rock"
+    ]
+  },
+  "childs-pose": {
+    "regressions": [],
+    "progressions": []
+  },
+  "mcgill-curl-up": {
+    "regressions": [
+      "dead-bug"
+    ],
+    "progressions": [
+      "plank"
+    ]
+  },
+  "prone-press-up": {
+    "regressions": [],
+    "progressions": []
+  },
+  "wrist-flexor-stretch": {
+    "regressions": [],
+    "progressions": []
+  },
+  "wrist-extensor-stretch": {
+    "regressions": [],
+    "progressions": []
+  }
+}
