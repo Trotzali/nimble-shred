@@ -106,12 +106,13 @@
         /* INPUTS */
         input, select, textarea {
             width: 100%; min-height: 48px; padding: 12px; background: var(--surface-2);
-            border: 1.5px solid var(--border); border-radius: 8px; color: #fff; font-size: 16px;
+            border: 1px solid var(--line); border-radius: 8px; color: #fff; font-size: 16px;
             margin: 5px 0; transition: border-color 0.15s, box-shadow 0.15s;
         }
+        /* B (v112): clean teal focus ring, no glow/blur */
         input:not([type=range]):focus, select:focus, textarea:focus {
-            border-color: var(--accent); outline: none;
-            box-shadow: 0 0 0 3px var(--accent-weak);   /* the accent-weak ring */
+            border-color: var(--sec); outline: none;
+            box-shadow: 0 0 0 2px var(--accent-weak);
         }
         
         /* LAYOUT */
@@ -288,13 +289,22 @@
         }
         
         /* SLIDER */
+        /* B (v112): teal fill (accent-color + Firefox progress), white knob with teal ring */
         input[type="range"] {
             width: 100%; height: 8px; min-height: auto; padding: 0; margin: 10px 0;
-            border: none; border-radius: 5px; background: var(--surface-2); outline: none; -webkit-appearance: none;
+            border: none; border-radius: 5px; background: var(--surface-2); outline: none;
+            -webkit-appearance: none; accent-color: var(--sec);
         }
-        input[type="range"]::-webkit-slider-thumb { 
-            -webkit-appearance: none; width: 20px; height: 20px; 
-            border-radius: 50%; background: var(--sec); cursor: pointer; 
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 20px; height: 20px;
+            border-radius: 50%; background: #fff; border: 3px solid var(--sec); cursor: pointer;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px; height: 20px; border-radius: 50%;
+            background: #fff; border: 3px solid var(--sec); cursor: pointer;
+        }
+        input[type="range"]::-moz-range-progress {
+            background: var(--sec); height: 8px; border-radius: 5px;
         }
         
         /* GIF SEARCH */
@@ -1234,7 +1244,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v111</span>
+        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v112</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -1308,6 +1318,7 @@
             <h3>Active Session</h3>
             <button class="btn btn-danger btn-small" onclick="endWorkout()">End</button>
         </div>
+        <div id="session-summary"></div>
         <div id="workout-list"></div>
     </div>
 </div>
@@ -3677,6 +3688,7 @@ function _executeQuickStart(type, focus) {
     // Store workout type for warmup
     appState.currentWorkoutType = type;
     appState.currentWorkout = exercises;
+    appState.currentWorkoutMeta = { type: type, equipment: sessionGear, focus: focus || null, count: exercises.length, checkIn: sessionCheckIn }; // A: session summary (record only)
     appState.currentSetIndex = {};
     appState.exerciseDone = {};
     saveAppState();
@@ -3759,6 +3771,7 @@ function _executeWedgeSession(minutes) {
 
     appState.currentWorkoutType = bestType;
     appState.currentWorkout = exercises;
+    appState.currentWorkoutMeta = { type: bestType, equipment: sessionGear, focus: null, count: exercises.length, checkIn: sessionCheckIn }; // A: session summary (record only)
     appState.currentSetIndex = {};
     appState.exerciseDone = {};
     saveAppState();
@@ -4003,9 +4016,35 @@ function startWorkout(exercises) {
 // ========================================
 // PROGRESSIVE SET DISPLAY
 // ========================================
+// A (v112): compact session summary under the Active Session title. Type+count are
+// derived LIVE; equipment/focus/check-in come from currentWorkoutMeta (record-only,
+// stashed at generation). Renders only the fields that exist; degrades cleanly.
+function renderSessionSummary() {
+    var el = document.getElementById('session-summary');
+    if (!el) return;
+    var type = appState.currentWorkoutType;
+    var cw = appState.currentWorkout;
+    var count = (cw && cw.length) ? cw.length : 0;
+    var meta = appState.currentWorkoutMeta || {};
+    if (!type && !count) { el.innerHTML = ''; return; }
+    var parts = [];
+    var equipMap = { gym: 'Full Gym', dumbbell: 'Dumbbells', bodyweight: 'Bodyweight' };
+    if (meta.equipment && equipMap[meta.equipment]) parts.push(equipMap[meta.equipment]);
+    if (meta.focus) parts.push(meta.focus);
+    if (count) parts.push(count + ' moves');
+    if (meta.checkIn && checkInConfig[meta.checkIn] && checkInConfig[meta.checkIn].weightMult < 1) {
+        var pct = Math.round((1 - checkInConfig[meta.checkIn].weightMult) * 100);
+        parts.push(meta.checkIn + ' -' + pct + '%');
+    }
+    var html = '';
+    if (type) html += '<div style="font-family:var(--font-display); font-size:1.05em; font-weight:700; margin-bottom:2px;">' + typeLabel(type) + '</div>';
+    if (parts.length) html += '<div style="font-family:var(--font-mono); font-size:11.5px; letter-spacing:0.04em; text-transform:uppercase; color:var(--text-muted);">' + parts.join(' &middot; ') + '</div>';
+    el.innerHTML = html;
+}
 function renderWorkout(exercises) {
     const container = document.getElementById('workout-list');
     container.innerHTML = '';
+    renderSessionSummary(); // A: keep the session summary in sync with each render
     
     // Track which exercises user has marked done (or has 1+ sets)
     if (!appState.exerciseDone) appState.exerciseDone = {};
@@ -4453,6 +4492,7 @@ function endWorkout() {
         if (qsPanel) qsPanel.style.display = '';
         updateTodaysBanner(); // restore hero banner — ended early, today not done -> shows "Start Workout" (#6)
         appState.currentWorkout = null;
+        appState.currentWorkoutMeta = null; // A: clear session summary on end
         appState.currentSetIndex = {};
         appState.niggleJoints = []; appState.niggleSetAt = null; // B7 clear path 2: session over
         saveAppState();
@@ -4475,6 +4515,7 @@ function finishWorkout() {
     if (qsPanel) qsPanel.style.display = '';
     updateTodaysBanner(); // restore hero banner after session; today now completed -> reflects completion, not "Start Workout" (#6)
     appState.currentWorkout = null;
+    appState.currentWorkoutMeta = null; // A: clear session summary on finish
     appState.currentSetIndex = {};
     appState.niggleJoints = []; appState.niggleSetAt = null; // B7 clear path 2: session over
     saveAppState();
@@ -8535,6 +8576,7 @@ function startAssessment() {
     
     appState.currentWorkoutType = 'assessment';
     appState.currentWorkout = exercises;
+    appState.currentWorkoutMeta = null; // A: assessment has no quick-start selections
     appState.currentSetIndex = {};
     appState.exerciseDone = {};
     saveAppState();
