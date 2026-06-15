@@ -44,7 +44,7 @@
             --sec: #03DAC6; --accent: var(--sec); --accent-weak: rgba(3,218,198,0.30);
             --teal-ink: #04302A; --teal-deep: #0B4A40;
             --amber: #E0A35C; --warn: var(--amber);
-            --success: #00C853; --danger: #CF6679; --radius: 14px;
+            --success: #00C853; --danger: #EF4444; --radius: 14px;
             --font-display: 'Archivo', sans-serif; --font-body: 'Hanken Grotesk', sans-serif; --font-mono: 'JetBrains Mono', monospace;
             /* Retained legacy tokens — OUT OF D1 SCOPE (do not collapse this phase): --primary still has other
                consumers (left intact per "don't hunt further"); workout-type rainbow + --gold/--rest-color untouched. */
@@ -1226,7 +1226,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v120</span>
+        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v121</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -4198,7 +4198,7 @@ function renderWorkout(exercises) {
         // YouTube link — curated video if present, else a YouTube search so every exercise has a working link (#14-B4)
         var ytLink = (media && media.yt) ? media.yt : 'https://www.youtube.com/results?search_query=' + encodeURIComponent(ex.name + ' exercise form');
         var ytHtml = '<a href="' + ytLink + '" target="_blank" rel="noopener" ' +
-            'style="display:inline-block; padding:5px 12px; margin-bottom:10px; background:rgba(255,0,0,0.1); border:1px solid rgba(255,0,0,0.3); border-radius:8px; color:#ff4444; text-decoration:none; font-size:0.8em;">' +
+            'style="display:inline-block; padding:5px 12px; margin-bottom:10px; background:var(--accent-weak); border:1px solid var(--accent); border-radius:8px; color:var(--accent); text-decoration:none; font-size:0.8em;">' +
             '▶ Watch Form Tutorial</a>';
         
         // Exercise description
@@ -6515,7 +6515,7 @@ function viewExerciseDetails(name) {
     const ytLink = ytUrl || ('https://www.youtube.com/results?search_query=' + encodeURIComponent(ex.name + ' exercise form'));
     let ytHtml = `
             <a href="${ytLink}" target="_blank" rel="noopener"
-               style="display:block; text-align:center; padding:10px; margin-bottom:12px; background:rgba(255,0,0,0.1); border:1px solid rgba(255,0,0,0.3); border-radius:10px; color:#ff4444; text-decoration:none; font-weight:bold; font-size:0.95em;">
+               style="display:block; text-align:center; padding:10px; margin-bottom:12px; background:var(--accent-weak); border:1px solid var(--accent); border-radius:10px; color:var(--accent); text-decoration:none; font-weight:bold; font-size:0.95em;">
                 ▶ Watch Form Tutorial on YouTube
             </a>
         `;
