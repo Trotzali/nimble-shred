@@ -114,7 +114,14 @@
             border-color: var(--sec); outline: none;
             box-shadow: 0 0 0 2px var(--accent-weak);
         }
-        
+        /* a11y (v118): keyboard focus ring for interactive controls (native focusables fire now; div-onclick controls need a tabindex follow-up) */
+        .btn:focus-visible, .btn-small:focus-visible, .nav-btn:focus-visible,
+        .chip:focus-visible, .rpe-tag:focus-visible, .day-bubble:focus-visible,
+        .modal-close:focus-visible, .preset-card:focus-visible,
+        .checkin-option:focus-visible, a[href]:focus-visible {
+            outline: 2px solid var(--sec); outline-offset: 2px;
+        }
+
         /* LAYOUT */
         .row { display: flex; gap: 10px; align-items: center; }
         
@@ -131,7 +138,7 @@
             gap: 3px; cursor: pointer; padding: 6px 4px; min-height: 48px; transition: color 0.2s; flex: 1;
         }
         .nav-btn:hover { color: #aaa; }
-        .nav-btn.active { color: var(--accent); }
+        .nav-btn.active { color: var(--accent); font-weight: 700; box-shadow: inset 0 2px 0 var(--accent); } /* a11y: non-colour active cue */
         .nav-icon { font-size: 1.4em; display: flex; align-items: center; justify-content: center; height: 24px; }
         .nav-icon svg { flex-shrink: 0; }
         
@@ -142,6 +149,7 @@
             padding: 10px 18px; background: var(--surface-2); border: 1px solid var(--line);
             border-radius: 10px; font-size: 0.85em; cursor: pointer; font-weight: 500;
             color: #ccc; font-family: inherit; transition: all 0.2s; user-select: none;
+            min-height: 44px; display: inline-flex; align-items: center; justify-content: center; /* a11y: 44px tap target */
         }
         .chip svg { opacity: 0.65; }
         .chip:hover { background: rgba(255,255,255,0.1); border-color: var(--sec); color: var(--sec); }
@@ -290,9 +298,10 @@
             align-items: center; margin-bottom: 20px; 
             padding-bottom: 15px; border-bottom: 2px solid #333;
         }
-        .modal-close { 
-            background: var(--danger); color: white; border: none; 
-            padding: 8px 16px; border-radius: 6px; cursor: pointer; 
+        .modal-close {
+            background: var(--danger); color: white; border: none;
+            padding: 8px 16px; border-radius: 6px; cursor: pointer;
+            min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center; /* a11y: 44px tap target */
         }
         
         /* SLIDER */
@@ -374,7 +383,7 @@
         }
         .metric-label {
             font-size: 0.75em;
-            color: #888;
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 5px;
@@ -417,7 +426,7 @@
             font-size: 0.9em;
         }
         .file-item .file-name { color: #00ff9d; }
-        .file-item .file-size { color: #888; }
+        .file-item .file-size { color: var(--text-muted); }
         .loading {
             display: inline-block;
             width: 20px;
@@ -545,6 +554,7 @@
             font-size: 0.8em;
             cursor: pointer;
             transition: all 0.2s;
+            min-height: 44px; display: inline-flex; align-items: center; justify-content: center; /* a11y: 44px tap target */
         }
         .rpe-tag:hover { border-color: var(--sec); color: var(--sec); background: rgba(3,218,198,0.08); }
         .rpe-tag:active { transform: scale(0.96); }
@@ -558,7 +568,7 @@
         /* GEAR TOGGLES & SECTION HELPERS */
         .gear-row { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
         .section-divider { border-top: 1px solid rgba(255,255,255,0.06); margin-top: 16px; padding-top: 16px; }
-        .section-label { font-size: 0.78em; color: #666; text-align: center; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .section-label { font-size: 0.78em; color: var(--text-muted); text-align: center; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
         
         /* CHECK-IN MODAL */
         .checkin-option {
@@ -574,7 +584,7 @@
         .checkin-option:active { transform: scale(0.97); }
         .checkin-emoji { font-size: 2em; margin-bottom: 6px; }
         .checkin-label { font-weight: 600; font-size: 0.9em; }
-        .checkin-desc { font-size: 0.75em; color: #888; margin-top: 2px; }
+        .checkin-desc { font-size: 0.75em; color: var(--text-muted); margin-top: 2px; }
         
         /* COACH CONSULTATION */
         #consult-modal {
@@ -592,7 +602,7 @@
         }
         .consult-header h3 { font-size: 1em; font-weight: 700; }
         .consult-header .close-btn {
-            background: none; border: none; color: #888; font-size: 1.5em;
+            background: none; border: none; color: var(--text-muted); font-size: 1.5em;
             cursor: pointer; padding: 4px 8px; line-height: 1;
         }
         .consult-progress {
@@ -626,7 +636,7 @@
         }
         .consult-msg.typing {
             background: rgba(255,255,255,0.04); align-self: flex-start;
-            border-bottom-left-radius: 4px; color: #888;
+            border-bottom-left-radius: 4px; color: var(--text-muted);
         }
         .consult-bubbles {
             display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 16px;
@@ -709,7 +719,7 @@
         }
         .rest-timer-bar .timer-label {
             font-size: 0.78em;
-            color: #888;
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -777,7 +787,7 @@
         }
         .history-day-header .day-meta {
             font-size: 0.8em;
-            color: #888;
+            color: var(--text-muted);
         }
         .history-day-header .day-rpe {
             font-size: 0.8em;
@@ -809,7 +819,7 @@
             border-bottom: 1px solid rgba(255,255,255,0.04);
         }
         .history-set-row:last-child { border-bottom: none; }
-        .history-set-row .set-num { color: #666; min-width: 50px; }
+        .history-set-row .set-num { color: var(--text-muted); min-width: 50px; }
         .history-set-row input {
             width: 60px;
             padding: 4px 6px;
@@ -820,7 +830,7 @@
             font-size: 0.9em;
             text-align: center;
         }
-        .history-set-row .set-unit { color: #888; font-size: 0.85em; }
+        .history-set-row .set-unit { color: var(--text-muted); font-size: 0.85em; }
         .history-set-actions button {
             background: none;
             border: none;
@@ -1012,7 +1022,7 @@
         }
         .message-timestamp {
             font-size: 10px;
-            color: #888;
+            color: var(--text-muted);
             margin-top: 4px;
             padding: 0 4px;
         }
@@ -1182,7 +1192,7 @@
             justify-content: center;
             padding: 40px 20px;
             text-align: center;
-            color: #888;
+            color: var(--text-muted);
         }
         .chat-empty-state .emoji {
             font-size: 48px;
@@ -1214,7 +1224,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v117</span>
+        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v118</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -1234,7 +1244,7 @@
                 oninput="updateExerciseCount(this.value)"
                 style="width: 100%;"
             >
-            <div style="display: flex; justify-content: space-between; font-size: 0.75em; color: #888; margin-top: 4px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.75em; color: var(--text-muted); margin-top: 4px;">
                 <span>4 (Quick)</span>
                 <span>10 (Full)</span>
             </div>
@@ -1257,7 +1267,7 @@
             <div class="chip" data-qs-type="cardio" onclick="setQsType(this,'cardio')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Cardio</div>
         </div>
 
-        <div class="section-label" style="margin-top:16px;">Focus <span style="color:#666;font-size:0.8em;">(optional)</span></div>
+        <div class="section-label" style="margin-top:16px;">Focus <span style="color:var(--text-muted);font-size:0.8em;">(optional)</span></div>
         <div class="chip-container" id="qs-focus-chips">
             <div class="chip" data-qs-focus="strength" onclick="setQsFocus(this,'strength')">Strength</div>
             <div class="chip" data-qs-focus="power" onclick="setQsFocus(this,'power')">Power</div>
@@ -1278,7 +1288,7 @@
                     <button class="btn btn-small btn-action" onclick="startWedgeSession(20)">20 min</button>
                     <button class="btn btn-small btn-action" onclick="startWedgeSession(30)">30 min</button>
                 </div>
-                <div style="text-align:center; font-size:0.75em; color:#555; margin-top:6px;">Surprise session, sized to your time • Uses equipment selected above • Skips warmup</div>
+                <div style="text-align:center; font-size:0.75em; color:var(--text-muted); margin-top:6px;">Surprise session, sized to your time • Uses equipment selected above • Skips warmup</div>
             </div>
         </div>
     </div>
@@ -1298,7 +1308,7 @@
     <div style="background:var(--card); border-radius:16px; padding:28px 22px; max-width:400px; width:92%; box-shadow:0 8px 32px rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.06);">
         <div style="text-align:center; margin-bottom:20px;">
             <div style="font-size:1.3em; font-weight:700; margin-bottom:4px;">How are you feeling?</div>
-            <div style="font-size:0.82em; color:#888;">This adjusts your warmup, weights, and rest periods</div>
+            <div style="font-size:0.82em; color:var(--text-muted);">This adjusts your warmup, weights, and rest periods</div>
         </div>
         <div id="checkin-feelings" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
             <div class="checkin-option" onclick="processCheckIn('fresh')">
@@ -1322,13 +1332,13 @@
                 <div class="checkin-desc">Joint or sharp pain</div>
             </div>
         </div>
-        <button id="checkin-skip-btn" class="btn" style="background:rgba(255,255,255,0.06); color:#888; margin-top:14px; font-size:0.85em;" onclick="processCheckIn('skip')">Skip check-in</button>
+        <button id="checkin-skip-btn" class="btn" style="background:rgba(255,255,255,0.06); color:var(--text-muted); margin-top:14px; font-size:0.85em;" onclick="processCheckIn('skip')">Skip check-in</button>
 
         <!-- B7: niggle capture step (revealed when "Something Hurts" is tapped) -->
         <div id="checkin-niggle-step" style="display:none;">
             <div style="text-align:center; margin:4px 0 12px;">
                 <div style="font-weight:700; margin-bottom:4px;">What hurts? (tap any)</div>
-                <div style="font-size:0.78em; color:#888;">I'll exclude exercises that load these joints</div>
+                <div style="font-size:0.78em; color:var(--text-muted);">I'll exclude exercises that load these joints</div>
             </div>
             <div id="niggle-joint-chips" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;">
                 <button class="rpe-tag" data-niggle="neck" onclick="toggleNiggleChip(this)">Neck</button>
@@ -1342,7 +1352,7 @@
                 <button class="rpe-tag" data-niggle="ankle" onclick="toggleNiggleChip(this)">Ankle</button>
             </div>
             <button class="btn btn-main" style="margin-top:14px;" onclick="confirmNiggles(true)">Start — work around it →</button>
-            <button class="btn" style="background:rgba(255,255,255,0.06); color:#888; margin-top:8px; font-size:0.85em;" onclick="confirmNiggles(false)">Just go easy</button>
+            <button class="btn" style="background:rgba(255,255,255,0.06); color:var(--text-muted); margin-top:8px; font-size:0.85em;" onclick="confirmNiggles(false)">Just go easy</button>
         </div>
     </div>
 </div>
@@ -1352,7 +1362,7 @@
     <div style="background:var(--card); border-radius:16px; padding:30px 24px; max-width:380px; width:90%; text-align:center; box-shadow:0 8px 32px rgba(0,0,0,0.5);">
         <div style="font-size:2.5em; margin-bottom:8px;">💪</div>
         <h2 style="margin-bottom:4px; color:var(--primary);">Workout Complete!</h2>
-        <p style="color:#888; font-size:0.9em; margin-bottom:20px;">How hard was that session?</p>
+        <p style="color:var(--text-muted); font-size:0.9em; margin-bottom:20px;">How hard was that session?</p>
         
         <div style="font-size:3em; font-weight:bold; color:var(--sec); margin-bottom:4px;" id="rpe-value-display">5</div>
         <div style="font-size:0.85em; color:#aaa; margin-bottom:16px;" id="rpe-label">Moderate</div>
@@ -1360,7 +1370,7 @@
         <input type="range" id="rpe-slider" min="1" max="10" value="5" 
             oninput="updateRPEDisplay(this.value)"
             style="width:100%; margin-bottom:8px; accent-color:var(--sec);">
-        <div style="display:flex; justify-content:space-between; font-size:0.75em; color:#666; margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; font-size:0.75em; color:var(--text-muted); margin-bottom:20px;">
             <span>1 - Easy</span>
             <span>10 - Max Effort</span>
         </div>
@@ -1375,7 +1385,7 @@
         </div>
         
         <button class="btn btn-main" onclick="submitRPE()" style="width:100%; padding:14px; font-size:1.1em;">Save & Finish</button>
-        <button onclick="skipRPE()" style="background:none; border:none; color:#666; margin-top:12px; cursor:pointer; font-size:0.85em; display:block; width:100%;">Skip</button>
+        <button onclick="skipRPE()" style="background:none; border:none; color:var(--text-muted); margin-top:12px; cursor:pointer; font-size:0.85em; display:block; width:100%;">Skip</button>
     </div>
 </div>
 
@@ -1385,7 +1395,7 @@
     
     <div class="card" style="background: linear-gradient(135deg, rgba(138,143,152,0.1), rgba(3,218,198,0.1)); border: 2px solid var(--primary);">
         <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg> AI Coach Consultation</h3>
-        <p style="margin-bottom: 15px; color: #888;">Chat with your AI coach to build a personalised training plan. Like a real PT session — tell me about your goals, schedule, injuries, and I'll build something that works for you.</p>
+        <p style="margin-bottom: 15px; color: var(--text-muted);">Chat with your AI coach to build a personalised training plan. Like a real PT session — tell me about your goals, schedule, injuries, and I'll build something that works for you.</p>
         <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
             <button class="btn btn-main" onclick="startConsultation()" style="border-radius:10px;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> Start Consultation
@@ -1486,7 +1496,7 @@
     
     <div class="card" style="background: linear-gradient(135deg, rgba(0,124,195,0.1), rgba(0,212,255,0.1)); border: 2px solid #007CC3;">
         <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg> Cloud Sync</h3>
-        <p style="font-size: 0.9em; color: #888; margin-bottom: 15px;">
+        <p style="font-size: 0.9em; color: var(--text-muted); margin-bottom: 15px;">
             Automatic cloud backup for workouts, plans, and Garmin data across all your devices.
         </p>
         <div style="margin-bottom: 10px;">
@@ -1506,7 +1516,7 @@
                 <h3 style="color: var(--sec); margin-bottom: 15px;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><circle cx="12" cy="4" r="2"/><path d="m7 21 3-7"/><path d="M10 14h4l3 7"/><path d="m8 10 4-2 4 2"/></svg> Garmin Auto-Sync
                 </h3>
-                <p style="color: #888; font-size: 14px; margin-bottom: 20px;">
+                <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">
                     Automatically sync your Garmin activities, heart rate, and training data
                 </p>
                 
@@ -1515,7 +1525,7 @@
                         <span style="font-weight: bold;">Status:</span>
                         <span id="garmin-connection-status" style="font-weight: bold;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg> Not Connected</span>
                     </div>
-                    <div id="garmin-last-sync" style="font-size: 12px; color: #888; display: none;"></div>
+                    <div id="garmin-last-sync" style="font-size: 12px; color: var(--text-muted); display: none;"></div>
                 </div>
                 
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
@@ -1544,7 +1554,7 @@
                     </button>
                 </div>
                 
-                <div style="margin-top: 15px; padding: 12px; background: rgba(3, 218, 198, 0.1); border-radius: 6px; font-size: 13px; color: #888;">
+                <div style="margin-top: 15px; padding: 12px; background: rgba(3, 218, 198, 0.1); border-radius: 6px; font-size: 13px; color: var(--text-muted);">
                     <strong style="color: var(--sec);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.2 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg> How it works:</strong>
                     <ul style="margin: 8px 0 0 20px; padding: 0;">
                         <li>Click "Connect Garmin" to authorize access</li>
@@ -1605,7 +1615,7 @@
     
     <div class="card">
         <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Export & Backup</h3>
-        <p style="font-size: 0.9em; color: #888; margin-bottom: 10px;">
+        <p style="font-size: 0.9em; color: var(--text-muted); margin-bottom: 10px;">
             Download backups of your data (works even if Drive isn't connected)
         </p>
         <button class="btn btn-action" onclick="exportAllData()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg> Export All Data</button>
@@ -1615,7 +1625,7 @@
     <div class="card">
         <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Equipment Available</h3>
         
-        <div style="font-size:0.85em; color:#888; margin-bottom:10px;">Quick presets:</div>
+        <div style="font-size:0.85em; color:var(--text-muted); margin-bottom:10px;">Quick presets:</div>
         <div id="equipment-presets"></div>
         
         <div class="section-divider">
@@ -1724,13 +1734,13 @@
         <h2 style="font-size: 2em; margin-bottom: 10px; background: linear-gradient(135deg, #00ff9d, #00d4ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/></svg> Garmin AI Recovery Coach
         </h2>
-        <p style="color: #888; margin-bottom: 30px;">Upload your Garmin data for AI-powered recovery analysis</p>
+        <p style="color: var(--text-muted); margin-bottom: 30px;">Upload your Garmin data for AI-powered recovery analysis</p>
         
         <!-- UPLOAD ZONE -->
         <div class="drop-zone" id="dropZone">
             <div style="margin-bottom: 10px;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg></div>
             <h3>Drop Garmin CSV Files Here</h3>
-            <p style="color: #888; margin-top: 10px;">or click to browse</p>
+            <p style="color: var(--text-muted); margin-top: 10px;">or click to browse</p>
             <input type="file" id="fileInput" multiple accept=".csv" style="display: none;">
         </div>
         
@@ -1766,7 +1776,7 @@
                 <div class="recovery-meter-fill" id="recoveryMeterFill" style="width: 0%"></div>
             </div>
             
-            <p style="text-align: center; color: #888; margin-top: 10px;" id="recoveryStatus">Analyzing...</p>
+            <p style="text-align: center; color: var(--text-muted); margin-top: 10px;" id="recoveryStatus">Analyzing...</p>
         </div>
         
         <!-- METRICS -->
@@ -1996,23 +2006,23 @@
             <div style="display:flex; flex-direction:column; gap:12px; margin:12px 0;">
                 <div style="text-align:center;">
                     <div class="chip" onclick="selectGoal('muscle')">Build Muscle</div>
-                    <div style="font-size:0.75em; color:#888; margin-top:3px;">Higher-volume push/pull/legs to grow size.</div>
+                    <div style="font-size:0.75em; color:var(--text-muted); margin-top:3px;">Higher-volume push/pull/legs to grow size.</div>
                 </div>
                 <div style="text-align:center;">
                     <div class="chip" onclick="selectGoal('strong')">Get Strong</div>
-                    <div style="font-size:0.75em; color:#888; margin-top:3px;">Heavy compound lifts with more recovery.</div>
+                    <div style="font-size:0.75em; color:var(--text-muted); margin-top:3px;">Heavy compound lifts with more recovery.</div>
                 </div>
                 <div style="text-align:center;">
                     <div class="chip" onclick="selectGoal('shred')">Shred Fat</div>
-                    <div style="font-size:0.75em; color:#888; margin-top:3px;">Conditioning + lifts to lean out.</div>
+                    <div style="font-size:0.75em; color:var(--text-muted); margin-top:3px;">Conditioning + lifts to lean out.</div>
                 </div>
                 <div style="text-align:center;">
                     <div class="chip" onclick="selectGoal('move')">Move Better</div>
-                    <div style="font-size:0.75em; color:#888; margin-top:3px;">Mobility &amp; resilience to feel good and bulletproof joints.</div>
+                    <div style="font-size:0.75em; color:var(--text-muted); margin-top:3px;">Mobility &amp; resilience to feel good and bulletproof joints.</div>
                 </div>
                 <div style="text-align:center;">
                     <div class="chip" onclick="selectGoal('balanced')">Balanced</div>
-                    <div style="font-size:0.75em; color:#888; margin-top:3px;">An even mix of strength, conditioning and mobility.</div>
+                    <div style="font-size:0.75em; color:var(--text-muted); margin-top:3px;">An even mix of strength, conditioning and mobility.</div>
                 </div>
             </div>
         </div>
@@ -4033,7 +4043,7 @@ function renderWorkout(exercises) {
     const progress = document.createElement('div');
     progress.style.cssText = 'margin-bottom:15px;';
     progress.innerHTML = `
-        <div style="display:flex; justify-content:space-between; font-size:0.85em; color:#888; margin-bottom:6px;">
+        <div style="display:flex; justify-content:space-between; font-size:0.85em; color:var(--text-muted); margin-bottom:6px;">
             <span>Exercise ${Math.min(currentIdx + 1, exercises.length)} of ${exercises.length}</span>
             <span>${completedCount} complete</span>
         </div>
@@ -4053,7 +4063,7 @@ function renderWorkout(exercises) {
         mini.style.cssText = 'background:rgba(26,77,46,0.3); border:1px solid rgba(3,218,198,0.2); border-radius:8px; padding:10px 14px; margin-bottom:8px; font-size:0.85em; cursor:pointer;';
         mini.onclick = function() { viewExerciseDetails(ex.name); };
         const setsStr = setData.length > 0 ? setData.map(function(s) { return formatSetLine(s, ex.name); }).join(', ') : 'skipped';
-        mini.innerHTML = '<span style="color:var(--sec);">✓</span> <strong>' + ex.name + '</strong> <span style="color:#888;">— ' + setsStr + '</span>';
+        mini.innerHTML = '<span style="color:var(--sec);">✓</span> <strong>' + ex.name + '</strong> <span style="color:var(--text-muted);">— ' + setsStr + '</span>';
         container.appendChild(mini);
     });
     
@@ -4128,13 +4138,13 @@ function renderWorkout(exercises) {
 
             html += '<div style="background:#1a1a2e; border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:10px 12px; margin-bottom:10px;">' +
                 '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">' +
-                    '<span style="font-size:0.8em; color:#888;">Last Session — ' + dateLabel + '</span>' +
-                    '<span style="font-size:0.8em; color:#666;">' + sessTotalLabel + '</span>' +
+                    '<span style="font-size:0.8em; color:var(--text-muted);">Last Session — ' + dateLabel + '</span>' +
+                    '<span style="font-size:0.8em; color:var(--text-muted);">' + sessTotalLabel + '</span>' +
                 '</div>';
             
             ls.sets.forEach(function(s, i) {
                 html += '<div style="display:flex; gap:8px; padding:3px 0; font-size:0.85em; color:#aaa;">' +
-                    '<span style="color:#666; min-width:40px;">Set ' + (i+1) + '</span>' +
+                    '<span style="color:var(--text-muted); min-width:40px;">Set ' + (i+1) + '</span>' +
                     '<span>' + formatSetLine(s, ex.name) + '</span>' +
                 '</div>';
             });
@@ -4143,7 +4153,7 @@ function renderWorkout(exercises) {
             if (logMode === 'weight_reps' && progression.prevSession) {
                 var volDiff = ls.totalVol - progression.prevSession.totalVol;
                 var volPct = progression.prevSession.totalVol > 0 ? Math.round((volDiff / progression.prevSession.totalVol) * 100) : 0;
-                var volColor = volDiff > 0 ? '#03dac6' : volDiff < 0 ? '#f5576c' : '#888';
+                var volColor = volDiff > 0 ? '#03dac6' : volDiff < 0 ? '#f5576c' : 'var(--text-muted)';
                 var volArrow = volDiff > 0 ? '↑' : volDiff < 0 ? '↓' : '→';
                 html += '<div style="margin-top:6px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.06); font-size:0.8em; color:' + volColor + ';">' +
                     volArrow + ' ' + (volDiff > 0 ? '+' : '') + volDiff + ' volume (' + (volPct > 0 ? '+' : '') + volPct + '%) vs previous' +
@@ -4245,11 +4255,11 @@ function renderWorkout(exercises) {
         if (currentIdx + 1 < exercises.length) {
             var upcoming = document.createElement('div');
             upcoming.style.cssText = 'margin-top:12px; padding:10px; background:rgba(255,255,255,0.02); border-radius:8px;';
-            var upHtml = '<div style="font-size:0.8em; color:#666; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Up Next</div>';
+            var upHtml = '<div style="font-size:0.8em; color:var(--text-muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Up Next</div>';
             for (var j = currentIdx + 1; j < exercises.length; j++) {
                 if (!appState.exerciseDone[exercises[j].name]) {
-                    upHtml += '<div style="padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.04); font-size:0.85em; color:#777;">' +
-                        (j + 1) + '. ' + exercises[j].name + ' <span style="color:#555;">• ' + exercises[j].cat.join(', ') + '</span>' +
+                    upHtml += '<div style="padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.04); font-size:0.85em; color:var(--text-muted);">' +
+                        (j + 1) + '. ' + exercises[j].name + ' <span style="color:var(--text-muted);">• ' + exercises[j].cat.join(', ') + '</span>' +
                     '</div>';
                 }
             }
@@ -4691,7 +4701,7 @@ function renderWorkoutHistory() {
                 </div>
                 <div style="display:flex; align-items:center; gap:8px;">
                     ${rpeBadge}
-                    <span style="color:#666; font-size:0.9em;">▸</span>
+                    <span style="color:var(--text-muted); font-size:0.9em;">▸</span>
                 </div>
             </div>
             <div class="history-day-body" id="history-body-${date}">
@@ -4725,7 +4735,7 @@ function renderHistoryExercises(date, exercises) {
             } else {
                 fieldsHtml = `<input type="number" id="hw-${safeId}" value="${set.weight}" step="0.5" title="Weight">
                 <span class="set-unit">${getWeightUnit()}</span>
-                <span style="color:#666;">×</span>
+                <span style="color:var(--text-muted);">×</span>
                 <input type="number" id="hr-${safeId}" value="${set.reps}" step="1" title="Reps">
                 <span class="set-unit">reps</span>`;
             }
@@ -4964,15 +4974,15 @@ function renderWeeklyBriefing() {
     html += '<div style="display:flex; gap:10px; margin-bottom:12px; flex-wrap:wrap;">';
     html += '<div style="flex:1; min-width:100px; background:rgba(255,255,255,0.04); border-radius:8px; padding:10px; text-align:center;">' +
         '<div style="font-size:1.8em; font-weight:bold; color:' + sessionColor + ';">' + sessionsThisWeek + (plannedSessions > 0 ? '/' + plannedSessions : '') + '</div>' +
-        '<div style="font-size:0.75em; color:#888;">Sessions</div>' +
+        '<div style="font-size:0.75em; color:var(--text-muted);">Sessions</div>' +
     '</div>';
     
     // Volume
     var volDiff = lastWeekVolume > 0 ? Math.round(((weekVolume - lastWeekVolume) / lastWeekVolume) * 100) : 0;
-    var volColor = volDiff > 0 ? '#03dac6' : volDiff < 0 ? '#f5576c' : '#888';
+    var volColor = volDiff > 0 ? '#03dac6' : volDiff < 0 ? '#f5576c' : 'var(--text-muted)';
     html += '<div style="flex:1; min-width:100px; background:rgba(255,255,255,0.04); border-radius:8px; padding:10px; text-align:center;">' +
         '<div style="font-size:1.8em; font-weight:bold; color:var(--sec);">' + (weekVolume > 1000 ? Math.round(weekVolume / 1000) + 'k' : weekVolume) + '</div>' +
-        '<div style="font-size:0.75em; color:#888;">Volume' + (lastWeekVolume > 0 ? ' <span style="color:' + volColor + ';">' + (volDiff > 0 ? '+' : '') + volDiff + '%</span>' : '') + '</div>' +
+        '<div style="font-size:0.75em; color:var(--text-muted);">Volume' + (lastWeekVolume > 0 ? ' <span style="color:' + volColor + ';">' + (volDiff > 0 ? '+' : '') + volDiff + '%</span>' : '') + '</div>' +
     '</div>';
     
     // RPE
@@ -4980,14 +4990,14 @@ function renderWeeklyBriefing() {
         var rpeHue = Math.round(120 - (avgRPE - 1) * (120 / 9));
         html += '<div style="flex:1; min-width:100px; background:rgba(255,255,255,0.04); border-radius:8px; padding:10px; text-align:center;">' +
             '<div style="font-size:1.8em; font-weight:bold; color:hsl(' + rpeHue + ',80%,55%);">' + avgRPE + '</div>' +
-            '<div style="font-size:0.75em; color:#888;">Avg RPE</div>' +
+            '<div style="font-size:0.75em; color:var(--text-muted);">Avg RPE</div>' +
         '</div>';
     }
     
     // Sets
     html += '<div style="flex:1; min-width:100px; background:rgba(255,255,255,0.04); border-radius:8px; padding:10px; text-align:center;">' +
         '<div style="font-size:1.8em; font-weight:bold; color:var(--primary);">' + weekSets + '</div>' +
-        '<div style="font-size:0.75em; color:#888;">Total Sets</div>' +
+        '<div style="font-size:0.75em; color:var(--text-muted);">Total Sets</div>' +
     '</div>';
     html += '</div>';
     
@@ -4995,7 +5005,7 @@ function renderWeeklyBriefing() {
     if (progressions.length > 0) {
         html += '<div style="margin-bottom:8px;">';
         progressions.slice(0, 3).forEach(function(p) {
-            html += '<div style="font-size:0.85em; padding:4px 0; color:#03dac6;">↑ ' + p.name + ' <span style="color:#888;">+' + p.pct + '% volume</span></div>';
+            html += '<div style="font-size:0.85em; padding:4px 0; color:#03dac6;">↑ ' + p.name + ' <span style="color:var(--text-muted);">+' + p.pct + '% volume</span></div>';
         });
         html += '</div>';
     }
@@ -5004,14 +5014,14 @@ function renderWeeklyBriefing() {
     if (stalls.length > 0) {
         html += '<div style="margin-bottom:8px;">';
         stalls.slice(0, 2).forEach(function(s) {
-            html += '<div style="font-size:0.85em; padding:4px 0; color:#f5576c;">↓ ' + s.name + ' <span style="color:#888;">' + s.pct + '% volume</span></div>';
+            html += '<div style="font-size:0.85em; padding:4px 0; color:#f5576c;">↓ ' + s.name + ' <span style="color:var(--text-muted);">' + s.pct + '% volume</span></div>';
         });
         html += '</div>';
     }
     
     // Last week comparison
     if (lastWeekSessions > 0) {
-        html += '<div style="font-size:0.8em; color:#666; border-top:1px solid rgba(255,255,255,0.06); padding-top:8px; margin-top:4px;">' +
+        html += '<div style="font-size:0.8em; color:var(--text-muted); border-top:1px solid rgba(255,255,255,0.06); padding-top:8px; margin-top:4px;">' +
             'Last week: ' + lastWeekSessions + ' sessions, ' + (lastWeekVolume > 1000 ? Math.round(lastWeekVolume / 1000) + 'k' : lastWeekVolume) + ' volume' +
         '</div>';
     }
@@ -5160,7 +5170,7 @@ function renderDeloadDetective() {
             var pct = maxVol > 0 ? Math.round((w.volume / maxVol) * 100) : 0;
             var barColor = w.weekNum === 0 ? 'var(--sec)' : 'rgba(255,255,255,0.15)';
             html += '<div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; font-size:0.8em;">' +
-                '<span style="min-width:75px; color:#888;">' + w.label + '</span>' +
+                '<span style="min-width:75px; color:var(--text-muted);">' + w.label + '</span>' +
                 '<div style="flex:1; background:rgba(255,255,255,0.05); border-radius:4px; height:16px; overflow:hidden;">' +
                     '<div style="width:' + pct + '%; height:100%; background:' + barColor + '; border-radius:4px; transition:width 0.3s;"></div>' +
                 '</div>' +
@@ -5266,7 +5276,7 @@ function renderRecoveryScorecard() {
     card.style.display = 'block';
     
     var html = '<div style="text-align:center; margin-bottom:14px;">' +
-        '<div style="font-size:0.78em; color:#666; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Recovery Grade</div>' +
+        '<div style="font-size:0.78em; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Recovery Grade</div>' +
         '<div style="font-size:4em; font-weight:800; color:' + gradeColor + '; line-height:1;">' + grade + '</div>' +
         '<div style="font-size:0.85em; color:' + gradeColor + '; margin-top:4px;">' + gradeLabel + '</div>' +
     '</div>';
@@ -5281,25 +5291,25 @@ function renderRecoveryScorecard() {
     
     html += '<div style="background:rgba(255,255,255,0.04); border-radius:8px; padding:10px; text-align:center;">' +
         '<div style="font-size:1.4em; font-weight:bold; color:' + (restDaysLast7 >= 2 ? '#03dac6' : '#f5576c') + ';">' + restDaysLast7 + '</div>' +
-        '<div style="font-size:0.75em; color:#888;">Rest days (7d)</div>' +
+        '<div style="font-size:0.75em; color:var(--text-muted);">Rest days (7d)</div>' +
     '</div>';
     
     html += '<div style="background:rgba(255,255,255,0.04); border-radius:8px; padding:10px; text-align:center;">' +
         '<div style="font-size:1.4em; font-weight:bold; color:' + (daysSinceRest < 4 ? '#03dac6' : '#f5576c') + ';">' + daysSinceRest + '</div>' +
-        '<div style="font-size:0.75em; color:#888;">Days in a row</div>' +
+        '<div style="font-size:0.75em; color:var(--text-muted);">Days in a row</div>' +
     '</div>';
     
     if (avgRPE) {
         var rpeColor = avgRPE <= 7 ? '#03dac6' : avgRPE <= 8.5 ? '#f0c674' : '#f5576c';
         html += '<div style="background:rgba(255,255,255,0.04); border-radius:8px; padding:10px; text-align:center;">' +
             '<div style="font-size:1.4em; font-weight:bold; color:' + rpeColor + ';">' + avgRPE.toFixed(1) + '</div>' +
-            '<div style="font-size:0.75em; color:#888;">Avg RPE (7d)</div>' +
+            '<div style="font-size:0.75em; color:var(--text-muted);">Avg RPE (7d)</div>' +
         '</div>';
     }
     
     html += '<div style="background:rgba(255,255,255,0.04); border-radius:8px; padding:10px; text-align:center;">' +
         '<div style="font-size:1.4em; font-weight:bold; color:' + (painFlags === 0 ? '#03dac6' : '#f5576c') + ';">' + painFlags + '</div>' +
-        '<div style="font-size:0.75em; color:#888;">Pain reports</div>' +
+        '<div style="font-size:0.75em; color:var(--text-muted);">Pain reports</div>' +
     '</div>';
     
     html += '</div>';
@@ -5462,7 +5472,7 @@ function renderMechanic() {
         '<span style="font-size:1.5em;">🔧</span>' +
         '<div>' +
             '<strong style="color:var(--sec);">The Mechanic</strong>' +
-            '<div style="font-size:0.8em; color:#888;">Pattern detection — potential issues found</div>' +
+            '<div style="font-size:0.8em; color:var(--text-muted);">Pattern detection — potential issues found</div>' +
         '</div>' +
     '</div>';
     
@@ -5470,7 +5480,7 @@ function renderMechanic() {
         html += '<div style="background:rgba(255,255,255,0.03); border-left:3px solid ' + a.color + '; border-radius:0 8px 8px 0; padding:10px 12px; margin-bottom:8px;">' +
             '<div style="font-size:0.85em; font-weight:600; color:#ddd;">' + a.icon + ' ' + a.exercise + '</div>' +
             '<div style="font-size:0.8em; color:#aaa; margin-top:2px;">' + a.msg + '</div>' +
-            '<div style="font-size:0.78em; color:#777; margin-top:4px; font-style:italic;">' + a.advice + '</div>' +
+            '<div style="font-size:0.78em; color:var(--text-muted); margin-top:4px; font-style:italic;">' + a.advice + '</div>' +
         '</div>';
     });
     
@@ -5618,7 +5628,7 @@ function renderBuilderExerciseList() {
     
     if (exercises.length === 0) {
         const emptyEl = document.createElement('div');
-        emptyEl.style.cssText = 'text-align:center; padding:20px; color:#888;';
+        emptyEl.style.cssText = 'text-align:center; padding:20px; color:var(--text-muted);';
         emptyEl.innerHTML = 'No exercises match this exact combination.<br>Try removing a filter.';
         container.appendChild(emptyEl);
     }
@@ -5791,7 +5801,7 @@ function renderEncyclopedia() {
     
     if (exercises.length === 0) {
         const emptyEl = document.createElement('div');
-        emptyEl.style.cssText = 'text-align:center; padding:30px; color:#888;';
+        emptyEl.style.cssText = 'text-align:center; padding:30px; color:var(--text-muted);';
         emptyEl.innerHTML = 'No exercises match this combination.<br>Try unchecking some filters.';
         container.appendChild(emptyEl);
     }
@@ -5849,8 +5859,8 @@ function renderPlanOverview() {
             var border = isCurrent ? '1px solid rgba(3,218,198,0.3)' : '1px solid rgba(255,255,255,0.06)';
             var dot = isCurrent ? '🟢' : '⚪';
             html += '<div style="background:' + bg + '; border:' + border + '; border-radius:8px; padding:10px 12px; margin-bottom:6px;">' +
-                '<div style="font-size:0.85em; font-weight:600;">' + dot + ' ' + phase.name + (phase.weeks ? ' <span style="color:#888; font-weight:400;">(Weeks ' + phase.weeks + ')</span>' : '') + '</div>' +
-                (phase.focus ? '<div style="font-size:0.78em; color:#888; margin-top:2px;">' + phase.focus + '</div>' : '') +
+                '<div style="font-size:0.85em; font-weight:600;">' + dot + ' ' + phase.name + (phase.weeks ? ' <span style="color:var(--text-muted); font-weight:400;">(Weeks ' + phase.weeks + ')</span>' : '') + '</div>' +
+                (phase.focus ? '<div style="font-size:0.78em; color:var(--text-muted); margin-top:2px;">' + phase.focus + '</div>' : '') +
             '</div>';
         });
         html += '</div>';
@@ -5868,7 +5878,7 @@ function renderPlanOverview() {
             var type = schedule[i] || 'rest';
             var col = typeColors[type] || '#555';
             html += '<div onclick="editDay(' + i + ')" style="cursor:pointer; text-align:center; flex:1; min-width:38px; padding:6px 2px; background:rgba(255,255,255,0.03); border-radius:6px; border-bottom:2px solid ' + col + ';">' +
-                '<div style="font-size:0.65em; color:#888;">' + name + '</div>' +
+                '<div style="font-size:0.65em; color:var(--text-muted);">' + name + '</div>' +
                 '<div style="font-size:0.72em; color:' + col + '; font-weight:600;">' + typeLabel(type) + '</div>' +
             '</div>';
         });
@@ -5879,7 +5889,7 @@ function renderPlanOverview() {
     var sp = JSON.parse(localStorage.getItem('strengthProfile')) || {};
     if (Object.keys(sp).length > 0) {
         html += '<div style="margin-top:12px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.06);">' +
-            '<div style="font-size:0.75em; color:#555; margin-bottom:8px;">STRENGTH PROFILE (from assessment)</div>';
+            '<div style="font-size:0.75em; color:var(--text-muted); margin-bottom:8px;">STRENGTH PROFILE (from assessment)</div>';
         
         var patternLabels = { h_push: 'Horizontal Push', v_push: 'Vertical Push', h_pull: 'Horizontal Pull', v_pull: 'Vertical Pull', squat: 'Squat', hinge: 'Hip Hinge' };
         var maxWeight = 0;
@@ -5897,7 +5907,7 @@ function renderPlanOverview() {
             '</div>';
         });
         
-        html += '<div style="font-size:0.7em; color:#555; margin-top:4px;">Tested: ' + (sp[Object.keys(sp)[0]].date || 'Unknown') + '</div>';
+        html += '<div style="font-size:0.7em; color:var(--text-muted); margin-top:4px;">Tested: ' + (sp[Object.keys(sp)[0]].date || 'Unknown') + '</div>';
         html += '</div>';
     }
     
@@ -5905,7 +5915,7 @@ function renderPlanOverview() {
     var profile = JSON.parse(localStorage.getItem('consultProfile')) || null;
     if (profile && Object.keys(profile).length > 0) {
         html += '<div style="margin-top:12px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.06);">' +
-            '<div style="font-size:0.75em; color:#555; margin-bottom:6px;">CONSULTATION PROFILE</div>' +
+            '<div style="font-size:0.75em; color:var(--text-muted); margin-bottom:6px;">CONSULTATION PROFILE</div>' +
             '<div style="display:flex; flex-wrap:wrap; gap:4px;">';
         if (profile.goal) html += '<span class="profile-tag">🎯 ' + profile.goal + '</span>';
         if (profile.age) html += '<span class="profile-tag">🎂 ' + profile.age + '</span>';
@@ -6413,7 +6423,7 @@ function viewExerciseDetails(name) {
             <h4 style="color:#ff6b35;margin-bottom:8px">Muscles Targeted</h4>
             <p>${ex.guide.muscles.join(', ')}</p>
         </div>
-        <div style="margin-top:8px;color:#888;font-size:0.85em">
+        <div style="margin-top:8px;color:var(--text-muted);font-size:0.85em">
             <strong>Category:</strong> ${ex.cat.join(', ')}<br>
             <strong>Equipment:</strong> ${ex.equip}<br>
             <strong>Type:</strong> ${ex.type}
@@ -6585,7 +6595,7 @@ function renderSavedProfiles() {
     var keys = Object.keys(profiles);
     
     if (keys.length === 0) {
-        container.innerHTML = '<div style="font-size:0.8em; color:#555;">No saved locations yet</div>';
+        container.innerHTML = '<div style="font-size:0.8em; color:var(--text-muted);">No saved locations yet</div>';
         return;
     }
     
@@ -6595,7 +6605,7 @@ function renderSavedProfiles() {
         html += '<div style="display:flex; justify-content:space-between; align-items:center; padding:8px; background:rgba(255,255,255,0.04); border-radius:8px; margin-bottom:6px;">' +
             '<div style="cursor:pointer; flex:1;" onclick="loadEquipmentProfile(\'' + name.replace(/'/g, "\\'") + '\')">' +
                 '<strong style="font-size:0.85em;">' + name + '</strong>' +
-                '<div style="font-size:0.75em; color:#888;">' + equipList + '</div>' +
+                '<div style="font-size:0.75em; color:var(--text-muted);">' + equipList + '</div>' +
             '</div>' +
             '<button onclick="deleteEquipmentProfile(\'' + name.replace(/'/g, "\\'") + '\')" style="background:none; border:none; color:#f5576c; cursor:pointer; padding:4px 8px;">✕</button>' +
         '</div>';
@@ -8541,7 +8551,7 @@ function patchRenderWorkoutForAssessment() {
         var progDiv = document.createElement('div');
         progDiv.className = 'assess-progress-wrap';
         progDiv.style.cssText = 'margin-bottom:12px;';
-        progDiv.innerHTML = '<div style="display:flex; justify-content:space-between; font-size:0.8em; color:#888; margin-bottom:4px;">' +
+        progDiv.innerHTML = '<div style="display:flex; justify-content:space-between; font-size:0.8em; color:var(--text-muted); margin-bottom:4px;">' +
             '<span>Fitness Assessment</span><span>' + done + '/' + total + ' exercises</span></div>' +
             '<div class="sp-bar-bg"><div class="sp-bar-fill" style="width:' + Math.round((done / total) * 100) + '%"></div></div>';
         container.insertBefore(progDiv, container.firstChild);
