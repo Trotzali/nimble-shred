@@ -247,10 +247,12 @@
             background: #333; border-left-color: var(--primary); 
             transform: translateX(5px);
         }
-        .exercise-list-item.selected { 
-            background: rgba(138,143,152,0.2); 
-            border-left-color: var(--primary); 
+        .exercise-list-item.selected {
+            background: rgba(3,218,198,0.15);
+            border-left-color: var(--sec);
+            border-left-width: 4px;
         }
+        .exercise-list-item.selected strong { color: var(--sec); }
         
         /* ENCYCLOPEDIA */
         .encyclopedia-section { 
@@ -1224,7 +1226,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v119</span>
+        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v120</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -1890,6 +1892,7 @@
         
         <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #333;">
             <p class="text-muted">Selected: <span id="selected-count">0</span> exercises</p>
+            <div id="builder-selected-list" style="display:flex; flex-wrap:wrap; gap:6px; margin:6px 0 10px;"></div>
             <button class="btn btn-main" onclick="startCustomWorkout()">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><polygon points="5 3 19 12 5 21 5 3"/></svg> Start Custom Workout
             </button>
@@ -5783,6 +5786,20 @@ function updateSelectedCount() {
     if(countEl) {
         countEl.textContent = appState.selectedExercises.length;
     }
+    // v120: paint a chip per selected exercise (visible regardless of the active filter)
+    const list = document.getElementById('builder-selected-list');
+    if (list) list.innerHTML = appState.selectedExercises.map(function(e) {
+        var safe = e.name.replace(/'/g, "\\'");
+        return '<span class="profile-tag" style="cursor:pointer;" onclick="removeSelectedExercise(\'' + safe + '\')">' + e.name + ' &times;</span>';
+    }).join('');
+}
+
+// v120: chip-x deselect (also reachable by re-clicking the highlighted row)
+function removeSelectedExercise(name) {
+    const i = appState.selectedExercises.findIndex(function(e) { return e.name === name; });
+    if (i > -1) appState.selectedExercises.splice(i, 1);
+    renderBuilderExerciseList();   // drop the row highlight
+    updateSelectedCount();         // repaint count + chips
 }
 
 function startCustomWorkout() {
