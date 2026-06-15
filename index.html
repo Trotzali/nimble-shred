@@ -164,10 +164,20 @@
             border-left: 3px solid var(--success); 
             display: flex; justify-content: space-between;
         }
-        .set-active { 
-            background: var(--surface-2); padding: 12px; border-radius: 6px;
-            border: 2px solid var(--sec); margin: 8px 0;
-            box-shadow: 0 0 10px rgba(3,218,198,0.2);
+        /* v115: set-log row reads like an instrument - surface-2 with a subtle teal left accent (no glow, no type colour) */
+        .set-active {
+            background: var(--surface-2); padding: 14px 16px; border-radius: 8px;
+            border: 1px solid var(--line); border-left: 3px solid var(--sec); margin: 8px 0;
+        }
+        .set-active .set-eyebrow {
+            display: block; font-size: 11px; text-transform: uppercase;
+            letter-spacing: 0.08em; color: var(--text-muted); font-weight: 600; margin-bottom: 3px;
+        }
+        .set-active .set-num {
+            font-family: var(--font-mono); font-size: 1.5em; font-weight: 600; color: var(--text);
+        }
+        .set-active input[type="number"] {
+            font-family: var(--font-mono); font-size: 1.5em; font-weight: 600; text-align: center;
         }
         .progression-badge {
             background: var(--success); color: #000; padding: 4px 8px;
@@ -1247,7 +1257,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v114</span>
+        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v115</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -4231,32 +4241,32 @@ function renderWorkout(exercises) {
         if (logMode === 'time') {
             inputsHtml = '<div class="row" style="margin-top:10px;">' +
                     '<div style="flex:1;">' +
-                        '<small class="text-muted">Duration (seconds)</small>' +
+                        '<span class="set-eyebrow">Duration (sec)</span>' +
                         '<input type="number" id="seconds-' + idx + '" value="' + suggestedSeconds + '" step="5" min="0">' +
                     '</div>' +
                 '</div>';
         } else if (logMode === 'reps') {
             inputsHtml = '<div class="row" style="margin-top:10px;">' +
                     '<div style="flex:1;">' +
-                        '<small class="text-muted">Reps</small>' +
+                        '<span class="set-eyebrow">Reps</span>' +
                         '<input type="number" id="reps-' + idx + '" value="' + suggestedReps + '" step="1">' +
                     '</div>' +
                 '</div>';
         } else {
             inputsHtml = '<div class="row" style="margin-top:10px;">' +
                     '<div style="flex:1;">' +
-                        '<small class="text-muted">Weight (' + getWeightUnit() + ')</small>' +
+                        '<span class="set-eyebrow">Weight (' + getWeightUnit() + ')</span>' +
                         '<input type="number" id="weight-' + idx + '" value="' + suggestedWeight + '" step="2.5">' +
                     '</div>' +
                     '<div style="flex:1;">' +
-                        '<small class="text-muted">Reps</small>' +
+                        '<span class="set-eyebrow">Reps</span>' +
                         '<input type="number" id="reps-' + idx + '" value="' + suggestedReps + '" step="1">' +
                     '</div>' +
                 '</div>';
         }
 
         html += '<div class="set-active">' +
-            '<strong>Set ' + (setsCompleted + 1) + '</strong>' +
+            '<div style="margin-bottom:10px;"><span class="set-eyebrow">Set</span><span class="set-num">' + (setsCompleted + 1) + '</span></div>' +
             inputsHtml +
             '<button class="btn btn-main" onclick="logSet(\'' + safeName + '\', ' + idx + ')">' +
                 '✓ Log Set' +
