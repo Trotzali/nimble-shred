@@ -1224,7 +1224,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v118</span>
+        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v119</span>
     </div>
     
     <div class="card" id="quickstart-panel">
@@ -3344,6 +3344,108 @@ function loadPreloadedImages() {
     console.log('✅ Pre-loaded ' + Object.keys(exerciseMedia).length + ' exercise media entries');
 }
 
+// ── AS-1 (v119): silent assessment profile store ─────────────────────────────
+// Additive lane, separate from nimbleState_v45. SCHEMA + STORAGE + silent assembly
+// ONLY — nothing reads nimbleProfile_v1 back (getProfile has zero call sites). Zero
+// behavioural diff: the app behaves identically with or without this store.
+var PROFILE_KEY = 'nimbleProfile_v1';
+var PROFILE_SCHEMA_VERSION = 1;
+
+function defaultProfile() {
+    return {
+        schemaVersion: PROFILE_SCHEMA_VERSION, source: 'default', updatedAt: null,
+        goalPrimary: null, goalSecondary: null, trainingAge: null, yearsTraining: null,
+        age: null, sex: 'unspecified', equipment: [], daysPerWeek: null, sessionMinutes: null,
+        niggles: [], sport: 'none', sportContext: null, strengthProfile: null,
+        dislikes: [], varietyBias: 0.5
+    };
+}
+
+// migration hook — v1 is a no-op; bump PROFILE_SCHEMA_VERSION + add a branch later.
+function migrateProfile(p) {
+    // if (p.schemaVersion < 2) { /* reshape */ p.schemaVersion = 2; }
+    return p;
+}
+
+// null-safe read: missing/corrupt -> default; old version -> migrate; ALWAYS a complete object.
+function readProfile() {
+    var base = defaultProfile();
+    try {
+        var raw = localStorage.getItem(PROFILE_KEY);
+        if (!raw) return base;
+        var p = JSON.parse(raw);
+        if (!p || typeof p !== 'object') return base;
+        p = migrateProfile(p);
+        return Object.assign(base, p);   // backfill any missing keys
+    } catch (e) { return base; }
+}
+
+// additive merge write: stamps version + updatedAt; never throws.
+function writeProfile(patch) {
+    try {
+        var next = Object.assign(readProfile(), patch || {});
+        next.schemaVersion = PROFILE_SCHEMA_VERSION;
+        next.updatedAt = new Date().toISOString();
+        localStorage.setItem(PROFILE_KEY, JSON.stringify(next));
+        return next;
+    } catch (e) { return readProfile(); }
+}
+
+function getProfile() { return readProfile(); }   // silent accessor for later phases (ZERO consumers in AS-1)
+
+function safeJSON(s) { try { return s ? JSON.parse(s) : null; } catch (e) { return null; } }
+
+// free-text legacy -> schema enum; unknown -> null.
+function mapGoal(t) { t = (t || '').toLowerCase();
+    if (/muscle|hypertroph|size|tone/.test(t)) return 'hypertrophy';
+    if (/strong|strength|1rm|heav/.test(t)) return 'strength';
+    if (/power|explos|speed|athlet/.test(t)) return 'power';
+    if (/fat|lean|cut|weight loss|shred/.test(t)) return 'fatloss';
+    if (/resilien|injur|mobility|prehab|pain/.test(t)) return 'resilience';
+    if (/condition|cardio|endur|fitness/.test(t)) return 'conditioning';
+    return null; }
+function mapTrainingAge(t) { t = (t || '').toLowerCase();
+    if (/nov|begin|new|start/.test(t)) return 'novice';
+    if (/adv|expert|elite|year/.test(t)) return 'advanced';
+    if (/inter|some|moderate/.test(t)) return 'intermediate';
+    return null; }
+function mapEquipment(v) { var s = (Array.isArray(v) ? v.join(' ') : String(v || '')).toLowerCase(); var out = [];
+    if (/cable/.test(s)) out.push('cable');
+    if (/dumbbell|db/.test(s)) out.push('dumbbell');
+    if (/barbell|bar\b/.test(s)) out.push('barbell');
+    if (/body|calisthenic|none|home/.test(s)) out.push('bodyweight');
+    if (/machine|gym/.test(s)) out.push('machine');
+    return out; }
+
+// read-only assembler: maps the existing stores into nimbleProfile_v1. NON-destructive —
+// reads consultProfile / strengthProfile / appState.niggleJoints, writes ONLY the profile key.
+// strengthProfile is MIRRORED (LS strengthProfile stays authoritative); niggleJoints is only
+// read to seed (no write-back, so the 3-day-expiry behaviour is untouched).
+function syncProfileFromLegacy() {
+    var consult = safeJSON(localStorage.getItem('consultProfile'));
+    var strength = safeJSON(localStorage.getItem('strengthProfile'));
+    var nj = (typeof appState !== 'undefined' && appState && appState.niggleJoints) || [];
+    var setAt = (typeof appState !== 'undefined' && appState && appState.niggleSetAt) || null;
+
+    var patch = {};
+    if (consult) {
+        if (consult.goal) patch.goalPrimary = mapGoal(consult.goal);
+        if (consult.experience) patch.trainingAge = mapTrainingAge(consult.experience);
+        if (consult.age != null) patch.age = parseInt(consult.age) || null;
+        if (consult.days != null) patch.daysPerWeek = parseInt(consult.days) || null;
+        if (consult.timePerSession) patch.sessionMinutes = parseInt(consult.timePerSession) || null;
+        if (consult.equipment) patch.equipment = mapEquipment(consult.equipment);
+        patch.source = 'assessment';
+    }
+    if (strength && Object.keys(strength).length) patch.strengthProfile = strength;  // mirror, not move
+    if (nj.length) patch.niggles = nj.map(function (j) {
+        return { joint: j, status: 'current', severity: null, note: null, setAt: setAt };  // severity unknown from check-in
+    });
+    if (Object.keys(patch).length) writeProfile(patch);
+    return getProfile();
+}
+// ── end AS-1 ─────────────────────────────────────────────────────────────────
+
 window.onload = () => {
     loadAppState();
     loadPreloadedImages(); // ← Load exercise GIFs
@@ -3360,6 +3462,7 @@ window.onload = () => {
         appState.niggleSetAt = null;
         saveAppState();
     }
+    syncProfileFromLegacy(); // AS-1 (v119): silent profile assembly -> writes nimbleProfile_v1 only; nothing reads it back
 };
 
 function loadAppState() {
