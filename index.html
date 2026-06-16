@@ -1226,7 +1226,7 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v122</span>
+        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v123</span>
     </div>
     
     <!-- v122 P1: Recommended-today card (additive; populated by renderRecommendation(); does not touch the hero) -->
@@ -1257,7 +1257,7 @@
         
         <div class="section-label">Equipment</div>
         <div class="gear-row" id="session-gear-toggles">
-            <button class="chip active" onclick="setSessionGear(this,'gym')" data-session-gear="gym">🏋️ Full Gym</button>
+            <button class="chip" onclick="setSessionGear(this,'gym')" data-session-gear="gym">🏋️ Full Gym</button>
             <button class="chip" onclick="setSessionGear(this,'cable')" data-session-gear="cable">🔌 Cables</button>
             <button class="chip" onclick="setSessionGear(this,'dumbbell')" data-session-gear="dumbbell">🔩 Dumbbells</button>
             <button class="chip" onclick="setSessionGear(this,'bodyweight')" data-session-gear="bodyweight">🤸 Bodyweight</button>
@@ -3540,7 +3540,7 @@ function switchTab(tab) {
 // ========================================
 // WORKOUT GENERATION
 // ========================================
-var sessionGear = 'gym'; // default for main workouts
+var sessionGear = 'auto'; // P2: AUTO = defer to the Settings equipment preset; explicit gear-chip tap overrides for the session
 var sessionCheckIn = 'skip'; // fresh | normal | tired | pain | skip
 var restTimerInterval = null;
 var restTimerSeconds = 0;
@@ -3706,6 +3706,7 @@ function setSessionGear(btn, gear) {
 }
 
 function applySessionGear(gear) {
+    if (gear === 'auto') return; // P2: AUTO -> keep the Settings preset already in appState.equipment/customEquipment (no gym override)
     if (gear === 'bodyweight') {
         appState.equipment = 'custom';
         appState.customEquipment = ['Bodyweight'];
@@ -3795,7 +3796,7 @@ function recommendType() {
 function gearFromProfile() {
     var p = getProfile() || {};
     var tokens = mapEquipment(p.equipment);                 // null-safe; [] -> []
-    if (!tokens.length) return 'gym';                       // default when empty
+    if (!tokens.length) return 'auto';                      // P2: empty profile -> defer to the Settings preset (no hardcoded gym)
     if (tokens.length === 1 && tokens[0] === 'bodyweight') return 'bodyweight';
     if (tokens.indexOf('cable') !== -1) return 'cable';
     if (tokens.indexOf('dumbbell') !== -1) return 'dumbbell';
@@ -3815,7 +3816,7 @@ function recommendSession() {
 // above #quickstart-panel; one-tap Start applies the rec into the EXISTING
 // chip-driven state and calls the EXISTING startConfiguredWorkout().
 // ============================================================================
-var REC_GEAR_LABEL = { gym: 'Full Gym', cable: 'Cables', dumbbell: 'Dumbbells', bodyweight: 'Bodyweight' };
+var REC_GEAR_LABEL = { gym: 'Full Gym', cable: 'Cables', dumbbell: 'Dumbbells', bodyweight: 'Bodyweight', auto: 'Your equipment' };
 
 function renderRecommendation() {
     var el = document.getElementById('recommended-card');
@@ -3972,7 +3973,7 @@ function _executeWedgeSession(minutes) {
     
     startWorkout(exercises);
     
-    var gearLabel = sessionGear === 'bodyweight' ? 'bodyweight only' : sessionGear === 'dumbbell' ? 'dumbbells' : 'full gym';
+    var gearLabel = sessionGear === 'bodyweight' ? 'bodyweight only' : sessionGear === 'dumbbell' ? 'dumbbells' : sessionGear === 'cable' ? 'cables' : sessionGear === 'auto' ? 'your saved equipment' : 'full gym';
     speak(minutes + ' minute wedge session! ' + exerciseCount + ' exercises, ' + bestType + ' focus, ' + gearLabel + '. Go!');
     showNotification('⏱ ' + minutes + 'min Wedge: ' + bestType.toUpperCase() + ' — ' + exerciseCount + ' exercises (' + gearLabel + ')', 'success');
 }
