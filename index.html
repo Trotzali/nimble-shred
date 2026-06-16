@@ -1226,9 +1226,12 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v121</span>
+        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v122</span>
     </div>
     
+    <!-- v122 P1: Recommended-today card (additive; populated by renderRecommendation(); does not touch the hero) -->
+    <div class="card" id="recommended-card" style="display:none;"></div>
+
     <div class="card" id="quickstart-panel">
         <h3 style="text-align:center; margin-bottom:16px;">Quick Start</h3>
         
@@ -3459,6 +3462,7 @@ window.onload = () => {
     renderEncyclopedia();
     updateSettingsUI();
     applyQsTypeSelection();
+    renderRecommendation(); // v122: render the Recommended-today card on initial Coach load
     // B7 clear path 3 (backstop): flags older than 3 days expire on load
     if (appState.niggleSetAt && (Date.now() - new Date(appState.niggleSetAt).getTime()) > 3 * 24 * 3600 * 1000) {
         appState.niggleJoints = [];
@@ -3529,6 +3533,7 @@ function switchTab(tab) {
     if(tab === 'cardio') loadCardioHistory();
     if(tab === 'garmin') renderRecoveryScorecard();
     if(tab === 'encyclopedia') { resetEncyclopediaFilters(); renderEncyclopedia(); } // #26: reset filters on open
+    if(tab === 'coach') { updateTodaysBanner(); renderRecommendation(); } // v122: refresh hero + recommendation on re-entry
     if(tab === 'settings') updateSettingsUI();
 }
 
@@ -3747,6 +3752,105 @@ function applyQsTypeSelection() {
 
 // B-1: the one explicit Start — fires check-in once, then generates from the current
 // selections (type + equipment gear + count). Nothing selected -> 'full' (full-body build).
+// ============================================================================
+// v122 P0 — RECOMMENDATION BRAIN (read-only helpers; additive, NO writes, NO
+// generation, NO check-in). focus is hard-null (gated on the programming-rules
+// review — no focusFromGoal here).
+// ============================================================================
+var REC_DEFAULT_MIN = 35;   // fallback session length when the profile has none
+var REC_MIN_PER_MOVE = 5;   // shared ~5-min/exercise model (matches the wedge)
+
+function countForMinutes(min) { return Math.max(2, Math.round((min || REC_DEFAULT_MIN) / REC_MIN_PER_MOVE)); }
+function minutesForCount(count) { return Math.max(REC_MIN_PER_MOVE, (parseInt(count) || 0) * REC_MIN_PER_MOVE); }
+
+// Read-only copy of the wedge's least-recently-trained PPL pick (the wedge keeps
+// its own inline rotation — this does NOT touch _executeWedgeSession).
+function leastRecentlyTrainedPPL() {
+    var history = JSON.parse(localStorage.getItem('exerciseHistory')) || {};
+    var types = ['push', 'pull', 'legs'];
+    var lastTrained = {}; types.forEach(function(t){ lastTrained[t] = '2000-01-01'; });
+    Object.keys(history).forEach(function(exName) {
+        var ex = window.allExercises ? window.allExercises.find(function(e){ return e.name === exName; }) : null;
+        if (!ex || !history[exName] || !history[exName].length) return;
+        var lastDate = history[exName][history[exName].length - 1].sessionDate || '2000-01-01';
+        if (ex.cat.some(function(c){ return ['Chest','Shoulders','Triceps'].indexOf(c) !== -1; }) && lastDate > lastTrained.push) lastTrained.push = lastDate;
+        if (ex.cat.some(function(c){ return ['Back','Lats','Biceps'].indexOf(c) !== -1; }) && lastDate > lastTrained.pull) lastTrained.pull = lastDate;
+        if (ex.cat.some(function(c){ return ['Legs','Quads','Hamstrings','Glutes'].indexOf(c) !== -1; }) && lastDate > lastTrained.legs) lastTrained.legs = lastDate;
+    });
+    types.sort(function(a, b){ return lastTrained[a] < lastTrained[b] ? -1 : 1; });
+    return types[0];
+}
+
+// today's planned type (non-rest) -> else least-recently-trained PPL -> else 'full'
+function recommendType() {
+    try {
+        var dayIdx = new Date().getDay();
+        var planType = getEffectiveType(getDateForDay(dayIdx), dayIdx);
+        if (planType && planType !== 'rest') return planType;
+    } catch (e) {}
+    return leastRecentlyTrainedPPL() || 'full';
+}
+
+// getProfile().equipment -> a gear token the chips understand (setSessionGear values)
+function gearFromProfile() {
+    var p = getProfile() || {};
+    var tokens = mapEquipment(p.equipment);                 // null-safe; [] -> []
+    if (!tokens.length) return 'gym';                       // default when empty
+    if (tokens.length === 1 && tokens[0] === 'bodyweight') return 'bodyweight';
+    if (tokens.indexOf('cable') !== -1) return 'cable';
+    if (tokens.indexOf('dumbbell') !== -1) return 'dumbbell';
+    return 'gym';
+}
+
+// Read-only orchestrator. getProfile() is null-safe (full default); read defensively.
+function recommendSession() {
+    var p = getProfile() || {};
+    var durationMin = (p.sessionMinutes && parseInt(p.sessionMinutes)) || REC_DEFAULT_MIN;
+    var count = Math.min(10, Math.max(4, countForMinutes(durationMin))); // keep inside the slider's 4-10 range
+    return { type: recommendType(), count: count, durationMin: durationMin, equipment: gearFromProfile(), focus: null };
+}
+
+// ============================================================================
+// v122 P1 — "Recommended today" card (additive). Renders into #recommended-card
+// above #quickstart-panel; one-tap Start applies the rec into the EXISTING
+// chip-driven state and calls the EXISTING startConfiguredWorkout().
+// ============================================================================
+var REC_GEAR_LABEL = { gym: 'Full Gym', cable: 'Cables', dumbbell: 'Dumbbells', bodyweight: 'Bodyweight' };
+
+function renderRecommendation() {
+    var el = document.getElementById('recommended-card');
+    if (!el) return;
+    if (appState.currentWorkout && appState.currentWorkout.length) { el.style.display = 'none'; return; } // hidden during a live session
+    var r = recommendSession();
+    var typeTxt = (typeof typeLabel === 'function' ? typeLabel(r.type) : r.type);
+    var gearTxt = REC_GEAR_LABEL[r.equipment] || 'Full Gym';
+    el.style.display = 'block';
+    el.innerHTML =
+        '<div style="font-size:0.78em; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); margin-bottom:6px;">Recommended today</div>' +
+        '<div style="font-size:1.05em; font-weight:600; margin-bottom:12px;">' + typeTxt.toUpperCase() +
+            ' <span style="color:var(--text-muted); font-weight:400;">&middot; up to ' + r.count + ' moves &middot; ~' + r.durationMin + ' min &middot; ' + gearTxt + '</span></div>' +
+        '<button class="btn btn-main" style="color:var(--teal-ink);" onclick="startRecommended()">Start recommended</button>';
+}
+
+// Apply the recommendation into the existing state the chips drive, mirror chip
+// .active, then call the EXISTING start path (keeps niggle check-in + generation).
+// focus stays null (clears any stale focus selection).
+function startRecommended() {
+    var r = recommendSession();
+    appState.qsType = (r.type === 'full') ? null : r.type;   // 'full' == empty selection == engine default
+    document.querySelectorAll('[data-qs-type]').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-qs-type') === appState.qsType); });
+    appState.qsFocus = null;                                  // focus gated -> null
+    document.querySelectorAll('[data-qs-focus]').forEach(function(b){ b.classList.remove('active'); });
+    sessionGear = r.equipment;
+    document.querySelectorAll('[data-session-gear]').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-session-gear') === r.equipment); });
+    appState.exerciseCount = r.count;
+    var slider = document.getElementById('exercise-count-slider'); if (slider) slider.value = r.count;
+    var disp = document.getElementById('exercise-count-display'); if (disp) disp.textContent = r.count;
+    var bdisp = document.getElementById('builder-count-display'); if (bdisp) bdisp.textContent = r.count;
+    saveAppState();
+    startConfiguredWorkout();   // existing path: check-in + generation, focus=null
+}
+
 function startConfiguredWorkout() {
     showCheckIn(function() {
         _executeQuickStart(appState.qsType || 'full', appState.qsFocus || null);
@@ -4094,6 +4198,7 @@ function startWorkout(exercises) {
     switchTab('coach'); // workout UI lives inside #view-coach (C-03)
     var qsPanel = document.getElementById('quickstart-panel'); // hide setup while a session is live (#11)
     if (qsPanel) qsPanel.style.display = 'none';
+    var recCard = document.getElementById('recommended-card'); if (recCard) recCard.style.display = 'none'; // v122: hide rec card during session
     var todayBanner = document.getElementById('todays-banner'); // hide hero banner during session (#6)
     if (todayBanner) todayBanner.style.display = 'none';
     document.getElementById('workout-interface').style.display = 'block';
@@ -4588,6 +4693,7 @@ function endWorkout() {
         appState.currentSetIndex = {};
         appState.niggleJoints = []; appState.niggleSetAt = null; // B7 clear path 2: session over
         saveAppState();
+        renderRecommendation(); // v122: restore the rec card after the session ends
 
         showRPEModal();
     }
@@ -4612,6 +4718,7 @@ function finishWorkout() {
     appState.currentSetIndex = {};
     appState.niggleJoints = []; appState.niggleSetAt = null; // B7 clear path 2: session over
     saveAppState();
+    renderRecommendation(); // v122: restore the rec card after the session ends
 
     showRPEModal();
 }
@@ -7230,6 +7337,7 @@ function continueToWorkout() {
     switchTab('coach'); // workout UI lives inside #view-coach (C-03)
     var qsPanel = document.getElementById('quickstart-panel'); // hide setup while a session is live (#11, warmup path)
     if (qsPanel) qsPanel.style.display = 'none';
+    var recCard = document.getElementById('recommended-card'); if (recCard) recCard.style.display = 'none'; // v122: hide rec card during session
     var todayBanner = document.getElementById('todays-banner'); // hide hero banner during session (#6, warmup path)
     if (todayBanner) todayBanner.style.display = 'none';
     document.getElementById('workout-interface').style.display = 'block';
