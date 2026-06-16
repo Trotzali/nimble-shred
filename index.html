@@ -1226,13 +1226,16 @@
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
         <h2 style="font-size:1.3em;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg> Workout Coach</h2>
-        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v123</span>
+        <span style="font-size:1.3em; color: var(--sec); font-family: var(--font-display);">v124</span>
     </div>
     
     <!-- v122 P1: Recommended-today card (additive; populated by renderRecommendation(); does not touch the hero) -->
     <div class="card" id="recommended-card" style="display:none;"></div>
 
-    <div class="card" id="quickstart-panel">
+    <!-- v124 P3: full config demoted behind a collapsed disclosure; the recommendation card leads -->
+    <button id="adjust-toggle" class="btn btn-action" aria-expanded="false" onclick="toggleAdjust()" style="margin-bottom:14px;">Adjust workout &#9656;</button>
+
+    <div class="card" id="quickstart-panel" style="display:none;">
         <h3 style="text-align:center; margin-bottom:16px;">Quick Start</h3>
         
         <div style="margin-bottom: 20px;">
@@ -3533,7 +3536,7 @@ function switchTab(tab) {
     if(tab === 'cardio') loadCardioHistory();
     if(tab === 'garmin') renderRecoveryScorecard();
     if(tab === 'encyclopedia') { resetEncyclopediaFilters(); renderEncyclopedia(); } // #26: reset filters on open
-    if(tab === 'coach') { updateTodaysBanner(); renderRecommendation(); } // v122: refresh hero + recommendation on re-entry
+    if(tab === 'coach') { updateTodaysBanner(); renderRecommendation(); if (!(appState.currentWorkout && appState.currentWorkout.length)) setAdjustExpanded(false); } // v122 hero+rec; v124 P3: keep Adjust collapsed on re-entry (not mid-session)
     if(tab === 'settings') updateSettingsUI();
 }
 
@@ -3850,6 +3853,23 @@ function startRecommended() {
     var bdisp = document.getElementById('builder-count-display'); if (bdisp) bdisp.textContent = r.count;
     saveAppState();
     startConfiguredWorkout();   // existing path: check-in + generation, focus=null
+}
+
+// v124 P3: Adjust disclosure — the full Quick-Start panel is collapsed by default so the
+// page leads with the recommendation. COLLAPSE-only: no control is moved, added, or changed.
+function setAdjustExpanded(expanded) {
+    var panel = document.getElementById('quickstart-panel');
+    var toggle = document.getElementById('adjust-toggle');
+    if (panel) panel.style.display = expanded ? 'block' : 'none';
+    if (toggle) {
+        toggle.style.display = '';                          // visible (hidden separately during a live session)
+        toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        toggle.innerHTML = expanded ? 'Adjust workout &#9662;' : 'Adjust workout &#9656;';
+    }
+}
+function toggleAdjust() {
+    var panel = document.getElementById('quickstart-panel');
+    setAdjustExpanded(!(panel && panel.style.display !== 'none'));
 }
 
 function startConfiguredWorkout() {
@@ -4200,6 +4220,7 @@ function startWorkout(exercises) {
     var qsPanel = document.getElementById('quickstart-panel'); // hide setup while a session is live (#11)
     if (qsPanel) qsPanel.style.display = 'none';
     var recCard = document.getElementById('recommended-card'); if (recCard) recCard.style.display = 'none'; // v122: hide rec card during session
+    var adjTog = document.getElementById('adjust-toggle'); if (adjTog) adjTog.style.display = 'none'; // v124 P3: hide Adjust toggle during session
     var todayBanner = document.getElementById('todays-banner'); // hide hero banner during session (#6)
     if (todayBanner) todayBanner.style.display = 'none';
     document.getElementById('workout-interface').style.display = 'block';
@@ -4687,7 +4708,7 @@ function endWorkout() {
 
         document.getElementById('workout-interface').style.display = 'none';
         var qsPanel = document.getElementById('quickstart-panel'); // restore setup panel (#11)
-        if (qsPanel) qsPanel.style.display = '';
+        if (qsPanel) qsPanel.style.display = 'none'; setAdjustExpanded(false); // v124 P3: restore COLLAPSED + show Adjust toggle
         updateTodaysBanner(); // restore hero banner — ended early, today not done -> shows "Start Workout" (#6)
         appState.currentWorkout = null;
         appState.currentWorkoutMeta = null; // A: clear session summary on end
@@ -4712,7 +4733,7 @@ function finishWorkout() {
     
     document.getElementById('workout-interface').style.display = 'none';
     var qsPanel = document.getElementById('quickstart-panel'); // restore setup panel (#11)
-    if (qsPanel) qsPanel.style.display = '';
+    if (qsPanel) qsPanel.style.display = 'none'; setAdjustExpanded(false); // v124 P3: restore COLLAPSED + show Adjust toggle
     updateTodaysBanner(); // restore hero banner after session; today now completed -> reflects completion, not "Start Workout" (#6)
     appState.currentWorkout = null;
     appState.currentWorkoutMeta = null; // A: clear session summary on finish
@@ -6385,6 +6406,7 @@ function nextPlannedSession(fromIdx, schedule) {
 
 // Secondary "Train anyway" action on the rest-day card -> focus the Quick Start panel.
 function focusQuickStart() {
+    setAdjustExpanded(true); // v124 P3: reveal the now-collapsed config when jumping to it (rest-day "Train anyway")
     const qs = document.getElementById('quickstart-panel');
     if (qs) qs.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -7339,6 +7361,7 @@ function continueToWorkout() {
     var qsPanel = document.getElementById('quickstart-panel'); // hide setup while a session is live (#11, warmup path)
     if (qsPanel) qsPanel.style.display = 'none';
     var recCard = document.getElementById('recommended-card'); if (recCard) recCard.style.display = 'none'; // v122: hide rec card during session
+    var adjTog = document.getElementById('adjust-toggle'); if (adjTog) adjTog.style.display = 'none'; // v124 P3: hide Adjust toggle during session
     var todayBanner = document.getElementById('todays-banner'); // hide hero banner during session (#6, warmup path)
     if (todayBanner) todayBanner.style.display = 'none';
     document.getElementById('workout-interface').style.display = 'block';
