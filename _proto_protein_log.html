@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0F1011">
+<title>Holdfast — Protein Quick-Log (prototype)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F1011;
+    --surface:#17191A;
+    --surface-2:#1E2122;
+    --line:rgba(255,255,255,.08);
+    --line-strong:rgba(255,255,255,.14);
+    --teal:#03DAC6;
+    --teal-weak:rgba(3,218,198,.12);
+    --teal-ink:#04211E;
+    --text:#F2F4F4;
+    --muted:#9AA1A1;
+    --faint:#6C7373;
+    --danger:#EF4444;
+    --display:'Archivo',system-ui,sans-serif;
+    --body:'Hanken Grotesk',system-ui,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+    --r:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    background:var(--bg);color:var(--text);font-family:var(--body);
+    padding:20px 16px calc(28px + env(safe-area-inset-bottom));
+    max-width:520px;margin:0 auto;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- header ---------- */
+  .proto-tag{
+    font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--faint);
+    text-transform:uppercase;text-align:center;margin-bottom:18px;
+  }
+
+  /* ---------- hero ---------- */
+  .hero{text-align:center;margin-bottom:26px}
+  .hero-num{
+    font-family:var(--mono);font-weight:700;font-size:76px;line-height:.95;
+    letter-spacing:-.03em;color:var(--teal);font-variant-numeric:tabular-nums;
+    transition:transform .18s cubic-bezier(.34,1.56,.64,1);display:inline-block;
+  }
+  .hero-num.pop{transform:scale(1.06)}
+  .hero-num.done{color:var(--text)}
+  .hero-unit{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--faint);margin-left:2px}
+  .hero-label{
+    font-family:var(--body);font-size:13px;font-weight:600;color:var(--muted);
+    letter-spacing:.04em;margin-top:8px;
+  }
+  .hero-sub{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:4px}
+  .track{height:4px;border-radius:99px;background:var(--surface-2);margin:16px auto 0;max-width:260px;overflow:hidden}
+  .track-fill{height:100%;background:var(--teal);border-radius:99px;width:0;transition:width .5s cubic-bezier(.22,1,.36,1)}
+
+  /* ---------- sections ---------- */
+  h2{
+    font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--faint);margin:0 0 10px 2px;
+  }
+
+  /* ---------- quick-pick grid ---------- */
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+  .staple{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+    padding:13px 12px;min-height:66px;cursor:pointer;text-align:left;
+    display:flex;flex-direction:column;justify-content:center;gap:3px;
+    transition:border-color .15s,background .15s,transform .08s;
+    color:inherit;font-family:inherit;
+  }
+  .staple:active{transform:scale(.975);border-color:var(--teal);background:var(--teal-weak)}
+  .staple-name{font-family:var(--body);font-weight:600;font-size:14px;line-height:1.25}
+  .staple-per{font-family:var(--mono);font-size:11px;color:var(--faint)}
+  .staple-per b{color:var(--teal);font-weight:600}
+
+  /* ---------- log list ---------- */
+  .log{margin-top:26px}
+  .log-empty{
+    font-size:13px;color:var(--faint);text-align:center;padding:18px 0;
+    border:1px dashed var(--line);border-radius:var(--r);
+  }
+  .row{
+    display:flex;align-items:center;gap:12px;background:var(--surface);
+    border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:6px;
+    cursor:pointer;transition:border-color .15s,opacity .2s,transform .2s;
+  }
+  .row:active{transform:scale(.99)}
+  .row.removing{opacity:0;transform:translateX(-12px)}
+  .row-main{flex:1;min-width:0}
+  .row-name{font-size:14px;font-weight:600;line-height:1.2}
+  .row-portion{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:2px}
+  .row-g{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--teal);font-variant-numeric:tabular-nums}
+  .row-x{
+    width:26px;height:26px;flex:0 0 26px;border-radius:50%;display:grid;place-items:center;
+    color:var(--faint);border:1px solid var(--line);
+  }
+  .row:active .row-x{color:var(--danger);border-color:var(--danger)}
+  .log-total{
+    display:flex;justify-content:space-between;align-items:baseline;
+    padding:12px 2px 0;margin-top:4px;border-top:1px solid var(--line);
+  }
+  .log-total span{font-size:12px;color:var(--faint);font-weight:600;letter-spacing:.04em}
+  .log-total b{font-family:var(--mono);font-size:15px;color:var(--text);font-weight:600}
+
+  /* ---------- portion sheet ---------- */
+  .scrim{
+    position:fixed;inset:0;background:rgba(0,0,0,.62);opacity:0;pointer-events:none;
+    transition:opacity .22s;z-index:40;backdrop-filter:blur(2px);
+  }
+  .scrim.open{opacity:1;pointer-events:auto}
+  .sheet{
+    position:fixed;left:0;right:0;bottom:0;z-index:50;
+    background:var(--surface);border-top:1px solid var(--line-strong);
+    border-radius:22px 22px 0 0;padding:10px 16px calc(20px + env(safe-area-inset-bottom));
+    transform:translateY(102%);transition:transform .28s cubic-bezier(.22,1,.36,1);
+    max-width:520px;margin:0 auto;
+  }
+  .sheet.open{transform:translateY(0)}
+  .grabber{width:36px;height:4px;border-radius:99px;background:var(--line-strong);margin:0 auto 14px}
+  .sheet-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px}
+  .sheet-title{font-family:var(--display);font-weight:700;font-size:19px}
+  .sheet-per{font-family:var(--mono);font-size:11px;color:var(--faint)}
+  .chips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+  .chip{
+    font-family:var(--mono);font-size:13px;font-weight:600;
+    background:var(--surface-2);border:1px solid var(--line);border-radius:12px;
+    padding:0 4px;min-height:52px;color:var(--muted);cursor:pointer;
+    transition:all .15s;display:grid;place-items:center;
+  }
+  .chip:active{transform:scale(.96)}
+  .chip.on{background:var(--teal-weak);border-color:var(--teal);color:var(--teal)}
+  .custom-wrap{display:none;margin-bottom:12px}
+  .custom-wrap.show{display:block}
+  .custom-wrap input{
+    width:100%;min-height:52px;background:var(--surface-2);border:1px solid var(--teal);
+    border-radius:12px;color:var(--text);font-family:var(--mono);font-size:17px;
+    padding:0 14px;text-align:center;
+  }
+  .custom-wrap input:focus{outline:none;box-shadow:0 0 0 3px var(--teal-weak)}
+  .preview{
+    text-align:center;font-family:var(--mono);font-size:12px;color:var(--faint);
+    margin-bottom:14px;min-height:16px;
+  }
+  .preview b{color:var(--teal);font-size:15px;font-weight:700}
+  .confirm{
+    width:100%;min-height:54px;border:none;border-radius:14px;background:var(--teal);
+    color:var(--teal-ink);font-family:var(--body);font-weight:700;font-size:16px;
+    cursor:pointer;transition:transform .08s,opacity .15s;
+  }
+  .confirm:active{transform:scale(.985)}
+  .confirm:disabled{opacity:.35}
+
+  /* ---------- toast ---------- */
+  .toast{
+    position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);
+    background:var(--surface-2);border:1px solid var(--teal);color:var(--teal);
+    font-family:var(--mono);font-size:12px;font-weight:600;
+    padding:9px 16px;border-radius:99px;opacity:0;pointer-events:none;
+    transition:all .25s;z-index:60;white-space:nowrap;
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  .foot{
+    text-align:center;font-family:var(--mono);font-size:10px;color:#3E4444;
+    margin-top:28px;letter-spacing:.06em;
+  }
+  .reset{background:none;border:none;color:#3E4444;font-family:var(--mono);font-size:10px;
+    text-decoration:underline;cursor:pointer;letter-spacing:.06em}
+</style>
+</head>
+<body>
+
+<div class="proto-tag">Holdfast · prototype</div>
+
+<div class="hero">
+  <div><span class="hero-num" id="heroNum">140</span><span class="hero-unit">g</span></div>
+  <div class="hero-label" id="heroLabel">protein left today</div>
+  <div class="hero-sub" id="heroSub">0 / 140 g</div>
+  <div class="track"><div class="track-fill" id="trackFill"></div></div>
+</div>
+
+<h2>Quick add</h2>
+<div class="grid" id="grid"></div>
+
+<div class="log">
+  <h2>Logged today</h2>
+  <div id="logList"></div>
+</div>
+
+<div class="foot">
+  local prototype · not linked to the app ·
+  <button class="reset" id="resetBtn">reset day</button>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="grabber"></div>
+  <div class="sheet-head">
+    <div class="sheet-title" id="sheetTitle">—</div>
+    <div class="sheet-per" id="sheetPer">—</div>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div class="custom-wrap" id="customWrap">
+    <input type="number" id="customInput" inputmode="numeric" placeholder="grams" min="1" max="2000">
+  </div>
+  <div class="preview" id="preview"></div>
+  <button class="confirm" id="confirmBtn">Add</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  'use strict';
+
+  var KEY = 'protoProteinLog_v1';
+  var TARGET = 140;
+
+  // per 100 g
+  var STAPLES = [
+    { id:'chicken', name:'Chicken breast', per100:31   },
+    { id:'yogurt',  name:'Greek yogurt',   per100:10   },
+    { id:'eggs',    name:'Eggs',           per100:12.6 },
+    { id:'whey',    name:'Whey scoop',     per100:80   },
+    { id:'tuna',    name:'Tuna',           per100:25.5 },
+    { id:'beef',    name:'Beef mince (lean)', per100:28.4 },
+    { id:'cottage', name:'Cottage cheese', per100:11.6 },
+    { id:'milk',    name:'Milk',           per100:3.4  }
+  ];
+
+  // Per-food presets: a scoop/egg/glass is not a 100/150/200 g decision.
+  var PRESETS = {
+    whey:   [30, 60, 90],
+    eggs:   [50, 100, 150],
+    milk:   [200, 250, 300],
+    _def:   [100, 150, 200]
+  };
+  var UNIT_HINT = {
+    whey:  { 30:'1 scoop', 60:'2 scoops', 90:'3 scoops' },
+    eggs:  { 50:'1 egg', 100:'2 eggs', 150:'3 eggs' },
+    milk:  { 200:'1 cup', 250:'mug', 300:'big glass' }
+  };
+
+  var log = load();
+  var sel = { staple:null, grams:null, custom:false };
+  var animTimer = null;
+
+  var $ = function(id){ return document.getElementById(id); };
+
+  /* ---------- storage ---------- */
+  function load(){
+    try{
+      var raw = JSON.parse(localStorage.getItem(KEY));
+      if(!raw || !Array.isArray(raw.entries)) return [];
+      // day-scoped: a new local day starts a fresh log
+      if(raw.day !== todayKey()) return [];
+      return raw.entries;
+    }catch(e){ return []; }
+  }
+  function save(){
+    try{
+      localStorage.setItem(KEY, JSON.stringify({ day: todayKey(), entries: log }));
+    }catch(e){}
+  }
+  function todayKey(){
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  /* ---------- maths ---------- */
+  function proteinFor(staple, grams){ return staple.per100 * grams / 100; }
+  function consumed(){ return log.reduce(function(a,e){ return a + e.protein; }, 0); }
+  function remaining(){ return TARGET - consumed(); }
+  function r1(n){ return Math.round(n * 10) / 10; }
+  function fmt(n){ // whole numbers stay clean, decimals get one place
+    var v = r1(n);
+    return (Math.abs(v % 1) < 0.05) ? String(Math.round(v)) : v.toFixed(1);
+  }
+
+  /* ---------- hero ---------- */
+  function paintHero(animateFrom){
+    var rem = remaining();
+    var el = $('heroNum');
+    var over = rem < 0;
+
+    $('heroSub').textContent = fmt(consumed()) + ' / ' + TARGET + ' g';
+    $('heroLabel').textContent = over ? 'over target — nice work' : 'protein left today';
+    el.classList.toggle('done', rem <= 0);
+
+    var pct = Math.max(0, Math.min(100, consumed() / TARGET * 100));
+    $('trackFill').style.width = pct + '%';
+
+    var end = over ? Math.abs(rem) : rem;
+    if(animateFrom == null){ el.textContent = fmt(end); return; }
+
+    // brief count-down animation (~420ms, eased)
+    if(animTimer) cancelAnimationFrame(animTimer);
+    var from = animateFrom, dur = 420, t0 = performance.now();
+    el.classList.add('pop');
+    setTimeout(function(){ el.classList.remove('pop'); }, 190);
+    (function step(now){
+      var p = Math.min(1, (now - t0) / dur);
+      var e = 1 - Math.pow(1 - p, 3);           // easeOutCubic
+      el.textContent = fmt(from + (end - from) * e);
+      if(p < 1) animTimer = requestAnimationFrame(step);
+      else el.textContent = fmt(end);
+    })(t0);
+  }
+
+  /* ---------- grid ---------- */
+  function paintGrid(){
+    var g = $('grid');
+    g.innerHTML = '';
+    STAPLES.forEach(function(s){
+      var b = document.createElement('button');
+      b.className = 'staple';
+      b.innerHTML = '<div class="staple-name"></div>' +
+                    '<div class="staple-per"><b>' + fmt(s.per100) + 'g</b> / 100g</div>';
+      b.querySelector('.staple-name').textContent = s.name;
+      b.addEventListener('click', function(){ openSheet(s); });
+      g.appendChild(b);
+    });
+  }
+
+  /* ---------- log list ---------- */
+  function paintLog(){
+    var wrap = $('logList');
+    wrap.innerHTML = '';
+    if(!log.length){
+      wrap.innerHTML = '<div class="log-empty">Nothing logged yet — tap a staple above.</div>';
+      return;
+    }
+    log.slice().reverse().forEach(function(e){
+      var row = document.createElement('div');
+      row.className = 'row';
+      row.innerHTML =
+        '<div class="row-main">' +
+          '<div class="row-name"></div>' +
+          '<div class="row-portion">' + e.grams + ' g' + (e.hint ? ' · ' + e.hint : '') + '</div>' +
+        '</div>' +
+        '<div class="row-g">' + fmt(e.protein) + 'g</div>' +
+        '<div class="row-x">&times;</div>';
+      row.querySelector('.row-name').textContent = e.name;
+      row.addEventListener('click', function(){ remove(e.id, row); });
+      wrap.appendChild(row);
+    });
+    var t = document.createElement('div');
+    t.className = 'log-total';
+    t.innerHTML = '<span>TOTAL</span><b>' + fmt(consumed()) + ' g</b>';
+    wrap.appendChild(t);
+  }
+
+  /* ---------- add / remove ---------- */
+  function add(staple, grams, hint){
+    var before = remaining();
+    log.push({
+      id: String(Date.now()) + Math.random().toString(16).slice(2,6),
+      name: staple.name, grams: grams, hint: hint || '',
+      protein: r1(proteinFor(staple, grams))
+    });
+    save();
+    paintLog();
+    paintHero(before < 0 ? Math.abs(before) : before);
+    toast('+' + fmt(proteinFor(staple, grams)) + 'g ' + staple.name.toLowerCase());
+  }
+  function remove(id, rowEl){
+    var before = remaining();
+    if(rowEl) rowEl.classList.add('removing');
+    setTimeout(function(){
+      log = log.filter(function(e){ return e.id !== id; });
+      save();
+      paintLog();
+      paintHero(before < 0 ? Math.abs(before) : before);
+    }, 160);
+  }
+
+  /* ---------- portion sheet ---------- */
+  function openSheet(staple){
+    sel = { staple:staple, grams:null, custom:false };
+    $('sheetTitle').textContent = staple.name;
+    $('sheetPer').textContent = fmt(staple.per100) + 'g / 100g';
+    $('customWrap').classList.remove('show');
+    $('customInput').value = '';
+
+    var presets = PRESETS[staple.id] || PRESETS._def;
+    var c = $('chips');
+    c.innerHTML = '';
+    presets.forEach(function(g, i){
+      var chip = document.createElement('button');
+      chip.className = 'chip';
+      var hint = (UNIT_HINT[staple.id] || {})[g];
+      chip.innerHTML = hint
+        ? '<div style="line-height:1.25"><div>' + g + 'g</div><div style="font-size:9px;opacity:.75">' + hint + '</div></div>'
+        : g + 'g';
+      chip.addEventListener('click', function(){ pick(g, hint, chip); });
+      c.appendChild(chip);
+      if(i === 0) pick(g, hint, chip);   // default to the first preset -> confirm is 2 taps total
+    });
+    var cust = document.createElement('button');
+    cust.className = 'chip';
+    cust.textContent = 'Custom';
+    cust.addEventListener('click', function(){
+      sel.custom = true; sel.grams = null;
+      [].forEach.call(c.children, function(x){ x.classList.remove('on'); });
+      cust.classList.add('on');
+      $('customWrap').classList.add('show');
+      $('customInput').focus();
+      updatePreview();
+    });
+    c.appendChild(cust);
+
+    $('scrim').classList.add('open');
+    $('sheet').classList.add('open');
+  }
+  function pick(g, hint, chipEl){
+    sel.grams = g; sel.custom = false; sel.hint = hint || '';
+    $('customWrap').classList.remove('show');
+    [].forEach.call($('chips').children, function(x){ x.classList.remove('on'); });
+    if(chipEl) chipEl.classList.add('on');
+    updatePreview();
+  }
+  function updatePreview(){
+    var g = sel.custom ? parseFloat($('customInput').value) : sel.grams;
+    var ok = g > 0 && isFinite(g);
+    $('confirmBtn').disabled = !ok;
+    $('preview').innerHTML = ok
+      ? g + 'g &rarr; <b>' + fmt(proteinFor(sel.staple, g)) + 'g</b> protein'
+      : 'pick a portion';
+    $('confirmBtn').textContent = ok ? 'Add ' + fmt(proteinFor(sel.staple, g)) + 'g' : 'Add';
+  }
+  function closeSheet(){
+    $('scrim').classList.remove('open');
+    $('sheet').classList.remove('open');
+    document.activeElement && document.activeElement.blur();
+  }
+
+  /* ---------- toast ---------- */
+  var toastTimer = null;
+  function toast(msg){
+    var t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 1500);
+  }
+
+  /* ---------- wiring ---------- */
+  $('customInput').addEventListener('input', updatePreview);
+  $('customInput').addEventListener('keydown', function(e){
+    if(e.key === 'Enter' && !$('confirmBtn').disabled) $('confirmBtn').click();
+  });
+  $('confirmBtn').addEventListener('click', function(){
+    var g = sel.custom ? parseFloat($('customInput').value) : sel.grams;
+    if(!(g > 0) || !isFinite(g)) return;
+    add(sel.staple, r1(g), sel.custom ? '' : sel.hint);
+    closeSheet();
+  });
+  $('scrim').addEventListener('click', closeSheet);
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeSheet(); });
+  $('resetBtn').addEventListener('click', function(){
+    if(!confirm('Clear today’s prototype log?')) return;
+    log = []; save(); paintLog(); paintHero(null);
+  });
+
+  paintGrid();
+  paintLog();
+  paintHero(null);
+})();
+</script>
+</body>
+</html>
