@@ -66,7 +66,7 @@ table. Tokens: `P`=push `U`=pull `L`=legs `F`=full `C`=cardio `M`=mobility
 | **muscle** | R P R U R L R | R P U L R P R | R P U L R P U | R P U L P U L |
 | **strong** | R F R F R F R | R P U R L R F | R P U L R P L | R P U L P U L |
 | **balanced** | R P R U R L R | R P U R L M R | R P C U R L M | C P U C L M R |
-| **shred** | R P R C R L R | R P C U R L R | R P C U C L M | C P C U C L M |
+| **shred** | R P R C R L R | R P C U R L R | R P C U R L C | C P C U R L C |
 | **move** | R M R F R M R | R M P R M L R | R M P U M L R | M P M U M L R |
 
 Engine mapping / rationale (all but `C` are honored today):
@@ -80,9 +80,34 @@ Engine mapping / rationale (all but `C` are honored today):
   plan-level rep/intensity target (track as follow-up, parallel to #24).
 - **balanced** → current behaviour (this is what v78 ships for every goal),
   P/U/L + 1 `M`, `C` at higher freq.
-- **shred** → cardio-forward + retained lifts + `M`. **Depends on #24** (1c).
+- **shred** → cardio-forward + retained lifts (P/U/L). 5-day = 2 cardio, 6-day =
+  3 cardio (the most cardio of any goal — its identity); rest counts now match
+  frequency. **Depends on #24** (1c).
 - **move** → `M` (Mobility/nimble) majority + `F`/P/U/L; `nimble` type is fully
   honored today (resilience bucket) → **the safest new goal to ship**.
+
+> **Correction (T1 flag, applied):** the original Shred Fat 5-day (`R P C U C L M`,
+> 6 active) and 6-day (`C P C U C L M`, 7 active / 0 rest) miscounted vs their
+> frequency. Fixed to **5-day `R P C U R L C`** (5 active + 2 rest, 2 cardio) and
+> **6-day `C P C U R L C`** (6 active + 1 rest, 3 cardio), preserving the
+> cardio-heavy intent (the trailing `M` was dropped in favour of conditioning).
+> Every other goal/frequency cell was verified correct and is unchanged.
+
+### 1b-fix. Exact corrected `PLAN_TEMPLATES` lines (one-line-each for T1 to land)
+Schedule-object form matching the existing `schedules` literal (L5708–5711;
+quoted string values, internal token `'nimble'` for Mobility). Only the two
+`shred` rows below change — drop these in verbatim:
+```js
+// PLAN_TEMPLATES.shred (only 5 and 6 corrected; 3 and 4 already correct, shown for context)
+shred: {
+  3: {0:'rest',  1:'push',  2:'rest',  3:'cardio',4:'rest',  5:'legs',  6:'rest'  }, // unchanged
+  4: {0:'rest',  1:'push',  2:'cardio',3:'pull',  4:'rest',  5:'legs',  6:'rest'  }, // unchanged
+  5: {0:'rest',  1:'push',  2:'cardio',3:'pull',  4:'rest',  5:'legs',  6:'cardio'}, // FIX: 5 active + 2 rest, 2 cardio
+  6: {0:'cardio',1:'push',  2:'cardio',3:'pull',  4:'rest',  5:'legs',  6:'cardio'}  // FIX: 6 active + 1 rest, 3 cardio
+}
+```
+The two lines to change are the `5:` and `6:` entries (the `3:`/`4:` lines are
+already correct and shown only for placement context).
 
 `goalNames` (L5715) updates to the 5 labels; `appState.activePlan.name` =
 `` `${freq}-Day ${goalNames[goal]}` ``. Optional: set `phase`/guidance copy per
@@ -226,4 +251,4 @@ routing) → Phase 2 (UI, medium) → Phase 3 (needs new exercise pool / #24, la
 Phases 1 and 2 are independently shippable; Shred Fat is *labelled honest* from
 Phase 1 via routing, *fully realised* at Phase 3.
 
-— T4, 2026-06-11 14:58 (+10:00)
+— T4, 2026-06-11 17:39 (+10:00)

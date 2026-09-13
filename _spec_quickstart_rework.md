@@ -126,16 +126,73 @@ function startConfiguredWorkout() {
 ## B4. Where the check-in fits now
 Unchanged mechanism, new trigger: **Start Workout → `showCheckIn` → feeling → `_executeQuickStart(selections)` → (warmup for PPL) → session.** One check-in per session, after the user has set Equipment + Type + Focus + count — strictly better than today (no check-in fires on incidental chip taps). The A2 levers apply exactly as now. **Niggle hook (optional, §B6):** this is the natural place to add a "what hurts?" capture so `pain` finally populates `appState.niggleJoints` and wakes `smartSelect`'s dormant `niggleSafe` — flagged, not in scope.
 
-## B5. Redundancy / consolidation flags (for the consolidation audit)
-- **Random Workout button (`:1233`, `generateRandomWorkout` `:3460`) becomes redundant.** A configured Start with **no Type/Focus** = full-body random fill = exactly Random Workout. **Recommend removing it** (or relabel Start as "Start / Surprise me" when nothing is selected). Removing it also kills its quirk of only randomising push/pull/legs (never full/mobility).
-- **"Full" type + no focus** == old Random == default Start — overlapping concepts; keep "Full" as an explicit type but note it equals the empty-selection default.
-- **Mobility type (`:1227`) vs Resilience focus (§B1)** — same pool (`getBucket==='resilience'`). **Recommend folding:** drop the Mobility *type* chip; Resilience *focus* covers it. Leaves Types = Push/Pull/Legs/Full (pure muscle axis), Focus = Strength/Power/Resilience/Cardio (pure bucket axis) — clean orthogonality (aligns with `_taxonomy_resolution.md`).
-- **Wedge Session (`:1236-1245`)** overlaps a count+Start (it's a time-boxed auto-build). Distinct enough to keep (time-based, auto-picks least-recently-trained type, skips warmup) but note the conceptual overlap for the audit.
+## B5. Consolidation — LOCKED decisions
+- **Random Workout is KEPT and absorbs Wedge.** Selecting **Random Workout** (`:1233`) reveals a **duration picker** (10 / 15 / 20 / 30 min) inline in the panel; choosing a duration generates a time-boxed random build by **reusing Wedge's existing mapping** — `time → count` (`exerciseCount = max(2, round(minutes/5))`, `_executeWedgeSession` `:3473`) and **no warmup**. The **separate Wedge Session row (`:1236-1245`) retires** (its logic moves behind Random's duration picker). Random keeps its "surprise me" character but is now duration-aware; it is **not** removed and is **not** collapsed into the Start button. (Reuse `_executeWedgeSession`'s least-recently-trained type pick + no-warmup path verbatim; just surface its durations under Random instead of a standalone row.)
+- **Focus = the 4 chips ONLY** (Strength / Power / Resilience / Cardio). No other focus values.
+- **Mobility type chip retires in P2** (not P4). When the Resilience focus chip lands (§B1 / B-2), the Mobility *type* chip (`:1227`, key `'nimble'`) is removed — Resilience *focus* covers the same `getBucket==='resilience'` pool. **Type row becomes Push / Pull / Legs / Full** (pure muscle axis); Focus row is the pure bucket axis. Clean orthogonality (aligns with `_taxonomy_resolution.md`).
+- **"Full" type + no focus** == default empty-selection Start — overlapping but both wanted (Full is the explicit "everything" type; empty Start defaults to it). No change.
 
 ## B6. Out of scope (flagged follow-ons)
-- **Activating pain-awareness:** a "what hurts?" body-region capture writing `appState.niggleJoints` — would make "Something Hurts" actually steer selection via the already-built `niggleSafe`. Separate niggle-UI spec.
+- **Activating pain-awareness:** now **specced below in §B7** (no longer deferred).
 - **Equipment taxonomy unification** (B2 flag) — separate build.
 - **Cardio as a focus** depends on the cardio bucket (already in metadata, 17 moves) but cardio moves log by `logMode` time/reps — full cardio logging UX rides on #5 (`_spec_logmode_integration.md`). Focus=Cardio will *build* a cardio circuit now; correct logging needs #5.
+
+---
+
+## B7. NIGGLE CAPTURE — "Something Hurts" → joint picker (activates the dormant `niggleSafe`)
+
+**Premise (from Part A.3):** the pain-aware engine is already built — `smartSelect` calls `niggleSafe()` (`:3642-3648`), which excludes any exercise whose `jointLoad[flaggedJoint] >= 2` (hard, never relaxed, §5.6). It reads `getNiggleJoints()` → `appState.niggleJoints` (`:3588`), which **nothing ever writes**. This feature is **only the missing capture UI + state write** — no engine work. Single build category.
+
+### B7.1 The 9-joint vocabulary (exact keys — must match `jointLoad`)
+`niggleSafe` indexes `jointLoad[key]`, so the picker MUST emit these exact keys (verified against `exercise-metadata.js`):
+
+| key (emit) | label (show) | | key | label |
+|---|---|---|---|---|
+| `neck` | Neck | | `lowBack` | Lower back |
+| `shoulder` | Shoulder | | `hip` | Hip |
+| `elbow` | Elbow | | `knee` | Knee |
+| `wrist` | Wrist | | `ankle` | Ankle |
+| `tSpine` | Upper back | | | |
+
+(`tSpine` = thoracic spine → user-facing "Upper back".) Any label is fine; the **value written to `niggleJoints` must be the raw key**, or `niggleSafe` silently matches nothing.
+
+### B7.2 UI flow
+Hook the existing check-in modal (`#checkin-modal`, `processCheckIn` `:3318`). When the user taps **"Something Hurts"**:
+1. Instead of closing immediately, reveal a **second step in the same modal** — "What hurts? (tap any)" — a 9-chip multi-select grid (the table above), styled like the existing `rpe-tag` toggles.
+2. A confirm button **"Start — work around it →"** (and a secondary **"Just go easy"** = proceed with no joints flagged → today's generic pain nudge only).
+3. On confirm: write state (B7.3), close modal, run the stored check-in callback exactly as now (`window._checkInCallback`). The chosen feeling stays `'pain'`, so the A2 intensity nudge (−20% suggested weight, +mobility warmup, 120s rest) **still applies on top of** the joint exclusion.
+
+Multi-select because more than one area can hurt. Selecting zero + confirm ≡ "Just go easy".
+
+### B7.3 State shape + persistence
+```
+appState.niggleJoints  = ['knee','lowBack'];     // array of raw joint keys (already read by getNiggleJoints)
+appState.niggleSetAt   = '2026-06-11';            // ISO date the flags were set (for expiry)
+```
+Written in `processCheckIn` on confirm, persisted via `saveAppState()` (the function `getNiggleJoints()` already reads `appState.niggleJoints`, so the engine goes live the instant this is written — no `smartSelect` change).
+
+### B7.4 Clear / expiry rule (proposed)
+Niggles are **acute, not permanent** — a flag must never silently suppress exercises forever. Three clear paths, all cheap:
+1. **Overwritten each check-in (primary):** every new session's check-in re-asks. Choosing **Fresh / Normal / Tired** (any non-pain feeling) sets `appState.niggleJoints = []`. Choosing **pain** replaces the array with the new picker result. So the flags only ever reflect the *current* session's answer.
+2. **Cleared on session end:** `finishWorkout` / `endWorkout` reset `niggleJoints = []` (the flag was for that session's build).
+3. **Hard expiry on load (backstop):** on app init, if `niggleSetAt` is more than **3 days** old, clear `niggleJoints`. Guards against a flag persisted then never followed by another check-in.
+**Convenience (optional):** if the last `niggleSetAt` is within 48h, pre-tick those joints in the picker ("still sore?") — prefill only, the user still confirms.
+
+### B7.5 Thin-pool guard (important — `niggleSafe` is HARD)
+Because `niggleSafe` excludes `load >= 2` and is **never relaxed**, flagging several joints can shrink the safe pool below `count`. The build must **not silently under-fill**:
+- If the niggle-safe pool `< count`, generate what's safely available and **surface a notice** — e.g. "Working around your knee + lower back — only N suitable exercises; consider resting or fewer joints." Never pad with an excluded (painful-joint) exercise.
+- If the safe pool is **empty** (everything loads a flagged joint), don't start — prompt to deselect a joint or pick Resilience focus (low-load mobility). 
+- Metadata-absent safety: `getJointLoad` returns `{}` on miss, so `niggleSafe` passes everything (no crash) → degrades to today's generic pain nudge. Already handled by the accessors; just confirm in test.
+
+### B7.6 Test gate (single category)
+1. Check-in → "Something Hurts" → 9-chip picker appears with the labels above.
+2. Pick **Knee** → confirm → `appState.niggleJoints === ['knee']`, `niggleSetAt` set, persists across reload (until expiry).
+3. Generated session contains **no** exercise with `jointLoad.knee >= 2` — verify a known knee-loader (e.g. Pistol Squat, Jump Squat, Goblet Squat) is absent; an unaffected move (e.g. a press) still appears.
+4. Next session: choose **Fresh** → `niggleJoints` cleared; build no longer excludes knee.
+5. Session end (`finishWorkout`/`endWorkout`) → `niggleJoints` cleared.
+6. Load-time backstop: set `niggleSetAt` 4 days back → flags cleared on init.
+7. Thin pool: flag knee + hip + ankle + lowBack → notice shown, **no** under-fill with an excluded move; empty pool → blocked with a deselect/Resilience prompt.
+8. Metadata-absent (simulate `exerciseMeta` unset) → no crash, generic pain nudge only.
 
 ---
 
@@ -144,11 +201,12 @@ Unchanged mechanism, new trigger: **Start Workout → `showCheckIn` → feeling 
 | Phase | Scope | Build | Test gate |
 |---|---|---|---|
 | **B-1 Decouple** | Type chips → select-only + Start button | `qsType` state, `setQsType`, repoint chips, add Start above the 3 buttons, `_executeQuickStart(type,focus)` thread | Tapping a Type highlights it, does **not** start; Start → check-in → generates that type; no Type selected → full-body; PPL still warms up; Random/Builder/Consult unaffected |
-| **B-2 Focus** | Add Focus chips + bucket generation | Focus row, `setQsFocus`, `qsFocus` state, `getBucket` filter + empty-intersection guard in `generateWorkoutByType` | Focus-only Start builds from bucket (Strength 110/Power 10/Resilience 40/Cardio 17 pools); Type+Focus intersects; thin/empty combos fall back, never start empty |
-| **B-3 Cables** | Front-page Cables equipment | Cables `rpe-tag` + `applySessionGear('cable')` | Cables selected → Start builds cable+bodyweight pool; other gears unchanged; flag the front-page/Builder vocabulary mismatch logged |
-| **B-4 Consolidate** | Fold Mobility→Resilience; retire Random | Remove Mobility type chip; remove/redirect Random Workout; confirm default-Start = random full | No dead controls; Resilience focus == old Mobility output; default Start == old Random output; Types are pure muscle axis, Focus pure bucket axis |
+| **B-2 Focus (+retire Mobility type)** | Add the 4 Focus chips + bucket generation; **drop the Mobility type chip** | Focus row, `setQsFocus`, `qsFocus` state, `getBucket` filter + empty-intersection guard in `generateWorkoutByType`; remove Mobility chip (`:1227`) | Focus-only Start builds from bucket (Strength 110/Power 10/Resilience 40/Cardio 17); Type+Focus intersects; thin/empty falls back, never empty; **Type row = Push/Pull/Legs/Full**; Resilience focus reproduces old Mobility output |
+| **B-3 Cables** | Front-page Cables equipment | Cables `rpe-tag` + `applySessionGear('cable')` | Cables selected → Start builds cable+bodyweight pool; other gears unchanged; front-page/Builder vocabulary mismatch logged |
+| **B-4 Random absorbs Wedge** | Random KEPT + duration picker; Wedge row retires | Add 10/15/20/30 duration picker under Random; route to `_executeWedgeSession` mapping (time→count, no warmup); remove the standalone Wedge row (`:1236-1245`) | Random → duration picker → time-boxed random build (count = max(2,round(min/5)), no warmup); old Wedge row gone; Random not removed |
+| **B-5 Niggle capture** (standalone, §B7) | "Something Hurts" → 9-joint picker → `appState.niggleJoints` → live `niggleSafe` | Picker UI in check-in, state write + persist, clear/expiry (B7.4), thin-pool guard (B7.5) | Full B7.6 gate: knee flag excludes knee-loaders; clears on non-pain / session-end / 3-day expiry; thin/empty pool warns not under-fills; metadata-absent degrades safely |
 
-Each phase is independently shippable on top of the already-landed Keystone Phase A (`getBucket` live). B-2 depends on B-1 (Start button); B-4 depends on B-1+B-2.
+Each phase is independently shippable on top of the already-landed Keystone Phase A (`getBucket` live). **B-2 depends on B-1** (Start button); **B-4** (Random/Wedge) and **B-5** (Niggle) are **independent** — both touch only their own surfaces (Random button / check-in modal) and can ship in any order. B-5 needs nothing beyond the already-built `smartSelect`/`niggleSafe` and the existing check-in modal.
 
 ---
 
@@ -156,8 +214,12 @@ Each phase is independently shippable on top of the already-landed Keystone Phas
 - **A1:** a Type chip tap generates+starts immediately, gated only by the check-in modal — no select/start separation.
 - **A2:** check-in changes rest (always), warmup length (PPL only), and the pre-filled weight suggestion (soft); plus a status badge. Real but partial — not just a label.
 - **A3:** "Something Hurts" does **not** ask what hurts or route anywhere; the niggle engine (`smartSelect` + `niggleSafe`) is wired but **inert** because `appState.niggleJoints` is never set. Net = generic intensity nudge only.
-- **B:** add Focus chips (bucket axis) + front-page Cables; **decouple** so chips select and a new **Start Workout** button (above Consult/Builder/Random) generates from selections, with the check-in firing once after Start. Flags: Mobility-type ≡ Resilience-focus (fold), Random Workout redundant (retire), front-page vs Builder equipment vocabularies inconsistent (unify), pain-capture is the dormant niggle activation point. Phased B-1→B-4 with test gates.
+- **B:** add the 4 Focus chips (bucket axis) + front-page Cables; **decouple** so chips select and a new **Start Workout** button (above Consult/Builder/Random) generates from selections, with the check-in firing once after Start.
+- **Locked decisions:** Focus = 4 chips only; **Mobility type chip retires in P2** (Type row → Push/Pull/Legs/Full; Resilience focus covers it); **Random Workout is KEPT** and gains a **duration picker that absorbs Wedge** (reusing Wedge's time→count + no-warmup mapping), and the standalone **Wedge row retires**.
+- **B7 Niggle capture (now specced):** "Something Hurts" opens a 9-joint picker (`neck/shoulder/elbow/wrist/tSpine/lowBack/hip/knee/ankle`) that writes `appState.niggleJoints` (+ `niggleSetAt`), instantly activating the already-built `niggleSafe` exclusion (no engine change). Includes clear/expiry (re-ask each check-in · clear on session end · 3-day backstop) and a thin-pool guard so the hard exclusion never silently under-fills. Single build category (B-5), independent of B-1→B-4.
+- Phased **B-1 → B-5**, test gate each.
 
 ---
 
 *Signed off — T5, terminal pts/T5, 2026-06-11 13:22 AEST (03:22 UTC). Read-only: no edits, no git, index.html untouched.*
+*Amended — T5, terminal pts/T5, 2026-06-11 14:33 AEST (04:33 UTC): locked P4 (Random kept + duration picker absorbs Wedge; Wedge row retires), Focus = 4 chips only, Mobility type retires in P2; added §B7 niggle-capture spec (9-joint picker → `appState.niggleJoints` → live `niggleSafe`) as build category B-5. Doc only — no edits, no git.*
