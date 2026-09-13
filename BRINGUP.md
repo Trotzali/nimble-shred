@@ -65,6 +65,17 @@ target is rather than assuming continuation of anything.
   exhaustive by construction.
 
 ## Gotchas (from this repo's own history)
+- **Garmin integration is dormant scaffolding, never live**: the Garmin developer
+  application was never approved (no response from Garmin) — this was never a working
+  integration anywhere, not something that broke. `GARMIN_CONSUMER_SECRET` is absent
+  from the `nimble-shred-backend` Vercel project as of 2026-09-13 (confirmed via
+  `vercel env ls` — `GARMIN_CONSUMER_KEY` is present, the secret isn't), consistent with
+  that. If Garmin work resumes, it needs a fresh developer-portal approval, not just a
+  re-provisioned secret. Otherwise, removing the Garmin UI/endpoints entirely (frontend
+  `garmin-*` elements + backend `api/garmin-*.js`) is a candidate future cleanup WP, not
+  an urgent fix. Also present and deliberately left alone: two junk Vercel env keys
+  literally named `Name`/`Value` on the same project — Troy will delete those himself
+  in the dashboard.
 - `nimble-shred-backend`'s `api/vercel.json` is silently ignored by Vercel (not at repo
   root) — routing is filesystem-based; don't "fix" its legacy `@secret` syntax expecting
   it to matter.
