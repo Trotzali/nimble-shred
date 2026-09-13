@@ -1,0 +1,15 @@
+{
+  "_comment": "WP-MAC-MIGRATION-TOOLING — shared config for migrate-pack.mjs / migrate-restore.mjs. Committed (no secrets). Reused across other repos by changing vaultRoot/project only. Adapted 2026-09-13 from the tjk-civil reference implementation.",
+  "_thinManifestNote": "Deliberately thin for this repo: no .env.local exists (all secrets live in the nimble-shred-backend Vercel project, none here), and all real data files (Gym-Visual-EXERCISES-list.xlsx, foods_curated.json, foods_full.json) are already tracked in git. getPackItems() in lib/migrate-common.mjs therefore only covers .vercel/project.json + the Claude Code memory folder. If a NEW untracked file or directory with real local-only data ever appears (check `git status --ignored --porcelain` before assuming git alone has you covered), add it to getPackItems() rather than assuming this manifest is exhaustive.",
+  "vaultRoot": "Dev Vault",
+  "project": "nimble-shred",
+  "backupsSubfolder": "backups",
+  "dataSubfolder": "data",
+  "retentionCount": 7,
+  "passwordFile": ".migrate-pack.secret",
+  "fallbackLocalDir": "_migration-packs",
+  "driveMountCandidates": {
+    "win32": ["G:", "H:", "I:"],
+    "darwin": ["~/Library/CloudStorage"]
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "nimble-shred-migrate-tools",
+  "private": true,
+  "description": "Mac-migration pack/restore tooling for Nimble Shred. Deliberately isolated here (its own package.json + node_modules under scripts/, not repo root) so Vercel's zero-config build detection for the deployed static site never sees it — a root-level package.json risked Vercel auto-running an install/build step that doesn't exist today (Build Command: none, per _spec_workflow.md).",
+  "dependencies": {
+    "adm-zip": "^0.5.17",
+    "archiver": "^7.0.1"
+  }
+}
